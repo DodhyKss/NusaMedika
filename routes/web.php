@@ -19,5 +19,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     # ========= MODUL PENDAFTARAN =============
-    Route::get('/list_pelayanan_pasien', [ListPelayananController::class, 'index']);
+    Route::get('/list_pelayanan_pasien', [ListPelayananController::class, 'index'])->name('list_pelayanan_pasien.index');
 });
