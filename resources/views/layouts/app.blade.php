@@ -6,22 +6,22 @@
     <title>{{ config('app.name', 'SIMRS') }} Dashboard</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        /* Hide details marker for summary */
-        summary::-webkit-details-marker {
-            display: none;
-        }
+        summary::-webkit-details-marker { display: none; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    @include('components.loading')
+
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar Wrapper for Toggling -->
-        <div id="sidebar-wrapper" class="transition-all duration-300 ease-in-out w-72 overflow-hidden bg-slate-900 border-r border-slate-800 flex-shrink-0">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper" class="transition-all duration-300 ease-in-out w-70 overflow-hidden bg-slate-900 border-r border-slate-800 flex-shrink-0">
             @include('layouts.sidebar')
         </div>
         
+        <!-- Main Content -->
         <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden min-w-0 bg-slate-50">
             @include('layouts.navbar')
-            <main class="w-full grow p-6 sm:p-8">
+            <main class="w-full grow p-6">
                 @yield('content')
             </main>
             @include('layouts.footer')
@@ -35,19 +35,19 @@
             
             if (toggleBtn && sidebar) {
                 toggleBtn.addEventListener('click', function() {
-                    if (sidebar.classList.contains('w-72')) {
-                        sidebar.classList.remove('w-72');
+                    if (sidebar.classList.contains('w-70')) {
+                        sidebar.classList.remove('w-70');
                         sidebar.classList.add('w-0');
-                        sidebar.classList.remove('border-r'); // Hide border when collapsed
+                        sidebar.classList.remove('border-r');
                     } else {
                         sidebar.classList.remove('w-0');
-                        sidebar.classList.add('w-72');
+                        sidebar.classList.add('w-70');
                         sidebar.classList.add('border-r');
                     }
                 });
             }
 
-            // Sidebar Search Logic
+            // Sidebar Search
             const searchInput = document.getElementById('sidebar-search');
             if (searchInput) {
                 searchInput.addEventListener('input', function(e) {
@@ -82,8 +82,6 @@
                                     submenu.style.display = 'block';
                                     anySubmenuMatches = true;
                                 } else {
-                                    // Show submenu if parent menu or modul matches the search directly, 
-                                    // or if search is empty
                                     if (searchTerm === '' || menuMatches || modulMatches) {
                                         submenu.style.display = 'block';
                                     } else {
@@ -95,7 +93,6 @@
                             if (anySubmenuMatches || menuMatches || modulMatches) {
                                 menu.style.display = 'block';
                                 anyMenuMatches = true;
-                                // Auto-expand if searching
                                 if (searchTerm !== '') {
                                     menu.setAttribute('open', '');
                                 } else {
@@ -108,7 +105,6 @@
                         
                         if (anyMenuMatches || modulMatches) {
                             modul.style.display = 'block';
-                            // Auto-expand if searching
                             if (searchTerm !== '') {
                                 modul.setAttribute('open', '');
                             } else {
