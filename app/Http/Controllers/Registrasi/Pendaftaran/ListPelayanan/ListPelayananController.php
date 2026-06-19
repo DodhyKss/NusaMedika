@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Pendaftaran;
+namespace App\Http\Controllers\Registrasi\Pendaftaran\ListPelayanan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Registrasi;
@@ -48,7 +48,7 @@ class ListPelayananController extends Controller
 
         $kunjungan = $query->orderBy('tgl_masuk', 'desc')->paginate(15)->withQueryString();
 
-        return view('moduls.registrasi.pendaftaran.list_pelayanan_pasien', compact(
+        return view('moduls.registrasi.pendaftaran.list_pelayanan.list_pelayanan_pasien', compact(
             'kunjungan', 'tanggalAwal', 'tanggalAkhir', 'jenisLayanan', 'pasienId'
         ));
     }

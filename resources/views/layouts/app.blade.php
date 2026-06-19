@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name', 'SIMRS') }} Dashboard</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <!-- Select2 CSS & JS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Dependencies loaded via Vite (app.js & app.css) -->
     <style>
         summary::-webkit-details-marker { display: none; }
     </style>
@@ -43,10 +42,21 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Scripts -->
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script>
+        // Polyfill untuk fungsi jQuery yang dihapus di versi 3.3+ namun masih dipakai oleh Select2
+        if (typeof jQuery.isArray === 'undefined') {
+            jQuery.isArray = Array.isArray;
+        }
+        if (typeof jQuery.isFunction === 'undefined') {
+            jQuery.isFunction = function(obj) {
+                return typeof obj === "function";
+            };
+        }
+    </script>
+    <script src="{{ asset('vendor/select2/js/select2.min.js') }}"></script>
     
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleBtn = document.getElementById('sidebar-toggle');

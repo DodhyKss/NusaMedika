@@ -23,7 +23,6 @@ $(document).ready(function () {
             }
         });
     });
-
     // Drag to scroll global handler
     // Tambahkan class 'drag-scroll' ke elemen yang ingin bisa digeser
     const sliders = document.querySelectorAll('.drag-scroll');
