@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Http\View\Composers\InformasiPasienComposer;
+use App\Http\View\Composers\SidebarComposer;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,9 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Support\Facades\View::composer(
-            'layouts.sidebar',
-            \App\Http\View\Composers\SidebarComposer::class
-        );
+        view::composer('layouts.sidebar', SidebarComposer::class);
+        view::composer('components.informasi-pasien', InformasiPasienComposer::class);
     }
 }

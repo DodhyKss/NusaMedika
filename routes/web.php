@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
     # ======================================= # 
     # ============ DASHBOARD PASIEN ========= #
     // GET
-    Route::get('/dashboard_pasien', [EmrDashboardController::class, 'index'])->name('dashboard_pasien.index');
+    Route::get('/dashboard_pasien/{registrasi_detail_id}', [EmrDashboardController::class, 'index'])->name('dashboard_pasien.index');
 
     # ======================================= #
     #             MODUL RAWAT JALAN           #
