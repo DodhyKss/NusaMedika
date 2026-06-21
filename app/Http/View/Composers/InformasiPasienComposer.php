@@ -2,8 +2,8 @@
 
 namespace App\Http\View\Composers;
 
-use App\Models\RegistrasiDetail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class InformasiPasienComposer
@@ -11,22 +11,60 @@ class InformasiPasienComposer
     /**
      * Bind data to the view.
      *
-     * @param  \Illuminate\View\View  $view
      * @return void
      */
     public function compose(View $view)
     {
         $registrasi_detail_id = request()->route('registrasi_detail_id');
         if ($registrasi_detail_id) {
-            $registrasi_detail = RegistrasiDetail::with('registrasi.pasien')->find($registrasi_detail_id);
-            
-            if ($registrasi_detail) {
-                // Masukkan ke object agar bisa dipanggil di blade
-                $registrasi_detail->diagnosa_awal = 'Belum ada Diagnosa';
+            try {
+                $informasi = DB::selectOne('
+                select
+                    r.jenis_rawat,
+                    r.tgl_masuk as tgl_layanan,
+                    b.nama_bagian,
+                    p.nama_pasien, 
+                    p.tempat_lahir, 
+                    p.tgl_lahir, 
+                    p.ktp, 
+                    p.jenis_kelamin, 
+                    p.no_hp, 
+                    p.alamat,
+                    pg.nama_pegawai,
+                    n.nama_nasabah,
+                    rs.sep
+                from registrasi_detail rd
+                    join registrasi r on r.registrasi_id = rd.registrasi_id
+                    join pasien p on p.pasien_id = r.pasien_id
+                    left join penanggung_rawat pr on pr.registrasi_id = r.registrasi_id
+                    left join users u on u.user_id = pr.rawat_user_id
+                    left join pegawai pg on pg.pegawai_id = u.pegawai_id
+                    join pasien_nasabah pn on pn.pasien_nasabah_id = r.pasien_nasabah_id
+                    join nasabah n on n.nasabah_id = pn.nasabah_id
+                    left join rujukan_sep rs on rs.registrasi_id = r.registrasi_id 
+                    join bagian b on b.bagian_id = rd.bagian_id
+                where 
+                    rd.registrasi_detail_id = :registrasi_detail_id
+                    and rd.status_batal is null
+                    and r.status_batal is null
+                    and p.status_batal is null
+                    and pr.status_batal is null
+                    and u.status_batal is null
+                    and pg.status_batal is null
+                    and pn.status_batal is null
+                    and n.status_batal is null
+                    and rs.status_batal is null
+                    and b.status_batal is null
+                ',
+                    [
+                        'registrasi_detail_id' => $registrasi_detail_id,
+                    ]
+                );
+            } catch (\Exception $e) {
+                Log::error('InformasiPasienComposer query failed: '.$e->getMessage());
+                $informasi = null;
             }
-            $pasien = ($registrasi_detail && $registrasi_detail->registrasi) ? $registrasi_detail->registrasi->pasien : null;
-            $view->with('registrasi_detail', $registrasi_detail);
-            $view->with('pasien', $pasien);
+            $view->with('pasien', $informasi);
         }
     }
 }
