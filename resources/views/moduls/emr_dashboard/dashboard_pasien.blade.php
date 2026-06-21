@@ -20,14 +20,14 @@
 
 <!-- EMR Tabs / Navigation -->
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden min-h-[500px]">
-    <div class="border-b border-slate-200 bg-slate-50/50 flex flex-wrap">
+    <div class="border-b border-slate-700 bg-slate-800 flex flex-wrap">
         @if(isset($ehrMenus) && count($ehrMenus) > 0)
             @foreach($ehrMenus as $menuName => $subMenus)
                 <div class="relative group">
-                    <button class="flex items-center gap-2 px-5 py-3.5 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-white min-w-max transition-colors border-b-2 border-transparent hover:border-blue-600 focus:outline-none">
+                    <button class="flex items-center gap-2 px-5 py-3.5 text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 min-w-max transition-colors border-b-2 border-transparent hover:border-blue-400 focus:outline-none">
                         {{ ucwords($menuName) }}
                         @if(is_array($subMenus) && count($subMenus) > 0 && !isset($subMenus['id']))
-                            <svg class="w-3.5 h-3.5 ml-1 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg class="w-3.5 h-3.5 ml-1 opacity-70 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         @endif
                     </button>
                     
@@ -70,7 +70,7 @@
             @endforeach
         @else
             <!-- Fallback if no menus loaded -->
-            <a href="{{ route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id]) }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="flex items-center gap-2 px-5 py-3.5 text-sm font-bold text-blue-600 border-b-2 border-blue-600 bg-white min-w-max transition-colors">
+            <a href="{{ route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id]) }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="flex items-center gap-2 px-5 py-3.5 text-sm font-bold text-white border-b-2 border-blue-400 bg-slate-700/50 min-w-max transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                 CPPT (SOAP)
             </a>

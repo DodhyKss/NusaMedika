@@ -10,16 +10,16 @@
 @endphp
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
     <!-- Header Pasien -->
-    <div class="bg-slate-600 border-b border-slate-700 px-5 py-4 flex items-center justify-between">
+    <div onclick="toggleInfoPasien()" class="bg-slate-800 border-b border-slate-700 px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-700/80 transition-colors group">
         <div class="flex items-center gap-4">
             <!-- Avatar/Initials -->
-            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg shadow-inner">
+            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg shadow-inner group-hover:scale-105 transition-transform">
                 {{ substr($pasien->nama_pasien ?? 'S', 0, 1) }}
             </div>
             
             <!-- Nama & MR -->
             <div>
-                <h2 class="text-lg font-bold text-white">{{ $pasien->nama_pasien ?? 'Tn. Supriyanto' }}</h2>
+                <h2 class="text-lg font-bold text-white group-hover:text-blue-100 transition-colors">{{ $pasien->nama_pasien ?? 'Tn. Supriyanto' }}</h2>
                 <div class="flex items-center gap-2 mt-0.5">
                     <span class="inline-flex items-center px-2 py-0.5 rounded bg-white/10 text-white text-xs font-bold border border-white/20">
                         RM: {{ $pasien->no_mr ?? '00-12-34-56' }}
@@ -30,26 +30,33 @@
             </div>
         </div>
         
-        <!-- Status Label -->
-        <div class="text-right">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-400/10 text-emerald-300 text-xs font-bold border border-emerald-400/20">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                @php
-                    $jenis_rawat_text = 'Unknown';
-                    if(isset($pasien)) {
-                        $jr = strtolower(trim($pasien->jenis_rawat));
-                        if ($jr == '1' || $jr == 'igd') $jenis_rawat_text = 'IGD';
-                        elseif ($jr == '2' || $jr == 'rj') $jenis_rawat_text = 'Rawat Jalan';
-                        elseif ($jr == '3' || $jr == 'ri') $jenis_rawat_text = 'Rawat Inap';
-                    }
-                @endphp
-                {{ $jenis_rawat_text }}
-            </span>
+        <!-- Status Label & Toggle -->
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-400/10 text-emerald-300 text-xs font-bold border border-emerald-400/20">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    @php
+                        $jenis_rawat_text = 'Unknown';
+                        if(isset($pasien)) {
+                            $jr = strtolower(trim($pasien->jenis_rawat));
+                            if ($jr == '1' || $jr == 'igd') $jenis_rawat_text = 'IGD';
+                            elseif ($jr == '2' || $jr == 'rj') $jenis_rawat_text = 'Rawat Jalan';
+                            elseif ($jr == '3' || $jr == 'ri') $jenis_rawat_text = 'Rawat Inap';
+                        }
+                    @endphp
+                    {{ $jenis_rawat_text }}
+                </span>
+            </div>
+            
+            <!-- Chevron Toggle Icon -->
+            <div class="text-slate-400 group-hover:text-white transition-colors">
+                <svg id="info-pasien-chevron" class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+            </div>
         </div>
     </div>
 
     <!-- Info Detail -->
-    <div class="px-5 py-4">
+    <div id="info-pasien-detail" class="px-5 py-4 transition-all duration-300">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- TTL -->
             <div>
@@ -137,3 +144,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    function toggleInfoPasien() {
+        const detail = document.getElementById('info-pasien-detail');
+        const chevron = document.getElementById('info-pasien-chevron');
+        
+        if (detail.classList.contains('hidden')) {
+            detail.classList.remove('hidden');
+            // Menghapus efek rotasi agar panah menghadap ke bawah
+            chevron.classList.remove('rotate-180');
+        } else {
+            detail.classList.add('hidden');
+            // Menambahkan efek rotasi agar panah menghadap ke atas
+            chevron.classList.add('rotate-180');
+        }
+    }
+</script>
