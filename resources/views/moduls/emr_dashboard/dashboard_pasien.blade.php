@@ -46,13 +46,21 @@
                                             <div class="absolute left-full top-0 w-64 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all z-50 -ml-1">
                                                 <div class="py-2">
                                                     @foreach($extras as $extra)
-                                                        <a href="#" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600">{{ ucwords($extra['nama']) }}</a>
+                                                        @php
+                                                            $isSoap = stripos($extra['nama'], 'soap') !== false || stripos($extra['nama'], 'cppt') !== false;
+                                                            $menuUrl = $isSoap ? route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id]) : route('emr.unsupported');
+                                                        @endphp
+                                                        <a href="{{ $menuUrl }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600">{{ ucwords($extra['nama']) }}</a>
                                                     @endforeach
                                                 </div>
                                             </div>
                                         </div>
                                     @else
-                                        <a href="#" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600">{{ ucwords($subMenuName) }}</a>
+                                        @php
+                                            $isSoap = stripos($subMenuName, 'soap') !== false || stripos($subMenuName, 'cppt') !== false;
+                                            $menuUrl = $isSoap ? route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id]) : route('emr.unsupported');
+                                        @endphp
+                                        <a href="{{ $menuUrl }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600">{{ ucwords($subMenuName) }}</a>
                                     @endif
                                 @endforeach
                             </div>
@@ -62,17 +70,26 @@
             @endforeach
         @else
             <!-- Fallback if no menus loaded -->
-            <button class="flex items-center gap-2 px-5 py-3.5 text-sm font-bold text-blue-600 border-b-2 border-blue-600 bg-white min-w-max transition-colors">
+            <a href="{{ route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id]) }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="flex items-center gap-2 px-5 py-3.5 text-sm font-bold text-blue-600 border-b-2 border-blue-600 bg-white min-w-max transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                 CPPT (SOAP)
-            </button>
+            </a>
         @endif
     </div>
 
-    <!-- Tab Content Area -->
-    <div class="p-6 bg-slate-50/30 h-full min-h-[600px]">
+    <!-- Tab Content Area (Iframe) -->
+    <div class="relative bg-slate-50/30 w-full h-[650px]">
+        
+        <!-- Loading Overlay -->
+        <div id="emr_loader" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-50/80 backdrop-blur-sm z-20 hidden">
+            <div class="w-10 h-10 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-3"></div>
+            <p class="text-sm font-semibold text-slate-600 animate-pulse">Memuat Form...</p>
+        </div>
+
+        <iframe name="emr_frame" id="emr_frame" onload="document.getElementById('emr_loader').classList.add('hidden');" class="w-full h-full border-none relative z-10" src="about:blank"></iframe>
+        
         <!-- Area Kosong / Placeholder -->
-        <div class="flex flex-col items-center justify-center h-[300px] text-center opacity-50">
+        <div id="emr_placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center opacity-50 pointer-events-none bg-slate-50/30 z-30">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4 border border-slate-200">
                 <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
             </div>

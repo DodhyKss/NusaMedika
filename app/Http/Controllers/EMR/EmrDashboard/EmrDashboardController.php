@@ -25,11 +25,13 @@ class EmrDashboardController extends Controller
 
         $jenis_rawat = strtolower(trim($registrasi->jenis_rawat));
         if ($jenis_rawat == '1' || $jenis_rawat == 'igd' || $jenis_rawat == env('JENIS_RAWAT_IGD', 'IGD')) {
-            $query->where('form.igd', true);
+            $query->where('form.igd', '1');
         } elseif ($jenis_rawat == '2' || $jenis_rawat == 'rj' || $jenis_rawat == env('JENIS_RAWAT_RJ', 'RJ')) {
-            $query->where('form.rj', true);
+            $query->where('form.rj', '1');
         } elseif ($jenis_rawat == '3' || $jenis_rawat == 'ri' || $jenis_rawat == env('JENIS_RAWAT_RI', 'RI')) {
-            $query->where('form.ri', true);
+            $query->where('form.ri', '1');
+        } elseif ($jenis_rawat == '4' || $jenis_rawat == 'mcu' || $jenis_rawat == env('JENIS_RAWAT_MCU', 'MCU')) {
+            $query->where('form.mcu', '1');
         }
 
         $rawMenus = $query->select('header_ehr.nama_menu', 'header_ehr.nama_sub_menu', 'header_ehr.nama_sub_menu_extra', 'form.id_dash_menu')
@@ -60,6 +62,6 @@ class EmrDashboardController extends Controller
             }
         }
 
-        return view('moduls.emr_dashboard.dashboard_pasien', compact('registrasi', 'ehrMenus'));
+        return view('moduls.emr_dashboard.dashboard_pasien', compact('registrasi', 'ehrMenus', 'registrasi_detail_id'));
     }
 }

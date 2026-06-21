@@ -54,6 +54,16 @@ Route::middleware('auth')->group(function () {
     // GET
     Route::get('/dashboard_pasien/{registrasi_detail_id}', [EmrDashboardController::class, 'index'])->name('dashboard_pasien.index');
 
+    # ============ SOAP (CPPT) ============== #
+    Route::get('/emr/unsupported', function () {
+        return view('moduls.emr.unsupported');
+    })->name('emr.unsupported');
+
+    Route::get('/emr/{registrasi_detail_id}/soap/{emr_id?}', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'index'])->name('emr.soap.index');
+    Route::post('/emr/{registrasi_detail_id}/soap', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'store'])->name('emr.soap.store');
+    Route::put('/emr/{registrasi_detail_id}/soap/{emr_id}', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'update'])->name('emr.soap.update');
+    Route::delete('/emr/{registrasi_detail_id}/soap/{emr_id}', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'destroy'])->name('emr.soap.destroy');
+
     # ======================================= #
     #             MODUL RAWAT JALAN           #
     # ======================================= # 
