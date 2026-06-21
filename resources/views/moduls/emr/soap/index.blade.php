@@ -4,7 +4,7 @@
 <div class="h-screen flex flex-col md:flex-row w-full overflow-hidden">
     
     <!-- Panel Kiri: List SOAP -->
-    <div class="w-full md:w-1/3 border-r border-slate-200 bg-white flex flex-col h-full">
+    <div id="panel-kiri" class="relative z-30 w-full md:w-1/3 border-r border-slate-200 bg-white flex flex-col h-full transition-all duration-300">
         <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center relative z-20">
             <h2 class="font-bold text-slate-700">Riwayat SOAP</h2>
             <div class="flex items-center gap-2">
@@ -15,7 +15,7 @@
                         History
                     </button>
                     <!-- Menu Dropdown -->
-                    <div class="absolute left-0 md:left-auto md:right-0 top-full mt-1 w-80 max-h-80 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 p-3.5 flex flex-col gap-3">
+                    <div class="absolute left-0 mt-1 w-80 max-h-80 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 p-3.5 flex flex-col gap-3">
                         @forelse($history_grouped ?? [] as $date => $units)
                             @php
                                 // Gunakan registrasi_detail_id pertama di hari tersebut
@@ -66,6 +66,10 @@
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Baru
                 </a>
+                
+                <button type="button" onclick="togglePanel('kiri')" title="Maximize/Minimize" class="inline-flex items-center justify-center p-1.5 text-slate-500 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-700 rounded-lg transition-colors shadow-sm ml-1">
+                    <svg id="icon-maximize-kiri" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                </button>
             </div>
         </div>
         
@@ -107,7 +111,7 @@
     </div>
     
     <!-- Panel Kanan: Form SOAP -->
-    <div class="w-full md:w-2/3 bg-slate-50 flex flex-col h-full overflow-y-auto">
+    <div id="panel-kanan" class="w-full md:w-2/3 bg-slate-50 flex flex-col h-full overflow-y-auto transition-all duration-300">
         @php
             $isEdit = isset($edit_soap);
             $actionUrl = $isEdit 
@@ -129,12 +133,18 @@
                     <p class="text-sm text-slate-500 mt-1">{{ $isEdit ? 'Perbarui rekam medis pasien.' : 'Isi form rekam medis di bawah ini.' }}</p>
                 </div>
                 
-                @if($isEdit)
-                    <button type="button" onclick="confirmDelete('{{ $edit_soap->emr_id }}')" class="inline-flex items-center px-3 py-2 text-sm font-semibold text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors border border-red-200">
-                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        Batalkan EMR
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="togglePanel('kanan')" title="Maximize/Minimize" class="inline-flex items-center justify-center p-2 text-slate-500 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-700 rounded-lg transition-colors shadow-sm">
+                        <svg id="icon-maximize-kanan" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
                     </button>
-                @endif
+                    
+                    @if($isEdit)
+                        <button type="button" onclick="confirmDelete('{{ $edit_soap->emr_id }}')" class="inline-flex items-center px-3 py-2 text-sm font-semibold text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors border border-red-200">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Batalkan EMR
+                        </button>
+                    @endif
+                </div>
             </div>
 
             <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
@@ -225,6 +235,40 @@
                 document.getElementById('delete-form-' + emrId).submit();
             }
         });
+    }
+
+    let panelState = 'split'; // split, kiri-full, kanan-full
+    
+    function togglePanel(target) {
+        const panelKiri = document.getElementById('panel-kiri');
+        const panelKanan = document.getElementById('panel-kanan');
+        const iconKiri = document.getElementById('icon-maximize-kiri');
+        const iconKanan = document.getElementById('icon-maximize-kanan');
+        
+        if (target === 'kiri') {
+            panelState = panelState === 'kiri-full' ? 'split' : 'kiri-full';
+        } else if (target === 'kanan') {
+            panelState = panelState === 'kanan-full' ? 'split' : 'kanan-full';
+        }
+        
+        if (panelState === 'split') {
+            panelKiri.style.display = 'flex';
+            panelKanan.style.display = 'flex';
+            panelKiri.className = 'relative z-30 w-full md:w-1/3 border-r border-slate-200 bg-white flex flex-col h-full transition-all duration-300';
+            panelKanan.className = 'w-full md:w-2/3 bg-slate-50 flex flex-col h-full overflow-y-auto transition-all duration-300';
+            if(iconKiri) iconKiri.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>';
+            if(iconKanan) iconKanan.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>';
+        } else if (panelState === 'kiri-full') {
+            panelKanan.style.display = 'none';
+            panelKiri.style.display = 'flex';
+            panelKiri.className = 'relative z-30 w-full bg-white flex flex-col h-full transition-all duration-300';
+            if(iconKiri) iconKiri.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v4m0 0H5m4 0L3 3m6 18v-4m0 0H5m4 0l-2 2m6-16V3m0 4h4m-4 0l2-2m-6 16v-4m0 0h4m-4 0l2 2"></path>';
+        } else if (panelState === 'kanan-full') {
+            panelKiri.style.display = 'none';
+            panelKanan.style.display = 'flex';
+            panelKanan.className = 'w-full bg-slate-50 flex flex-col h-full overflow-y-auto transition-all duration-300';
+            if(iconKanan) iconKanan.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v4m0 0H5m4 0L3 3m6 18v-4m0 0H5m4 0l-2 2m6-16V3m0 4h4m-4 0l2-2m-6 16v-4m0 0h4m-4 0l2 2"></path>';
+        }
     }
 </script>
 @endsection
