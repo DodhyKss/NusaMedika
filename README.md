@@ -1,58 +1,80 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Panduan Menjalankan MediTechV2 dengan Docker
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi MediTechV2 (Laravel + Vite + PostgreSQL) telah siap dijalankan menggunakan **Docker** dan **Docker Compose**. Struktur yang disiapkan menggunakan arsitektur multi-stage build yang otomatis melakukan kompilasi aset frontend (Node 22) dan mengemas aplikasi backend (PHP 8.3 FPM + Nginx + Supervisor) dalam lingkungan Alpine yang ringan dan optimal.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🏗️ Struktur Konfigurasi Docker
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **`Dockerfile`**: Multi-stage build (build frontend dengan Vite -> build image PHP 8.3 Alpine + Nginx + Supervisor).
+- **`docker-compose.yml`**: Orkestrasi 4 layanan utama:
+  - **`app`**: Aplikasi utama (Nginx + PHP-FPM) berjalan di port **8000** (`http://localhost:8000`).
+  - **`db`**: Database **PostgreSQL 16** berjalan di port **5432**.
+  - **`redis`**: Layanan caching, session, dan queue redis berjalan di port **6379**.
+  - **`queue`**: Background worker (`php artisan queue:work`) untuk memproses antrian.
+- **`docker/`**: Konfigurasi Nginx, PHP (`custom.ini`), Supervisor, dan script `entrypoint.sh`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🚀 Cara Menjalankan Aplikasi (Step-by-Step)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. Menjalankan Container (Build & Up)
+Pastikan Docker Desktop / Docker Engine sudah aktif, kemudian jalankan perintah berikut di terminal root proyek ini:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+docker compose up --build -d
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Perintah di atas akan:
+1. Membangun aset frontend (`npm run build`).
+2. Menginstall dependensi composer & ekstensi PHP yang dibutuhkan (`pdo_pgsql`, `pgsql`, `mbstring`, `gd`, `zip`, `bcmath`, `intl`, `opcache`, `redis`).
+3. Menyiapkan `.env` secara otomatis dan menghasilkan `APP_KEY` jika belum ada.
+4. Menjalankan container di background.
 
-## Contributing
+### 2. Mengecek Status Container
+Untuk melihat apakah semua layanan sudah berjalan normal (`Up` / `healthy`):
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+docker compose ps
+```
 
-## Code of Conduct
+### 3. Menjalankan Migrasi Database (Opsional - TIDAK PERLU Jika Database Sudah Ada)
+> **Bisa Langsung Akses!** Karena Anda menggunakan database PostgreSQL yang sudah ada di IP Lokal / Server (sesuai `DB_HOST` di `.env` Anda), Anda **TIDAK PERLU** melakukan migrasi apapun. Aplikasi akan langsung terhubung ke database tersebut.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+*(Catatan: Langkah migrasi `docker compose exec app php artisan migrate` hanya perlu dilakukan jika Anda ingin membuat tabel dari nol pada database baru)*
 
-## Security Vulnerabilities
+### 4. Akses Aplikasi di Browser
+Buka browser dan akses ke alamat berikut:
+- **Web App**: [http://localhost:8000](http://localhost:8000)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🛠️ Perintah Berguna Lainnya (Cheat Sheet)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Kebutuhan | Perintah Terminal |
+| :--- | :--- |
+| **Melihat Log Aplikasi (Realtime)** | `docker compose logs -f app` |
+| **Masuk ke Shell Container Aplikasi** | `docker compose exec -it app bash` |
+| **Menjalankan Artisan Command** | `docker compose exec app php artisan [command]` |
+| **Membersihkan Cache Laravel** | `docker compose exec app php artisan optimize:clear` |
+| **Stop & Matikan Semua Container** | `docker compose down` |
+| **Stop & Hapus Data Volume DB** | `docker compose down -v` |
+
+---
+
+## 💻 Mode Pengembangan Lokal (Hot Reload / Live Dev)
+
+Secara default, container memuat build statis yang cocok untuk deployment/testing. Jika Anda ingin melakukan pengeditan kode PHP lokal di Windows dan langsung tercermin di container:
+
+1. Buka file `docker-compose.yml`.
+2. Hapus komentar (`#`) pada bagian `volumes:` di dalam service `app`:
+   ```yaml
+   volumes:
+     - ./:/var/www/html
+     - app_storage:/var/www/html/storage
+   ```
+3. Restart container:
+   ```bash
+   docker compose down
+   docker compose up -d
+   ```
