@@ -19,7 +19,7 @@
 <x-informasi-pasien />
 
 <!-- EMR Tabs / Navigation -->
-<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden min-h-[500px]">
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden min-h-[500px]" data-no-loader="true">
     <div class="border-b border-slate-700 bg-slate-800 flex flex-wrap">
         @if(isset($ehrMenus) && count($ehrMenus) > 0)
             @foreach($ehrMenus as $menuName => $subMenus)

@@ -76,10 +76,13 @@
             if (!link) return;
 
             const href = link.getAttribute('href');
+            const target = link.getAttribute('target');
             if (!href || 
                 href.startsWith('#') || 
                 href.startsWith('javascript:') || 
-                link.getAttribute('target') === '_blank' || 
+                (target && target !== '_self') || 
+                link.hasAttribute('data-no-loader') || 
+                link.closest('[data-no-loader]') || 
                 e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
                 return;
             }
@@ -90,7 +93,11 @@
         // Intercept submit form
         document.addEventListener('submit', function(e) {
             const form = e.target;
-            if (!form.getAttribute('target') || form.getAttribute('target') !== '_blank') {
+            const target = form.getAttribute('target');
+            if (form.hasAttribute('data-no-loader') || form.closest('[data-no-loader]')) {
+                return;
+            }
+            if (!target || target === '_self') {
                 window.showPageLoader(true);
             }
         });
