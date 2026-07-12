@@ -27,11 +27,10 @@ services:
       CACHE_STORE: redis
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
-      RUN_MIGRATIONS: "${RUN_MIGRATIONS:-false}"
-    # volumes:
-      # Uncomment lines below if you want live local development (hot-reloading code changes):
-      # - ./:/var/www/html
-      # - app_storage:/var/www/html/storage
+    volumes:
+      # Live local development active (hot-reloading code changes from Windows):
+      - ./:/var/www/html
+      - app_storage:/var/www/html/storage
     depends_on:
       redis:
         condition: service_healthy
@@ -92,6 +91,9 @@ services:
       DB_PASSWORD: "${DB_PASSWORD:-admin}"
       REDIS_HOST: redis
       QUEUE_CONNECTION: redis
+    volumes:
+      - ./:/var/www/html
+      - app_storage:/var/www/html/storage
     depends_on:
       - app
       - redis

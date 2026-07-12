@@ -45,7 +45,7 @@
     <!-- Scripts -->
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
     <script>
-        // Polyfill untuk fungsi jQuery yang dihapus di versi 3.3+ namun masih dipakai oleh Select2
+        // Polyfill lengkap untuk fungsi-fungsi jQuery lama yang dibutuhkan oleh Select2 v4
         if (typeof jQuery.isArray === 'undefined') {
             jQuery.isArray = Array.isArray;
         }
@@ -54,8 +54,57 @@
                 return typeof obj === "function";
             };
         }
+        if (typeof jQuery.trim === 'undefined') {
+            jQuery.trim = function(str) {
+                return str == null ? "" : (str + "").replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, "");
+            };
+        }
+        if (typeof jQuery.camelCase === 'undefined') {
+            jQuery.camelCase = function(string) {
+                return string.replace(/-([a-z])/ig, function(all, letter) {
+                    return letter.toUpperCase();
+                });
+            };
+        }
+        if (typeof jQuery.isNumeric === 'undefined') {
+            jQuery.isNumeric = function(obj) {
+                return !isNaN(parseFloat(obj)) && isFinite(obj);
+            };
+        }
+        if (typeof jQuery.type === 'undefined') {
+            jQuery.type = function(obj) {
+                return obj == null ? String(obj) : Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+            };
+        }
+        if (typeof jQuery.nodeName === 'undefined') {
+            jQuery.nodeName = function(elem, name) {
+                return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
+            };
+        }
+        // Safeguard agar Select2 tidak error ("c.trim is not a function") saat memproses data/opsi bertipe Number atau non-string
+        if (!Number.prototype.trim) {
+            Number.prototype.trim = function() { return String(this).trim(); };
+        }
+        if (!Boolean.prototype.trim) {
+            Boolean.prototype.trim = function() { return String(this).trim(); };
+        }
     </script>
     <script src="{{ asset('vendor/select2/js/select2.min.js') }}"></script>
+    <script>
+        // Pastikan setiap data teks yang dicari oleh matcher Select2 dikonversi ke String
+        if (typeof jQuery.fn.select2 !== 'undefined' && jQuery.fn.select2.defaults && jQuery.fn.select2.defaults.defaults.matcher) {
+            var originalMatcher = jQuery.fn.select2.defaults.defaults.matcher;
+            jQuery.fn.select2.defaults.set('matcher', function(params, data) {
+                if (data && data.text != null && typeof data.text !== 'string') {
+                    data.text = String(data.text);
+                }
+                if (params && params.term != null && typeof params.term !== 'string') {
+                    params.term = String(params.term);
+                }
+                return originalMatcher(params, data);
+            });
+        }
+    </script>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -147,5 +196,6 @@
             }
         });
     </script>
+    @stack('scripts')
 </body>
 </html>
