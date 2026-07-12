@@ -4,7 +4,7 @@
 <!-- Page Header -->
 <div class="mb-6 flex justify-between items-end">
     <div>
-        <h1 class="text-[22px] font-bold text-slate-900 tracking-tight">List Pasien Dokter</h1>
+        <h1 class="text-[22px] font-bold text-slate-900 tracking-tight">List Pasien Rawat Jalan</h1>
         <p class="text-sm text-slate-500 mt-1">Daftar antrean pasien rawat jalan berdasarkan jadwal poliklinik.</p>
     </div>
 </div>

@@ -45,6 +45,7 @@ class ListPasienRajalController extends Controller
                 ->where('pr.rawat_user_id', auth()->user()->user_id)
                 ->whereDate('r.tgl_masuk', $tanggalKunjungan)
                 ->where('rd.bagian_id', $poliklinikId)
+                ->where('r.jenis_rawat', env('JENIS_RAWAT_RJ'))
                 ->orderBy('ru.urutan', 'asc')
                 ->paginate(10)->withQueryString();
 
