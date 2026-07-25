@@ -3,107 +3,47 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: meditech-app:latest
+    image: meditech-app:dev
     container_name: meditech_app
-    restart: unless-stopped
+    # Mengekspos port 8000 agar bisa diakses di browser komputer host (localhost:8000)
+    ports:
+      - "${APP_PORT:-8000}:8000"
     env_file:
       - .env
-    ports:
-      - "${APP_PORT:-8000}:80"
     environment:
-      APP_NAME: "${APP_NAME:-SIMRS}"
-      APP_ENV: "${APP_ENV:-local}"
-      APP_KEY: "${APP_KEY}"
-      APP_DEBUG: "${APP_DEBUG:-true}"
-      APP_URL: "http://localhost:${APP_PORT:-8000}"
-      DB_CONNECTION: "${DB_CONNECTION:-pgsql}"
-      DB_HOST: "${DB_HOST:-36.67.195.3}"
-      DB_PORT: "${DB_PORT:-5432}"
-      DB_DATABASE: "${DB_DATABASE:-new_simrs_dev}"
-      DB_USERNAME: "${DB_USERNAME:-postgres}"
-      DB_PASSWORD: "${DB_PASSWORD:-admin}"
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      CACHE_STORE: redis
-      QUEUE_CONNECTION: redis
-      SESSION_DRIVER: redis
+      # Memastikan koneksi database
+      DB_CONNECTION: "${DB_CONNECTION}"
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_DATABASE: "${DB_DATABASE}"
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      # Menggunakan sync/file/database agar tidak bergantung pada redis
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+      SESSION_DRIVER: file
+    # Mem-binding folder saat ini ke dalam container secara live (Hot Reloading)
     volumes:
-      # Live local development active (hot-reloading code changes from Windows):
       - ./:/var/www/html
-      - app_storage:/var/www/html/storage
-    depends_on:
-      redis:
-        condition: service_healthy
+    # Otomatis install dependency (jika belum ada) lalu jalankan built-in server PHP
+    command: sh -c "composer install && php artisan serve --host=0.0.0.0 --port=8000"
     networks:
       - meditech_network
 
-  # Layanan DB lokal dinonaktifkan (dikomentari) karena Anda menggunakan database di IP lokal/eksternal (seperti 36.67.195.3 atau 192.168.x.x)
-  # db:
-  #   image: postgres:16-alpine
-  #   container_name: meditech_db
-  #   restart: unless-stopped
-  #   environment:
-  #     POSTGRES_DB: "${DB_DATABASE:-new_simrs_dev}"
-  #     POSTGRES_USER: "${DB_USERNAME:-postgres}"
-  #     POSTGRES_PASSWORD: "${DB_PASSWORD:-admin}"
-  #   ports:
-  #     - "${DB_PORT:-5432}:5432"
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_DATABASE:-new_simrs_dev}"]
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 5
-  #   networks:
-  #     - meditech_network
-
-  redis:
-    image: redis:alpine
-    container_name: meditech_redis
-    restart: unless-stopped
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redisdata:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - meditech_network
-
-  queue:
-    image: meditech-app:latest
-    container_name: meditech_queue
-    restart: unless-stopped
+  vite:
+    image: node:22-alpine
+    container_name: meditech_vite
+    working_dir: /var/www/html
     env_file:
       - .env
-    command: php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
-    environment:
-      APP_ENV: "${APP_ENV:-local}"
-      DB_CONNECTION: "${DB_CONNECTION:-pgsql}"
-      DB_HOST: "${DB_HOST:-36.67.195.3}"
-      DB_PORT: "${DB_PORT:-5432}"
-      DB_DATABASE: "${DB_DATABASE:-new_simrs_dev}"
-      DB_USERNAME: "${DB_USERNAME:-postgres}"
-      DB_PASSWORD: "${DB_PASSWORD:-admin}"
-      REDIS_HOST: redis
-      QUEUE_CONNECTION: redis
     volumes:
       - ./:/var/www/html
-      - app_storage:/var/www/html/storage
-    depends_on:
-      - app
-      - redis
+    # Otomatis install dependency npm lalu jalankan vite server
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
     networks:
       - meditech_network
-
-volumes:
-  pgdata:
-  redisdata:
-  app_storage:
 
 networks:
   meditech_network:
