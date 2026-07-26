@@ -114,12 +114,7 @@
                                 $forms = $row->emr_forms ?? [];
                             @endphp
 
-                            @if(!empty($row->status_selesai))
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    Telah Tutup Billing
-                                </span>
-                            @elseif(in_array(env('FORM_ID_SOAP'), $forms))
+                            @if(in_array(env('FORM_ID_SOAP'), $forms))
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-blue-100 text-blue-700 border border-blue-200">
                                     <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     Dokter Sudah Mengisi Soap
@@ -130,9 +125,9 @@
                                     Telah Mendapatkan Pelayanan Medis
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                    Menunggu
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-red-100 text-red-700 border border-red-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                    Belum Mendapatkan Pelayanan Medis
                                 </span>
                             @endif
                         </td>
@@ -141,7 +136,7 @@
                                 $forms = $row->emr_forms ?? [];
                             @endphp
 
-                            @if((in_array(env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN'), $forms) || in_array(env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN'), $forms)) && empty($row->status_selesai))
+                            @if((in_array(env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN'), $forms) || in_array(env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN'), $forms)))
                                 <a target="_blank" href="{{ route('dashboard_pasien.index', $row->registrasi_detail_id) }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />

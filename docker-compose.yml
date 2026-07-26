@@ -5,9 +5,7 @@ services:
       dockerfile: Dockerfile
     image: meditech-app:dev
     container_name: meditech_app
-    # Mengekspos port 8000 agar bisa diakses di browser komputer host (localhost:8000)
-    ports:
-      - "${APP_PORT:-8000}:8000"
+    network_mode: "host"
     env_file:
       - .env
     environment:
@@ -27,8 +25,6 @@ services:
       - ./:/var/www/html
     # Otomatis install dependency (jika belum ada) lalu jalankan built-in server PHP
     command: sh -c "composer install && php artisan serve --host=0.0.0.0 --port=8000"
-    networks:
-      - meditech_network
 
   vite:
     image: node:22-alpine
@@ -40,11 +36,4 @@ services:
       - ./:/var/www/html
     # Otomatis install dependency npm lalu jalankan vite server
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
-    ports:
-      - "5173:5173"
-    networks:
-      - meditech_network
-
-networks:
-  meditech_network:
-    driver: bridge
+    network_mode: "host"
