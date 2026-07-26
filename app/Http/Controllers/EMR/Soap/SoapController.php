@@ -14,7 +14,7 @@ class SoapController extends Controller
         $registrasi_detail = RegistrasiDetail::with('registrasi.pasien')->findOrFail($registrasi_detail_id);
         
         // Form ID untuk SOAP biasanya 3
-        $form_id = env('FORM_ID_SOAP', 3);
+        $form_id = env('FORM_ID_SOAP');
         
         // Ambil riwayat SOAP untuk pasien ini (dari registrasi_id)
         $riwayat_soap = DB::table('emr')
@@ -25,7 +25,81 @@ class SoapController extends Controller
             ->select('emr.*', 'pegawai.nama_pegawai')
             ->orderBy('emr.tgl_jam', 'desc')
             ->get();
-            
+
+
+        // ambil riwayat pengkajian
+        $riwayat_pengkajian = [];
+
+        // pengkajian awal keperawatan
+        $emr_pengkajian_awal_keperawatan = DB::table('emr')
+            ->where('registrasi_detail_id', $registrasi_detail_id)
+            ->where('form_id', env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN'))
+            ->whereNull('status_batal')
+            ->orderBy('tgl_jam', 'desc')
+            ->first();
+
+        // pengkajian harian keperawatan
+        $emr_pengkajian_harian_keperawatan = DB::table('emr')
+            ->where('registrasi_detail_id', $registrasi_detail_id)
+            ->where('form_id', env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN'))
+            ->whereNull('status_batal')
+            ->orderBy('tgl_jam', 'desc')
+            ->first();
+
+        if ($emr_pengkajian_awal_keperawatan) {
+            $riwayat_pengkajian = DB::table('emr_detail')
+                ->where('emr_id', $emr_pengkajian_awal_keperawatan->emr_id)
+                ->whereIn('objek_id', [
+                    env('OBJEK_ID_SISTOLIK'),
+                    env('OBJEK_ID_DIASTOLIK'),
+                    env('OBJEK_ID_NADI'),
+                    env('OBJEK_ID_SUHU'),
+                    env('OBJEK_ID_PERNAPASAN'),
+                    env('OBJEK_ID_BERAT_BADAN'),
+                    env('OBJEK_ID_TINGGI_BADAN'),
+                    env('OBJEK_ID_OKSIGEN'),
+                    env('OBJEK_ID_CARA_PEMBERIAN'),
+                    env('OBJEK_ID_ETT'),
+                    env('OBJEK_ID_SATURASI'),
+                    env('OBJEK_ID_EWS'),
+                    env('OBJEK_ID_GCS_SCORE')
+                ])
+                ->whereNull('status_batal')
+                ->pluck('value', 'objek_id');
+        }
+
+        if ($emr_pengkajian_harian_keperawatan) {
+            $riwayat_pengkajian = DB::table('emr_detail')
+                ->where('emr_id', $emr_pengkajian_harian_keperawatan->emr_id)
+                ->whereIn('objek_id', [
+                    env('OBJEK_ID_SISTOLIK'),
+                    env('OBJEK_ID_DIASTOLIK'),
+                    env('OBJEK_ID_NADI'),
+                    env('OBJEK_ID_SUHU'),
+                    env('OBJEK_ID_PERNAPASAN'),
+                    env('OBJEK_ID_BERAT_BADAN'),
+                    env('OBJEK_ID_TINGGI_BADAN'),
+                    env('OBJEK_ID_OKSIGEN'),
+                    env('OBJEK_ID_CARA_PEMBERIAN'),
+                    env('OBJEK_ID_ETT'),
+                    env('OBJEK_ID_SATURASI'),
+                    env('OBJEK_ID_EWS'),
+                    env('OBJEK_ID_GCS_SCORE')
+                ])
+                ->whereNull('status_batal')
+                ->pluck('value', 'objek_id');
+        }
+
+        // Ambil assesment terakhir (dari riwayat SOAP paling baru)
+        $assesment_terakhir = null;
+        if ($riwayat_soap->isNotEmpty()) {
+            $last_soap = $riwayat_soap->first();
+            $assesment_terakhir = DB::table('emr_detail')
+                ->where('emr_id', $last_soap->emr_id)
+                ->where('objek_id', env('OBJEK_ID_ASSESSMENT'))
+                ->value('value');
+        }
+
         // Jika sedang edit, ambil data
         $edit_soap = null;
         if ($emr_id) {
@@ -58,7 +132,7 @@ class SoapController extends Controller
             }
         }
 
-        return view('moduls.emr.soap.index', compact('registrasi_detail', 'riwayat_soap', 'edit_soap', 'form_id', 'history_grouped'));
+        return view('moduls.emr.soap.index', compact('registrasi_detail', 'riwayat_soap', 'edit_soap', 'form_id', 'history_grouped', 'riwayat_pengkajian', 'assesment_terakhir'));
     }
 
     public function store(Request $request, $registrasi_detail_id)

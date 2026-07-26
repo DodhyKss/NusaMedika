@@ -54,6 +54,9 @@ Route::middleware('auth')->group(function () {
     // GET
     Route::get('/dashboard_pasien/{registrasi_detail_id}', [EmrDashboardController::class, 'index'])->name('dashboard_pasien.index');
 
+    # ============ DYNAMIC EMR ROUTE ======== #
+    Route::get('/emr/form/{form_name}/{registrasi_detail_id}/{emr_id?}', [\App\Http\Controllers\EMR\DynamicFormController::class, 'index'])->name('emr.dynamic.index');
+
     # ============ SOAP (CPPT) ============== #
     Route::get('/emr/unsupported', function () {
         return view('moduls.emr.unsupported');

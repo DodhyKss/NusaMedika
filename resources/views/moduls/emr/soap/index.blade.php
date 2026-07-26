@@ -62,6 +62,63 @@
             @endforelse
         </x-slot>
 
+        {{-- Riwayat Pengkajian Pasien --}}
+
+        @if(!empty($riwayat_pengkajian) && count($riwayat_pengkajian) > 0)
+        <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h3 class="font-semibold text-slate-800 text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Data Pengkajian Terakhir
+                </h3>
+            </div>
+            <div class="p-5">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-sm">
+                    <div class="space-y-1">
+                        <p class="text-slate-500 text-xs">Tekanan Darah</p>
+                        <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_SISTOLIK')] ?? '-' }} / {{ $riwayat_pengkajian[env('OBJEK_ID_DIASTOLIK')] ?? '-' }} <span class="text-xs text-slate-400 font-normal">mmHg</span></p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-slate-500 text-xs">Nadi</p>
+                        <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_NADI')] ?? '-' }} <span class="text-xs text-slate-400 font-normal">x/mnt</span></p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-slate-500 text-xs">Suhu</p>
+                        <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_SUHU')] ?? '-' }} <span class="text-xs text-slate-400 font-normal">°C</span></p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-slate-500 text-xs">Pernapasan</p>
+                        <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_PERNAPASAN')] ?? '-' }} <span class="text-xs text-slate-400 font-normal">x/mnt</span></p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-slate-500 text-xs">Saturasi O2</p>
+                        <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_SATURASI')] ?? '-' }} <span class="text-xs text-slate-400 font-normal">%</span></p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-slate-500 text-xs">Berat Badan</p>
+                        <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_BERAT_BADAN')] ?? '-' }} <span class="text-xs text-slate-400 font-normal">kg</span></p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-slate-500 text-xs">Tinggi Badan</p>
+                        <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_TINGGI_BADAN')] ?? '-' }} <span class="text-xs text-slate-400 font-normal">cm</span></p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-slate-500 text-xs">EWS / GCS</p>
+                        <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_EWS')] ?? '-' }} / {{ $riwayat_pengkajian[env('OBJEK_ID_GCS_SCORE')] ?? '-' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-slate-500 text-xs">Oksigen</p>
+                        <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_OKSIGEN')] ?? '-' }} ({{ $riwayat_pengkajian[env('OBJEK_ID_CARA_PEMBERIAN')] ?? '-' }})</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-slate-500 text-xs">ETT</p>
+                        <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_ETT')] ?? '-' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="p-5 space-y-6">
                 <!-- Subjective -->
@@ -70,7 +127,7 @@
                         <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs">S</span>
                         Subjective (Subyektif)
                     </label>
-                    <textarea id="subjective" name="subjective" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors text-sm" placeholder="Keluhan utama, riwayat penyakit, keluhan tambahan...">{{ old('subjective', $formData['s'] ?? '') }}</textarea>
+                    <textarea id="subjective" name="subjective" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors text-sm" placeholder="Keluhan utama, riwayat penyakit, keluhan tambahan..."></textarea>
                 </div>
 
                 <!-- Objective -->
@@ -79,7 +136,7 @@
                         <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs">O</span>
                         Objective (Obyektif)
                     </label>
-                    <textarea id="objective" name="objective" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors text-sm" placeholder="Hasil pemeriksaan fisik, tanda vital, hasil lab...">{{ old('objective', $formData['o'] ?? '') }}</textarea>
+                    <textarea id="objective" name="objective" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors text-sm" placeholder="Hasil pemeriksaan fisik, tanda vital, hasil lab..."></textarea>
                 </div>
 
                 <!-- Assessment -->
@@ -88,7 +145,7 @@
                         <span class="flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-700 font-bold text-xs">A</span>
                         Assessment (Asesmen)
                     </label>
-                    <textarea id="assessment" name="assessment" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors text-sm" placeholder="Diagnosis kerja, diagnosis banding...">{{ old('assessment', $formData['a'] ?? '') }}</textarea>
+                    <textarea id="assessment" name="assessment" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors text-sm" placeholder="Diagnosis kerja, diagnosis banding...">{{ $assesment_terakhir }}</textarea>
                 </div>
 
                 <!-- Plan -->
@@ -97,7 +154,16 @@
                         <span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs">P</span>
                         Plan (Perencanaan)
                     </label>
-                    <textarea id="plan" name="plan" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm" placeholder="Rencana terapi, tindakan, edukasi...">{{ old('plan', $formData['p'] ?? '') }}</textarea>
+                    <textarea id="plan" name="plan" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm" placeholder="Rencana terapi, tindakan, edukasi..."></textarea>
+                </div>
+
+                <!-- Instruksi -->
+                <div>
+                    <label for="instruction" class="block text-sm font-semibold text-slate-700 mb-1.5 flex items-center gap-2">
+                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-700 font-bold text-xs">I</span>
+                        Instruksi (Dokter, Perawat, Dietisien, Farmasi)
+                    </label>
+                    <textarea id="instruction" name="instruction" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm" placeholder="Rencana terapi, tindakan, edukasi..."></textarea>
                 </div>
             </div>
         </div>

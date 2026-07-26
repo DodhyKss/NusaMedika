@@ -7,12 +7,6 @@
         <h1 class="text-[22px] font-bold text-slate-900 tracking-tight">Dashboard Rekam Medis (EMR)</h1>
         <p class="text-sm text-slate-500 mt-1">Pusat informasi medis dan riwayat klinis pasien.</p>
     </div>
-    <div class="flex items-center gap-3">
-        <a href="{{ route('list_pelayanan_pasien.index') }}" class="inline-flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Kembali
-        </a>
-    </div>
 </div>
 
 <!-- Komponen Informasi Pasien -->
@@ -24,7 +18,7 @@
         @if(isset($ehrMenus) && count($ehrMenus) > 0)
             @foreach($ehrMenus as $menuName => $subMenus)
                 <div class="relative group">
-                    <button class="flex items-center gap-2 px-5 py-3.5 text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 min-w-max transition-colors border-b-2 border-transparent hover:border-blue-400 focus:outline-none">
+                    <button type="button" onclick="toggleDropdown(this)" class="flex items-center gap-2 px-5 py-3.5 text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 min-w-max transition-colors border-b-2 border-transparent hover:border-blue-400 focus:outline-none cursor-pointer">
                         {{ ucwords($menuName) }}
                         @if(is_array($subMenus) && count($subMenus) > 0 && !isset($subMenus['id']))
                             <svg class="w-3.5 h-3.5 ml-1 opacity-70 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -33,22 +27,22 @@
                     
                     @if(is_array($subMenus) && count($subMenus) > 0 && !isset($subMenus['id']))
                         <!-- Dropdown Sub Menu -->
-                        <div class="absolute left-0 top-full w-64 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                        <div class="submenu hidden absolute left-full top-0 w-64 bg-white border border-slate-200 rounded-lg shadow-xl z-50">
                             <div class="py-2">
                                 @foreach($subMenus as $subMenuName => $extras)
                                     @if(is_array($extras) && !isset($extras['id']) && count($extras) > 0)
-                                        <div class="relative group/sub">
-                                            <a href="#" class="flex items-center justify-between px-4 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600">
+                                        <div class="relative group-sub">
+                                            <a href="#" onclick="toggleExtraDropdown(event, this)" class="flex items-center justify-between px-4 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600">
                                                 {{ ucwords($subMenuName) }}
                                                 <svg class="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                             </a>
                                             <!-- Sub-Dropdown (Extra) -->
-                                            <div class="absolute left-full top-0 w-64 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all z-50 -ml-1">
+                                            <div class="extra-submenu hidden absolute left-full top-0 w-64 bg-white border border-slate-200 rounded-lg shadow-xl transition-all z-50 -ml-1">
                                                 <div class="py-2">
                                                     @foreach($extras as $extra)
                                                         @php
-                                                            $isSoap = stripos($extra['nama'], 'soap') !== false || stripos($extra['nama'], 'cppt') !== false;
-                                                            $menuUrl = $isSoap ? route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id]) : route('emr.unsupported');
+                                                            $folder_name = Str::slug($extra['nama'], '_');
+                                                            $menuUrl = route('emr.dynamic.index', ['form_name' => $folder_name, 'registrasi_detail_id' => $registrasi_detail_id]);
                                                         @endphp
                                                         <a href="{{ $menuUrl }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600">{{ ucwords($extra['nama']) }}</a>
                                                     @endforeach
@@ -57,8 +51,8 @@
                                         </div>
                                     @else
                                         @php
-                                            $isSoap = stripos($subMenuName, 'soap') !== false || stripos($subMenuName, 'cppt') !== false;
-                                            $menuUrl = $isSoap ? route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id]) : route('emr.unsupported');
+                                            $folder_name = Str::slug($subMenuName, '_');
+                                            $menuUrl = route('emr.dynamic.index', ['form_name' => $folder_name, 'registrasi_detail_id' => $registrasi_detail_id]);
                                         @endphp
                                         <a href="{{ $menuUrl }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600">{{ ucwords($subMenuName) }}</a>
                                     @endif
@@ -103,4 +97,66 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
+
+<script>
+    function closeAllDropdowns() {
+        document.querySelectorAll('.submenu, .extra-submenu').forEach(menu => {
+            menu.classList.add('hidden');
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        // 1. Jika yang diklik adalah link menu tujuan (bukan tombol toggle submenu)
+        if (e.target.closest('a') && !e.target.closest('a').hasAttribute('onclick') || (e.target.closest('a') && !e.target.closest('a').getAttribute('onclick').includes('toggleExtraDropdown'))) {
+            // Kita ingin menu tertutup setelah item dipilih
+            closeAllDropdowns();
+        }
+        
+        // 2. Jika klik terjadi di luar area menu sama sekali
+        else if (!e.target.closest('.group')) {
+            closeAllDropdowns();
+        }
+    });
+
+    // 3. Jika klik terjadi di dalam iframe (iframe iframe merebut fokus dari window utama)
+    window.addEventListener('blur', function() {
+        closeAllDropdowns();
+    });
+
+    function toggleDropdown(button) {
+        const submenu = button.nextElementSibling;
+
+        // Tutup submenu lain yang selevel
+        document.querySelectorAll('.submenu').forEach(menu => {
+            if (menu !== submenu) {
+                menu.classList.add('hidden');
+            }
+        });
+        
+        // Tutup semua extra-submenu jika ada yang terbuka
+        document.querySelectorAll('.extra-submenu').forEach(menu => {
+            menu.classList.add('hidden');
+        });
+
+        // Toggle submenu yang diklik
+        submenu.classList.toggle('hidden');
+    }
+
+    function toggleExtraDropdown(event, link) {
+        event.preventDefault();
+        event.stopPropagation(); // Mencegah click menyebar ke document (agar menu tidak tertutup otomatis)
+        
+        const extraSubmenu = link.nextElementSibling;
+        
+        // Tutup extra-submenu lain jika ada yang terbuka
+        document.querySelectorAll('.extra-submenu').forEach(menu => {
+            if (menu !== extraSubmenu) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Toggle extra-submenu yang diklik
+        extraSubmenu.classList.toggle('hidden');
+    }
+</script>
 @endsection
