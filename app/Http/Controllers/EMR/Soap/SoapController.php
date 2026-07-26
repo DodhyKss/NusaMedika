@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\RegistrasiDetail;
+use Illuminate\Support\Facades\Auth;
 
 class SoapController extends Controller
 {
     public function index($registrasi_detail_id, $emr_id = null)
     {
+
         $registrasi_detail = RegistrasiDetail::with('registrasi.pasien')->findOrFail($registrasi_detail_id);
         
         // Form ID untuk SOAP biasanya 3
@@ -24,7 +26,19 @@ class SoapController extends Controller
             ->whereNull('emr.status_batal')
             ->select('emr.*', 'pegawai.nama_pegawai')
             ->orderBy('emr.tgl_jam', 'desc')
+            ->paginate(5)
+            ->withQueryString();
+
+        // Ambil emr_detail untuk riwayat_soap yang sedang tampil (hindari N+1 query)
+        $emr_ids = $riwayat_soap->pluck('emr_id')->toArray();
+        $riwayat_details_raw = DB::table('emr_detail')
+            ->whereIn('emr_id', $emr_ids)
             ->get();
+            
+        $riwayat_details = [];
+        foreach ($riwayat_details_raw as $rd) {
+            $riwayat_details[$rd->emr_id][$rd->objek_id] = $rd->value;
+        }
 
 
         // ambil riwayat pengkajian
@@ -102,11 +116,39 @@ class SoapController extends Controller
 
         // Jika sedang edit, ambil data
         $edit_soap = null;
+        $formData = [];
         if ($emr_id) {
             $edit_soap = DB::table('emr')
                 ->where('emr_id', $emr_id)
                 ->whereNull('status_batal')
                 ->first();
+                
+            if ($edit_soap) {
+                $details = DB::table('emr_detail')
+                    ->where('emr_id', $edit_soap->emr_id)
+                    ->pluck('value', 'objek_id')
+                    ->toArray();
+                
+                $formData = [
+                    's' => $details[env('OBJEK_ID_SUBJECTIVE')] ?? '',
+                    'o' => $details[env('OBJEK_ID_OBJECTIVE')] ?? '',
+                    'a' => $details[env('OBJEK_ID_ASSESSMENT')] ?? '',
+                    'p' => $details[env('OBJEK_ID_PLANNING')] ?? '',
+                    'i' => $details[env('OBJEK_ID_INSTRUKSI')] ?? ''
+                ];
+
+                // Fallback untuk data lama yang hanya tersimpan di JSON
+                if (empty($details)) {
+                    $jsonData = json_decode($edit_soap->data, true) ?? [];
+                    $formData = [
+                        's' => $jsonData['s'] ?? '',
+                        'o' => $jsonData['o'] ?? '',
+                        'a' => $jsonData['a'] ?? '',
+                        'p' => $jsonData['p'] ?? '',
+                        'i' => $jsonData['i'] ?? ''
+                    ];
+                }
+            }
         }
 
         // Ambil riwayat seluruh kunjungan pasien (untuk dropdown History)
@@ -132,7 +174,14 @@ class SoapController extends Controller
             }
         }
 
-        return view('moduls.emr.soap.index', compact('registrasi_detail', 'riwayat_soap', 'edit_soap', 'form_id', 'history_grouped', 'riwayat_pengkajian', 'assesment_terakhir'));
+        $isView = request('action') === 'view';
+
+        return view('moduls.emr.soap.index', compact('registrasi_detail', 'riwayat_soap', 'riwayat_details', 'edit_soap', 'formData', 'form_id', 'history_grouped', 'riwayat_pengkajian', 'assesment_terakhir', 'isView'));
+    }
+
+    public function print($emr_id)
+    {
+        return view('moduls.emr.soap.print', compact('emr_id'));
     }
 
     public function store(Request $request, $registrasi_detail_id)
@@ -142,20 +191,19 @@ class SoapController extends Controller
             'objective' => 'nullable|string',
             'assessment' => 'nullable|string',
             'plan' => 'nullable|string',
+            'instruction' => 'nullable|string'
         ]);
 
         $registrasi_detail = RegistrasiDetail::findOrFail($registrasi_detail_id);
-        $user_id = session('user_id', 1);
-        $pegawai_id = session('pegawai_id', 1);
-        $form_id = env('FORM_ID_SOAP', 3);
+        $user_id = Auth::user()->user_id;
+        $pegawai_id = Auth::user()->pegawai_id;
+        $form_id = env('FORM_ID_SOAP');
         $now = now();
 
-        $data_json = json_encode([
-            's' => $request->subjective,
-            'o' => $request->objective,
-            'a' => $request->assessment,
-            'p' => $request->plan,
-        ]);
+        // jika pegawai_id atau user_id null, maka redirect ke halaman login
+        if($pegawai_id == null || $user_id == null) {
+            return redirect()->back()->with('error', 'Sesi Anda Telah Habis Silahkan Login Kembali!');
+        }
 
         DB::beginTransaction();
         try {
@@ -170,17 +218,17 @@ class SoapController extends Controller
                 'registrasi_detail_id' => $registrasi_detail_id,
                 'pasien_id' => $registrasi_detail->registrasi->pasien_id,
                 'registrasi_id' => $registrasi_detail->registrasi_id,
-                'data' => $data_json,
                 'input_time' => $now,
                 'input_user_id' => $user_id,
             ]);
 
-            // Insert ke tabel emr_detail (S, O, A, P)
+            // Insert ke tabel emr_detail (S, O, A, P, I)
             $details = [
-                ['objek_id' => null, 'variabel' => 'Subjective', 'value' => $request->subjective],
-                ['objek_id' => null, 'variabel' => 'Objective', 'value' => $request->objective],
-                ['objek_id' => null, 'variabel' => 'Assessment', 'value' => $request->assessment],
-                ['objek_id' => null, 'variabel' => 'Plan', 'value' => $request->plan],
+                ['objek_id' => env('OBJEK_ID_SUBJECTIVE'), 'variabel' => 'subjective', 'value' => $request->subjective],
+                ['objek_id' => env('OBJEK_ID_OBJECTIVE'), 'variabel' => 'objective', 'value' => $request->objective],
+                ['objek_id' => env('OBJEK_ID_ASSESSMENT'), 'variabel' => 'assessment', 'value' => $request->assessment],
+                ['objek_id' => env('OBJEK_ID_PLANNING'), 'variabel' => 'planning', 'value' => $request->plan],
+                ['objek_id' => env('OBJEK_ID_INSTRUKSI'), 'variabel' => 'instruksi', 'value' => $request->instruction],
             ];
 
             foreach ($details as $d) {

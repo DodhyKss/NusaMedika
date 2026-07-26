@@ -8,7 +8,8 @@
     'formAction' => '',
     'isEdit' => false,
     'deleteAction' => '',
-    'emrId' => ''
+    'emrId' => '',
+    'isView' => false
 ])
 
 <div class="h-screen flex flex-col md:flex-row w-full overflow-hidden">
@@ -18,6 +19,10 @@
         <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center relative z-20">
             <h2 class="font-bold text-slate-700">{{ $titleRiwayat }}</h2>
             <div class="flex items-center gap-2">
+                <!-- Tombol Refresh -->
+                <a href="{{ route($routeName, ['registrasi_detail_id' => $registrasiDetailId]) }}" onclick="document.getElementById('save_loader').classList.remove('hidden'); document.querySelector('#save_loader div:nth-child(2)').innerText='Memuat Data...';" title="Refresh" class="inline-flex items-center justify-center p-2 text-slate-500 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-700 rounded-lg transition-colors shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </a>
                 <!-- Dropdown History Kunjungan -->
                 <div class="relative group">
                     <button type="button" class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 shadow-sm transition-colors">
@@ -117,11 +122,21 @@
             <!-- Isi Form Custom Disini -->
             {{ $slot }}
 
-            <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end">
-                <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-500/20 transition-all shadow-sm">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    Simpan {{ $isEdit ? 'Perubahan' : 'Data' }}
-                </button>
+            <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end gap-3">
+                @if($isView)
+                    <button type="button" onclick="window.open('{{ route('emr.soap.print', $emrId) }}', '_blank')" class="inline-flex items-center px-6 py-2.5 bg-white border border-slate-300 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Print
+                    </button>
+                    <a href="{{ route($routeName, ['registrasi_detail_id' => $registrasiDetailId]) }}" class="inline-flex items-center px-6 py-2.5 bg-slate-800 text-white text-sm font-semibold rounded-lg hover:bg-slate-700 transition-all shadow-sm">
+                        Tutup
+                    </a>
+                @else
+                    <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-500/20 transition-all shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Simpan {{ $isEdit ? 'Perubahan' : 'Data' }}
+                    </button>
+                @endif
             </div>
         </form>
         
