@@ -259,17 +259,11 @@ class SoapController extends Controller
             'objective' => 'nullable|string',
             'assessment' => 'nullable|string',
             'plan' => 'nullable|string',
+            'instruction' => 'nullable|string',
         ]);
 
-        $user_id = session('user_id', 1);
+        $user_id = Auth::user()->user_id;
         $now = now();
-
-        $data_json = json_encode([
-            's' => $request->subjective,
-            'o' => $request->objective,
-            'a' => $request->assessment,
-            'p' => $request->plan,
-        ]);
 
         DB::beginTransaction();
         try {
@@ -277,7 +271,6 @@ class SoapController extends Controller
             DB::table('emr')
                 ->where('emr_id', $emr_id)
                 ->update([
-                    'data' => $data_json,
                     'mod_time' => $now,
                     'mod_user_id' => $user_id,
                 ]);
@@ -289,10 +282,11 @@ class SoapController extends Controller
 
             // Insert new details
             $details = [
-                ['variabel' => 'Subjective', 'value' => $request->subjective],
-                ['variabel' => 'Objective', 'value' => $request->objective],
-                ['variabel' => 'Assessment', 'value' => $request->assessment],
-                ['variabel' => 'Plan', 'value' => $request->plan],
+                ['objek_id' => env('OBJEK_ID_SUBJECTIVE'), 'variabel' => 'subjective', 'value' => $request->subjective],
+                ['objek_id' => env('OBJEK_ID_OBJECTIVE'), 'variabel' => 'objective', 'value' => $request->objective],
+                ['objek_id' => env('OBJEK_ID_ASSESSMENT'), 'variabel' => 'assessment', 'value' => $request->assessment],
+                ['objek_id' => env('OBJEK_ID_PLANNING'), 'variabel' => 'planning', 'value' => $request->plan],
+                ['objek_id' => env('OBJEK_ID_INSTRUKSI'), 'variabel' => 'instruksi', 'value' => $request->instruction],
             ];
 
             foreach ($details as $d) {
@@ -300,6 +294,7 @@ class SoapController extends Controller
                 DB::table('emr_detail')->insert([
                     'emr_detail_id' => $emr_detail_id,
                     'emr_id' => $emr_id,
+                    'objek_id' => $d['objek_id'],
                     'variabel' => $d['variabel'],
                     'value' => $d['value'],
                     'input_time' => $now,
@@ -317,7 +312,7 @@ class SoapController extends Controller
 
     public function destroy($registrasi_detail_id, $emr_id)
     {
-        $user_id = session('user_id', 1);
+        $user_id = Auth::user()->user_id;
         $now = now();
 
         DB::beginTransaction();

@@ -26,11 +26,21 @@
         }
     @endphp
 
-    <x-emr-split-layout titleRiwayat="Riwayat SOAP" :titleForm="$titleForm"
+    <x-emr-split-layout 
+        titleRiwayat="Riwayat SOAP" 
+        :titleForm="$titleForm"
         :subtitleForm="$subtitleForm"
-        :historyGrouped="$history_grouped ?? []" routeName="emr.soap.index"
-        :registrasiDetailId="$registrasi_detail->registrasi_detail_id" :formAction="$actionUrl" :isEdit="$isEdit"
-        :deleteAction="$deleteUrl" :emrId="($isEdit || $isView) ? $edit_soap->emr_id : ''" :isView="$isView">
+        :historyGrouped="$history_grouped ?? []" 
+        routeName=""
+        routeUrl="{{ url('emr/form/soap') }}"
+        :registrasiDetailId="$registrasi_detail->registrasi_detail_id" 
+        :formAction="$actionUrl" 
+        :isEdit="$isEdit"
+        :deleteAction="$deleteUrl" 
+        :emrId="($isEdit || $isView) ? $edit_soap->emr_id : ''" 
+        :printUrl="$isView ? route('emr.soap.print', $edit_soap->emr_id) : ''"
+        :isView="$isView"
+    >
         <x-slot name="listRiwayat">
             <!-- Search Bar -->
             <div class="mb-4 relative">
