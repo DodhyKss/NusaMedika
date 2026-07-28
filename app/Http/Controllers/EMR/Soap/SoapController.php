@@ -245,7 +245,7 @@ class SoapController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil disimpan');
+            return redirect()->route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil disimpan');
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', 'Gagal menyimpan SOAP: ' . $e->getMessage())->withInput();
@@ -303,7 +303,7 @@ class SoapController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil diperbarui');
+            return redirect()->route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', 'Gagal memperbarui SOAP: ' . $e->getMessage())->withInput();
@@ -334,7 +334,7 @@ class SoapController extends Controller
                 ]);
 
             DB::commit();
-            return redirect()->route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil dibatalkan');
+            return redirect()->route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil dibatalkan');
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', 'Gagal membatalkan SOAP: ' . $e->getMessage());

@@ -63,10 +63,17 @@ Route::middleware('auth')->group(function () {
     })->name('emr.unsupported');
 
     Route::get('/emr/soap/print/{emr_id}', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'print'])->name('emr.soap.print');
-    Route::get('/emr/{registrasi_detail_id}/soap/{emr_id?}', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'index'])->name('emr.soap.index');
+    // Route::get('/emr/{registrasi_detail_id}/soap/{emr_id?}', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'index'])->name('emr.soap.index');
     Route::post('/emr/{registrasi_detail_id}/soap', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'store'])->name('emr.soap.store');
     Route::put('/emr/{registrasi_detail_id}/soap/{emr_id}', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'update'])->name('emr.soap.update');
     Route::delete('/emr/{registrasi_detail_id}/soap/{emr_id}', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'destroy'])->name('emr.soap.destroy');
+
+    # ============ PENGKAJIAN AWAL KEPERAWATAN ============ #
+    // Route::get('/emr/{registrasi_detail_id}/pengkajian_awal_keperawatan/{emr_id?}', [\App\Http\Controllers\EMR\PengkajianAwalKeperawatan\PengkajianAwalKeperawatanController::class, 'index'])->name('emr.pengkajian_awal_keperawatan.index');
+    Route::post('/emr/{registrasi_detail_id}/pengkajian_awal_keperawatan', [\App\Http\Controllers\EMR\PengkajianAwalKeperawatan\PengkajianAwalKeperawatanController::class, 'store'])->name('emr.pengkajian_awal_keperawatan.store');
+    Route::put('/emr/{registrasi_detail_id}/pengkajian_awal_keperawatan/{emr_id}', [\App\Http\Controllers\EMR\PengkajianAwalKeperawatan\PengkajianAwalKeperawatanController::class, 'update'])->name('emr.pengkajian_awal_keperawatan.update');
+    Route::delete('/emr/{registrasi_detail_id}/pengkajian_awal_keperawatan/{emr_id}', [\App\Http\Controllers\EMR\PengkajianAwalKeperawatan\PengkajianAwalKeperawatanController::class, 'destroy'])->name('emr.pengkajian_awal_keperawatan.destroy');
+
 
     # ======================================= #
     #             MODUL RAWAT JALAN           #

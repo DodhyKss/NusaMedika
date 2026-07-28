@@ -64,7 +64,7 @@
             @endforeach
         @else
             <!-- Fallback if no menus loaded -->
-            <a href="{{ route('emr.soap.index', ['registrasi_detail_id' => $registrasi_detail_id]) }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="flex items-center gap-2 px-5 py-3.5 text-sm font-bold text-white border-b-2 border-blue-400 bg-slate-700/50 min-w-max transition-colors">
+            <a href="{{ route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail_id]) }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="flex items-center gap-2 px-5 py-3.5 text-sm font-bold text-white border-b-2 border-blue-400 bg-slate-700/50 min-w-max transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                 CPPT (SOAP)
             </a>

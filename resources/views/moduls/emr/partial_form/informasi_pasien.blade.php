@@ -1,4 +1,4 @@
-<x-emr-accordion id="acc-informasi-pasien" title="A. Informasi Pasien" bgClass="bg-slate-100" :isOpen="true">
+<x-emr-accordion id="acc-informasi-pasien" title="A. Informasi Pasien" bgClass="bg-slate-100" :isOpen="false">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
         <!-- Kiri: Informasi Dasar & Keluarga -->
         <div class="space-y-6">
@@ -7,43 +7,43 @@
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Agama <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="agama" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" value="{{ $emr_data[env('OBJEK_ID_AGAMA')]['agama'] }}">
+                        <span>:</span> <input type="text" name="agama" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data[env('OBJEK_ID_AGAMA')]['agama'] ?? '' }}" placeholder="Agama">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Nilai-nilai budaya / kepercayaan <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="nilai_budaya" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="kegiatan_ibadah" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" value="{{ $emr_data[env('OBJEK_ID_KEGIATAN_IBADAH_ATAU_BUDAYA')]['kegiatan_ibadah'] ?? '' }}" placeholder="Nilai-nilai budaya / kepercayaan">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Tingkat Pendidikan <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="pendidikan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" value="{{ $emr_data[env('OBJEK_ID_TINKAT_PENDIDIKAN')]['tingkat_pendidikan'] }}">
+                        <span>:</span> <input type="text" name="tingkat_pendidikan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data[env('OBJEK_ID_TINKAT_PENDIDIKAN')]['tingkat_pendidikan'] ?? '' }}" placeholder="Tingkat Pendidikan">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Pekerjaan <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="pekerjaan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="pekerjaan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data[env('OBJEK_ID_PEKERJAAN')]['pekerjaan'] ?? '' }}" placeholder="Pekerjaan">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Suku Bangsa <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="suku_bangsa" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="suku_bangsa" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data[env('OBJEK_ID_SUKU_BANGSA')]['suku_bangsa'] ?? '' }}" placeholder="Suku Bangsa">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Kebangsaan <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="kebangsaan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="kebangsaan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data[env('OBJEK_ID_KEBANGSAAN')]['kebangsaan'] ?? '' }}" placeholder="Kebangsaan">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">No. Hp / Tlp. Pasien <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="no_hp" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="handphone" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" value="{{ $emr_data[env('OBJEK_ID_HANDPHONE')]['handphone'] ?? '' }}" placeholder="No. Hp / Tlp. Pasien">
                     </div>
                 </div>
             </div>
@@ -53,55 +53,55 @@
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Nama Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="nama_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="nama_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Nama Suami / Istri" value="{{ $emr_data[env('OBJEK_ID_NAMA_PASANGAN')]['nama_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Usia Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="usia_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="usia_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Usia Suami / Istri" value="{{ $emr_data[env('OBJEK_ID_USIA_PASANGAN')]['usia_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Pendidikan Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="pendidikan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="pendidikan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Pendidikan Suami / Istri" value="{{ $emr_data[env('OBJEK_ID_PENDIDIKAN_PASANGAN')]['pendidikan_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Pekerjaan Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="pekerjaan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="pekerjaan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Pekerjaan Suami / Istri" value="{{ $emr_data[env('OBJEK_ID_PEKERJAAN_PASANGAN')]['pekerjaan_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Suku Bangsa Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="suku_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="suku_bangsa_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Suku Bangsa Suami / Istri" value="{{ $emr_data[env('OBJEK_ID_SUKU_BANGSA_PASANGAN')]['suku_bangsa_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Kebangsaan Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="kebangsaan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="kebangsaan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Kebangsaan Suami / Istri" value="{{ $emr_data[env('OBJEK_ID_KEBANGSAAN_PASANGAN')]['kebangsaan_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Tinggal Bersama <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="tinggal_bersama" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="tinggal_bersama" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Tinggal Bersama" value="{{ $emr_data[env('OBJEK_ID_TINGGAL_BERSAMA')]['tinggal_bersama'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Penanggung Jawab Pasien <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="penanggung_jawab" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="penanggung_jawab_pasien" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Penanggung Jawab Pasien" value="{{ $emr_data[env('OBJEK_ID_PENANGGUNG_JAWAB_PASIEN')]['penanggung_jawab_pasien'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Hubungan <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="hubungan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500">
+                        <span>:</span> <input type="text" name="hubungan_pasien" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Hubungan" value="{{ $emr_data[env('OBJEK_ID_HUBUNGAN_PASIEN')]['hubungan_pasien'] ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -117,15 +117,15 @@
                 </div>
                 <div class="w-full sm:w-1/2 flex flex-col gap-2">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="aktifitas_makan" value="tidak" class="text-blue-500 focus:ring-blue-500" checked>
+                        <input type="radio" name="aktifitas_sebelum_makan_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (!isset($emr_data[env('OBJEK_ID_AKTIFITAS_SEBELUM_MAKAN')]['aktifitas_sebelum_makan']) || $emr_data[env('OBJEK_ID_AKTIFITAS_SEBELUM_MAKAN')]['aktifitas_sebelum_makan'] == 'off') ? 'checked' : '' }}>
                         <span class="ml-2 text-slate-600">Tidak</span>
                     </label>
                     <div class="flex items-center gap-2">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="aktifitas_makan" value="ya" class="text-blue-500 focus:ring-blue-500">
+                            <input type="radio" name="aktifitas_sebelum_makan_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (isset($emr_data[env('OBJEK_ID_AKTIFITAS_SEBELUM_MAKAN')]['aktifitas_sebelum_makan']) && $emr_data[env('OBJEK_ID_AKTIFITAS_SEBELUM_MAKAN')]['aktifitas_sebelum_makan'] != 'off') ? 'checked' : '' }}>
                             <span class="ml-2 mr-2 text-slate-600">Ya</span>
                         </label>
-                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="aktifitas_makan_ya">
+                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="aktifitas_sebelum_makan" placeholder="Sebutkan Aktifitas" value="{{ (isset($emr_data[env('OBJEK_ID_AKTIFITAS_SEBELUM_MAKAN')]['aktifitas_sebelum_makan']) && $emr_data[env('OBJEK_ID_AKTIFITAS_SEBELUM_MAKAN')]['aktifitas_sebelum_makan'] != 'off') ? $emr_data[env('OBJEK_ID_AKTIFITAS_SEBELUM_MAKAN')]['aktifitas_sebelum_makan'] : '' }}">
                     </div>
                 </div>
             </div>
@@ -136,15 +136,15 @@
                 </div>
                 <div class="w-full sm:w-1/2 flex flex-col gap-2">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="pantangan_pulang" value="tidak" class="text-blue-500 focus:ring-blue-500" checked>
+                        <input type="radio" name="pantangan_pulang_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (!isset($emr_data[env('OBJEK_ID_PANTANGAN_PULANG')]['pantangan_pulang']) || $emr_data[env('OBJEK_ID_PANTANGAN_PULANG')]['pantangan_pulang'] == 'off') ? 'checked' : '' }}>
                         <span class="ml-2 text-slate-600">Tidak</span>
                     </label>
                     <div class="flex items-center gap-2">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="pantangan_pulang" value="ya" class="text-blue-500 focus:ring-blue-500">
+                            <input type="radio" name="pantangan_pulang_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (isset($emr_data[env('OBJEK_ID_PANTANGAN_PULANG')]['pantangan_pulang']) && $emr_data[env('OBJEK_ID_PANTANGAN_PULANG')]['pantangan_pulang'] != 'off') ? 'checked' : '' }}>
                             <span class="ml-2 mr-2 text-slate-600">Ya</span>
                         </label>
-                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_pulang_ya">
+                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_pulang" placeholder="Sebutkan Pantangan" value="{{ (isset($emr_data[env('OBJEK_ID_PANTANGAN_PULANG')]['pantangan_pulang']) && $emr_data[env('OBJEK_ID_PANTANGAN_PULANG')]['pantangan_pulang'] != 'off') ? $emr_data[env('OBJEK_ID_PANTANGAN_PULANG')]['pantangan_pulang'] : '' }}">
                     </div>
                 </div>
             </div>
@@ -155,15 +155,15 @@
                 </div>
                 <div class="w-full sm:w-1/2 flex flex-col gap-2">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="pantangan_transfusi" value="tidak" class="text-blue-500 focus:ring-blue-500" checked>
+                        <input type="radio" name="pantangan_transfusi_darah_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (!isset($emr_data[env('OBJEK_ID_PANTANGAN_TRANSFUSI_DARAH')]['pantangan_transfusi_darah']) || $emr_data[env('OBJEK_ID_PANTANGAN_TRANSFUSI_DARAH')]['pantangan_transfusi_darah'] == 'off') ? 'checked' : '' }}>
                         <span class="ml-2 text-slate-600">Tidak</span>
                     </label>
                     <div class="flex items-center gap-2">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="pantangan_transfusi" value="ya" class="text-blue-500 focus:ring-blue-500">
+                            <input type="radio" name="pantangan_transfusi_darah_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (isset($emr_data[env('OBJEK_ID_PANTANGAN_TRANSFUSI_DARAH')]['pantangan_transfusi_darah']) && $emr_data[env('OBJEK_ID_PANTANGAN_TRANSFUSI_DARAH')]['pantangan_transfusi_darah'] != 'off') ? 'checked' : '' }}>
                             <span class="ml-2 mr-2 text-slate-600">Ya</span>
                         </label>
-                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_transfusi_ya">
+                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_transfusi_darah" placeholder="Sebutkan Pantangan" value="{{ (isset($emr_data[env('OBJEK_ID_PANTANGAN_TRANSFUSI_DARAH')]['pantangan_transfusi_darah']) && $emr_data[env('OBJEK_ID_PANTANGAN_TRANSFUSI_DARAH')]['pantangan_transfusi_darah'] != 'off') ? $emr_data[env('OBJEK_ID_PANTANGAN_TRANSFUSI_DARAH')]['pantangan_transfusi_darah'] : '' }}">
                     </div>
                 </div>
             </div>
@@ -174,15 +174,15 @@
                 </div>
                 <div class="w-full sm:w-1/2 flex flex-col gap-2">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="pantangan_makan" value="tidak" class="text-blue-500 focus:ring-blue-500" checked>
+                        <input type="radio" name="pantangan_makan_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (!isset($emr_data[env('OBJEK_ID_PANTANGAN_MAKAN')]['pantangan_makan']) || $emr_data[env('OBJEK_ID_PANTANGAN_MAKAN')]['pantangan_makan'] == 'off') ? 'checked' : '' }}>
                         <span class="ml-2 text-slate-600">Tidak</span>
                     </label>
                     <div class="flex items-center gap-2">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="pantangan_makan" value="ya" class="text-blue-500 focus:ring-blue-500">
+                            <input type="radio" name="pantangan_makan_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (isset($emr_data[env('OBJEK_ID_PANTANGAN_MAKAN')]['pantangan_makan']) && $emr_data[env('OBJEK_ID_PANTANGAN_MAKAN')]['pantangan_makan'] != 'off') ? 'checked' : '' }}>
                             <span class="ml-2 mr-2 text-slate-600">Ya</span>
                         </label>
-                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_makan_ya">
+                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_makan" placeholder="Sebutkan Pantangan" value="{{ (isset($emr_data[env('OBJEK_ID_PANTANGAN_MAKAN')]['pantangan_makan']) && $emr_data[env('OBJEK_ID_PANTANGAN_MAKAN')]['pantangan_makan'] != 'off') ? $emr_data[env('OBJEK_ID_PANTANGAN_MAKAN')]['pantangan_makan'] : '' }}">
                     </div>
                 </div>
             </div>
