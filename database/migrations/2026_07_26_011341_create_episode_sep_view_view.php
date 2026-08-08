@@ -10,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("CREATE VIEW \"episode_sep_view\" AS SELECT registrasi_id1,
+        DB::statement("CREATE OR REPLACE VIEW \"episode_sep_view\" AS SELECT registrasi_id1,
     registrasi_id2,
     registrasi_id3,
     registrasi_id4,

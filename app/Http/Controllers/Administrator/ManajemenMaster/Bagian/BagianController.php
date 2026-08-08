@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class BagianController extends Controller
 {
@@ -44,7 +45,7 @@ class BagianController extends Controller
         try {
             $bagian = new Bagian;
             $bagian->bagian_id = SequenceHelper::getNextId('bagian');
-            $bagian->nama_bagian = $request->nama_bagian;
+            $bagian->nama_bagian = Str::upper($request->nama_bagian);
             $bagian->referensi_bagian = $request->referensi_bagian;
             $bagian->group_bagian = $request->group_bagian;
             $bagian->seri_bagian = $request->seri_bagian;
@@ -89,7 +90,7 @@ class BagianController extends Controller
         DB::beginTransaction();
         try {
             $bagian = Bagian::findOrFail($id);
-            $bagian->nama_bagian = $request->nama_bagian;
+            $bagian->nama_bagian = Str::upper($request->nama_bagian);
             $bagian->referensi_bagian = $request->referensi_bagian;
             $bagian->group_bagian = $request->group_bagian;
             $bagian->seri_bagian = $request->seri_bagian;

@@ -10,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("CREATE VIEW \"vacuum_report\" AS WITH table_stats AS (
+        DB::statement("CREATE OR REPLACE VIEW \"vacuum_report\" AS WITH table_stats AS (
          SELECT pg_stat_user_tables.schemaname,
             pg_stat_user_tables.relname,
             pg_stat_user_tables.n_live_tup,

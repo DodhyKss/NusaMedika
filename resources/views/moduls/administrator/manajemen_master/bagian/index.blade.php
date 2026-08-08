@@ -32,7 +32,6 @@
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nama Bagian</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Referensi</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Group</th>
-                    <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Seri</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Eksekutif</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Aksi</th>
                 </tr>
@@ -44,7 +43,6 @@
                     <td class="px-3 py-3 font-semibold text-slate-800">{{ $bagian->nama_bagian }}</td>
                     <td class="px-3 py-3 text-slate-600">{{ $bagian->referensi?->nama_referensi_bagian ?? '-' }}</td>
                     <td class="px-3 py-3 text-slate-600">{{ $bagian->group_bagian ?? '-' }}</td>
-                    <td class="px-3 py-3 text-slate-600">{{ $bagian->seri_bagian ?? '-' }}</td>
                     <td class="px-3 py-3 text-center">
                         @if ($bagian->flag_eksekutif)
                             <span class="inline-flex px-2 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">Ya</span>
@@ -69,7 +67,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-3 py-8 text-center text-slate-400">Belum ada data bagian.</td>
+                    <td colspan="6" class="px-3 py-8 text-center text-slate-400">Belum ada data bagian.</td>
                 </tr>
                 @endforelse
             </tbody>

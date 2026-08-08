@@ -23,6 +23,22 @@ $(document).ready(function () {
             }
         });
     });
+    // Select2 untuk select statis (mis. pilih Bagian pada form pegawai)
+    $('.select2').each(function () {
+        var placeholder = $(this).find('option[value=""]').first().text() || 'Pilih...';
+        $(this).select2({
+            placeholder: placeholder,
+            allowClear: true,
+            width: '100%'
+        });
+    });
+    // Sinkronkan Select2 saat form di-reset
+    $('form').on('reset', function () {
+        var $form = $(this);
+        setTimeout(function () {
+            $form.find('.select2').val(null).trigger('change');
+        }, 0);
+    });
     // Drag to scroll global handler
     // Tambahkan class 'drag-scroll' ke elemen yang ingin bisa digeser
     const sliders = document.querySelectorAll('.drag-scroll');

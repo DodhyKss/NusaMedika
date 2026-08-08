@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             ReferensiBagianSeeder::class,
+            BagianSeeder::class,
             ModulMenuSubMenuSeeder::class,
             FormObjekSeeder::class,
             MasterPegawaiSeeder::class,

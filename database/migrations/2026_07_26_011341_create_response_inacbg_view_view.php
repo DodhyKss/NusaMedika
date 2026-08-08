@@ -10,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("CREATE VIEW \"response_inacbg_view\" AS SELECT (((json_data -> 'response'::text) -> 'data'::text) ->> 'nomor_sep'::text) AS nomor_sep,
+        DB::statement("CREATE OR REPLACE VIEW \"response_inacbg_view\" AS SELECT (((json_data -> 'response'::text) -> 'data'::text) ->> 'nomor_sep'::text) AS nomor_sep,
     ((((((json_data -> 'response'::text) -> 'data'::text) -> 'grouper'::text) -> 'response'::text) -> 'cbg'::text) ->> 'code'::text) AS cbg_code,
     ((((((json_data -> 'response'::text) -> 'data'::text) -> 'grouper'::text) -> 'response'::text) -> 'cbg'::text) ->> 'description'::text) AS cbg_name,
     (((json_data -> 'response'::text) -> 'data'::text) ->> 'kemenkes_dc_status_cd'::text) AS kemenkes_dc_status_cd,

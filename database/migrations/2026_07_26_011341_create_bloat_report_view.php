@@ -10,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("CREATE VIEW \"bloat_report\" AS WITH index_info AS (
+        DB::statement("CREATE OR REPLACE VIEW \"bloat_report\" AS WITH index_info AS (
          SELECT n.nspname AS schema_name,
             c.relname AS index_name,
             t.relname AS table_name,

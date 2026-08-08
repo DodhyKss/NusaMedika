@@ -10,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("CREATE VIEW \"newview\" AS SELECT (arr.item_object ->> 'SEP'::text) AS sep,
+        DB::statement("CREATE OR REPLACE VIEW \"newview\" AS SELECT (arr.item_object ->> 'SEP'::text) AS sep,
     (arr.item_object ->> 'nilai_klaim'::text) AS nilai_klaim,
     (arr.item_object ->> 'klaim_dibayar'::text) AS klaim_dibayar,
     'SEP'::text AS alias_

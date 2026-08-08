@@ -54,8 +54,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                 <div>
                     <label for="bagian_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Bagian</label>
-                    <select id="bagian_id" name="bagian_id"
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                    <select id="bagian_id" name="bagian_id" class="select2 w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none" style="width: 100%">
                         <option value="">-- Pilih Bagian --</option>
                         @foreach ($bagians as $bagian)
                             <option value="{{ $bagian->bagian_id }}" {{ old('bagian_id') == $bagian->bagian_id ? 'selected' : '' }}>{{ $bagian->nama_bagian }}</option>

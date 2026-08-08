@@ -10,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("CREATE VIEW \"bloat_table_report\" AS WITH table_stats AS (
+        DB::statement("CREATE OR REPLACE VIEW \"bloat_table_report\" AS WITH table_stats AS (
          SELECT n.nspname AS schema_name,
             c.relname AS table_name,
             (c.reltuples)::bigint AS est_rows,

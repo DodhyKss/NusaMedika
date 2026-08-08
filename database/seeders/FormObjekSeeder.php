@@ -30,25 +30,6 @@ class FormObjekSeeder extends Seeder
             );
         }
 
-        // ================== BAGIAN ==================
-        // REF_BAGIAN_RAJAL=1 di .env
-        $bagians = [
-            ['bagian_id' => 1, 'nama_bagian' => 'Rawat Jalan', 'referensi_bagian' => 1, 'group_bagian' => 'RJ'],
-            ['bagian_id' => 2, 'nama_bagian' => 'Rawat Inap', 'referensi_bagian' => 2, 'group_bagian' => 'RI'],
-            ['bagian_id' => 3, 'nama_bagian' => 'IGD', 'referensi_bagian' => 3, 'group_bagian' => 'IGD'],
-        ];
-
-        foreach ($bagians as $bagian) {
-            DB::table('bagian')->updateOrInsert(
-                ['bagian_id' => $bagian['bagian_id']],
-                array_merge($bagian, [
-                    'input_time' => $now,
-                    'input_user_id' => 1,
-                    'status_batal' => 0,
-                ])
-            );
-        }
-
         // ================== DASHBOARD MENU (EMR) ==================
         // id_dash_menu format: "dashboard_menu_id.dashboard_menu_sub_id.dashboard_menu_sub_extra_id"
         $dashboardMenus = [
