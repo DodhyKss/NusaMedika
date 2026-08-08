@@ -32,11 +32,15 @@ The 294 migrations were generated from a pre-existing SIMRS PostgreSQL database 
 
 ## Seeders
 
-`php artisan db:seed` runs: `ModulMenuSubMenuSeeder` (6 modul → 10 menu → 22 sub_menu), `UserSeeder` (admin/perawat/dokter + `user_akses`), `FormObjekSeeder` (form, objek, `objek_form_control`, plus `profesi`/`bagian`/`dashboard_menu`/`dashboard_menu_sub`/`akses_ehr`), `MasterPegawaiSeeder` (jabatan 1–8 + `status_kepegawaian` 1–4). All are idempotent and safe to re-run (modul/menu/sub_menu/users use `updateOrInsert` keyed on the PK; `user_akses` keys on `(user_id, sub_menu_id)` and only assigns `user_akses_id` for new rows via `SequenceHelper::getNextId`).
+`php artisan db:seed` runs (in order): `ModulMenuSubMenuSeeder` (6 modul → 10 menu → 22 sub_menu), `FormObjekSeeder` (form, objek, `objek_form_control`, plus `profesi`/`bagian`/`dashboard_menu`/`dashboard_menu_sub`/`akses_ehr`), `MasterPegawaiSeeder` (jabatan 1–8 + `status_kepegawaian` 1–4 + `pegawai` 1–3: Administrator Sistem/Perawat Jaga/Dokter Jaga), `UserSeeder` (admin/perawat/dokter + `user_akses`). All are idempotent and safe to re-run (modul/menu/sub_menu/users use `updateOrInsert` keyed on the PK; `user_akses` keys on `(user_id, sub_menu_id)` and only assigns `user_akses_id` for new rows via `SequenceHelper::getNextId`). Users are linked to a `pegawai` via `users.pegawai_id` and `users.nama_pegawai` is copied from the pegawai record (admin→1, perawat→2, dokter→3).
 
 ## Auth is plain-text
 
 `AuthController::login` compares `user_password` directly (no bcrypt), and `users.user_password` is `varchar(30)`. Do **not** use the default `UserFactory` (it targets `name`/`email`/`password` columns that don't exist). Seed passwords as plain strings.
+
+## Select options tanpa tabel database
+
+Daftar pilihan dropdown yang **tidak** tersimpan di database (jenis kelamin, agama, golongan darah, status perkawinan, jaminan, kelas perawatan, shift, poliklinik, dokter/ruang/bed, triase, cara masuk, hubungan, dll.) dipusatkan di `App\Helpers\SelectOption`. Jangan hardcode `<option>` di blade — ambil via `\App\Helpers\SelectOption::get($key)` untuk datanya, atau `\App\Helpers\SelectOption::render($key, $selected = null, $placeholder = null)` untuk output `<option>` siap pakai. Tambah pilihan baru cukup di array `all()`.
 
 ## Modular structure (semua modul)
 
@@ -56,6 +60,7 @@ The same modular layout applies to **every** modul, menu, and sub_menu in the si
 - Modul 6 "Administrator" drives CRUD pages for modul/menu/sub_menu/bagian/profesi/jabatan/pegawai/user. Resource routes at the root URI equal to `file_sub_menu` (`/modul`, `/menu`, `/sub_menu`, `/bagian`, `/profesi`, `/jabatan`, `/pegawai`, `/user`) but route names stay `admin.modul.*`, `admin.menu.*`, `admin.sub_menu.*`, `admin.bagian.*`, `admin.profesi.*`, `admin.jabatan.*`, `admin.pegawai.*`, `admin.user.*`.
 - Menus: 9 "Manajemen Master" → `manajemen_master`, 10 "Manajemen User" → `manajemen_user` (see the modular structure section above for the full path pattern).
 - All writes run inside `DB::beginTransaction()` and allocate PKs via `SequenceHelper::getNextId` (mind the PK quirk above — `users` uses `'user_id'`).
+- Creating/editing a user **requires** `pegawai_id` (validated `required|exists:pegawai,pegawai_id`); `users.nama_pegawai` is copied from the linked pegawai record, so there is no manual name field in the user form.
 - Every store/update/destroy clears the sidebar cache for **all** users (`Cache::forget('sidebar_moduls_user_'.$id)` per user), unlike logout which only clears the current user.
 
 ## EMR dynamic forms

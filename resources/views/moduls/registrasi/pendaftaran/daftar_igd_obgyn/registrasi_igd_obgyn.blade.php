@@ -75,9 +75,7 @@
                     <select id="triase" name="triase" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none text-slate-700 appearance-none font-medium">
                         <option value="">-- Pilih Triase --</option>
-                        <option value="Merah" class="text-red-600">Level 1 - Resusitasi / Kedaruratan Mengancam Jiwa (Merah)</option>
-                        <option value="Kuning" class="text-amber-500">Level 2 - Gawat Darurat Maternal/Neonatal (Kuning)</option>
-                        <option value="Hijau" class="text-emerald-500">Level 3 - Darurat Tidak Gawat (Hijau)</option>
+                        {!! \App\Helpers\SelectOption::render('triase_igd_obgyn') !!}
                     </select>
                 </div>
 
@@ -87,9 +85,7 @@
                     <select id="dokter_jaga" name="dokter_jaga" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Petugas Jaga --</option>
-                        <option value="1">dr. Sarah Wijaya, Sp.OG</option>
-                        <option value="2">dr. Budi Setiawan, Sp.OG</option>
-                        <option value="3">Bdn. Rina Mulyani, S.ST</option>
+                        {!! \App\Helpers\SelectOption::render('dokter_igd_obgyn') !!}
                     </select>
                 </div>
 
@@ -99,11 +95,7 @@
                     <select id="kondisi_obgyn" name="kondisi_obgyn" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Kondisi --</option>
-                        <option value="Inpartu">Inpartu (Akan Melahirkan)</option>
-                        <option value="Pendarahan">Pendarahan Hamil Muda / Tua</option>
-                        <option value="KPD">Ketuban Pecah Dini (KPD)</option>
-                        <option value="Pre-eklampsia">Pre-eklampsia / Kejang</option>
-                        <option value="Ginekologi">Kasus Ginekologi Lainnya</option>
+                        {!! \App\Helpers\SelectOption::render('indikasi_igd_obgyn') !!}
                     </select>
                 </div>
                 
@@ -134,9 +126,7 @@
                     <label for="jenis_penjamin" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Jenis Penjamin <span class="text-red-500">*</span></label>
                     <select id="jenis_penjamin" name="jenis_penjamin" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="Umum" selected>Umum / Mandiri</option>
-                        <option value="BPJS Kesehatan">BPJS Kesehatan / JAMPERSAL</option>
-                        <option value="Asuransi Swasta">Asuransi Swasta</option>
+                        {!! \App\Helpers\SelectOption::render('jaminan', 'Umum') !!}
                     </select>
                 </div>
 
@@ -152,10 +142,7 @@
                     <label for="hubungan_pengantar" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Hubungan Pengantar</label>
                     <select id="hubungan_pengantar" name="hubungan_pengantar" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="Suami">Suami</option>
-                        <option value="Orang Tua">Orang Tua</option>
-                        <option value="Keluarga Lain">Keluarga Lainnya</option>
-                        <option value="Bidan">Bidan Pendamping</option>
+                        {!! \App\Helpers\SelectOption::render('hubungan_penanggung_obgyn', 'Suami') !!}
                     </select>
                 </div>
 

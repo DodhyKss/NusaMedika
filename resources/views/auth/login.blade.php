@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login — {{ config('app.name', 'SIMRS') }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ asset('img/icon.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-white font-sans antialiased text-slate-800">
@@ -20,11 +22,8 @@
 
             <!-- Content -->
             <div class="relative w-full h-full flex flex-col justify-between p-16 z-10">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 shadow-xl">
-                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    </div>
-                    <span class="text-2xl font-bold text-white tracking-wide">{{ config('app.name', 'SIMRS') }}</span>
+                <div class="flex items-center">
+                    <img src="{{ asset('img/logo.png') }}" alt="{{ config('app.name', 'SIMRS') }}" class="h-16 w-auto object-contain bg-white rounded-xl p-2.5 shadow-xl">
                 </div>
 
                 <div class="max-w-md">
@@ -52,9 +51,7 @@
             <div class="w-full max-w-md">
                 <!-- Mobile Logo -->
                 <div class="lg:hidden flex justify-center mb-8">
-                    <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/30">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    </div>
+                    <img src="{{ asset('img/icon.png') }}" alt="{{ config('app.name', 'SIMRS') }}" class="w-16 h-16 object-contain bg-white rounded-2xl p-2 shadow-lg shadow-blue-600/30">
                 </div>
 
                 <div class="text-center lg:text-left mb-10">

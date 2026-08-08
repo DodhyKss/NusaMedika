@@ -39,8 +39,7 @@
                 <div class="relative">
                     <select id="jenis_kelamin" name="jenis_kelamin" class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">Semua</option>
-                        <option value="L">Laki-laki</option>
-                        <option value="P">Perempuan</option>
+                        {!! \App\Helpers\SelectOption::render('jenis_kelamin') !!}
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>

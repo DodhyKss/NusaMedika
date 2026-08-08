@@ -24,12 +24,7 @@
                     <select id="ruangan" name="ruangan" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">Semua Ruangan IGD</option>
-                        <option value="Resusitasi">Ruang Resusitasi</option>
-                        <option value="Tindakan">Ruang Tindakan Bedah/Non-Bedah</option>
-                        <option value="Observasi">Ruang Observasi</option>
-                        <option value="P1">Zona P1 (Merah)</option>
-                        <option value="P2">Zona P2 (Kuning)</option>
-                        <option value="P3">Zona P3 (Hijau)</option>
+                        {!! \App\Helpers\SelectOption::render('ruang_igd') !!}
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -44,9 +39,7 @@
                     <select id="dokter" name="dokter" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">Semua Dokter Jaga</option>
-                        <option value="dr. Eka">dr. Eka Pratama (Jaga Pagi)</option>
-                        <option value="dr. Fajar">dr. Fajar Hidayat (Jaga Siang)</option>
-                        <option value="dr. Gita">dr. Gita Nirmala (Jaga Malam)</option>
+                        {!! \App\Helpers\SelectOption::render('dokter_jaga_igd') !!}
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>

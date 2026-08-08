@@ -68,9 +68,7 @@
                     <select id="dokter_dpjp" name="dokter_dpjp" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Dokter --</option>
-                        <option value="1">dr. Andi Saputra, Sp.PD</option>
-                        <option value="2">dr. Siti Aminah, Sp.A</option>
-                        <option value="3">dr. Budi Santoso, Sp.B</option>
+                        {!! \App\Helpers\SelectOption::render('dokter_ranap') !!}
                     </select>
                 </div>
 
@@ -80,10 +78,7 @@
                     <select id="ruangan_id" name="ruangan_id" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Ruangan --</option>
-                        <option value="1">Ruang Melati (Penyakit Dalam)</option>
-                        <option value="2">Ruang Mawar (Kebidanan)</option>
-                        <option value="3">Ruang Anggrek (Anak)</option>
-                        <option value="4">ICU / HCU</option>
+                        {!! \App\Helpers\SelectOption::render('ruang_rawat_inap') !!}
                     </select>
                 </div>
 
@@ -93,11 +88,7 @@
                     <select id="kelas_perawatan" name="kelas_perawatan" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Kelas --</option>
-                        <option value="Kelas 1">Kelas 1</option>
-                        <option value="Kelas 2">Kelas 2</option>
-                        <option value="Kelas 3">Kelas 3</option>
-                        <option value="VIP">VIP</option>
-                        <option value="VVIP">VVIP</option>
+                        {!! \App\Helpers\SelectOption::render('kelas_perawatan') !!}
                     </select>
                 </div>
 
@@ -107,9 +98,7 @@
                     <select id="nomor_bed" name="nomor_bed" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Bed Tersedia --</option>
-                        <option value="Bed 1">Bed 1 (Kosong)</option>
-                        <option value="Bed 2">Bed 2 (Kosong)</option>
-                        <option value="Bed 3">Bed 3 (Kosong)</option>
+                        {!! \App\Helpers\SelectOption::render('bed') !!}
                     </select>
                 </div>
             </div>
@@ -134,10 +123,7 @@
                     <select id="jenis_penjamin" name="jenis_penjamin" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Penjamin --</option>
-                        <option value="Umum">Umum / Mandiri</option>
-                        <option value="BPJS Kesehatan">BPJS Kesehatan</option>
-                        <option value="Asuransi Swasta">Asuransi Swasta</option>
-                        <option value="Perusahaan">Perusahaan</option>
+                        {!! \App\Helpers\SelectOption::render('jaminan') !!}
                     </select>
                 </div>
 
@@ -147,9 +133,7 @@
                     <select id="asal_masuk" name="asal_masuk" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Asal --</option>
-                        <option value="IGD">Instalasi Gawat Darurat (IGD)</option>
-                        <option value="Poliklinik">Poliklinik (Rawat Jalan)</option>
-                        <option value="Rujukan Luar">Rujukan RS/Klinik Lain</option>
+                        {!! \App\Helpers\SelectOption::render('asal_pasien_ranap') !!}
                     </select>
                 </div>
 
@@ -166,12 +150,7 @@
                     <select id="hubungan_pj" name="hubungan_pj" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Hubungan --</option>
-                        <option value="Suami">Suami</option>
-                        <option value="Istri">Istri</option>
-                        <option value="Anak">Anak</option>
-                        <option value="Orang Tua">Orang Tua</option>
-                        <option value="Saudara Kandung">Saudara Kandung</option>
-                        <option value="Lainnya">Lainnya</option>
+                        {!! \App\Helpers\SelectOption::render('hubungan_keluarga_ranap') !!}
                     </select>
                 </div>
 

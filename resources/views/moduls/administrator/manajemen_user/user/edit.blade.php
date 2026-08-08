@@ -45,25 +45,18 @@
                 </div>
 
                 <div>
-                    <label for="pegawai_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nama Pegawai <span class="text-slate-400">(Data Master)</span></label>
-                    <select id="pegawai_id" name="pegawai_id"
+                    <label for="pegawai_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nama Pegawai <span class="text-red-500">*</span></label>
+                    <select id="pegawai_id" name="pegawai_id" required
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Pegawai --</option>
                         @foreach ($pegawais as $pegawai)
-                            <option value="{{ $pegawai->pegawai_id }}" data-nama="{{ $pegawai->nama_pegawai }}" {{ old('pegawai_id', $user->pegawai_id) == $pegawai->pegawai_id ? 'selected' : '' }}>
+                            <option value="{{ $pegawai->pegawai_id }}" {{ old('pegawai_id', $user->pegawai_id) == $pegawai->pegawai_id ? 'selected' : '' }}>
                                 {{ $pegawai->nama_pegawai }}{{ $pegawai->nip ? ' — '.$pegawai->nip : '' }}
                             </option>
                         @endforeach
                     </select>
                     @error('pegawai_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
-                    <p class="mt-1 text-[11px] text-slate-400">Pilih dari data master, atau isi manual di bawah.</p>
-                </div>
-
-                <div>
-                    <label for="nama_pegawai" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nama Pegawai <span class="text-slate-400">(Manual)</span></label>
-                    <input type="text" id="nama_pegawai" name="nama_pegawai" value="{{ old('nama_pegawai', $user->nama_pegawai) }}"
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('nama_pegawai')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                    <p class="mt-1 text-[11px] text-slate-400">User wajib terhubung ke data pegawai dari master data.</p>
                 </div>
             </div>
         </div>
@@ -137,13 +130,5 @@
             cb.checked = checked;
         });
     }
-
-    document.getElementById('pegawai_id').addEventListener('change', function () {
-        var namaInput = document.getElementById('nama_pegawai');
-        var selected = this.options[this.selectedIndex];
-        if (selected && selected.dataset.nama) {
-            namaInput.value = selected.dataset.nama;
-        }
-    });
 </script>
 @endsection

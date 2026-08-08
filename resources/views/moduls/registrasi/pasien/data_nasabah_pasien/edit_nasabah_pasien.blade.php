@@ -60,10 +60,7 @@
                     <select id="jenis_nasabah" name="jenis_nasabah" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Jenis Nasabah --</option>
-                        <option value="Umum">Umum / Mandiri</option>
-                        <option value="BPJS Kesehatan" selected>BPJS Kesehatan</option>
-                        <option value="Asuransi Swasta">Asuransi Swasta</option>
-                        <option value="Perusahaan">Perusahaan</option>
+                        {!! \App\Helpers\SelectOption::render('jenis_nasabah', 'BPJS Kesehatan') !!}
                     </select>
                 </div>
 
@@ -87,11 +84,7 @@
                     <select id="kelas_perawatan" name="kelas_perawatan" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Kelas --</option>
-                        <option value="Kelas 1" selected>Kelas 1</option>
-                        <option value="Kelas 2">Kelas 2</option>
-                        <option value="Kelas 3">Kelas 3</option>
-                        <option value="VIP">VIP</option>
-                        <option value="VVIP">VVIP</option>
+                        {!! \App\Helpers\SelectOption::render('kelas_perawatan', 'Kelas 1') !!}
                     </select>
                 </div>
 

@@ -68,8 +68,7 @@
                     <select id="jenis_kelamin" name="jenis_kelamin" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Jenis Kelamin --</option>
-                        <option value="L">Laki-laki</option>
-                        <option value="P">Perempuan</option>
+                        {!! \App\Helpers\SelectOption::render('jenis_kelamin') !!}
                     </select>
                 </div>
 
@@ -79,12 +78,7 @@
                     <select id="agama" name="agama" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Agama --</option>
-                        <option value="Islam">Islam</option>
-                        <option value="Kristen">Kristen Protestan</option>
-                        <option value="Katolik">Katolik</option>
-                        <option value="Hindu">Hindu</option>
-                        <option value="Buddha">Buddha</option>
-                        <option value="Konghucu">Konghucu</option>
+                        {!! \App\Helpers\SelectOption::render('agama') !!}
                     </select>
                 </div>
 
@@ -108,10 +102,7 @@
                     <select id="gol_darah" name="gol_darah" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Gol. Darah --</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="AB">AB</option>
-                        <option value="O">O</option>
+                        {!! \App\Helpers\SelectOption::render('golongan_darah') !!}
                     </select>
                 </div>
 
@@ -121,10 +112,7 @@
                     <select id="status_pernikahan" name="status_pernikahan" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Status --</option>
-                        <option value="Belum Kawin">Belum Kawin</option>
-                        <option value="Kawin">Kawin</option>
-                        <option value="Cerai Hidup">Cerai Hidup</option>
-                        <option value="Cerai Mati">Cerai Mati</option>
+                        {!! \App\Helpers\SelectOption::render('status_perkawinan') !!}
                     </select>
                 </div>
 

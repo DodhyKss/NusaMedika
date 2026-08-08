@@ -122,6 +122,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 20, 'menu_id' => 9, 'nama_sub_menu' => 'Profesi', 'file_sub_menu' => 'profesi', 'urutan_sub_menu' => 5],
             ['sub_menu_id' => 21, 'menu_id' => 9, 'nama_sub_menu' => 'Jabatan', 'file_sub_menu' => 'jabatan', 'urutan_sub_menu' => 6],
             ['sub_menu_id' => 22, 'menu_id' => 9, 'nama_sub_menu' => 'Pegawai', 'file_sub_menu' => 'pegawai', 'urutan_sub_menu' => 7],
+            ['sub_menu_id' => 23, 'menu_id' => 9, 'nama_sub_menu' => 'Referensi Bagian', 'file_sub_menu' => 'referensi_bagian', 'urutan_sub_menu' => 8],
             // Menu Manajemen User (10) - Administrator
             ['sub_menu_id' => 18, 'menu_id' => 10, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'user', 'urutan_sub_menu' => 1],
         ];

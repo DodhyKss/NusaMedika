@@ -13,33 +13,18 @@ class UserSeeder extends Seeder
         $now = now();
 
         $users = [
-            [
-                'user_id' => 1,
-                'user_name' => 'admin',
-                'user_password' => 'admin',
-                'nama_pegawai' => 'Administrator Sistem',
-                'pegawai_id' => null,
-            ],
-            [
-                'user_id' => 2,
-                'user_name' => 'perawat',
-                'user_password' => 'perawat',
-                'nama_pegawai' => 'Perawat Jaga',
-                'pegawai_id' => null,
-            ],
-            [
-                'user_id' => 3,
-                'user_name' => 'dokter',
-                'user_password' => 'dokter',
-                'nama_pegawai' => 'Dokter Jaga',
-                'pegawai_id' => null,
-            ],
+            ['user_id' => 1, 'user_name' => 'admin', 'user_password' => 'admin', 'pegawai_id' => 1],
+            ['user_id' => 2, 'user_name' => 'perawat', 'user_password' => 'perawat', 'pegawai_id' => 2],
+            ['user_id' => 3, 'user_name' => 'dokter', 'user_password' => 'dokter', 'pegawai_id' => 3],
         ];
 
         foreach ($users as $user) {
+            $pegawai = DB::table('pegawai')->where('pegawai_id', $user['pegawai_id'])->first();
+
             DB::table('users')->updateOrInsert(
                 ['user_id' => $user['user_id']],
                 array_merge($user, [
+                    'nama_pegawai' => $pegawai ? $pegawai->nama_pegawai : null,
                     'input_time' => $now,
                     'input_user_id' => 1,
                     'last_update_pass' => $now,
@@ -50,7 +35,7 @@ class UserSeeder extends Seeder
 
         $akses = [
             // Admin: semua sub menu
-            1 => range(1, 22),
+            1 => range(1, 23),
             // Perawat: registrasi, dashboard pasien, pengkajian, list pasien
             2 => [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14],
             // Dokter: daftar pasien, dashboard pasien, SOAP, pengkajian, list pasien

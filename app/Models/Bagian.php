@@ -23,6 +23,11 @@ class Bagian extends Model
         'status_batal',
     ];
 
+    public function referensi()
+    {
+        return $this->belongsTo(ReferensiBagian::class, 'referensi_bagian', 'referensi_bagian_id');
+    }
+
     public function pegawais()
     {
         return $this->hasMany(Pegawai::class, 'bagian_id', 'bagian_id');

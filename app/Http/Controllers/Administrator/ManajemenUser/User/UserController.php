@@ -37,20 +37,21 @@ class UserController extends Controller
         $request->validate([
             'user_name' => 'required|string|max:50|unique:users,user_name',
             'user_password' => 'required|string|max:30',
-            'nama_pegawai' => 'nullable|string|max:100',
-            'pegawai_id' => 'nullable|integer|exists:pegawai,pegawai_id',
+            'pegawai_id' => 'required|integer|exists:pegawai,pegawai_id',
             'sub_menu_ids' => 'nullable|array',
             'sub_menu_ids.*' => 'integer|exists:sub_menu,sub_menu_id',
         ]);
 
         DB::beginTransaction();
         try {
+            $pegawai = Pegawai::findOrFail($request->pegawai_id);
+
             $user = new User;
             $user->user_id = SequenceHelper::getNextId('users', 'user_id');
             $user->user_name = $request->user_name;
             $user->user_password = $request->user_password;
-            $user->nama_pegawai = $request->nama_pegawai;
-            $user->pegawai_id = $request->filled('pegawai_id') ? $request->pegawai_id : null;
+            $user->nama_pegawai = $pegawai->nama_pegawai;
+            $user->pegawai_id = $pegawai->pegawai_id;
             $user->input_time = now();
             $user->input_user_id = Auth::id();
             $user->last_update_pass = now();
@@ -90,18 +91,19 @@ class UserController extends Controller
         $request->validate([
             'user_name' => 'required|string|max:50|unique:users,user_name,'.$id.',user_id',
             'user_password' => 'nullable|string|max:30',
-            'nama_pegawai' => 'nullable|string|max:100',
-            'pegawai_id' => 'nullable|integer|exists:pegawai,pegawai_id',
+            'pegawai_id' => 'required|integer|exists:pegawai,pegawai_id',
             'sub_menu_ids' => 'nullable|array',
             'sub_menu_ids.*' => 'integer|exists:sub_menu,sub_menu_id',
         ]);
 
         DB::beginTransaction();
         try {
+            $pegawai = Pegawai::findOrFail($request->pegawai_id);
+
             $user = User::findOrFail($id);
             $user->user_name = $request->user_name;
-            $user->nama_pegawai = $request->nama_pegawai;
-            $user->pegawai_id = $request->filled('pegawai_id') ? $request->pegawai_id : null;
+            $user->nama_pegawai = $pegawai->nama_pegawai;
+            $user->pegawai_id = $pegawai->pegawai_id;
             if ($request->filled('user_password')) {
                 $user->user_password = $request->user_password;
                 $user->last_update_pass = now();

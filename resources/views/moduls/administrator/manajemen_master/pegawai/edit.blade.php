@@ -93,10 +93,7 @@
                     <label for="status_kepegawaian_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Status Kepegawaian</label>
                     <select id="status_kepegawaian_id" name="status_kepegawaian_id"
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Status --</option>
-                        @foreach ($statuses as $status)
-                            <option value="{{ $status->status_kepegawaian_id }}" {{ old('status_kepegawaian_id', $pegawai->status_kepegawaian_id) == $status->status_kepegawaian_id ? 'selected' : '' }}>{{ $status->nama_status_kepegawaian }}</option>
-                        @endforeach
+                        {!! \App\Helpers\SelectOption::render('status_kepegawaian', old('status_kepegawaian_id', $pegawai->status_kepegawaian_id), '-- Pilih Status --') !!}
                     </select>
                     @error('status_kepegawaian_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                 </div>

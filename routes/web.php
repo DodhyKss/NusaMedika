@@ -6,6 +6,7 @@ use App\Http\Controllers\Administrator\ManajemenMaster\Menu\MenuController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Modul\ModulController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Pegawai\PegawaiController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Profesi\ProfesiController;
+use App\Http\Controllers\Administrator\ManajemenMaster\ReferensiBagian\ReferensiBagianController;
 use App\Http\Controllers\Administrator\ManajemenMaster\SubMenu\SubMenuController;
 use App\Http\Controllers\Administrator\ManajemenUser\User\UserController;
 use App\Http\Controllers\API\ApiPasienController;
@@ -112,6 +113,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('menu', MenuController::class)->names('admin.menu');
     Route::resource('sub_menu', SubMenuController::class)->names('admin.sub_menu');
     Route::resource('bagian', BagianController::class)->names('admin.bagian');
+    Route::resource('referensi_bagian', ReferensiBagianController::class)->names('admin.referensi_bagian');
     Route::resource('profesi', ProfesiController::class)->names('admin.profesi');
     Route::resource('jabatan', JabatanController::class)->names('admin.jabatan');
     Route::resource('pegawai', PegawaiController::class)->names('admin.pegawai');

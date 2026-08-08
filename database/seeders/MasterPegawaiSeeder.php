@@ -50,5 +50,46 @@ class MasterPegawaiSeeder extends Seeder
                 ])
             );
         }
+
+        $pegawais = [
+            [
+                'pegawai_id' => 1,
+                'nama_pegawai' => 'Administrator Sistem',
+                'nip' => 'ADM001',
+                'bagian_id' => 1,
+                'profesi_id' => 3,
+                'jabatan_id' => 8,
+                'status_kepegawaian_id' => 3,
+            ],
+            [
+                'pegawai_id' => 2,
+                'nama_pegawai' => 'Perawat Jaga',
+                'nip' => 'PRW001',
+                'bagian_id' => 1,
+                'profesi_id' => 2,
+                'jabatan_id' => 6,
+                'status_kepegawaian_id' => 1,
+            ],
+            [
+                'pegawai_id' => 3,
+                'nama_pegawai' => 'Dokter Jaga',
+                'nip' => 'DKT001',
+                'bagian_id' => 1,
+                'profesi_id' => 1,
+                'jabatan_id' => 5,
+                'status_kepegawaian_id' => 1,
+            ],
+        ];
+
+        foreach ($pegawais as $pegawai) {
+            DB::table('pegawai')->updateOrInsert(
+                ['pegawai_id' => $pegawai['pegawai_id']],
+                array_merge($pegawai, [
+                    'input_time' => $now,
+                    'input_user_id' => 1,
+                    'status_batal' => 0,
+                ])
+            );
+        }
     }
 }

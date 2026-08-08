@@ -86,17 +86,103 @@ class FormObjekSeeder extends Seeder
         }
 
         // ================== FORM ==================
-        // FORM_ID_* di .env
+        // FORM_ID_* di .env (id berurutan tanpa gap karena primary key)
         $forms = [
             // Catatan Awal Medis (id_dash_menu: SOAP -> Catatan Awal Medis)
             ['form_id' => (int) env('FORM_ID_CATATAN_AWAL_MEDIS', 1), 'nama_form' => 'Catatan Awal Medis', 'id_dash_menu' => '1.2', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
             // SOAP / CPPT (id_dash_menu: SOAP -> SOAP CPPT)
-            ['form_id' => (int) env('FORM_ID_SOAP', 3), 'nama_form' => 'SOAP (CPPT)', 'id_dash_menu' => '1.1', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            ['form_id' => (int) env('FORM_ID_SOAP', 2), 'nama_form' => 'SOAP (CPPT)', 'id_dash_menu' => '1.1', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             // Pengkajian Awal Keperawatan
-            ['form_id' => (int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN', 6), 'nama_form' => 'Pengkajian Awal Keperawatan', 'id_dash_menu' => '2.3', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => (int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN', 3), 'nama_form' => 'Pengkajian Awal Keperawatan', 'id_dash_menu' => '2.3', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
             // Pengkajian Harian Keperawatan
-            ['form_id' => (int) env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN', 112), 'nama_form' => 'Pengkajian Harian Keperawatan', 'id_dash_menu' => '2.4', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => (int) env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN', 4), 'nama_form' => 'Pengkajian Harian Keperawatan', 'id_dash_menu' => '2.4', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
         ];
+
+        // ================== OBJEK ==================
+        // OBJEK_ID_* di .env — id berurutan 1..68 tanpa gap (primary key)
+        $objeks = [
+            1 => 'Subjective',
+            2 => 'Objective',
+            3 => 'Assessment',
+            4 => 'Planning',
+            5 => 'Instruksi',
+            6 => 'Sistolik',
+            7 => 'Diastolik',
+            8 => 'Berat Badan',
+            9 => 'Tinggi Badan',
+            10 => 'Nadi',
+            11 => 'Suhu',
+            12 => 'Pernapasan',
+            13 => 'Keluhan',
+            14 => 'Nyeri',
+            15 => 'Saturasi',
+            16 => 'EWS',
+            17 => 'Alergi',
+            18 => 'Oksigen',
+            19 => 'Cara Pemberian',
+            20 => 'ETT',
+            21 => 'Agama',
+            22 => 'Kegiatan Ibadah/Budaya',
+            23 => 'Tingkat Pendidikan',
+            24 => 'Pekerjaan',
+            25 => 'Suku Bangsa',
+            26 => 'Kebangsaan',
+            27 => 'Aktifitas Sebelum Makan',
+            28 => 'Pantangan Pulang',
+            29 => 'Pantangan Transfusi Darah',
+            30 => 'Pantangan Makan',
+            31 => 'Nama Pasangan',
+            32 => 'Usia Pasangan',
+            33 => 'Pendidikan Pasangan',
+            34 => 'Pekerjaan Pasangan',
+            35 => 'Suku Bangsa Pasangan',
+            36 => 'Kebangsaan Pasangan',
+            37 => 'Tinggal Bersama',
+            38 => 'Penanggung Jawab Pasien',
+            39 => 'Hubungan Pasien',
+            40 => 'Diagnosa Medis',
+            41 => 'Riwayat Penyakit Sebelumnya',
+            42 => 'Riwayat Penyakit Sekarang',
+            43 => 'Infeksius Flag',
+            44 => 'Menular Melalui',
+            45 => 'Infeksius Memerlukan Isolasi',
+            46 => 'Infeksius Hasil Penunjang',
+            47 => 'Imunologi Flag',
+            48 => 'Imunologi Memerlukan Isolasi',
+            49 => 'Imunologi Pembatasan Pengunjung',
+            50 => 'Imunologi Hasil Penunjang',
+            51 => 'Kesadaran',
+            52 => 'Riwayat Kemoterapi',
+            53 => 'Riwayat Radioterapi',
+            54 => 'GCS E',
+            55 => 'GCS M',
+            56 => 'GCS V',
+            57 => 'GCS Score',
+            58 => 'BMI',
+            59 => 'DPO',
+            60 => 'Handphone',
+            61 => 'Riwayat Operasi Kemo',
+            62 => 'Vaksin Covid',
+            63 => 'Allo Anamnesa',
+            64 => 'Nama Allo',
+            65 => 'Hubungan Allo',
+            66 => 'UP GO 1A',
+            67 => 'UP GO 1B',
+            68 => 'UP GO 2',
+        ];
+
+        // ================== PEMBERSIHAN ID LAMA ==================
+        // Sebelumnya id tidak berurutan (form 1/3/6/112, objek hingga 1351/3006).
+        // Hapus baris ber-id lama agar penomoran baru 1..n berurutan tanpa gap.
+        $oldFormIds = [1, 3, 6, 112];
+        $oldObjekIds = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 17, 28, 69, 141, 157, 158, 159, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 255, 281, 417, 443, 1351, 3001, 3002, 3003, 3004, 3005, 3006];
+
+        $seededFormIds = array_unique(array_merge($oldFormIds, array_column($forms, 'form_id')));
+
+        DB::table('objek_form_control')->whereIn('form_id', $seededFormIds)->delete();
+        DB::table('akses_ehr')->whereIn('form_id', $seededFormIds)->delete();
+        DB::table('objek')->whereIn('objek_id', $oldObjekIds)->delete();
+        DB::table('form')->whereIn('form_id', $seededFormIds)->delete();
 
         foreach ($forms as $form) {
             DB::table('form')->updateOrInsert(
@@ -108,79 +194,6 @@ class FormObjekSeeder extends Seeder
                 ])
             );
         }
-
-        // ================== OBJEK ==================
-        // OBJEK_ID_* di .env (nama diambil dari komentar .env)
-        $objeks = [
-            1 => 'Subjective',
-            2 => 'Objective',
-            3 => 'Assessment',
-            4 => 'Planning',
-            5 => 'Instruksi',
-            6 => 'Sistolik',
-            7 => 'Diastolik',
-            10 => 'Berat Badan',
-            11 => 'Tinggi Badan',
-            12 => 'Nadi',
-            13 => 'Suhu',
-            14 => 'Pernapasan',
-            15 => 'Keluhan',
-            17 => 'Nyeri',
-            28 => 'Saturasi',
-            69 => 'EWS',
-            141 => 'Alergi',
-            157 => 'Oksigen',
-            158 => 'Cara Pemberian',
-            159 => 'ETT',
-            169 => 'Agama',
-            170 => 'Kegiatan Ibadah/Budaya',
-            171 => 'Tingkat Pendidikan',
-            172 => 'Pekerjaan',
-            173 => 'Suku Bangsa',
-            174 => 'Kebangsaan',
-            175 => 'Aktifitas Sebelum Makan',
-            176 => 'Pantangan Pulang',
-            177 => 'Pantangan Transfusi Darah',
-            178 => 'Pantangan Makan',
-            179 => 'Nama Pasangan',
-            180 => 'Usia Pasangan',
-            181 => 'Pendidikan Pasangan',
-            182 => 'Pekerjaan Pasangan',
-            183 => 'Suku Bangsa Pasangan',
-            184 => 'Kebangsaan Pasangan',
-            185 => 'Tinggal Bersama',
-            186 => 'Penanggung Jawab Pasien',
-            187 => 'Hubungan Pasien',
-            224 => 'Diagnosa Medis',
-            225 => 'Riwayat Penyakit Sebelumnya',
-            226 => 'Riwayat Penyakit Sekarang',
-            227 => 'Infeksius Flag',
-            228 => 'Menular Melalui',
-            229 => 'Infeksius Memerlukan Isolasi',
-            230 => 'Infeksius Hasil Penunjang',
-            231 => 'Imunologi Flag',
-            232 => 'Imunologi Memerlukan Isolasi',
-            233 => 'Imunologi Pembatasan Pengunjung',
-            234 => 'Imunologi Hasil Penunjang',
-            235 => 'Kesadaran',
-            236 => 'Riwayat Kemoterapi',
-            237 => 'Riwayat Radioterapi',
-            238 => 'GCS E',
-            239 => 'GCS M',
-            240 => 'GCS V',
-            241 => 'GCS Score',
-            255 => 'BMI',
-            281 => 'DPO',
-            417 => 'Handphone',
-            443 => 'Riwayat Operasi Kemo',
-            1351 => 'Vaksin Covid',
-            3001 => 'Allo Anamnesa',
-            3002 => 'Nama Allo',
-            3003 => 'Hubungan Allo',
-            3004 => 'UP GO 1A',
-            3005 => 'UP GO 1B',
-            3006 => 'UP GO 2',
-        ];
 
         foreach ($objeks as $objekId => $namaObjek) {
             DB::table('objek')->updateOrInsert(
@@ -198,24 +211,24 @@ class FormObjekSeeder extends Seeder
         // ================== OBJEK FORM CONTROL ==================
         // bagian_id 1 (Rawat Jalan) - mapping form ke objek
         $formObjeks = [
-            (int) env('FORM_ID_SOAP', 3) => [1, 2, 3, 4, 15, 17, 224],
-            (int) env('FORM_ID_CATATAN_AWAL_MEDIS', 1) => [15, 225, 226, 224],
-            (int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN', 6) => [
-                169, 170, 171, 172, 173, 174, 417,
-                179, 180, 181, 182, 183, 184, 185, 186, 187,
-                175, 176, 177, 178,
-                225, 226, 224,
-                227, 228, 229, 230, 231, 232, 233, 234,
-                235, 238, 239, 240, 241,
-                281, 6, 7, 12, 13, 14, 10, 11, 157, 158, 159, 28, 69, 255, 17, 141,
-                3001, 3002, 3003, 3004, 3005, 3006,
+            (int) env('FORM_ID_SOAP', 2) => [1, 2, 3, 4, 13, 14, 40],
+            (int) env('FORM_ID_CATATAN_AWAL_MEDIS', 1) => [13, 41, 42, 40],
+            (int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN', 3) => [
+                21, 22, 23, 24, 25, 26, 60,
+                31, 32, 33, 34, 35, 36, 37, 38, 39,
+                27, 28, 29, 30,
+                41, 42, 40,
+                43, 44, 45, 46, 47, 48, 49, 50,
+                51, 54, 55, 56, 57,
+                59, 6, 7, 10, 11, 12, 8, 9, 18, 19, 20, 15, 16, 58, 14, 17,
+                63, 64, 65, 66, 67, 68,
             ],
-            (int) env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN', 112) => [
-                6, 7, 12, 13, 14, 28, 69, 17, 15,
+            (int) env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN', 4) => [
+                6, 7, 10, 11, 12, 15, 16, 14, 13,
             ],
         ];
 
-        $objekFormControlId = 1;
+        $objekFormControlId = (int) DB::table('objek_form_control')->max('objek_form_control_id') + 1;
         foreach ($formObjeks as $formId => $objekIds) {
             foreach ($objekIds as $objekId) {
                 DB::table('objek_form_control')->updateOrInsert(
@@ -237,16 +250,16 @@ class FormObjekSeeder extends Seeder
         // ================== AKSES EHR ==================
         // Dokter (1) bisa akses semua form; Perawat (2) form pengkajian + SOAP
         $aksesEhrs = [
-            ['profesi_id' => 1, 'form_id' => (int) env('FORM_ID_SOAP', 3), 'level_id' => 1, 'bagian_id' => 1],
+            ['profesi_id' => 1, 'form_id' => (int) env('FORM_ID_SOAP', 2), 'level_id' => 1, 'bagian_id' => 1],
             ['profesi_id' => 1, 'form_id' => (int) env('FORM_ID_CATATAN_AWAL_MEDIS', 1), 'level_id' => 1, 'bagian_id' => 1],
-            ['profesi_id' => 1, 'form_id' => (int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN', 6), 'level_id' => 1, 'bagian_id' => 1],
-            ['profesi_id' => 1, 'form_id' => (int) env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN', 112), 'level_id' => 1, 'bagian_id' => 1],
-            ['profesi_id' => 2, 'form_id' => (int) env('FORM_ID_SOAP', 3), 'level_id' => 1, 'bagian_id' => 1],
-            ['profesi_id' => 2, 'form_id' => (int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN', 6), 'level_id' => 1, 'bagian_id' => 1],
-            ['profesi_id' => 2, 'form_id' => (int) env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN', 112), 'level_id' => 1, 'bagian_id' => 1],
+            ['profesi_id' => 1, 'form_id' => (int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN', 3), 'level_id' => 1, 'bagian_id' => 1],
+            ['profesi_id' => 1, 'form_id' => (int) env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN', 4), 'level_id' => 1, 'bagian_id' => 1],
+            ['profesi_id' => 2, 'form_id' => (int) env('FORM_ID_SOAP', 2), 'level_id' => 1, 'bagian_id' => 1],
+            ['profesi_id' => 2, 'form_id' => (int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN', 3), 'level_id' => 1, 'bagian_id' => 1],
+            ['profesi_id' => 2, 'form_id' => (int) env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN', 4), 'level_id' => 1, 'bagian_id' => 1],
         ];
 
-        $aksesEhrId = 1;
+        $aksesEhrId = (int) DB::table('akses_ehr')->max('akses_ehr_id') + 1;
         foreach ($aksesEhrs as $aksesEhr) {
             DB::table('akses_ehr')->updateOrInsert(
                 [

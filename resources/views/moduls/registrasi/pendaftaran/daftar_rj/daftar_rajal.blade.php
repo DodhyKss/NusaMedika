@@ -68,8 +68,7 @@
                     <select id="shift" name="shift" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Waktu --</option>
-                        <option value="Pagi">Pagi (08:00 - 14:00)</option>
-                        <option value="Sore">Sore (15:00 - 21:00)</option>
+                        {!! \App\Helpers\SelectOption::render('shift') !!}
                     </select>
                 </div>
 
@@ -79,11 +78,7 @@
                     <select id="poliklinik" name="poliklinik" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Poliklinik --</option>
-                        <option value="Poli Umum">Poliklinik Umum</option>
-                        <option value="Poli Gigi">Poliklinik Gigi</option>
-                        <option value="Poli Penyakit Dalam">Poliklinik Penyakit Dalam</option>
-                        <option value="Poli Anak">Poliklinik Anak</option>
-                        <option value="Poli Kandungan">Poliklinik Kandungan (Obgyn)</option>
+                        {!! \App\Helpers\SelectOption::render('poliklinik') !!}
                     </select>
                 </div>
 
@@ -93,9 +88,7 @@
                     <select id="dokter_id" name="dokter_id" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Dokter --</option>
-                        <option value="1">dr. Andi Saputra, Sp.PD</option>
-                        <option value="2">dr. Siti Aminah, Sp.A</option>
-                        <option value="3">drg. Budi Santoso</option>
+                        {!! \App\Helpers\SelectOption::render('dokter_rj') !!}
                     </select>
                 </div>
             </div>
@@ -120,9 +113,7 @@
                     <select id="jenis_penjamin" name="jenis_penjamin" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Penjamin --</option>
-                        <option value="Umum">Umum / Mandiri</option>
-                        <option value="BPJS Kesehatan">BPJS Kesehatan</option>
-                        <option value="Asuransi Swasta">Asuransi Swasta</option>
+                        {!! \App\Helpers\SelectOption::render('jaminan') !!}
                     </select>
                 </div>
 

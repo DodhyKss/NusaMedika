@@ -8,7 +8,6 @@ use App\Models\Bagian;
 use App\Models\Jabatan;
 use App\Models\Pegawai;
 use App\Models\Profesi;
-use App\Models\StatusKepegawaian;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -181,11 +180,7 @@ class PegawaiController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('nama_jabatan')->get();
 
-        $statuses = StatusKepegawaian::where(function ($q) {
-            $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->orderBy('nama_status_kepegawaian')->get();
-
-        return compact('bagians', 'profesis', 'jabatans', 'statuses');
+        return compact('bagians', 'profesis', 'jabatans');
     }
 
     private function clearSidebarCache()

@@ -75,10 +75,7 @@
                     <select id="triase" name="triase" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none font-medium">
                         <option value="">-- Pilih Triase --</option>
-                        <option value="Merah" class="text-red-600">Level 1 - Resusitasi (Merah)</option>
-                        <option value="Kuning" class="text-amber-500">Level 2 - Gawat Darurat (Kuning)</option>
-                        <option value="Hijau" class="text-emerald-500">Level 3 - Darurat Tidak Gawat (Hijau)</option>
-                        <option value="Hitam" class="text-slate-800">Level 4 - Meninggal (Hitam)</option>
+                        {!! \App\Helpers\SelectOption::render('triase_igd') !!}
                     </select>
                 </div>
 
@@ -88,9 +85,7 @@
                     <select id="dokter_igd" name="dokter_igd" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Dokter Jaga --</option>
-                        <option value="1">dr. Rudi Hermawan</option>
-                        <option value="2">dr. Ayu Lestari</option>
-                        <option value="3">dr. Bimo Prasetyo</option>
+                        {!! \App\Helpers\SelectOption::render('dokter_igd') !!}
                     </select>
                 </div>
 
@@ -100,10 +95,7 @@
                     <select id="cara_masuk" name="cara_masuk" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Kedatangan --</option>
-                        <option value="Datang Sendiri">Datang Sendiri / Keluarga</option>
-                        <option value="Diantar Ambulans">Diantar Ambulans</option>
-                        <option value="Diantar Polisi">Diantar Polisi</option>
-                        <option value="Rujukan Faskes">Rujukan RS / Puskesmas Lain</option>
+                        {!! \App\Helpers\SelectOption::render('cara_masuk_igd') !!}
                     </select>
                 </div>
             </div>
@@ -127,11 +119,7 @@
                     <label for="jenis_penjamin" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Jenis Penjamin <span class="text-red-500">*</span></label>
                     <select id="jenis_penjamin" name="jenis_penjamin" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="Umum" selected>Umum / Mandiri</option>
-                        <option value="BPJS Kesehatan">BPJS Kesehatan</option>
-                        <option value="Asuransi Swasta">Asuransi Swasta</option>
-                        <option value="Jasa Raharja">Jasa Raharja (Kecelakaan Lalin)</option>
-                        <option value="Polisi">Tanggungan Kepolisian (Kriminal)</option>
+                        {!! \App\Helpers\SelectOption::render('jaminan', 'Umum') !!}
                     </select>
                 </div>
 
@@ -148,11 +136,7 @@
                     <select id="hubungan_pengantar" name="hubungan_pengantar" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Hubungan --</option>
-                        <option value="Keluarga Inti">Keluarga Inti</option>
-                        <option value="Kerabat">Kerabat / Teman</option>
-                        <option value="Tetangga">Tetangga / Warga</option>
-                        <option value="Petugas">Petugas (Polisi/Ambulans)</option>
-                        <option value="Tidak Diketahui">Tidak Diketahui</option>
+                        {!! \App\Helpers\SelectOption::render('hubungan_penanggung') !!}
                     </select>
                 </div>
 

@@ -15,10 +15,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            ReferensiBagianSeeder::class,
             ModulMenuSubMenuSeeder::class,
-            UserSeeder::class,
             FormObjekSeeder::class,
             MasterPegawaiSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

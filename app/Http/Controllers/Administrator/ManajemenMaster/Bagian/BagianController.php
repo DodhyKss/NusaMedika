@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Administrator\ManajemenMaster\Bagian;
 use App\Helpers\SequenceHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Bagian;
+use App\Models\ReferensiBagian;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,7 @@ class BagianController extends Controller
 {
     public function index()
     {
-        $bagians = Bagian::where(function ($q) {
+        $bagians = Bagian::with('referensi')->where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('nama_bagian')->get();
 
@@ -24,14 +25,14 @@ class BagianController extends Controller
 
     public function create()
     {
-        return view('moduls.administrator.manajemen_master.bagian.create');
+        return view('moduls.administrator.manajemen_master.bagian.create', $this->dropdownData());
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'nama_bagian' => 'required|string|max:100',
-            'referensi_bagian' => 'nullable|integer',
+            'referensi_bagian' => 'required|integer|exists:referensi_bagian,referensi_bagian_id',
             'group_bagian' => 'nullable|string|max:10',
             'seri_bagian' => 'nullable|string|max:20',
             'id_satu_sehat' => 'nullable|string|max:50',
@@ -70,14 +71,14 @@ class BagianController extends Controller
     {
         $bagian = Bagian::findOrFail($id);
 
-        return view('moduls.administrator.manajemen_master.bagian.edit', compact('bagian'));
+        return view('moduls.administrator.manajemen_master.bagian.edit', array_merge(compact('bagian'), $this->dropdownData()));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'nama_bagian' => 'required|string|max:100',
-            'referensi_bagian' => 'nullable|integer',
+            'referensi_bagian' => 'nullable|integer|exists:referensi_bagian,referensi_bagian_id',
             'group_bagian' => 'nullable|string|max:10',
             'seri_bagian' => 'nullable|string|max:20',
             'id_satu_sehat' => 'nullable|string|max:50',
@@ -129,6 +130,15 @@ class BagianController extends Controller
 
             return back()->with('error', 'Gagal menghapus bagian: '.$e->getMessage());
         }
+    }
+
+    private function dropdownData()
+    {
+        $referensiBagians = ReferensiBagian::where(function ($q) {
+            $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
+        })->orderBy('referensi_bagian_id')->get();
+
+        return compact('referensiBagians');
     }
 
     private function clearSidebarCache()
