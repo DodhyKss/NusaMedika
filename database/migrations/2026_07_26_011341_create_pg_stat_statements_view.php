@@ -10,7 +10,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("CREATE VIEW \"pg_stat_statements\" AS SELECT userid,
+        DB::statement("CREATE EXTENSION IF NOT EXISTS pg_stat_statements");
+
+        DB::statement("CREATE OR REPLACE VIEW \"pg_stat_statements\" AS SELECT userid,
     dbid,
     toplevel,
     queryid,

@@ -12,6 +12,10 @@ use App\Http\Controllers\Registrasi\Pendaftaran\DaftarIGDObgyn\DaftarIGDObgynCon
 use App\Http\Controllers\Registrasi\Pendaftaran\DaftarRajal\DaftarRajalController;
 use App\Http\Controllers\Registrasi\Pendaftaran\DaftarRanap\DaftarRanapController;
 use App\Http\Controllers\Registrasi\Pendaftaran\ListPelayanan\ListPelayananController;
+use App\Http\Controllers\Admin\ModulController;
+use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\SubMenuController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
@@ -93,6 +97,16 @@ Route::middleware('auth')->group(function () {
     # ======================================= # 
     # ========== MENU PASIEN ================ #
     Route::get('/list_pasien_igd', [ListPasienIGDController::class, 'index'])->name('list_pasien_igd.index');
+
+    # ======================================= #
+    #           MODUL ADMINISTRATOR           #
+    # ======================================= #
+    # ========== MANAJEMEN MASTER =========== #
+    Route::resource('admin/modul', ModulController::class)->names('admin.modul');
+    Route::resource('admin/menu', MenuController::class)->names('admin.menu');
+    Route::resource('admin/sub_menu', SubMenuController::class)->names('admin.sub_menu');
+    # ========== MANAJEMEN USER ============= #
+    Route::resource('admin/user', UserController::class)->names('admin.user');
 
     # ========= API ROUTES =============
     Route::get('/api/pasien/search', [ApiPasienController::class, 'searchPasien'])->name('api.pasien.search');
