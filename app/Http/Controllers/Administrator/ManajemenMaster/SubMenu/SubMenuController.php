@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Administrator\ManajemenMaster\SubMenu;
 
 use App\Helpers\SequenceHelper;
 use App\Http\Controllers\Controller;
@@ -21,7 +21,7 @@ class SubMenuController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->with(['menu.modul'])->orderBy('menu_id')->orderBy('urutan_sub_menu')->get();
 
-        return view('moduls.administrator.sub_menu.index', compact('subMenus'));
+        return view('moduls.administrator.manajemen_master.sub_menu.index', compact('subMenus'));
     }
 
     public function create()
@@ -30,7 +30,7 @@ class SubMenuController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->with('modul')->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
-        return view('moduls.administrator.sub_menu.create', compact('menus'));
+        return view('moduls.administrator.manajemen_master.sub_menu.create', compact('menus'));
     }
 
     public function store(Request $request)
@@ -73,7 +73,7 @@ class SubMenuController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->with('modul')->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
-        return view('moduls.administrator.sub_menu.edit', compact('subMenu', 'menus'));
+        return view('moduls.administrator.manajemen_master.sub_menu.edit', compact('subMenu', 'menus'));
     }
 
     public function update(Request $request, $id)

@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ModulMenuSubMenuSeeder::class,
             UserSeeder::class,
             FormObjekSeeder::class,
+            MasterPegawaiSeeder::class,
         ]);
     }
 }

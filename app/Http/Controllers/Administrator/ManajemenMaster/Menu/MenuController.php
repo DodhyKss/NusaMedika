@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Administrator\ManajemenMaster\Menu;
 
 use App\Helpers\SequenceHelper;
 use App\Http\Controllers\Controller;
@@ -21,7 +21,7 @@ class MenuController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->with('modul')->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
-        return view('moduls.administrator.menu.index', compact('menus'));
+        return view('moduls.administrator.manajemen_master.menu.index', compact('menus'));
     }
 
     public function create()
@@ -30,7 +30,7 @@ class MenuController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('urutan_modul')->get();
 
-        return view('moduls.administrator.menu.create', compact('moduls'));
+        return view('moduls.administrator.manajemen_master.menu.create', compact('moduls'));
     }
 
     public function store(Request $request)
@@ -71,7 +71,7 @@ class MenuController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('urutan_modul')->get();
 
-        return view('moduls.administrator.menu.edit', compact('menu', 'moduls'));
+        return view('moduls.administrator.manajemen_master.menu.edit', compact('menu', 'moduls'));
     }
 
     public function update(Request $request, $id)

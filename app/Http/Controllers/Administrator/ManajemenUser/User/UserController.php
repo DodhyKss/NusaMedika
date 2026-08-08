@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Administrator\ManajemenUser\User;
 
 use App\Helpers\SequenceHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Modul;
+use App\Models\Pegawai;
 use App\Models\User;
 use App\Models\UserAkses;
 use Illuminate\Http\Request;
@@ -18,16 +19,17 @@ class UserController extends Controller
     {
         $users = User::where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->orderBy('user_id')->get();
+        })->with('pegawai')->orderBy('user_id')->get();
 
-        return view('moduls.administrator.user.index', compact('users'));
+        return view('moduls.administrator.manajemen_user.user.index', compact('users'));
     }
 
     public function create()
     {
         $moduls = $this->modulsWithSubMenus();
+        $pegawais = $this->activePegawais();
 
-        return view('moduls.administrator.user.create', compact('moduls'));
+        return view('moduls.administrator.manajemen_user.user.create', compact('moduls', 'pegawais'));
     }
 
     public function store(Request $request)
@@ -36,6 +38,7 @@ class UserController extends Controller
             'user_name' => 'required|string|max:50|unique:users,user_name',
             'user_password' => 'required|string|max:30',
             'nama_pegawai' => 'nullable|string|max:100',
+            'pegawai_id' => 'nullable|integer|exists:pegawai,pegawai_id',
             'sub_menu_ids' => 'nullable|array',
             'sub_menu_ids.*' => 'integer|exists:sub_menu,sub_menu_id',
         ]);
@@ -47,7 +50,7 @@ class UserController extends Controller
             $user->user_name = $request->user_name;
             $user->user_password = $request->user_password;
             $user->nama_pegawai = $request->nama_pegawai;
-            $user->pegawai_id = null;
+            $user->pegawai_id = $request->filled('pegawai_id') ? $request->pegawai_id : null;
             $user->input_time = now();
             $user->input_user_id = Auth::id();
             $user->last_update_pass = now();
@@ -71,6 +74,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $moduls = $this->modulsWithSubMenus();
+        $pegawais = $this->activePegawais();
         $userAkses = UserAkses::where('user_id', $id)
             ->where(function ($q) {
                 $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
@@ -78,7 +82,7 @@ class UserController extends Controller
             ->pluck('sub_menu_id')
             ->toArray();
 
-        return view('moduls.administrator.user.edit', compact('user', 'moduls', 'userAkses'));
+        return view('moduls.administrator.manajemen_user.user.edit', compact('user', 'moduls', 'pegawais', 'userAkses'));
     }
 
     public function update(Request $request, $id)
@@ -87,6 +91,7 @@ class UserController extends Controller
             'user_name' => 'required|string|max:50|unique:users,user_name,'.$id.',user_id',
             'user_password' => 'nullable|string|max:30',
             'nama_pegawai' => 'nullable|string|max:100',
+            'pegawai_id' => 'nullable|integer|exists:pegawai,pegawai_id',
             'sub_menu_ids' => 'nullable|array',
             'sub_menu_ids.*' => 'integer|exists:sub_menu,sub_menu_id',
         ]);
@@ -96,6 +101,7 @@ class UserController extends Controller
             $user = User::findOrFail($id);
             $user->user_name = $request->user_name;
             $user->nama_pegawai = $request->nama_pegawai;
+            $user->pegawai_id = $request->filled('pegawai_id') ? $request->pegawai_id : null;
             if ($request->filled('user_password')) {
                 $user->user_password = $request->user_password;
                 $user->last_update_pass = now();
@@ -164,6 +170,13 @@ class UserController extends Controller
             }])
             ->orderBy('urutan_modul')
             ->get();
+    }
+
+    private function activePegawais()
+    {
+        return Pegawai::where(function ($q) {
+            $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
+        })->orderBy('nama_pegawai')->get();
     }
 
     private function syncUserAkses($userId, array $subMenuIds)

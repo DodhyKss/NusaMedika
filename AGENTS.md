@@ -32,30 +32,37 @@ The 294 migrations were generated from a pre-existing SIMRS PostgreSQL database 
 
 ## Seeders
 
-`php artisan db:seed` runs: `ModulMenuSubMenuSeeder` (6 modul → 10 menu → 18 sub_menu), `UserSeeder` (admin/perawat/dokter + `user_akses`), `FormObjekSeeder` (form, objek, `objek_form_control`, plus `profesi`/`bagian`/`dashboard_menu`/`akses_ehr`). They are idempotent and safe to re-run (modul/menu/sub_menu/users use `updateOrInsert` keyed on the PK; `user_akses` keys on `(user_id, sub_menu_id)` and only assigns `user_akses_id` for new rows via `SequenceHelper::getNextId`).
+`php artisan db:seed` runs: `ModulMenuSubMenuSeeder` (6 modul → 10 menu → 22 sub_menu), `UserSeeder` (admin/perawat/dokter + `user_akses`), `FormObjekSeeder` (form, objek, `objek_form_control`, plus `profesi`/`bagian`/`dashboard_menu`/`dashboard_menu_sub`/`akses_ehr`), `MasterPegawaiSeeder` (jabatan 1–8 + `status_kepegawaian` 1–4). All are idempotent and safe to re-run (modul/menu/sub_menu/users use `updateOrInsert` keyed on the PK; `user_akses` keys on `(user_id, sub_menu_id)` and only assigns `user_akses_id` for new rows via `SequenceHelper::getNextId`).
 
 ## Auth is plain-text
 
 `AuthController::login` compares `user_password` directly (no bcrypt), and `users.user_password` is `varchar(30)`. Do **not** use the default `UserFactory` (it targets `name`/`email`/`password` columns that don't exist). Seed passwords as plain strings.
 
+## Modular structure (semua modul)
+
+The same modular layout applies to **every** modul, menu, and sub_menu in the sidebar:
+
+- **Controllers**: `app/Http/Controllers/{Modul}/{Menu}/{SubMenu}/{SubMenu}Controller.php` — folder = StudlyCase of the modul name, the menu name, then the sub-menu. Examples: `Registrasi/Pendaftaran/DaftarRajal/DaftarRajalController.php`, `Registrasi/Pasien/DataPasien/DataPasienController.php`, `EMR/EmrDashboard/EmrDashboardController.php`, `Administrator/ManajemenUser/User/UserController.php`.
+- **Views**: `resources/views/moduls/{modul}/{menu}/{sub_menu}/...` — folders are snake_case: e.g. `moduls/registrasi/pendaftaran/daftar_rj/daftar_rajal.blade.php`, `moduls/emr/soap/index.blade.php`, `moduls/administrator/manajemen_master/pegawai/index.blade.php`. The sub-menu's landing view file is named after `file_sub_menu`.
+- **`sub_menu.file_sub_menu`** stores the sub-menu file name (e.g. `daftar_rajal`, `modul`, `pegawai`), not a path — the sidebar renders it via `url($subMenu->file_sub_menu)` and a matching route exists at the same URI. Use `'#'` only for sub-menus that need a dynamic id (EMR forms).
+
 ## Sidebar / menu behavior
 
 - `SidebarComposer` builds the sidebar from `modul` → `menu` → `sub_menu`, filtered by the user's `user_akses.sub_menu_id`, and caches it 24h keyed `sidebar_moduls_user_{user_id}`. After changing modul/menu/sub_menu/user_akses, clear the cache (logout already does `Cache::forget`).
-- `sub_menu.file_sub_menu` is rendered via `url($subMenu->file_sub_menu)`; use `'#'` for sub-menus that need a dynamic id (EMR forms).
 - A modul/menu only shows if it has at least one sub_menu assigned to the user.
 
 ## Administrator module (master data CRUD)
 
-- Modul 6 "Administrator" drives CRUD pages for modul/menu/sub_menu/user: resource routes `admin/modul`, `admin/menu`, `admin/sub_menu`, `admin/user` (names `admin.modul.*`, `admin.menu.*`, `admin.sub_menu.*`, `admin.user.*`).
-- Controllers in `app/Http/Controllers/Admin/`, views in `resources/views/moduls/administrator/`. All writes run inside `DB::beginTransaction()` and allocate PKs via `SequenceHelper::getNextId` (mind the PK quirk above — `users` uses `'user_id'`).
+- Modul 6 "Administrator" drives CRUD pages for modul/menu/sub_menu/bagian/profesi/jabatan/pegawai/user. Resource routes at the root URI equal to `file_sub_menu` (`/modul`, `/menu`, `/sub_menu`, `/bagian`, `/profesi`, `/jabatan`, `/pegawai`, `/user`) but route names stay `admin.modul.*`, `admin.menu.*`, `admin.sub_menu.*`, `admin.bagian.*`, `admin.profesi.*`, `admin.jabatan.*`, `admin.pegawai.*`, `admin.user.*`.
+- Menus: 9 "Manajemen Master" → `manajemen_master`, 10 "Manajemen User" → `manajemen_user` (see the modular structure section above for the full path pattern).
+- All writes run inside `DB::beginTransaction()` and allocate PKs via `SequenceHelper::getNextId` (mind the PK quirk above — `users` uses `'user_id'`).
 - Every store/update/destroy clears the sidebar cache for **all** users (`Cache::forget('sidebar_moduls_user_'.$id)` per user), unlike logout which only clears the current user.
-- The sub_menu rows for these pages use `file_sub_menu = 'admin/...'` (a real URL path), not `'#'`.
 
 ## EMR dynamic forms
 
 - Route `/emr/form/{form_name}/{registrasi_detail_id}/{emr_id?}` (`emr.dynamic.index`): `DynamicFormController` first tries `App\Http\Controllers\EMR\{Studly}\{Studly}Controller`, else the view `moduls.emr.{slug}.index`.
 - Form/objek IDs are read from `.env` at runtime (e.g. `env('FORM_ID_SOAP')`, `env('OBJEK_ID_SISTOLIK')`, `env('JENIS_RAWAT_RJ')`), not from `config()`. Don't `config:cache` with these unset or the app loses its SIMRS constants.
-- EMR dashboard menus come from `dashboard_menu`/`dashboard_menu_sub`/`dashboard_menu_sub_extra` (via the `header_ehr` view) joined to `form.id_dash_menu` and `akses_ehr.profesi_id`; form flags (`ri`/`rj`/`igd`/`mcu`) control which forms appear per rawat type.
+- EMR dashboard menus come from the `header_ehr` view (built from `dashboard_menu`/`dashboard_menu_sub`/`dashboard_menu_sub_extra`; its `id_dash_menu` is the concatenated IDs) joined to `form.id_dash_menu` and `akses_ehr.profesi_id`; `profesi_id` comes from `session('profesi_id', 1)` and form flags (`ri`/`rj`/`igd`/`mcu`) control which forms appear per rawat type.
 
 ## Tests / lint
 

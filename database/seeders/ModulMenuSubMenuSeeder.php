@@ -115,11 +115,15 @@ class ModulMenuSubMenuSeeder extends Seeder
             // Menu Pasien (8) - Gawat Darurat
             ['sub_menu_id' => 14, 'menu_id' => 8, 'nama_sub_menu' => 'List Pasien IGD', 'file_sub_menu' => 'list_pasien_igd', 'urutan_sub_menu' => 1],
             // Menu Manajemen Master (9) - Administrator
-            ['sub_menu_id' => 15, 'menu_id' => 9, 'nama_sub_menu' => 'Modul', 'file_sub_menu' => 'admin/modul', 'urutan_sub_menu' => 1],
-            ['sub_menu_id' => 16, 'menu_id' => 9, 'nama_sub_menu' => 'Menu', 'file_sub_menu' => 'admin/menu', 'urutan_sub_menu' => 2],
-            ['sub_menu_id' => 17, 'menu_id' => 9, 'nama_sub_menu' => 'Sub Menu', 'file_sub_menu' => 'admin/sub_menu', 'urutan_sub_menu' => 3],
+            ['sub_menu_id' => 15, 'menu_id' => 9, 'nama_sub_menu' => 'Modul', 'file_sub_menu' => 'modul', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 16, 'menu_id' => 9, 'nama_sub_menu' => 'Menu', 'file_sub_menu' => 'menu', 'urutan_sub_menu' => 2],
+            ['sub_menu_id' => 17, 'menu_id' => 9, 'nama_sub_menu' => 'Sub Menu', 'file_sub_menu' => 'sub_menu', 'urutan_sub_menu' => 3],
+            ['sub_menu_id' => 19, 'menu_id' => 9, 'nama_sub_menu' => 'Bagian', 'file_sub_menu' => 'bagian', 'urutan_sub_menu' => 4],
+            ['sub_menu_id' => 20, 'menu_id' => 9, 'nama_sub_menu' => 'Profesi', 'file_sub_menu' => 'profesi', 'urutan_sub_menu' => 5],
+            ['sub_menu_id' => 21, 'menu_id' => 9, 'nama_sub_menu' => 'Jabatan', 'file_sub_menu' => 'jabatan', 'urutan_sub_menu' => 6],
+            ['sub_menu_id' => 22, 'menu_id' => 9, 'nama_sub_menu' => 'Pegawai', 'file_sub_menu' => 'pegawai', 'urutan_sub_menu' => 7],
             // Menu Manajemen User (10) - Administrator
-            ['sub_menu_id' => 18, 'menu_id' => 10, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'admin/user', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 18, 'menu_id' => 10, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'user', 'urutan_sub_menu' => 1],
         ];
 
         foreach ($subMenus as $subMenu) {

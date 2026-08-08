@@ -41,7 +41,7 @@
                 <tr class="hover:bg-blue-50/40 transition-colors">
                     <td class="px-3 py-3 text-center text-slate-500">{{ $i + 1 }}</td>
                     <td class="px-3 py-3 font-semibold text-slate-800">{{ $user->user_name }}</td>
-                    <td class="px-3 py-3 text-slate-600">{{ $user->nama_pegawai ?? '-' }}</td>
+                    <td class="px-3 py-3 text-slate-600">{{ $user->pegawai->nama_pegawai ?? $user->nama_pegawai ?? '-' }}</td>
                     <td class="px-3 py-3 text-slate-400 tracking-widest">••••••</td>
                     <td class="px-3 py-3 text-center">
                         <span class="inline-flex items-center px-2 py-1 rounded-full text-[11px] font-semibold {{ $user->akses->where('status_batal', '!=', 1)->count() > 0 ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-500' }}">

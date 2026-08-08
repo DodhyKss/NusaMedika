@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Registrasi\Pasien;
+namespace App\Http\Controllers\Registrasi\Pasien\NasabahPasien;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

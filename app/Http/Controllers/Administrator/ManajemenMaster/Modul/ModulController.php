@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Administrator\ManajemenMaster\Modul;
 
 use App\Helpers\SequenceHelper;
 use App\Http\Controllers\Controller;
@@ -21,12 +21,12 @@ class ModulController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('urutan_modul')->get();
 
-        return view('moduls.administrator.modul.index', compact('moduls'));
+        return view('moduls.administrator.manajemen_master.modul.index', compact('moduls'));
     }
 
     public function create()
     {
-        return view('moduls.administrator.modul.create');
+        return view('moduls.administrator.manajemen_master.modul.create');
     }
 
     public function store(Request $request)
@@ -64,7 +64,7 @@ class ModulController extends Controller
     {
         $modul = Modul::findOrFail($id);
 
-        return view('moduls.administrator.modul.edit', compact('modul'));
+        return view('moduls.administrator.manajemen_master.modul.edit', compact('modul'));
     }
 
     public function update(Request $request, $id)

@@ -7,7 +7,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     protected $table = 'users';
+
     protected $primaryKey = 'user_id';
+
     public $timestamps = false; // We have custom timestamps
 
     protected $fillable = [
@@ -15,7 +17,7 @@ class User extends Authenticatable
         'user_password',
         'nama_pegawai',
         'pegawai_id',
-        'status_batal'
+        'status_batal',
     ];
 
     protected $hidden = [
@@ -30,5 +32,10 @@ class User extends Authenticatable
     public function akses()
     {
         return $this->hasMany(UserAkses::class, 'user_id', 'user_id');
+    }
+
+    public function pegawai()
+    {
+        return $this->belongsTo(Pegawai::class, 'pegawai_id', 'pegawai_id');
     }
 }

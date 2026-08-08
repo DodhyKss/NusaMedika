@@ -62,6 +62,6 @@ class EmrDashboardController extends Controller
             }
         }
 
-        return view('moduls.emr_dashboard.dashboard_pasien', compact('registrasi', 'ehrMenus', 'registrasi_detail_id'));
+        return view('moduls.emr.emr_dashboard.dashboard_pasien', compact('registrasi', 'ehrMenus', 'registrasi_detail_id'));
     }
 }
