@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             MasterPegawaiSeeder::class,
             UserSeeder::class,
             WilayahSeeder::class,
+            KelasRuangSeeder::class,
         ]);
     }
 }

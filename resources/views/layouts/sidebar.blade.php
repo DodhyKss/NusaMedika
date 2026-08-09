@@ -3,7 +3,8 @@
     <!-- Sidebar Header -->
     <div class="relative z-10 h-16 flex items-center px-5 border-b border-slate-800 flex-shrink-0">
         <a href="{{ route('dashboard') }}" class="flex items-center gap-3 min-w-0">
-            <img src="{{ asset('img/logo.png') }}" alt="{{ config('app.name', 'SIMRS') }}" class="h-9 w-auto object-contain">
+            <img src="{{ asset('logo_white.png') }}" alt="{{ config('app.name', 'SIMRS') }}" class="h-9 w-auto object-contain flex-shrink-0">
+            <span class="text-white font-bold text-[15px] leading-tight truncate">{{ config('app.name', 'SIMRS') }}</span>
         </a>
     </div>
 

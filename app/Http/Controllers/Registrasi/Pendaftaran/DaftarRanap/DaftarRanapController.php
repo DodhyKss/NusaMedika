@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Registrasi\Pendaftaran\DaftarRanap;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\KelasRuang;
 
 class DaftarRanapController extends Controller
 {
     public function index()
     {
-        return view('moduls.registrasi.pendaftaran.daftar_ri.daftar_ranap');
+        $kelasList = KelasRuang::aktif()->orderBy('kelas_ruang_id')->get();
+
+        return view('moduls.registrasi.pendaftaran.daftar_ri.daftar_ranap', compact('kelasList'));
     }
 }

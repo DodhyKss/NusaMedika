@@ -7,10 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Nasabah extends Model
 {
     protected $table = 'nasabah';
+
     protected $primaryKey = 'nasabah_id';
+
     public $timestamps = false;
 
+    protected $casts = [
+        'instalasi' => 'array',
+    ];
+
     protected $fillable = [
-        'nama_nasabah'
+        'nama_nasabah',
     ];
 }

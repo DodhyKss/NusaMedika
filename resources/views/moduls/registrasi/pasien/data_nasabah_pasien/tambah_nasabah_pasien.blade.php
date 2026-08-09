@@ -29,41 +29,42 @@
 
     <!-- Form Body -->
     <div class="p-6">
-        <form action="#" method="POST" id="formTambahNasabah">
+        <form action="{{ route('nasabah_pasien.store') }}" method="POST" id="formTambahNasabah">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                 
                 <!-- Pilih Pasien -->
                 <div class="md:col-span-2">
-                    <x-select_pasien label="Pilih Pasien" required />
+                    <x-select_pasien label="Pilih Pasien" :selected="old('pasien_id')" required />
+                    @error('pasien_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="md:col-span-2">
                     <hr class="border-slate-200 my-2">
                 </div>
 
-                <!-- Jenis Nasabah / Penjamin -->
-                <div>
-                    <label for="jenis_nasabah" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Jenis Nasabah <span class="text-red-500">*</span></label>
-                    <select id="jenis_nasabah" name="jenis_nasabah" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Jenis Nasabah --</option>
-                        {!! \App\Helpers\SelectOption::render('jenis_nasabah') !!}
-                    </select>
-                </div>
-
                 <!-- Nomor Kartu / BPJS -->
                 <div>
                     <label for="nomor_kartu" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nomor Kartu / BPJS</label>
-                    <input type="text" id="nomor_kartu" name="nomor_kartu" placeholder="Masukkan nomor kartu" 
+                    <input type="text" id="nomor_kartu" name="nomor_kartu" value="{{ old('nomor_kartu') }}" placeholder="Masukkan nomor kartu" 
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
                 </div>
 
-                <!-- Nama Perusahaan / Asuransi -->
+                <!-- Nasabah / Penjamin -->
                 <div>
-                    <label for="nama_perusahaan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nama Perusahaan Asuransi</label>
-                    <input type="text" id="nama_perusahaan" name="nama_perusahaan" placeholder="Contoh: Prudential, Allianz, dll (Jika ada)" 
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
+                    <label for="nasabah_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nasabah / Penjamin</label>
+                    <select id="nasabah_id" name="nasabah_id" 
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                        <option value="">Umum / Mandiri</option>
+                        @foreach ($nasabahs as $nasabah)
+                            <option value="{{ $nasabah->nasabah_id }}" @selected((string) old('nasabah_id') === (string) $nasabah->nasabah_id)>{{ $nasabah->nama_nasabah }}</option>
+                        @endforeach
+                    </select>
+                    @error('nasabah_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Kelas Perawatan -->
@@ -72,7 +73,9 @@
                     <select id="kelas_perawatan" name="kelas_perawatan" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Kelas --</option>
-                        {!! \App\Helpers\SelectOption::render('kelas_perawatan') !!}
+                        @foreach ($kelas as $kelasItem)
+                            <option value="{{ $kelasItem->kelas_ruang_id }}" @selected((string) old('kelas_perawatan') === (string) $kelasItem->kelas_ruang_id)>{{ $kelasItem->nama_kelas_ruang }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -80,7 +83,7 @@
                 <div class="md:col-span-2 mt-2">
                     <label for="catatan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Catatan Tambahan</label>
                     <textarea id="catatan" name="catatan" rows="2" placeholder="Catatan khusus mengenai nasabah/asuransi ini" 
-                              class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400 resize-none"></textarea>
+                              class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400 resize-none">{{ old('catatan') }}</textarea>
                 </div>
             </div>
 

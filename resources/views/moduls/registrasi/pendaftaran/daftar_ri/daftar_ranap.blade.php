@@ -85,7 +85,10 @@
                     <select id="kelas_perawatan" name="kelas_perawatan" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Kelas --</option>
-                        {!! \App\Helpers\SelectOption::render('kelas_perawatan') !!}
+                        <option value="">-- Pilih Kelas --</option>
+                        @foreach ($kelasList as $kelasItem)
+                            <option value="{{ $kelasItem->kelas_ruang_id }}">{{ $kelasItem->nama_kelas_ruang }}</option>
+                        @endforeach
                     </select>
                 </div>
 

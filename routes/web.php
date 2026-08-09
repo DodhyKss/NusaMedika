@@ -2,14 +2,16 @@
 
 use App\Http\Controllers\Administrator\ManajemenMaster\Bagian\BagianController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Jabatan\JabatanController;
+use App\Http\Controllers\Administrator\ManajemenMaster\Kelas\KelasController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Menu\MenuController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Modul\ModulController;
+use App\Http\Controllers\Administrator\ManajemenMaster\Nasabah\NasabahController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Pegawai\PegawaiController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Profesi\ProfesiController;
 use App\Http\Controllers\Administrator\ManajemenMaster\ReferensiBagian\ReferensiBagianController;
 use App\Http\Controllers\Administrator\ManajemenMaster\SubMenu\SubMenuController;
-use App\Http\Controllers\Administrator\ManajemenUser\User\UserController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Wilayah\WilayahController;
+use App\Http\Controllers\Administrator\ManajemenUser\User\UserController;
 use App\Http\Controllers\API\ApiPasienController;
 use App\Http\Controllers\API\ApiWilayahController;
 use App\Http\Controllers\Auth\AuthController;
@@ -58,6 +60,11 @@ Route::middleware('auth')->group(function () {
     // DELETE
     Route::delete('/daftar_pasien/{id}', [DataPasienController::class, 'destroy'])->name('daftar_pasien.destroy');
     Route::get('/nasabah_pasien', [NasabahPasienController::class, 'index'])->name('nasabah_pasien.index');
+    Route::get('/nasabah_pasien/create', [NasabahPasienController::class, 'create'])->name('nasabah_pasien.create');
+    Route::get('/nasabah_pasien/{id}/edit', [NasabahPasienController::class, 'edit'])->name('nasabah_pasien.edit');
+    Route::post('/nasabah_pasien', [NasabahPasienController::class, 'store'])->name('nasabah_pasien.store');
+    Route::put('/nasabah_pasien/{id}', [NasabahPasienController::class, 'update'])->name('nasabah_pasien.update');
+    Route::delete('/nasabah_pasien/{id}', [NasabahPasienController::class, 'destroy'])->name('nasabah_pasien.destroy');
 
     // ========= MENU PENDAFTARAN ============= #
     // GET
@@ -128,6 +135,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('jabatan', JabatanController::class)->names('admin.jabatan');
     Route::resource('pegawai', PegawaiController::class)->names('admin.pegawai');
     Route::resource('wilayah', WilayahController::class)->names('admin.wilayah');
+    Route::resource('nasabah', NasabahController::class)->names('admin.nasabah');
+    Route::resource('kelas', KelasController::class)->names('admin.kelas');
     // ========== MANAJEMEN USER ============= #
     Route::resource('user', UserController::class)->names('admin.user');
 
@@ -138,4 +147,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/wilayah/kecamatan', [ApiWilayahController::class, 'kecamatan'])->name('api.wilayah.kecamatan');
     Route::get('/api/wilayah/kelurahan', [ApiWilayahController::class, 'kelurahan'])->name('api.wilayah.kelurahan');
 });
-Route::get('/api/test/pasien/search', [\App\Http\Controllers\API\ApiPasienController::class, 'searchPasien']);
+Route::get('/api/test/pasien/search', [ApiPasienController::class, 'searchPasien']);

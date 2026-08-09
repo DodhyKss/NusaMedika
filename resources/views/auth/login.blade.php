@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login — {{ config('app.name', 'SIMRS') }}</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    <link rel="icon" type="image/png" href="{{ asset('img/icon.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo_blue.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-white font-sans antialiased text-slate-800">
@@ -22,8 +22,9 @@
 
             <!-- Content -->
             <div class="relative w-full h-full flex flex-col justify-between p-16 z-10">
-                <div class="flex items-center">
-                    <img src="{{ asset('img/logo.png') }}" alt="{{ config('app.name', 'SIMRS') }}" class="h-16 w-auto object-contain bg-white rounded-xl p-2.5 shadow-xl">
+                <div class="flex items-center gap-3">
+                    <img src="{{ asset('logo_white.png') }}" alt="{{ config('app.name', 'SIMRS') }}" class="h-16 w-auto object-contain drop-shadow-lg">
+                    <span class="text-white font-extrabold text-2xl tracking-tight">{{ config('app.name', 'SIMRS') }}</span>
                 </div>
 
                 <div class="max-w-md">
@@ -50,8 +51,9 @@
         <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-slate-50/50">
             <div class="w-full max-w-md">
                 <!-- Mobile Logo -->
-                <div class="lg:hidden flex justify-center mb-8">
-                    <img src="{{ asset('img/icon.png') }}" alt="{{ config('app.name', 'SIMRS') }}" class="w-16 h-16 object-contain bg-white rounded-2xl p-2 shadow-lg shadow-blue-600/30">
+                <div class="lg:hidden flex flex-col items-center gap-2 mb-8">
+                    <img src="{{ asset('logo_white.png') }}" alt="{{ config('app.name', 'SIMRS') }}" class="w-16 h-16 object-contain bg-blue-900 rounded-2xl p-2 shadow-lg shadow-blue-600/30">
+                    <span class="text-slate-900 font-bold text-lg tracking-tight">{{ config('app.name', 'SIMRS') }}</span>
                 </div>
 
                 <div class="text-center lg:text-left mb-10">
