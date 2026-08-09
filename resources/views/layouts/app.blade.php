@@ -92,21 +92,7 @@
         }
     </script>
     <script src="{{ asset('vendor/select2/js/select2.min.js') }}"></script>
-    <script>
-        // Pastikan setiap data teks yang dicari oleh matcher Select2 dikonversi ke String
-        if (typeof jQuery.fn.select2 !== 'undefined' && jQuery.fn.select2.defaults && jQuery.fn.select2.defaults.defaults.matcher) {
-            var originalMatcher = jQuery.fn.select2.defaults.defaults.matcher;
-            jQuery.fn.select2.defaults.set('matcher', function(params, data) {
-                if (data && data.text != null && typeof data.text !== 'string') {
-                    data.text = String(data.text);
-                }
-                if (params && params.term != null && typeof params.term !== 'string') {
-                    params.term = String(params.term);
-                }
-                return originalMatcher(params, data);
-            });
-        }
-    </script>
+    <!-- Custom Matcher Select2 Removed -->
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {

@@ -9,24 +9,21 @@ use App\Models\Pasien;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class DataPasienController extends Controller
 {
     public function index(Request $request)
     {
-        $search = trim((string) $request->input('search'));
+        $pasienId = (int) $request->input('pasien_id');
         $jenisKelamin = $request->input('jenis_kelamin');
 
         $query = Pasien::where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         });
 
-        if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_pasien', 'ilike', "%{$search}%")
-                    ->orWhere('no_mr', 'ilike', "%{$search}%")
-                    ->orWhere('ktp', 'ilike', "%{$search}%");
-            });
+        if ($pasienId > 0) {
+            $query->where('pasien_id', $pasienId);
         }
 
         if (! empty($jenisKelamin)) {
@@ -35,7 +32,9 @@ class DataPasienController extends Controller
 
         $pasiens = $query->orderBy('pasien_id', 'desc')->paginate(10)->withQueryString();
 
-        return view('moduls.registrasi.pasien.data_pasien.daftar_pasien', compact('pasiens', 'search', 'jenisKelamin'));
+        $selectedPasien = $pasienId > 0 ? Pasien::find($pasienId) : null;
+
+        return view('moduls.registrasi.pasien.data_pasien.daftar_pasien', compact('pasiens', 'pasienId', 'jenisKelamin', 'selectedPasien'));
     }
 
     public function create()
@@ -79,9 +78,13 @@ class DataPasienController extends Controller
 
         $prefill = [
             'provinsi_id' => $provinsi?->provinsi_id,
+            'provinsi_nama' => $provinsi?->nama_provinsi,
             'kabupaten_id' => $kabupaten?->kabupaten_id,
+            'kabupaten_nama' => $kabupaten?->nama_kabupaten,
             'kecamatan_id' => $kecamatan?->kecamatan_id,
+            'kecamatan_nama' => $kecamatan?->nama_kecamatan,
             'kelurahan_id' => $kelurahan?->kelurahan_id,
+            'kelurahan_nama' => $kelurahan?->nama_kelurahan,
         ];
 
         return view('moduls.registrasi.pasien.data_pasien.edit_pasien', compact('pasien', 'prefill'));
@@ -89,7 +92,7 @@ class DataPasienController extends Controller
 
     public function update(Request $request, $id)
     {
-        $data = $this->validatedData($request);
+        $data = $this->validatedData($request, (int) $id);
 
         DB::beginTransaction();
         try {
@@ -129,22 +132,44 @@ class DataPasienController extends Controller
         }
     }
 
-    private function validatedData(Request $request): array
+    private function validatedData(Request $request, ?int $ignoreId = null): array
     {
-        return $request->validate([
-            'ktp' => 'nullable|string|max:20',
-            'nama_pasien' => 'required|string|max:255',
-            'tempat_lahir' => 'nullable|string|max:100',
-            'tgl_lahir' => 'required|date',
-            'jenis_kelamin' => 'required|in:L,P',
-            'agama' => 'nullable|string|max:100',
-            'no_hp' => 'nullable|string|max:15',
-            'nama_ibu_kandung' => 'nullable|string|max:100',
-            'gol_darah' => 'nullable|string|max:10',
-            'status_perkawinan' => 'nullable|string|max:20',
-            'alamat' => 'nullable|string',
-            'kelurahan_id' => 'nullable|integer|exists:kelurahan,kelurahan_id',
-        ]);
+        return $request->validate(
+            [
+                'ktp' => [
+                    'required',
+                    'digits:16',
+                    Rule::unique('pasien', 'ktp')
+                        ->where(function ($q) {
+                            $q->where(fn ($q2) => $q2->where('status_batal', '!=', 1)->orWhereNull('status_batal'));
+                        })
+                        ->ignore($ignoreId, 'pasien_id'),
+                ],
+                'nama_pasien' => 'required|string|max:255',
+                'tempat_lahir' => 'required|string|max:100',
+                'tgl_lahir' => 'required|date',
+                'jenis_kelamin' => 'required|in:L,P',
+                'agama' => 'required|string|max:100',
+                'no_hp' => 'nullable|string|max:15',
+                'nama_ibu_kandung' => 'nullable|string|max:100',
+                'nama_ayah_kandung' => 'nullable|string|max:100',
+                'gol_darah' => 'required|string|max:10',
+                'status_perkawinan' => 'required|string|max:20',
+                'kebangsaan' => 'required|string|max:10',
+                'suku' => 'required|string|max:100',
+                'pendidikan' => 'required|string|max:100',
+                'pekerjaan' => 'required|string|max:100',
+                'disabilitas' => 'required|string|max:100',
+                'alamat' => 'required|string',
+                'wilayah_provinsi_id' => 'required|integer|exists:provinsi,provinsi_id',
+                'wilayah_kabupaten_id' => 'required|integer|exists:kabupaten,kabupaten_id',
+                'wilayah_kecamatan_id' => 'required|integer|exists:kecamatan,kecamatan_id',
+                'kelurahan_id' => 'required|integer|exists:kelurahan,kelurahan_id',
+            ],
+            [
+                'ktp.unique' => 'No. KTP / NIK sudah terdaftar pada pasien lain.',
+            ]
+        );
     }
 
     private function fillData(Pasien $pasien, array $data): void
@@ -157,8 +182,14 @@ class DataPasienController extends Controller
         $pasien->agama = $data['agama'] ?? null;
         $pasien->no_hp = $data['no_hp'] ?? null;
         $pasien->nama_ibu_kandung = $data['nama_ibu_kandung'] ?? null;
+        $pasien->nama_ayah_kandung = $data['nama_ayah_kandung'] ?? null;
         $pasien->gol_darah = $data['gol_darah'] ?? null;
         $pasien->status_perkawinan = $data['status_perkawinan'] ?? null;
+        $pasien->kebangsaan = $data['kebangsaan'] ?? null;
+        $pasien->suku = $data['suku'] ?? null;
+        $pasien->pendidikan = $data['pendidikan'] ?? null;
+        $pasien->pekerjaan = $data['pekerjaan'] ?? null;
+        $pasien->disabilitas = $data['disabilitas'] ?? null;
         $pasien->alamat = $data['alamat'] ?? null;
         $pasien->kelurahan_id = $data['kelurahan_id'] ?? null;
     }

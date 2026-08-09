@@ -138,3 +138,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/wilayah/kecamatan', [ApiWilayahController::class, 'kecamatan'])->name('api.wilayah.kecamatan');
     Route::get('/api/wilayah/kelurahan', [ApiWilayahController::class, 'kelurahan'])->name('api.wilayah.kelurahan');
 });
+Route::get('/api/test/pasien/search', [\App\Http\Controllers\API\ApiPasienController::class, 'searchPasien']);

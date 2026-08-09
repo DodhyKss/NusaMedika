@@ -35,6 +35,7 @@
             <div>
                 <label for="pasien_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">No. MR / Nama Pasien</label>
                 <select id="pasien_id" name="pasien_id" class="select2-pasien w-full text-sm border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700" style="width: 100%" data-url="{{ route('api.pasien.search') }}">
+                    <option value=""></option>
                     @if(isset($pasienId) && $pasienId != '')
                         @php $pasien = \App\Models\Pasien::find($pasienId); @endphp
                         @if($pasien)

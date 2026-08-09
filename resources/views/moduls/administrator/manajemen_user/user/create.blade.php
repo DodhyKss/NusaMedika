@@ -15,10 +15,6 @@
     </div>
 </div>
 
-@if (session('error'))
-    <div class="mb-4 px-4 py-3 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg">{{ session('error') }}</div>
-@endif
-
 <form action="{{ route('admin.user.store') }}" method="POST" id="formTambahUser">
     @csrf
 

@@ -15,13 +15,6 @@
     </div>
 </div>
 
-@if (session('success'))
-    <div class="mb-4 px-4 py-3 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg">{{ session('success') }}</div>
-@endif
-@if (session('error'))
-    <div class="mb-4 px-4 py-3 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg">{{ session('error') }}</div>
-@endif
-
 <!-- Filter Card -->
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 mb-6">
     <div class="flex items-center gap-2 mb-4">
@@ -30,15 +23,15 @@
     </div>
     <form action="{{ route('daftar_pasien.index') }}" method="GET" id="filterForm">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <div class="col-span-1 md:col-span-2">
-                <label for="search" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Pencarian Pasien</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                    <input type="text" id="search" name="search" value="{{ $search }}" placeholder="Cari Nama / No. RM / NIK..."
-                           class="w-full text-sm border border-slate-200 rounded-lg pl-9 pr-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                </div>
+            <div class="md:col-span-2">
+                <label for="pasien_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Pencarian Pasien (No. RM / NIK / Nama)</label>
+                <select id="pasien_id" name="pasien_id" class="select2-pasien w-full text-sm border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700"
+                        data-url="{{ route('api.pasien.search') }}" data-placeholder="-- Ketik No. RM / NIK / Nama --" style="width: 100%">
+                    <option value=""></option>
+                    @if ($selectedPasien)
+                        <option value="{{ $selectedPasien->pasien_id }}" selected>{{ $selectedPasien->no_mr }} - {{ $selectedPasien->nama_pasien }}</option>
+                    @endif
+                </select>
             </div>
 
             <div>

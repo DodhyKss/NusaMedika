@@ -1,22 +1,29 @@
 $(document).ready(function () {
     $('.select2-pasien').each(function () {
         var searchUrl = $(this).data('url') || '/api/pasien/search';
-        
+        var field = $(this).data('field');
+        var placeholder = $(this).data('placeholder') || 'Ketik No MR / Nama...';
+
         $(this).select2({
-            placeholder: 'Ketik No MR / Nama...',
+            placeholder: placeholder,
             allowClear: true,
             ajax: {
                 url: searchUrl,
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
-                    return {
+                    var data = {
                         q: params.term // search term
                     };
+                    if (field) {
+                        data.field = field;
+                    }
+                    return data;
                 },
                 processResults: function (data) {
+                    var res = typeof data === 'string' ? JSON.parse(data) : data;
                     return {
-                        results: data.results
+                        results: res.results || (Array.isArray(res) ? res : [])
                     };
                 },
                 cache: true
@@ -33,7 +40,7 @@ $(document).ready(function () {
         });
     });
 
-    // Cascade wilayah: provinsi -> kabupaten -> kecamatan -> kelurahan
+    // Cascade wilayah: provinsi -> kabupaten -> kecamatan -> kelurahan (Select2 AJAX)
     function initWilayahCascade($root) {
         $root.each(function () {
             var $c = $(this);
@@ -45,41 +52,60 @@ $(document).ready(function () {
             };
             var parentKey = { kabupaten: 'provinsi_id', kecamatan: 'kabupaten_id', kelurahan: 'kecamatan_id' };
             var parentSel = { kabupaten: 'provinsi', kecamatan: 'kabupaten', kelurahan: 'kecamatan' };
+            var childrenMap = {
+                provinsi: ['kabupaten', 'kecamatan', 'kelurahan'],
+                kabupaten: ['kecamatan', 'kelurahan'],
+                kecamatan: ['kelurahan'],
+                kelurahan: []
+            };
             var prefill = $c.data('prefill') || null;
 
-            function muatWilayah(level) {
-                var $s = sel[level];
-                var url = $s.data('url');
-                if (!url) return;
-                var params = {};
-                if (parentSel[level] && sel[parentSel[level]].val()) {
-                    params[parentKey[level]] = sel[parentSel[level]].val();
+            $.each(sel, function (level, $s) {
+                // Option awal untuk menampilkan label nilai prefill (edit)
+                if (prefill && prefill[level + '_id'] && prefill[level + '_nama']) {
+                    $s.append($('<option>').val(prefill[level + '_id']).text(prefill[level + '_nama']));
                 }
-                $s.empty();
-                $s.append($('<option>').val('').text($s.data('placeholder') || '-- Pilih --'));
-                $.getJSON(url, params, function (data) {
-                    $.each(data.results, function (_, r) {
-                        $s.append($('<option>').val(r.id).text(r.text));
-                    });
-                    if (prefill && prefill[level + '_id']) {
-                        $s.val(prefill[level + '_id']).trigger('change');
+
+                $s.select2({
+                    placeholder: $s.data('placeholder') || '-- Pilih --',
+                    allowClear: true,
+                    width: '100%',
+                    ajax: {
+                        url: $s.data('url'),
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            var query = {};
+                            var parent = parentSel[level];
+                            if (parent && sel[parent].val()) {
+                                query[parentKey[level]] = sel[parent].val();
+                            }
+                            if (params.term) {
+                                query.q = params.term;
+                            }
+                            return query;
+                        },
+                        processResults: function (data) {
+                            return { results: data.results };
+                        },
+                        cache: true
                     }
                 });
-            }
 
-            $.each(['provinsi', 'kabupaten', 'kecamatan'], function (_, level) {
-                sel[level].on('change', function () {
-                    var children = level === 'provinsi'
-                        ? ['kabupaten', 'kecamatan', 'kelurahan']
-                        : level === 'kabupaten' ? ['kecamatan', 'kelurahan'] : ['kelurahan'];
-                    $.each(children, function (_, child) {
-                        sel[child].empty().append($('<option>').val('').text(sel[child].data('placeholder') || '-- Pilih --'));
+                // Saat nilai berubah, kosongkan semua turunan
+                $s.on('change', function () {
+                    $.each(childrenMap[level], function (_, child) {
+                        sel[child].val(null).trigger('change');
                     });
-                    muatWilayah(children[0]);
                 });
             });
 
-            muatWilayah('provinsi');
+            // Terapkan nilai prefill setelah semua select2 diinisialisasi
+            $.each(sel, function (level, $s) {
+                if (prefill && prefill[level + '_id']) {
+                    $s.val(prefill[level + '_id']).trigger('change');
+                }
+            });
         });
     }
 
@@ -91,6 +117,7 @@ $(document).ready(function () {
         var $form = $(this);
         setTimeout(function () {
             $form.find('.select2').val(null).trigger('change');
+            $form.find('select[data-wilayah]').val(null).trigger('change');
         }, 0);
     });
     // Drag to scroll global handler

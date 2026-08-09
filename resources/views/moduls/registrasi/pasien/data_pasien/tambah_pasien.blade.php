@@ -15,9 +15,6 @@
     </div>
 </div>
 
-@if (session('error'))
-    <div class="mb-4 px-4 py-3 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg">{{ session('error') }}</div>
-@endif
 @if ($errors->any())
     <div class="mb-4 px-4 py-3 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg">
         <ul class="list-disc list-inside">
@@ -48,8 +45,8 @@
 
                 <!-- NIK -->
                 <div>
-                    <label for="ktp" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">No. KTP / NIK</label>
-                    <input type="text" id="ktp" name="ktp" value="{{ old('ktp') }}" placeholder="Masukkan 16 digit NIK"
+                    <label for="ktp" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">No. KTP / NIK <span class="text-red-500">*</span></label>
+                    <input type="text" id="ktp" name="ktp" value="{{ old('ktp') }}" placeholder="Masukkan 16 digit NIK" maxlength="16" inputmode="numeric"
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400 @error('ktp') border-red-400 @enderror">
                     @error('ktp')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                 </div>
@@ -64,7 +61,7 @@
 
                 <!-- Tempat Lahir -->
                 <div>
-                    <label for="tempat_lahir" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Tempat Lahir</label>
+                    <label for="tempat_lahir" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Tempat Lahir <span class="text-red-500">*</span></label>
                     <input type="text" id="tempat_lahir" name="tempat_lahir" value="{{ old('tempat_lahir') }}" placeholder="Kota / Kabupaten"
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
                 </div>
@@ -90,7 +87,7 @@
 
                 <!-- Agama -->
                 <div>
-                    <label for="agama" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Agama</label>
+                    <label for="agama" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Agama <span class="text-red-500">*</span></label>
                     <select id="agama" name="agama"
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Agama --</option>
@@ -112,9 +109,16 @@
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
                 </div>
 
+                <!-- Nama Ayah Kandung -->
+                <div>
+                    <label for="nama_ayah_kandung" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nama Ayah Kandung</label>
+                    <input type="text" id="nama_ayah_kandung" name="nama_ayah_kandung" value="{{ old('nama_ayah_kandung') }}" placeholder="Nama Ayah"
+                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
+                </div>
+
                 <!-- Golongan Darah -->
                 <div>
-                    <label for="gol_darah" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Golongan Darah</label>
+                    <label for="gol_darah" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Golongan Darah <span class="text-red-500">*</span></label>
                     <select id="gol_darah" name="gol_darah"
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Gol. Darah --</option>
@@ -124,7 +128,7 @@
 
                 <!-- Status Pernikahan -->
                 <div>
-                    <label for="status_perkawinan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Status Pernikahan</label>
+                    <label for="status_perkawinan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Status Pernikahan <span class="text-red-500">*</span></label>
                     <select id="status_perkawinan" name="status_perkawinan"
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Status --</option>
@@ -132,9 +136,59 @@
                     </select>
                 </div>
 
+                <!-- Kebangsaan -->
+                <div>
+                    <label for="kebangsaan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kebangsaan <span class="text-red-500">*</span></label>
+                    <select id="kebangsaan" name="kebangsaan"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                        <option value="">-- Pilih Kebangsaan --</option>
+                        {!! \App\Helpers\SelectOption::render('kebangsaan', old('kebangsaan')) !!}
+                    </select>
+                </div>
+
+                <!-- Suku -->
+                <div>
+                    <label for="suku" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Suku <span class="text-red-500">*</span></label>
+                    <select id="suku" name="suku"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                        <option value="">-- Pilih Suku --</option>
+                        {!! \App\Helpers\SelectOption::render('suku', old('suku')) !!}
+                    </select>
+                </div>
+
+                <!-- Pendidikan -->
+                <div>
+                    <label for="pendidikan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Pendidikan <span class="text-red-500">*</span></label>
+                    <select id="pendidikan" name="pendidikan"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                        <option value="">-- Pilih Pendidikan --</option>
+                        {!! \App\Helpers\SelectOption::render('pendidikan', old('pendidikan')) !!}
+                    </select>
+                </div>
+
+                <!-- Pekerjaan -->
+                <div>
+                    <label for="pekerjaan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Pekerjaan <span class="text-red-500">*</span></label>
+                    <select id="pekerjaan" name="pekerjaan"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                        <option value="">-- Pilih Pekerjaan --</option>
+                        {!! \App\Helpers\SelectOption::render('pekerjaan', old('pekerjaan')) !!}
+                    </select>
+                </div>
+
+                <!-- Disabilitas -->
+                <div>
+                    <label for="disabilitas" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Disabilitas <span class="text-red-500">*</span></label>
+                    <select id="disabilitas" name="disabilitas"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                        <option value="">-- Pilih Disabilitas --</option>
+                        {!! \App\Helpers\SelectOption::render('disabilitas', old('disabilitas')) !!}
+                    </select>
+                </div>
+
                 <!-- Alamat Lengkap -->
                 <div class="md:col-span-2 mt-2">
-                    <label for="alamat" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Alamat Lengkap KTP</label>
+                    <label for="alamat" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Alamat Lengkap KTP <span class="text-red-500">*</span></label>
                     <textarea id="alamat" name="alamat" rows="3" placeholder="Jalan, RT/RW, Kelurahan, Kecamatan"
                               class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400 resize-none">{{ old('alamat') }}</textarea>
                 </div>
@@ -149,31 +203,30 @@
                 </div>
                 <div class="wilayah-cascade md:col-span-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
                     <div>
-                        <label for="wilayah_provinsi_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Provinsi</label>
+                        <label for="wilayah_provinsi_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Provinsi <span class="text-red-500">*</span></label>
                         <select id="wilayah_provinsi_id" name="wilayah_provinsi_id" data-wilayah="provinsi" data-url="{{ route('api.wilayah.provinsi') }}" data-placeholder="-- Pilih Provinsi --"
                                 class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                            <option value="">-- Pilih Provinsi --</option>
                         </select>
+                        @error('wilayah_provinsi_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label for="wilayah_kabupaten_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kabupaten/Kota</label>
+                        <label for="wilayah_kabupaten_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kabupaten/Kota <span class="text-red-500">*</span></label>
                         <select id="wilayah_kabupaten_id" name="wilayah_kabupaten_id" data-wilayah="kabupaten" data-url="{{ route('api.wilayah.kabupaten') }}" data-placeholder="-- Pilih Kabupaten/Kota --"
                                 class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                            <option value="">-- Pilih Kabupaten/Kota --</option>
                         </select>
+                        @error('wilayah_kabupaten_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label for="wilayah_kecamatan_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kecamatan</label>
+                        <label for="wilayah_kecamatan_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kecamatan <span class="text-red-500">*</span></label>
                         <select id="wilayah_kecamatan_id" name="wilayah_kecamatan_id" data-wilayah="kecamatan" data-url="{{ route('api.wilayah.kecamatan') }}" data-placeholder="-- Pilih Kecamatan --"
                                 class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                            <option value="">-- Pilih Kecamatan --</option>
                         </select>
+                        @error('wilayah_kecamatan_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label for="kelurahan_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kelurahan</label>
+                        <label for="kelurahan_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kelurahan <span class="text-red-500">*</span></label>
                         <select id="kelurahan_id" name="kelurahan_id" data-wilayah="kelurahan" data-url="{{ route('api.wilayah.kelurahan') }}" data-placeholder="-- Pilih Kelurahan --"
                                 class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                            <option value="">-- Pilih Kelurahan --</option>
                         </select>
                         @error('kelurahan_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                     </div>
