@@ -16,7 +16,7 @@
 </div>
 
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-    <form action="#" method="POST" id="formDaftarRajal">
+    <form action="{{ route('daftar_rajal.store') }}" method="POST" id="formDaftarRajal">
         @csrf
         
         <!-- Section 1: Data Pasien -->
@@ -59,15 +59,7 @@
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
                 </div>
 
-                <!-- Waktu Kunjungan (Shift) -->
-                <div>
-                    <label for="shift" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Shift / Waktu <span class="text-red-500">*</span></label>
-                    <select id="shift" name="shift" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Waktu --</option>
-                        {!! \App\Helpers\SelectOption::render('shift') !!}
-                    </select>
-                </div>
+
 
                 <!-- Poliklinik -->
                 <div>
@@ -81,15 +73,12 @@
                     </select>
                 </div>
 
-                <!-- Dokter / DPJP -->
+                <!-- Jadwal Dokter -->
                 <div>
-                    <label for="dokter_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Dokter (DPJP) <span class="text-red-500">*</span></label>
-                    <select id="dokter_id" name="dokter_id" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Dokter --</option>
-                        @foreach ($dokters as $dokter)
-                            <option value="{{ $dokter->pegawai_id }}" data-bagian="{{ implode(',', $poliklinikDokter[$dokter->pegawai_id] ?? []) }}" @selected((string) old('dokter_id') === (string) $dokter->pegawai_id)>{{ $dokter->nama_pegawai }}</option>
-                        @endforeach
+                    <label for="jadwal_dokter_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Jadwal Dokter <span class="text-red-500">*</span></label>
+                    <select id="jadwal_dokter_id" name="jadwal_dokter_id" required
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none disabled:bg-slate-100 disabled:text-slate-400">
+                        <option value="">-- Pilih Jadwal Dokter --</option>
                     </select>
                 </div>
             </div>
@@ -108,13 +97,34 @@
 
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                <!-- Jenis Penjamin -->
+                <!-- Nasabah -->
                 <div>
-                    <label for="jenis_penjamin" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Jenis Penjamin <span class="text-red-500">*</span></label>
-                    <select id="jenis_penjamin" name="jenis_penjamin" 
+                    <label for="nasabah_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nasabah / Penjamin <span class="text-red-500">*</span></label>
+                    <select id="nasabah_id" name="nasabah_id" required
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Penjamin --</option>
-                        {!! \App\Helpers\SelectOption::render('jaminan') !!}
+                        <option value="">-- Pilih Nasabah --</option>
+                        @foreach ($nasabahs as $nasabah)
+                            <option value="{{ $nasabah->nasabah_id }}" @selected((string) old('nasabah_id') === (string) $nasabah->nasabah_id)>{{ $nasabah->nama_nasabah }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Cara Pasien Datang -->
+                <div>
+                    <label for="cara_masuk" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Cara Pasien Datang <span class="text-red-500">*</span></label>
+                    <select id="cara_masuk" name="cara_masuk" required
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                        <option value="">-- Pilih Cara Datang --</option>
+                        <option value="Datang Sendiri" @selected(old('cara_masuk') == 'Datang Sendiri')>Datang Sendiri / Keluarga</option>
+                        <option value="Rujukan" @selected(old('cara_masuk') == 'Rujukan')>Rujukan</option>
+                    </select>
+                </div>
+
+                <!-- Diagnosa (ICD) -->
+                <div>
+                    <label for="icd_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Diagnosa Awal (ICD) <span class="text-red-500">*</span></label>
+                    <select id="icd_id" name="icd_id" class="select2-icd w-full" data-url="{{ route('api.icd.search') }}" required>
+                        <!-- Options akan dimuat via AJAX -->
                     </select>
                 </div>
 
@@ -162,29 +172,52 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const poliklinik = document.getElementById('poliklinik');
-        const dokter = document.getElementById('dokter_id');
-        if (!poliklinik || !dokter) return;
+        const jadwalDokter = document.getElementById('jadwal_dokter_id');
+        const tglKunjungan = document.getElementById('tgl_kunjungan');
+        if (!poliklinik || !jadwalDokter || !tglKunjungan) return;
 
-        const options = Array.from(dokter.options);
+        const jadwalsByPoli = @json($jadwalsByPoli);
+        const oldJadwal = "{{ old('jadwal_dokter_id') }}";
 
-        function filterDokter() {
+        function updateJadwal() {
             const bagian = poliklinik.value;
-            options.forEach(option => {
-                if (option.value === '') return;
-                const bagians = (option.dataset.bagian || '').split(',').filter(Boolean);
-                option.style.display = (!bagian || bagians.includes(bagian)) ? '' : 'none';
-            });
-        }
+            jadwalDokter.innerHTML = '<option value="">-- Pilih Jadwal Dokter --</option>';
+            jadwalDokter.disabled = true;
 
-        poliklinik.addEventListener('change', function () {
-            filterDokter();
-            if (dokter.selectedIndex > 0) {
-                const selected = dokter.options[dokter.selectedIndex];
-                if (selected.style.display === 'none') {
-                    dokter.value = '';
+            let selectedDay = null;
+            if (tglKunjungan.value) {
+                const d = new Date(tglKunjungan.value);
+                if (!isNaN(d.getTime())) {
+                    const jsDay = d.getDay(); // 0 = Minggu, 1 = Senin, dll
+                    selectedDay = jsDay === 0 ? 7 : jsDay;
                 }
             }
-        });
+
+            if (bagian && jadwalsByPoli[bagian]) {
+                const jadwals = jadwalsByPoli[bagian];
+                let adaJadwal = false;
+                jadwals.forEach(j => {
+                    // Filter berdasarkan hari dari tanggal kunjungan
+                    if (selectedDay !== null && j.hari != selectedDay) return;
+
+                    const selected = (oldJadwal == j.id) ? 'selected' : '';
+                    const optionText = `${j.dokter} | ${j.nama_hari} (${j.waktu}) | Kuota: ${j.kuota}`;
+                    jadwalDokter.innerHTML += `<option value="${j.id}" ${selected}>${optionText}</option>`;
+                    adaJadwal = true;
+                });
+                if (adaJadwal) {
+                    jadwalDokter.disabled = false;
+                }
+            }
+        }
+
+        poliklinik.addEventListener('change', updateJadwal);
+        tglKunjungan.addEventListener('change', updateJadwal);
+
+        // Init on load if old value exists
+        if (poliklinik.value) {
+            updateJadwal();
+        }
     });
 </script>
 @endsection

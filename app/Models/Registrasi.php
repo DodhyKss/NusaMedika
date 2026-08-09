@@ -34,7 +34,10 @@ class Registrasi extends Model
 
     public function rujukanSep()
     {
-        return $this->hasOne(RujukanSep::class, 'registrasi_id', 'registrasi_id')->whereNull('status_batal');
+        return $this->hasOne(RujukanSep::class, 'registrasi_id', 'registrasi_id')
+                    ->where(function($q) {
+                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                    });
     }
 
     public function pasienNasabah()
@@ -44,6 +47,9 @@ class Registrasi extends Model
 
     public function penanggungRawat()
     {
-        return $this->hasMany(PenanggungRawat::class, 'registrasi_id', 'registrasi_id')->whereNull('status_batal');
+        return $this->hasMany(PenanggungRawat::class, 'registrasi_id', 'registrasi_id')
+                    ->where(function($q) {
+                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                    });
     }
 }

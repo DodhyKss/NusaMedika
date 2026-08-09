@@ -24,7 +24,7 @@ class ICD extends Model
     public function scopeAktif(Builder $query): Builder
     {
         return $query->where(function ($q) {
-            $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
+            $q->whereNull('status_batal')->orWhere('status_batal', 0);
         });
     }
 }

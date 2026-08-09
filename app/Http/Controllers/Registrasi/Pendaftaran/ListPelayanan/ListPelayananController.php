@@ -20,13 +20,17 @@ class ListPelayananController extends Controller
         $query = Registrasi::with([
             'pasien',
             'registrasiDetails' => function($q) {
-                $q->whereNull('status_batal')->with(['bagian', 'billTemp']);
+                $q->where(function($sq) {
+                    $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+                })->with(['bagian', 'billTemp']);
             },
             'rujukanSep',
             'pasienNasabah.nasabah',
             'penanggungRawat.user'
         ])
-        ->whereNull('status_batal');
+        ->where(function($q) {
+            $q->whereNull('status_batal')->orWhere('status_batal', 0);
+        });
 
         // Filter Tanggal
         if ($tanggalAwal) {

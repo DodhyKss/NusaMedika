@@ -21,10 +21,13 @@ class ApiPasienController extends Controller
         $field = $request->input('field');
         $column = in_array($field, ['no_mr', 'ktp', 'nama'], true) ? ($field === 'nama' ? 'nama_pasien' : $field) : null;
 
-        $query = Pasien::select('pasien_id', 'nama_pasien', 'no_mr', 'ktp')
-            ->where(function ($q) {
-                $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-            });
+        $query = Pasien::select(
+            'pasien_id', 'nama_pasien', 'no_mr', 'ktp', 'jenis_kelamin', 
+            'tempat_lahir', 'tgl_lahir', 'alamat', 'no_hp', 'agama', 
+            'gol_darah', 'status_perkawinan', 'pekerjaan', 'nama_ibu_kandung'
+        )->where(function ($q) {
+            $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
+        });
 
         if ($search !== '') {
             if ($column !== null) {
@@ -41,6 +44,20 @@ class ApiPasienController extends Controller
         $pasiens = $query->orderBy('nama_pasien')->limit(min((int) $request->input('limit', 20), 1000))->get();
 
         $formatted = $pasiens->map(function ($pasien) use ($field, $column) {
+            $extra = [
+                'ktp' => $pasien->ktp,
+                'jenis_kelamin' => $pasien->jenis_kelamin === 'L' ? 'Laki-Laki' : ($pasien->jenis_kelamin === 'P' ? 'Perempuan' : $pasien->jenis_kelamin),
+                'tempat_lahir' => $pasien->tempat_lahir,
+                'tgl_lahir' => $pasien->tgl_lahir ? date('d-m-Y', strtotime($pasien->tgl_lahir)) : '-',
+                'alamat' => $pasien->alamat,
+                'no_hp' => $pasien->no_hp,
+                'agama' => $pasien->agama,
+                'gol_darah' => $pasien->gol_darah,
+                'status_perkawinan' => $pasien->status_perkawinan,
+                'pekerjaan' => $pasien->pekerjaan,
+                'nama_ibu_kandung' => $pasien->nama_ibu_kandung,
+            ];
+
             if ($column !== null) {
                 return [
                     'id' => (string) $pasien->{$column},
@@ -49,12 +66,14 @@ class ApiPasienController extends Controller
                         : ($field === 'ktp'
                             ? "{$pasien->ktp} - {$pasien->nama_pasien}"
                             : "{$pasien->no_mr} - {$pasien->nama_pasien}"),
+                    'extra' => $extra
                 ];
             }
 
             return [
                 'id' => (string) $pasien->pasien_id,
                 'text' => "{$pasien->no_mr} - {$pasien->nama_pasien}",
+                'extra' => $extra
             ];
         });
 

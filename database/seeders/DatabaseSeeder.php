@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             WilayahSeeder::class,
             KelasRuangSeeder::class,
+            IcdSeeder::class,
         ]);
     }
 }

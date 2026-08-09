@@ -16,6 +16,7 @@ use App\Http\Controllers\Administrator\ManajemenMaster\Wilayah\WilayahController
 use App\Http\Controllers\Administrator\ManajemenUser\User\UserController;
 use App\Http\Controllers\API\ApiPasienController;
 use App\Http\Controllers\API\ApiWilayahController;
+use App\Http\Controllers\API\ApiIcdController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\EMR\DynamicFormController;
@@ -72,6 +73,7 @@ Route::middleware('auth')->group(function () {
     // GET
     Route::get('/list_pelayanan_pasien', [ListPelayananController::class, 'index'])->name('list_pelayanan_pasien.index');
     Route::get('/daftar_rajal', [DaftarRajalController::class, 'index'])->name('daftar_rajal.index');
+    Route::post('/daftar_rajal', [DaftarRajalController::class, 'store'])->name('daftar_rajal.store');
     Route::get('/daftar_ranap', [DaftarRanapController::class, 'index'])->name('daftar_ranap.index');
     Route::get('/registrasi_igd', [DaftarIGDController::class, 'index'])->name('registrasi_igd.index');
     Route::get('/registrasi_igd_obgyn', [DaftarIGDObgynController::class, 'index'])->name('registrasi_igd_obgyn.index');
@@ -150,5 +152,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/wilayah/kabupaten', [ApiWilayahController::class, 'kabupaten'])->name('api.wilayah.kabupaten');
     Route::get('/api/wilayah/kecamatan', [ApiWilayahController::class, 'kecamatan'])->name('api.wilayah.kecamatan');
     Route::get('/api/wilayah/kelurahan', [ApiWilayahController::class, 'kelurahan'])->name('api.wilayah.kelurahan');
+    Route::get('/api/icd/search', [ApiIcdController::class, 'searchIcd'])->name('api.icd.search');
 });
 Route::get('/api/test/pasien/search', [ApiPasienController::class, 'searchPasien']);

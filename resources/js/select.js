@@ -36,11 +36,83 @@ $(function () {
             var results = (res && res.results) || [];
             results.forEach(function (p) {
                 if (p && p.id != null && !$el.find('option[value="' + p.id + '"]').length) {
-                    $el.append(new Option(p.text, p.id));
+                    var opt = new Option(p.text, p.id);
+                    if (p.extra) {
+                        $(opt).attr('data-extra', JSON.stringify(p.extra));
+                    }
+                    $el.append(opt);
                 }
             });
             pasangSelect2($el, {
                 placeholder: $el.data('placeholder') || 'Ketik No MR / Nama...',
+                allowClear: true,
+                width: '100%',
+                matcher: function (params, data) {
+                    if (!params.term) {
+                        return data;
+                    }
+                    var term = params.term.toLowerCase();
+                    var text = String(data.text || '').toLowerCase();
+                    return text.indexOf(term) !== -1 ? data : null;
+                }
+            });
+
+            // Handle card update
+            $el.on('change', function () {
+                var selectedOpt = $(this).find(':selected');
+                var cardId = '#pasien-card-' + $(this).attr('id');
+                var $card = $(cardId);
+                
+                if (!$card.length) return;
+
+                var extraStr = selectedOpt.attr('data-extra');
+                if (extraStr) {
+                    try {
+                        var extra = JSON.parse(extraStr);
+                        $card.find('.p-ktp').text(extra.ktp || '-');
+                        $card.find('.p-kelamin').text(extra.jenis_kelamin || '-');
+                        $card.find('.p-ttl').text((extra.tempat_lahir || '-') + ' / ' + (extra.tgl_lahir || '-'));
+                        $card.find('.p-nohp').text(extra.no_hp || '-');
+                        $card.find('.p-goldar').text(extra.gol_darah || '-');
+                        $card.find('.p-agama').text(extra.agama || '-');
+                        $card.find('.p-kawin').text(extra.status_perkawinan || '-');
+                        $card.find('.p-kerja').text(extra.pekerjaan || '-');
+                        $card.find('.p-ibu').text(extra.nama_ibu_kandung || '-');
+                        $card.find('.p-alamat').text(extra.alamat || '-');
+                        $card.removeClass('hidden');
+                    } catch (e) {
+                        $card.addClass('hidden');
+                    }
+                } else {
+                    $card.addClass('hidden');
+                }
+            });
+        });
+    });
+
+    // Select2 pencarian ICD (Statis + Matcher) mengikuti rule pasien
+    $('.select2-icd').each(function () {
+        var $el = $(this);
+        var url = $el.data('url');
+        console.log('[select2] icd #' + ($el.attr('id') || '?') + ' -> muat dari: ' + url);
+        
+        $.getJSON(url, { limit: 1000 }, function (res) {
+            var results = (res && res.results) || [];
+            
+            if (!$el.find('option[value=""]').length) {
+                $el.append(new Option('', ''));
+            }
+
+            results.forEach(function (p) {
+                if (p && p.id != null && !$el.find('option[value="' + p.id + '"]').length) {
+                    $el.append(new Option(p.text, p.id));
+                }
+            });
+
+            $el.val(null);
+
+            pasangSelect2($el, {
+                placeholder: $el.data('placeholder') || 'Ketik Kode / Nama Diagnosa...',
                 allowClear: true,
                 width: '100%',
                 matcher: function (params, data) {
