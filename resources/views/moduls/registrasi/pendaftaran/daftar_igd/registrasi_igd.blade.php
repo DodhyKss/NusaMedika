@@ -41,11 +41,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                 <!-- Pilih Pasien -->
                 <div class="md:col-span-2">
-                    <label for="pasien_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Cari Pasien Terdaftar <span class="text-red-500">*</span></label>
-                    <select id="pasien_id" name="pasien_id" class="select2-pasien w-full text-sm border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700" style="width: 100%">
-                    <option value=""></option>
-                        <option value="">-- Ketik Nama atau No. RM Pasien --</option>
-                    </select>
+                    <x-select_pasien label="Cari Pasien Terdaftar" required />
                 </div>
             </div>
         </div>

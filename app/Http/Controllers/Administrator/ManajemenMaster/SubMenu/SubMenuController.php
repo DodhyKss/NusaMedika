@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\SubMenu;
 
-use App\Helpers\SequenceHelper;
+use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\SubMenu;
@@ -45,7 +45,7 @@ class SubMenuController extends Controller
         DB::beginTransaction();
         try {
             $subMenu = new SubMenu;
-            $subMenu->sub_menu_id = SequenceHelper::getNextId('sub_menu');
+            $subMenu->sub_menu_id = GenerateHelper::getNextId('sub_menu');
             $subMenu->menu_id = $request->menu_id;
             $subMenu->nama_sub_menu = $request->nama_sub_menu;
             $subMenu->file_sub_menu = $request->file_sub_menu;

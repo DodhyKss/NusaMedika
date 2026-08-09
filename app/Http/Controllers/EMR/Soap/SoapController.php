@@ -207,7 +207,7 @@ class SoapController extends Controller
 
         DB::beginTransaction();
         try {
-            $emr_id = \App\Helpers\SequenceHelper::getNextId('emr');
+            $emr_id = \App\Helpers\GenerateHelper::getNextId('emr');
 
             // Insert ke tabel emr
             DB::table('emr')->insert([
@@ -232,7 +232,7 @@ class SoapController extends Controller
             ];
 
             foreach ($details as $d) {
-                $emr_detail_id = \App\Helpers\SequenceHelper::getNextId('emr_detail');
+                $emr_detail_id = \App\Helpers\GenerateHelper::getNextId('emr_detail');
                 DB::table('emr_detail')->insert([
                     'emr_detail_id' => $emr_detail_id,
                     'emr_id' => $emr_id,
@@ -290,7 +290,7 @@ class SoapController extends Controller
             ];
 
             foreach ($details as $d) {
-                $emr_detail_id = \App\Helpers\SequenceHelper::getNextId('emr_detail');
+                $emr_detail_id = \App\Helpers\GenerateHelper::getNextId('emr_detail');
                 DB::table('emr_detail')->insert([
                     'emr_detail_id' => $emr_detail_id,
                     'emr_id' => $emr_id,

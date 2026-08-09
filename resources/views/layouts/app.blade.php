@@ -44,54 +44,7 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
-    <script>
-        // Polyfill lengkap untuk fungsi-fungsi jQuery lama yang dibutuhkan oleh Select2 v4
-        if (typeof jQuery.isArray === 'undefined') {
-            jQuery.isArray = Array.isArray;
-        }
-        if (typeof jQuery.isFunction === 'undefined') {
-            jQuery.isFunction = function(obj) {
-                return typeof obj === "function";
-            };
-        }
-        if (typeof jQuery.trim === 'undefined') {
-            jQuery.trim = function(str) {
-                return str == null ? "" : (str + "").replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, "");
-            };
-        }
-        if (typeof jQuery.camelCase === 'undefined') {
-            jQuery.camelCase = function(string) {
-                return string.replace(/-([a-z])/ig, function(all, letter) {
-                    return letter.toUpperCase();
-                });
-            };
-        }
-        if (typeof jQuery.isNumeric === 'undefined') {
-            jQuery.isNumeric = function(obj) {
-                return !isNaN(parseFloat(obj)) && isFinite(obj);
-            };
-        }
-        if (typeof jQuery.type === 'undefined') {
-            jQuery.type = function(obj) {
-                return obj == null ? String(obj) : Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
-            };
-        }
-        if (typeof jQuery.nodeName === 'undefined') {
-            jQuery.nodeName = function(elem, name) {
-                return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
-            };
-        }
-        // Safeguard agar Select2 tidak error ("c.trim is not a function") saat memproses data/opsi bertipe Number atau non-string
-        if (!Number.prototype.trim) {
-            Number.prototype.trim = function() { return String(this).trim(); };
-        }
-        if (!Boolean.prototype.trim) {
-            Boolean.prototype.trim = function() { return String(this).trim(); };
-        }
-    </script>
-    <script src="{{ asset('vendor/select2/js/select2.min.js') }}"></script>
+    <!-- Scripts (jQuery & Select2 dibundle via Vite di resources/js/app.js) -->
     <!-- Custom Matcher Select2 Removed -->
     
     <script>

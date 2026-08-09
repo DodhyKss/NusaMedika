@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Bagian;
 
-use App\Helpers\SequenceHelper;
+use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Bagian;
 use App\Models\ReferensiBagian;
@@ -44,7 +44,7 @@ class BagianController extends Controller
         DB::beginTransaction();
         try {
             $bagian = new Bagian;
-            $bagian->bagian_id = SequenceHelper::getNextId('bagian');
+            $bagian->bagian_id = GenerateHelper::getNextId('bagian');
             $bagian->nama_bagian = Str::upper($request->nama_bagian);
             $bagian->referensi_bagian = $request->referensi_bagian;
             $bagian->group_bagian = $request->group_bagian;

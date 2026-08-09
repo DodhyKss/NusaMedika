@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Pegawai;
 
-use App\Helpers\SequenceHelper;
+use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Bagian;
 use App\Models\Jabatan;
@@ -53,7 +53,7 @@ class PegawaiController extends Controller
         DB::beginTransaction();
         try {
             $pegawai = new Pegawai;
-            $pegawai->pegawai_id = SequenceHelper::getNextId('pegawai');
+            $pegawai->pegawai_id = GenerateHelper::getNextId('pegawai');
             $pegawai->nama_pegawai = $request->nama_pegawai;
             $pegawai->nip = $request->nip;
             $pegawai->nik = $request->nik;

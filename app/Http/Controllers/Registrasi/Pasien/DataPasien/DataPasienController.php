@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Registrasi\Pasien\DataPasien;
 
-use App\Helpers\SequenceHelper;
+use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Kelurahan;
 use App\Models\Pasien;
@@ -49,8 +49,8 @@ class DataPasienController extends Controller
         DB::beginTransaction();
         try {
             $pasien = new Pasien;
-            $pasien->pasien_id = SequenceHelper::getNextId('pasien');
-            $pasien->no_mr = $this->generateNoMr();
+            $pasien->pasien_id = GenerateHelper::getNextId('pasien');
+            $pasien->no_mr = GenerateHelper::generateNoMr();
             $this->fillData($pasien, $data);
             $pasien->input_time = now();
             $pasien->input_user_id = Auth::id();
@@ -192,14 +192,5 @@ class DataPasienController extends Controller
         $pasien->disabilitas = $data['disabilitas'] ?? null;
         $pasien->alamat = $data['alamat'] ?? null;
         $pasien->kelurahan_id = $data['kelurahan_id'] ?? null;
-    }
-
-    private function generateNoMr(): string
-    {
-        $max = (int) DB::table('pasien')
-            ->where('no_mr', '~', '^[0-9]+$')
-            ->max('no_mr');
-
-        return str_pad((string) ($max + 1), 7, '0', STR_PAD_LEFT);
     }
 }

@@ -22,17 +22,3 @@
         </select>
     </div>
 </div>
-
-@once
-    @push('scripts')
-        <script>
-            $(function () {
-                $('.select2-poliklinik').select2({
-                    width: '100%',
-                    placeholder: 'Pilih Poliklinik',
-                    allowClear: true
-                });
-            });
-        </script>
-    @endpush
-@endonce

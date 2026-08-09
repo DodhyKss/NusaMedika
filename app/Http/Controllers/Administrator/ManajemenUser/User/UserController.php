@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenUser\User;
 
-use App\Helpers\SequenceHelper;
+use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Modul;
 use App\Models\Pegawai;
@@ -47,7 +47,7 @@ class UserController extends Controller
             $pegawai = Pegawai::findOrFail($request->pegawai_id);
 
             $user = new User;
-            $user->user_id = SequenceHelper::getNextId('users', 'user_id');
+            $user->user_id = GenerateHelper::getNextId('users', 'user_id');
             $user->user_name = $request->user_name;
             $user->user_password = $request->user_password;
             $user->nama_pegawai = $pegawai->nama_pegawai;
@@ -189,7 +189,7 @@ class UserController extends Controller
             'mod_user_id' => Auth::id(),
         ]);
 
-        $nextId = SequenceHelper::getNextId('user_akses');
+        $nextId = GenerateHelper::getNextId('user_akses');
         foreach ($subMenuIds as $subMenuId) {
             $exists = UserAkses::where('user_id', $userId)
                 ->where('sub_menu_id', $subMenuId)

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Jabatan;
 
-use App\Helpers\SequenceHelper;
+use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Jabatan;
 use App\Models\User;
@@ -36,7 +36,7 @@ class JabatanController extends Controller
         DB::beginTransaction();
         try {
             $jabatan = new Jabatan;
-            $jabatan->jabatan_id = SequenceHelper::getNextId('jabatan');
+            $jabatan->jabatan_id = GenerateHelper::getNextId('jabatan');
             $jabatan->nama_jabatan = $request->nama_jabatan;
             $jabatan->input_time = now();
             $jabatan->input_user_id = Auth::id();

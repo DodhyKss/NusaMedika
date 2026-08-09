@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Profesi;
 
-use App\Helpers\SequenceHelper;
+use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Profesi;
 use App\Models\User;
@@ -37,7 +37,7 @@ class ProfesiController extends Controller
         DB::beginTransaction();
         try {
             $profesi = new Profesi;
-            $profesi->profesi_id = SequenceHelper::getNextId('profesi');
+            $profesi->profesi_id = GenerateHelper::getNextId('profesi');
             $profesi->nama_profesi = $request->nama_profesi;
             $profesi->ehr = $request->boolean('ehr');
             $profesi->input_time = now();

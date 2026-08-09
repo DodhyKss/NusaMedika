@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 use Illuminate\Support\Facades\DB;
 
-class SequenceHelper
+class GenerateHelper
 {
     /**
      * Mengambil ID berikutnya dari sequence PostgreSQL.
@@ -62,5 +62,21 @@ class SequenceHelper
         } catch (\Exception $e) {
             throw new \Exception("Gagal mendapatkan sequence ID untuk tabel {$tableName}. Pastikan sequence atau tabel valid.");
         }
+    }
+
+    /**
+     * Membuat nomor rekam medis (No. MR) baru.
+     * Berdasarkan MAX(no_mr) numerik pada semua pasien + 1,
+     * diformat 7 digit dengan leading zero.
+     *
+     * @return string
+     */
+    public static function generateNoMr(): string
+    {
+        $max = (int) DB::table('pasien')
+            ->where('no_mr', '~', '^[0-9]+$')
+            ->max('no_mr');
+
+        return str_pad((string) ($max + 1), 7, '0', STR_PAD_LEFT);
     }
 }

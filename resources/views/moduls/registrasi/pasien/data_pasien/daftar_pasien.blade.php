@@ -24,14 +24,11 @@
     <form action="{{ route('daftar_pasien.index') }}" method="GET" id="filterForm">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div class="md:col-span-2">
-                <label for="pasien_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Pencarian Pasien (No. RM / NIK / Nama)</label>
-                <select id="pasien_id" name="pasien_id" class="select2-pasien w-full text-sm border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700"
-                        data-url="{{ route('api.pasien.search') }}" data-placeholder="-- Ketik No. RM / NIK / Nama --" style="width: 100%">
-                    <option value=""></option>
-                    @if ($selectedPasien)
-                        <option value="{{ $selectedPasien->pasien_id }}" selected>{{ $selectedPasien->no_mr }} - {{ $selectedPasien->nama_pasien }}</option>
-                    @endif
-                </select>
+                <x-select_pasien
+                    label="Pencarian Pasien (No. RM / NIK / Nama)"
+                    placeholder="-- Ketik No. RM / NIK / Nama --"
+                    :selected="$selectedPasien?->pasien_id"
+                />
             </div>
 
             <div>

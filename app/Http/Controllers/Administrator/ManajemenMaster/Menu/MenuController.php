@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Menu;
 
-use App\Helpers\SequenceHelper;
+use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Modul;
@@ -44,7 +44,7 @@ class MenuController extends Controller
         DB::beginTransaction();
         try {
             $menu = new Menu;
-            $menu->menu_id = SequenceHelper::getNextId('menu');
+            $menu->menu_id = GenerateHelper::getNextId('menu');
             $menu->modul_id = $request->modul_id;
             $menu->nama_menu = $request->nama_menu;
             $menu->urutan_menu = $request->urutan_menu;

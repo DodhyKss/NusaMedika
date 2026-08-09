@@ -184,7 +184,7 @@ class PengkajianAwalKeperawatanController extends Controller
 
         DB::beginTransaction();
         try {
-            $emr_id = \App\Helpers\SequenceHelper::getNextId('emr');
+            $emr_id = \App\Helpers\GenerateHelper::getNextId('emr');
 
             DB::table('emr')->insert([
                 'emr_id' => $emr_id,
@@ -279,7 +279,7 @@ class PengkajianAwalKeperawatanController extends Controller
 
             foreach ($mapping as $key => $objek_id) {
                 if ($request->has($key)) {
-                    $emr_detail_id = \App\Helpers\SequenceHelper::getNextId('emr_detail');
+                    $emr_detail_id = \App\Helpers\GenerateHelper::getNextId('emr_detail');
                     DB::table('emr_detail')->insert([
                         'emr_detail_id' => $emr_detail_id,
                         'emr_id' => $emr_id,
@@ -399,7 +399,7 @@ class PengkajianAwalKeperawatanController extends Controller
 
             foreach ($mapping as $key => $objek_id) {
                 if ($request->has($key)) {
-                    $emr_detail_id = \App\Helpers\SequenceHelper::getNextId('emr_detail');
+                    $emr_detail_id = \App\Helpers\GenerateHelper::getNextId('emr_detail');
                     DB::table('emr_detail')->insert([
                         'emr_detail_id' => $emr_detail_id,
                         'emr_id' => $emr_id,

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Helpers\SequenceHelper;
+use App\Helpers\GenerateHelper;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -59,7 +59,7 @@ class UserSeeder extends Seeder
                         ]);
                 } else {
                     DB::table('user_akses')->insert([
-                        'user_akses_id' => SequenceHelper::getNextId('user_akses'),
+                        'user_akses_id' => GenerateHelper::getNextId('user_akses'),
                         'user_id' => $userId,
                         'sub_menu_id' => $subMenuId,
                         'input_time' => $now,

@@ -22,17 +22,3 @@
         </select>
     </div>
 </div>
-
-@once
-    @push('scripts')
-        <script>
-            $(function () {
-                $('.select2-ruangan').select2({
-                    width: '100%',
-                    placeholder: 'Pilih Ruang Perawatan',
-                    allowClear: true
-                });
-            });
-        </script>
-    @endpush
-@endonce

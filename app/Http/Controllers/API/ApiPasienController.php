@@ -38,7 +38,7 @@ class ApiPasienController extends Controller
             }
         }
 
-        $pasiens = $query->orderBy('nama_pasien')->limit(20)->get();
+        $pasiens = $query->orderBy('nama_pasien')->limit(min((int) $request->input('limit', 20), 1000))->get();
 
         $formatted = $pasiens->map(function ($pasien) use ($field, $column) {
             if ($column !== null) {
