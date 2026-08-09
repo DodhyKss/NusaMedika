@@ -54,8 +54,8 @@ $(function () {
             });
         });
     });
-    // Select2 untuk select statis (mis. pilih Bagian pada form pegawai / Poliklinik / Ruang Perawatan)
-    $('.select2, .select2-poliklinik, .select2-ruangan').not('.select2-pasien').each(function () {
+    // Select2 untuk select statis (mis. pilih Bagian pada form pegawai / Poliklinik / Ruang Perawatan / Dokter)
+    $('.select2, .select2-poliklinik, .select2-ruangan, .select2-dokter').not('.select2-pasien').each(function () {
         var placeholder = $(this).find('option[value=""]').first().text() || 'Pilih...';
         pasangSelect2($(this), {
             placeholder: placeholder,

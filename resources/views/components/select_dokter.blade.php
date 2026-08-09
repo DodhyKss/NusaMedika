@@ -9,13 +9,13 @@
             id="{{ $id }}"
             name="{{ $name }}"
             {!! $required ? 'required' : '' !!}
-            class="select2-poliklinik w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
+            class="select2-dokter w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
 
             <option value="">{{ $placeholder }}</option>
 
-            @foreach ($poliklinik as $poli)
-                <option value="{{ $poli->bagian_id }}" @selected((string) $selected === (string) $poli->bagian_id)>
-                    {{ $poli->nama_bagian ?? '' }}
+            @foreach ($dokters as $dokter)
+                <option value="{{ $dokter->pegawai_id }}" @selected((string) $selected === (string) $dokter->pegawai_id)>
+                    {{ $dokter->nama_pegawai ?? '' }}
                 </option>
             @endforeach
 

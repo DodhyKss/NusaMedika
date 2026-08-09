@@ -75,7 +75,9 @@
                     <select id="poliklinik" name="poliklinik" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Poliklinik --</option>
-                        {!! \App\Helpers\SelectOption::render('poliklinik') !!}
+                        @foreach ($polikliniks as $poliklinik)
+                            <option value="{{ $poliklinik->bagian_id }}" @selected((string) old('poliklinik') === (string) $poliklinik->bagian_id)>{{ $poliklinik->nama_bagian }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -85,7 +87,9 @@
                     <select id="dokter_id" name="dokter_id" 
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Dokter --</option>
-                        {!! \App\Helpers\SelectOption::render('dokter_rj') !!}
+                        @foreach ($dokters as $dokter)
+                            <option value="{{ $dokter->pegawai_id }}" data-bagian="{{ implode(',', $poliklinikDokter[$dokter->pegawai_id] ?? []) }}" @selected((string) old('dokter_id') === (string) $dokter->pegawai_id)>{{ $dokter->nama_pegawai }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -154,4 +158,33 @@
         background-size: 1.25em 1.25em;
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const poliklinik = document.getElementById('poliklinik');
+        const dokter = document.getElementById('dokter_id');
+        if (!poliklinik || !dokter) return;
+
+        const options = Array.from(dokter.options);
+
+        function filterDokter() {
+            const bagian = poliklinik.value;
+            options.forEach(option => {
+                if (option.value === '') return;
+                const bagians = (option.dataset.bagian || '').split(',').filter(Boolean);
+                option.style.display = (!bagian || bagians.includes(bagian)) ? '' : 'none';
+            });
+        }
+
+        poliklinik.addEventListener('change', function () {
+            filterDokter();
+            if (dokter.selectedIndex > 0) {
+                const selected = dokter.options[dokter.selectedIndex];
+                if (selected.style.display === 'none') {
+                    dokter.value = '';
+                }
+            }
+        });
+    });
+</script>
 @endsection

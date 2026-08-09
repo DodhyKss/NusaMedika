@@ -149,6 +149,10 @@ class SelectOption
                 ['value' => 'Saudara Kandung', 'label' => 'Saudara Kandung'],
                 ['value' => 'Lainnya', 'label' => 'Lainnya'],
             ],
+            'kategori_icd' => [
+                ['value' => 'ICD-10', 'label' => 'ICD-10'],
+                ['value' => 'ICD-9', 'label' => 'ICD-9'],
+            ],
         ];
     }
 

@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Administrator\ManajemenMaster\Bagian\BagianController;
+use App\Http\Controllers\Administrator\ManajemenMaster\Icd\IcdController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Jabatan\JabatanController;
+use App\Http\Controllers\Administrator\ManajemenMaster\JadwalDokter\JadwalDokterController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Kelas\KelasController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Menu\MenuController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Modul\ModulController;
@@ -137,6 +139,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('wilayah', WilayahController::class)->names('admin.wilayah');
     Route::resource('nasabah', NasabahController::class)->names('admin.nasabah');
     Route::resource('kelas', KelasController::class)->names('admin.kelas');
+    Route::resource('jadwal_dokter', JadwalDokterController::class)->names('admin.jadwal_dokter');
+    Route::resource('icd', IcdController::class)->names('admin.icd');
     // ========== MANAJEMEN USER ============= #
     Route::resource('user', UserController::class)->names('admin.user');
 
