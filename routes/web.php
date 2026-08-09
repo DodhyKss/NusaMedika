@@ -9,7 +9,9 @@ use App\Http\Controllers\Administrator\ManajemenMaster\Profesi\ProfesiController
 use App\Http\Controllers\Administrator\ManajemenMaster\ReferensiBagian\ReferensiBagianController;
 use App\Http\Controllers\Administrator\ManajemenMaster\SubMenu\SubMenuController;
 use App\Http\Controllers\Administrator\ManajemenUser\User\UserController;
+use App\Http\Controllers\Administrator\ManajemenMaster\Wilayah\WilayahController;
 use App\Http\Controllers\API\ApiPasienController;
+use App\Http\Controllers\API\ApiWilayahController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\EMR\DynamicFormController;
@@ -47,6 +49,14 @@ Route::middleware('auth')->group(function () {
     // ========= MENU PASIEN ================== #
     // GET
     Route::get('/daftar_pasien', [DataPasienController::class, 'index'])->name('daftar_pasien.index');
+    Route::get('/daftar_pasien/create', [DataPasienController::class, 'create'])->name('daftar_pasien.create');
+    Route::get('/daftar_pasien/{id}/edit', [DataPasienController::class, 'edit'])->name('daftar_pasien.edit');
+    // POST
+    Route::post('/daftar_pasien', [DataPasienController::class, 'store'])->name('daftar_pasien.store');
+    // PUT
+    Route::put('/daftar_pasien/{id}', [DataPasienController::class, 'update'])->name('daftar_pasien.update');
+    // DELETE
+    Route::delete('/daftar_pasien/{id}', [DataPasienController::class, 'destroy'])->name('daftar_pasien.destroy');
     Route::get('/nasabah_pasien', [NasabahPasienController::class, 'index'])->name('nasabah_pasien.index');
 
     // ========= MENU PENDAFTARAN ============= #
@@ -117,9 +127,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('profesi', ProfesiController::class)->names('admin.profesi');
     Route::resource('jabatan', JabatanController::class)->names('admin.jabatan');
     Route::resource('pegawai', PegawaiController::class)->names('admin.pegawai');
+    Route::resource('wilayah', WilayahController::class)->names('admin.wilayah');
     // ========== MANAJEMEN USER ============= #
     Route::resource('user', UserController::class)->names('admin.user');
 
     // ========= API ROUTES =============
     Route::get('/api/pasien/search', [ApiPasienController::class, 'searchPasien'])->name('api.pasien.search');
+    Route::get('/api/wilayah/provinsi', [ApiWilayahController::class, 'provinsi'])->name('api.wilayah.provinsi');
+    Route::get('/api/wilayah/kabupaten', [ApiWilayahController::class, 'kabupaten'])->name('api.wilayah.kabupaten');
+    Route::get('/api/wilayah/kecamatan', [ApiWilayahController::class, 'kecamatan'])->name('api.wilayah.kecamatan');
+    Route::get('/api/wilayah/kelurahan', [ApiWilayahController::class, 'kelurahan'])->name('api.wilayah.kelurahan');
 });

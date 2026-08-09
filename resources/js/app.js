@@ -32,6 +32,60 @@ $(document).ready(function () {
             width: '100%'
         });
     });
+
+    // Cascade wilayah: provinsi -> kabupaten -> kecamatan -> kelurahan
+    function initWilayahCascade($root) {
+        $root.each(function () {
+            var $c = $(this);
+            var sel = {
+                provinsi: $c.find('select[data-wilayah="provinsi"]'),
+                kabupaten: $c.find('select[data-wilayah="kabupaten"]'),
+                kecamatan: $c.find('select[data-wilayah="kecamatan"]'),
+                kelurahan: $c.find('select[data-wilayah="kelurahan"]')
+            };
+            var parentKey = { kabupaten: 'provinsi_id', kecamatan: 'kabupaten_id', kelurahan: 'kecamatan_id' };
+            var parentSel = { kabupaten: 'provinsi', kecamatan: 'kabupaten', kelurahan: 'kecamatan' };
+            var prefill = $c.data('prefill') || null;
+
+            function muatWilayah(level) {
+                var $s = sel[level];
+                var url = $s.data('url');
+                if (!url) return;
+                var params = {};
+                if (parentSel[level] && sel[parentSel[level]].val()) {
+                    params[parentKey[level]] = sel[parentSel[level]].val();
+                }
+                $s.empty();
+                $s.append($('<option>').val('').text($s.data('placeholder') || '-- Pilih --'));
+                $.getJSON(url, params, function (data) {
+                    $.each(data.results, function (_, r) {
+                        $s.append($('<option>').val(r.id).text(r.text));
+                    });
+                    if (prefill && prefill[level + '_id']) {
+                        $s.val(prefill[level + '_id']).trigger('change');
+                    }
+                });
+            }
+
+            $.each(['provinsi', 'kabupaten', 'kecamatan'], function (_, level) {
+                sel[level].on('change', function () {
+                    var children = level === 'provinsi'
+                        ? ['kabupaten', 'kecamatan', 'kelurahan']
+                        : level === 'kabupaten' ? ['kecamatan', 'kelurahan'] : ['kelurahan'];
+                    $.each(children, function (_, child) {
+                        sel[child].empty().append($('<option>').val('').text(sel[child].data('placeholder') || '-- Pilih --'));
+                    });
+                    muatWilayah(children[0]);
+                });
+            });
+
+            muatWilayah('provinsi');
+        });
+    }
+
+    $('.wilayah-cascade').each(function () {
+        initWilayahCascade($(this));
+    });
     // Sinkronkan Select2 saat form di-reset
     $('form').on('reset', function () {
         var $form = $(this);

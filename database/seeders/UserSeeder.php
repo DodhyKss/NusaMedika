@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
 
         $akses = [
             // Admin: semua sub menu
-            1 => range(1, 23),
+            1 => range(1, 24),
             // Perawat: registrasi, dashboard pasien, pengkajian, list pasien
             2 => [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14],
             // Dokter: daftar pasien, dashboard pasien, SOAP, pengkajian, list pasien

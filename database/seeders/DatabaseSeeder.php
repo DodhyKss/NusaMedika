@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             FormObjekSeeder::class,
             MasterPegawaiSeeder::class,
             UserSeeder::class,
+            WilayahSeeder::class,
         ]);
     }
 }
