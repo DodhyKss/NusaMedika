@@ -22,24 +22,24 @@ class SidebarComposer
             $jsonModuls = Cache::remember('sidebar_moduls_user_' . Auth::id(), now()->addHours(24), function () use ($user) {
                 $aksesSubMenuIds = $user->akses()->pluck('sub_menu_id')->toArray();
 
-                return Modul::where('status_batal', '!=', 1)
-                    ->orWhereNull('status_batal')
+                return Modul::where(function($q) {
+                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                    })
                     ->with(['menus' => function ($query) use ($aksesSubMenuIds) {
-                        $query->where('status_batal', '!=', 1)
-                              ->orWhereNull('status_batal')
+                        $query->where(function($q) {
+                                  $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                              })
                               ->with(['subMenus' => function ($query) use ($aksesSubMenuIds) {
                                   $query->whereIn('sub_menu_id', $aksesSubMenuIds)
                                         ->where(function($q) {
-                                            $q->where('status_batal', '!=', 1)
-                                              ->orWhereNull('status_batal');
+                                            $q->whereNull('status_batal')->orWhere('status_batal', 0);
                                         })
                                         ->orderBy('urutan_sub_menu');
                               }])
                               ->whereHas('subMenus', function ($query) use ($aksesSubMenuIds) {
                                   $query->whereIn('sub_menu_id', $aksesSubMenuIds)
                                         ->where(function($q) {
-                                            $q->where('status_batal', '!=', 1)
-                                              ->orWhereNull('status_batal');
+                                            $q->whereNull('status_batal')->orWhere('status_batal', 0);
                                         });
                               })
                               ->orderBy('urutan_menu');
@@ -47,8 +47,7 @@ class SidebarComposer
                     ->whereHas('menus.subMenus', function ($query) use ($aksesSubMenuIds) {
                         $query->whereIn('sub_menu_id', $aksesSubMenuIds)
                               ->where(function($q) {
-                                  $q->where('status_batal', '!=', 1)
-                                    ->orWhereNull('status_batal');
+                                  $q->whereNull('status_batal')->orWhere('status_batal', 0);
                               });
                     })
                     ->orderBy('urutan_modul')

@@ -36,25 +36,21 @@ class InformasiPasienComposer
                 from registrasi_detail rd
                     join registrasi r on r.registrasi_id = rd.registrasi_id
                     join pasien p on p.pasien_id = r.pasien_id
-                    left join penanggung_rawat pr on pr.registrasi_id = r.registrasi_id
-                    left join users u on u.user_id = pr.rawat_user_id
-                    left join pegawai pg on pg.pegawai_id = u.pegawai_id
+                    left join penanggung_rawat pr on pr.registrasi_id = r.registrasi_id and (pr.status_batal is null or pr.status_batal = 0)
+                    left join users u on u.user_id = pr.rawat_user_id and (u.status_batal is null or u.status_batal = 0)
+                    left join pegawai pg on pg.pegawai_id = u.pegawai_id and (pg.status_batal is null or pg.status_batal = 0)
                     join pasien_nasabah pn on pn.pasien_nasabah_id = r.pasien_nasabah_id
                     join nasabah n on n.nasabah_id = pn.nasabah_id
-                    left join rujukan_sep rs on rs.registrasi_id = r.registrasi_id 
+                    left join rujukan_sep rs on rs.registrasi_id = r.registrasi_id and (rs.status_batal is null or rs.status_batal = 0)
                     join bagian b on b.bagian_id = rd.bagian_id
                 where 
                     rd.registrasi_detail_id = :registrasi_detail_id
-                    and rd.status_batal is null
-                    and r.status_batal is null
-                    and p.status_batal is null
-                    and pr.status_batal is null
-                    and u.status_batal is null
-                    and pg.status_batal is null
-                    and pn.status_batal is null
-                    and n.status_batal is null
-                    and rs.status_batal is null
-                    and b.status_batal is null
+                    and (rd.status_batal is null or rd.status_batal = 0)
+                    and (r.status_batal is null or r.status_batal = 0)
+                    and (p.status_batal is null or p.status_batal = 0)
+                    and (pn.status_batal is null or pn.status_batal = 0)
+                    and (n.status_batal is null or n.status_batal = 0)
+                    and (b.status_batal is null or b.status_batal = 0)
                 ',
                     [
                         'registrasi_detail_id' => $registrasi_detail_id,
