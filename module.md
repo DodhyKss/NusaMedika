@@ -3,4 +3,6 @@
         - SUB MENU :
             1. DAFTAR RAWAT JALAN 
                 TODO :
-                    - Buat Hingga bisa tampil di list pasien dokter
+                    - Sudah bisa mendaftar pasien.
+                    - Sudah muncul di list pelayanan pasien dan list pasien dokter.
+            2. DAFTAR PASIEN IGD

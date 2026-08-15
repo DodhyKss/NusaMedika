@@ -54,10 +54,10 @@
 
                 <!-- Nasabah / Penjamin -->
                 <div>
-                    <label for="nasabah_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nasabah / Penjamin</label>
-                    <select id="nasabah_id" name="nasabah_id" 
+                    <label for="nasabah_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nasabah / Penjamin <span class="text-red-500">*</span></label>
+                    <select id="nasabah_id" name="nasabah_id" required
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">Umum / Mandiri</option>
+                        <option value="">-- Pilih Nasabah --</option>
                         @foreach ($nasabahs as $nasabah)
                             <option value="{{ $nasabah->nasabah_id }}" @selected((string) old('nasabah_id') === (string) $nasabah->nasabah_id)>{{ $nasabah->nama_nasabah }}</option>
                         @endforeach
@@ -69,8 +69,8 @@
 
                 <!-- Kelas Perawatan -->
                 <div>
-                    <label for="kelas_perawatan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kelas Hak Perawatan</label>
-                    <select id="kelas_perawatan" name="kelas_perawatan" 
+                    <label for="kelas_perawatan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kelas Hak Perawatan <span class="text-red-500">*</span></label>
+                    <select id="kelas_perawatan" name="kelas_perawatan" required
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Kelas --</option>
                         @foreach ($kelas as $kelasItem)

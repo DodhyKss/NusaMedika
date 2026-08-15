@@ -25,7 +25,14 @@ class JadwalDokterController extends Controller
     {
         $search = trim((string) $request->input('search'));
 
-        $query = JadwalDokter::aktif()->with(['pegawai', 'bagian']);
+        $query = JadwalDokter::aktif()->with([
+            'pegawai' => fn ($q) => $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            }),
+            'bagian' => fn ($q) => $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            }),
+        ]);
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {

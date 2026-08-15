@@ -32,7 +32,11 @@ class DataPasienController extends Controller
 
         $pasiens = $query->orderBy('pasien_id', 'desc')->paginate(10)->withQueryString();
 
-        $selectedPasien = $pasienId > 0 ? Pasien::find($pasienId) : null;
+        $selectedPasien = $pasienId > 0 ? Pasien::where('pasien_id', $pasienId)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->first() : null;
 
         return view('moduls.registrasi.pasien.data_pasien.daftar_pasien', compact('pasiens', 'pasienId', 'jenisKelamin', 'selectedPasien'));
     }
@@ -71,7 +75,7 @@ class DataPasienController extends Controller
     {
         $pasien = Pasien::findOrFail($id);
 
-        $kelurahan = $pasien->kelurahan_id ? Kelurahan::find($pasien->kelurahan_id) : null;
+        $kelurahan = $pasien->kelurahan_id ? Kelurahan::aktif()->find($pasien->kelurahan_id) : null;
         $kecamatan = $kelurahan?->kecamatan;
         $kabupaten = $kecamatan?->kabupaten;
         $provinsi = $kabupaten?->provinsi;

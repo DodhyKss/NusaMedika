@@ -19,7 +19,9 @@ class SelectRuangPerawatan extends Component
         $this->selected = $selected;
         $this->name = $name;
         $this->id = $id;
-        $this->ruangan = Bagian::orderBy('nama_bagian')->whereNull('status_batal')->where('referensi_bagian', env('REF_BAGIAN_RANAP'))->get(); 
+        $this->ruangan = Bagian::where(function ($q) {
+            $q->whereNull('status_batal')->orWhere('status_batal', 0);
+        })->where('referensi_bagian', env('REF_BAGIAN_RANAP'))->orderBy('nama_bagian')->get();
     }
 
     /**

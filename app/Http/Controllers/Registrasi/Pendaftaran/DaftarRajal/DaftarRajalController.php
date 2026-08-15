@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Registrasi\Pendaftaran\DaftarRajal;
 
 use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
+use App\Models\BillTemp;
 use App\Models\DiagnosaRawat;
 use App\Models\JadwalDokter;
+use App\Models\KelasRuang;
 use App\Models\Nasabah;
 use App\Models\PasienNasabah;
 use App\Models\PenanggungRawat;
@@ -22,7 +24,14 @@ class DaftarRajalController extends Controller
     public function index()
     {
         $jadwals = JadwalDokter::aktif()
-            ->with(['pegawai', 'bagian'])
+            ->with([
+                'pegawai' => fn ($q) => $q->where(function ($sq) {
+                    $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+                }),
+                'bagian' => fn ($q) => $q->where(function ($sq) {
+                    $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+                }),
+            ])
             ->orderBy('hari')
             ->orderBy('waktu_mulai')
             ->get();
@@ -51,7 +60,9 @@ class DaftarRajalController extends Controller
             })->values();
         })->toArray();
 
-        $nasabahs = Nasabah::orderBy('nama_nasabah')->get();
+        $nasabahs = Nasabah::where(function ($q) {
+            $q->whereNull('status_batal')->orWhere('status_batal', 0);
+        })->orderBy('nama_nasabah')->get();
 
         return view('moduls.registrasi.pendaftaran.daftar_rj.daftar_rajal', compact('polikliniks', 'nasabahs', 'jadwalsByPoli'));
     }
@@ -76,7 +87,7 @@ class DaftarRajalController extends Controller
             ->exists();
 
         if ($aktif) {
-            return back()->withInput()->with('error', 'Pasien telah memiliki pendaftaran aktif pada periode kunjungan ' . $request->tgl_kunjungan);
+            return back()->withInput()->with('error', 'Pasien telah memiliki pendaftaran aktif pada periode kunjungan '.$request->tgl_kunjungan);
         }
 
         try {
@@ -84,6 +95,9 @@ class DaftarRajalController extends Controller
 
             $pasienNasabah = PasienNasabah::where('pasien_id', $request->pasien_id)
                 ->where('nasabah_id', $request->nasabah_id)
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
                 ->first();
 
             if (! $pasienNasabah) {
@@ -95,12 +109,19 @@ class DaftarRajalController extends Controller
                 $pasienNasabah->save();
             }
 
+            $hakKelasId = $pasienNasabah->hak_kelas_id;
+
+            $kelasId = $hakKelasId
+                ? KelasRuang::aktif()->where('kelas_ruang_id', $hakKelasId)->value('kelas_bpjs')
+                : null;
+
             $registrasiId = GenerateHelper::getNextId('registrasi');
             $registrasi = new Registrasi;
             $registrasi->registrasi_id = $registrasiId;
             $registrasi->pasien_id = $request->pasien_id;
             $registrasi->tgl_masuk = $request->tgl_kunjungan.' '.date('H:i:s');
-            $registrasi->jenis_rawat = 'RJ';
+            $registrasi->jenis_rawat = env('JENIS_RAWAT_RJ');
+            $registrasi->prioritas = $request->cara_masuk;
             $registrasi->pasien_nasabah_id = $pasienNasabah->pasien_nasabah_id;
             $registrasi->memo = $request->keluhan;
             $registrasi->status_batal = 0;
@@ -108,11 +129,15 @@ class DaftarRajalController extends Controller
             $registrasi->input_user_id = auth()->id();
             $registrasi->save();
 
-            $jadwal = JadwalDokter::find($request->jadwal_dokter_id);
+            $jadwal = JadwalDokter::aktif()->find($request->jadwal_dokter_id);
             $dokter_id = $jadwal->pegawai_id;
 
             // Cari user_id dari dokter berdasarkan pegawai_id
-            $userDokter = User::where('pegawai_id', $dokter_id)->first();
+            $userDokter = User::where('pegawai_id', $dokter_id)
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
+                ->first();
             $rawatUserId = $userDokter ? $userDokter->user_id : auth()->id();
 
             $registrasiDetailId = GenerateHelper::getNextId('registrasi_detail');
@@ -120,12 +145,30 @@ class DaftarRajalController extends Controller
             $registrasiDetail->registrasi_detail_id = $registrasiDetailId;
             $registrasiDetail->registrasi_id = $registrasiId;
             $registrasiDetail->bagian_id = $request->poliklinik;
-            $registrasiDetail->terima_dari = $request->cara_masuk;
+            $registrasiDetail->kelas_id = $kelasId;
+            $registrasiDetail->hak_kelas_id = $hakKelasId;
+            $registrasiDetail->terima_dari = 'DALAM';
             $registrasiDetail->tgl_daftar = now();
             $registrasiDetail->status_batal = 0;
             $registrasiDetail->input_time = now();
             $registrasiDetail->input_user_id = auth()->id();
             $registrasiDetail->save();
+
+            $billTempId = GenerateHelper::getNextId('bill_temp');
+            $billTemp = new BillTemp;
+            $billTemp->bill_temp_id = $billTempId;
+            $billTemp->registrasi_detail_id = $registrasiDetailId;
+            $billTemp->pasien_id = $request->pasien_id;
+            $billTemp->bagian_id = $request->poliklinik;
+            $billTemp->nasabah_id = $request->nasabah_id;
+            $billTemp->kelas_ruang_id = $hakKelasId;
+            $billTemp->hak_kelas_ruang_id = $kelasId;
+            $billTemp->tgl_bill = now();
+            $billTemp->status_selesai = 0;
+            $billTemp->status_batal = 0;
+            $billTemp->input_time = now();
+            $billTemp->input_user_id = auth()->id();
+            $billTemp->save();
 
             $tglKunjungan = Carbon::parse($request->tgl_kunjungan)->toDateString();
 

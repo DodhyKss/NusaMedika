@@ -32,7 +32,11 @@ class AuthController extends Controller
         ];
 
         // Also check if user is active (status_batal = 0 or null)
-        $user = User::where('user_name', $request->user_name)->first();
+        $user = User::where('user_name', $request->user_name)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->first();
         
         if ($user) {
             // Check plain text password directly

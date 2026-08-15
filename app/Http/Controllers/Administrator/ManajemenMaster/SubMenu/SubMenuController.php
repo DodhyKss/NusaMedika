@@ -19,7 +19,15 @@ class SubMenuController extends Controller
     {
         $subMenus = SubMenu::where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->with(['menu.modul'])->orderBy('menu_id')->orderBy('urutan_sub_menu')->get();
+        })->with(['menu' => function ($q) {
+            $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            })->with(['modul' => function ($sq) {
+                $sq->where(function ($sqq) {
+                    $sqq->whereNull('status_batal')->orWhere('status_batal', 0);
+                });
+            }]);
+        }])->orderBy('menu_id')->orderBy('urutan_sub_menu')->get();
 
         return view('moduls.administrator.manajemen_master.sub_menu.index', compact('subMenus'));
     }
@@ -28,7 +36,11 @@ class SubMenuController extends Controller
     {
         $menus = Menu::where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->with('modul')->orderBy('modul_id')->orderBy('urutan_menu')->get();
+        })->with(['modul' => function ($q) {
+            $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            });
+        }])->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
         return view('moduls.administrator.manajemen_master.sub_menu.create', compact('menus'));
     }
@@ -71,7 +83,11 @@ class SubMenuController extends Controller
         $subMenu = SubMenu::findOrFail($id);
         $menus = Menu::where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->with('modul')->orderBy('modul_id')->orderBy('urutan_menu')->get();
+        })->with(['modul' => function ($q) {
+            $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            });
+        }])->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
         return view('moduls.administrator.manajemen_master.sub_menu.edit', compact('subMenu', 'menus'));
     }

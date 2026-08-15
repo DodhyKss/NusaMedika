@@ -20,7 +20,20 @@ class PegawaiController extends Controller
     {
         $pegawais = Pegawai::where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->with(['bagian', 'profesi', 'jabatan', 'statusKepegawaian'])->orderBy('nama_pegawai')->get();
+        })->with([
+            'bagian' => fn ($q) => $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            }),
+            'profesi' => fn ($q) => $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            }),
+            'jabatan' => fn ($q) => $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            }),
+            'statusKepegawaian' => fn ($q) => $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            }),
+        ])->orderBy('nama_pegawai')->get();
 
         return view('moduls.administrator.manajemen_master.pegawai.index', compact('pegawais'));
     }

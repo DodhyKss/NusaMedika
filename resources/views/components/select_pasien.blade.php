@@ -12,7 +12,11 @@
     $extraJson = null;
     $selectedPasienData = null;
     if ($selected) {
-        $selectedPasien = \App\Models\Pasien::find($selected);
+        $selectedPasien = \App\Models\Pasien::where('pasien_id', $selected)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->first();
         if ($selectedPasien) {
             $selectedLabel = "{$selectedPasien->no_mr} - {$selectedPasien->nama_pasien}";
             $selectedPasienData = [

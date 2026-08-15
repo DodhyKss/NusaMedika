@@ -114,9 +114,7 @@
                     <label for="cara_masuk" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Cara Pasien Datang <span class="text-red-500">*</span></label>
                     <select id="cara_masuk" name="cara_masuk" required
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Cara Datang --</option>
-                        <option value="Datang Sendiri" @selected(old('cara_masuk') == 'Datang Sendiri')>Datang Sendiri / Keluarga</option>
-                        <option value="Rujukan" @selected(old('cara_masuk') == 'Rujukan')>Rujukan</option>
+                        {!! \App\Helpers\SelectOption::render('cara_masuk', old('cara_masuk'), '-- Pilih Cara Datang --') !!}
                     </select>
                 </div>
 

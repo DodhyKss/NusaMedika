@@ -20,8 +20,13 @@ class EmrDashboardController extends Controller
             ->join('akses_ehr', 'form.form_id', '=', 'akses_ehr.form_id')
             ->whereNotNull('form.id_dash_menu')
             ->where('form.id_dash_menu', '<>', '')
-            ->whereNull('form.status_batal')
-            ->where('akses_ehr.profesi_id', $profesi_id);
+            ->where(function ($q) {
+                $q->whereNull('form.status_batal')->orWhere('form.status_batal', 0);
+            })
+            ->where('akses_ehr.profesi_id', $profesi_id)
+            ->where(function ($q) {
+                $q->whereNull('akses_ehr.status_batal')->orWhere('akses_ehr.status_batal', 0);
+            });
 
         $jenis_rawat = strtolower(trim($registrasi->jenis_rawat));
         if ($jenis_rawat == '1' || $jenis_rawat == 'igd' || $jenis_rawat == env('JENIS_RAWAT_IGD', 'IGD')) {

@@ -20,10 +20,17 @@ class SoapController extends Controller
         
         // Ambil riwayat SOAP untuk pasien ini (dari registrasi_id)
         $riwayat_soap = DB::table('emr')
-            ->leftJoin('pegawai', 'emr.pegawai_id', '=', 'pegawai.pegawai_id')
+            ->leftJoin('pegawai', function ($join) {
+                $join->on('emr.pegawai_id', '=', 'pegawai.pegawai_id')
+                    ->where(function ($q) {
+                        $q->whereNull('pegawai.status_batal')->orWhere('pegawai.status_batal', 0);
+                    });
+            })
             ->where('emr.registrasi_id', $registrasi_detail->registrasi_id)
             ->where('emr.form_id', $form_id)
-            ->whereNull('emr.status_batal')
+            ->where(function ($q) {
+                $q->whereNull('emr.status_batal')->orWhere('emr.status_batal', 0);
+            })
             ->select('emr.*', 'pegawai.nama_pegawai')
             ->orderBy('emr.tgl_jam', 'desc')
             ->paginate(5)
@@ -33,6 +40,9 @@ class SoapController extends Controller
         $emr_ids = $riwayat_soap->pluck('emr_id')->toArray();
         $riwayat_details_raw = DB::table('emr_detail')
             ->whereIn('emr_id', $emr_ids)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
             ->get();
             
         $riwayat_details = [];
@@ -48,7 +58,9 @@ class SoapController extends Controller
         $emr_pengkajian_awal_keperawatan = DB::table('emr')
             ->where('registrasi_detail_id', $registrasi_detail_id)
             ->where('form_id', env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN'))
-            ->whereNull('status_batal')
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
             ->orderBy('tgl_jam', 'desc')
             ->first();
 
@@ -56,7 +68,9 @@ class SoapController extends Controller
         $emr_pengkajian_harian_keperawatan = DB::table('emr')
             ->where('registrasi_detail_id', $registrasi_detail_id)
             ->where('form_id', env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN'))
-            ->whereNull('status_batal')
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
             ->orderBy('tgl_jam', 'desc')
             ->first();
 
@@ -78,7 +92,9 @@ class SoapController extends Controller
                     env('OBJEK_ID_EWS'),
                     env('OBJEK_ID_GCS_SCORE')
                 ])
-                ->whereNull('status_batal')
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
                 ->pluck('value', 'objek_id');
         }
 
@@ -100,7 +116,9 @@ class SoapController extends Controller
                     env('OBJEK_ID_EWS'),
                     env('OBJEK_ID_GCS_SCORE')
                 ])
-                ->whereNull('status_batal')
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
                 ->pluck('value', 'objek_id');
         }
 
@@ -111,6 +129,9 @@ class SoapController extends Controller
             $assesment_terakhir = DB::table('emr_detail')
                 ->where('emr_id', $last_soap->emr_id)
                 ->where('objek_id', env('OBJEK_ID_ASSESSMENT'))
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
                 ->value('value');
         }
 
@@ -120,12 +141,17 @@ class SoapController extends Controller
         if ($emr_id) {
             $edit_soap = DB::table('emr')
                 ->where('emr_id', $emr_id)
-                ->whereNull('status_batal')
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
                 ->first();
                 
             if ($edit_soap) {
                 $details = DB::table('emr_detail')
                     ->where('emr_id', $edit_soap->emr_id)
+                    ->where(function ($q) {
+                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                    })
                     ->pluck('value', 'objek_id')
                     ->toArray();
                 
@@ -154,10 +180,19 @@ class SoapController extends Controller
         // Ambil riwayat seluruh kunjungan pasien (untuk dropdown History)
         $history_kunjungan = DB::table('registrasi_detail')
             ->join('registrasi', 'registrasi_detail.registrasi_id', '=', 'registrasi.registrasi_id')
-            ->leftJoin('bagian', 'registrasi_detail.bagian_id', '=', 'bagian.bagian_id')
+            ->leftJoin('bagian', function ($join) {
+                $join->on('registrasi_detail.bagian_id', '=', 'bagian.bagian_id')
+                    ->where(function ($q) {
+                        $q->whereNull('bagian.status_batal')->orWhere('bagian.status_batal', 0);
+                    });
+            })
             ->where('registrasi.pasien_id', $registrasi_detail->registrasi->pasien_id)
-            ->whereNull('registrasi.status_batal')
-            ->whereNull('registrasi_detail.status_batal')
+            ->where(function ($q) {
+                $q->whereNull('registrasi.status_batal')->orWhere('registrasi.status_batal', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('registrasi_detail.status_batal')->orWhere('registrasi_detail.status_batal', 0);
+            })
             ->select('registrasi.tgl_masuk', 'bagian.nama_bagian', 'registrasi_detail.registrasi_detail_id')
             ->orderBy('registrasi.tgl_masuk', 'desc')
             ->get();

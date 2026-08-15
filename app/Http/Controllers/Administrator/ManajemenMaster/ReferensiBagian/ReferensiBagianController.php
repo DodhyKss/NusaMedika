@@ -16,7 +16,11 @@ class ReferensiBagianController extends Controller
 {
     public function index()
     {
-        $referensiBagians = ReferensiBagian::withCount('bagians')->where(function ($q) {
+        $referensiBagians = ReferensiBagian::withCount(['bagians' => function ($q) {
+            $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            });
+        }])->where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('referensi_bagian_id')->get();
 

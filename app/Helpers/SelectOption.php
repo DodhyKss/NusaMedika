@@ -110,11 +110,10 @@ class SelectOption
                 ['value' => 'Kuning', 'label' => 'Level 2 - Gawat Darurat Maternal/Neonatal (Kuning)', 'class' => 'text-amber-500'],
                 ['value' => 'Hijau', 'label' => 'Level 3 - Darurat Tidak Gawat (Hijau)', 'class' => 'text-emerald-500'],
             ],
-            'cara_masuk_igd' => [
-                ['value' => 'Datang Sendiri', 'label' => 'Datang Sendiri / Keluarga'],
-                ['value' => 'Diantar Ambulans', 'label' => 'Diantar Ambulans'],
-                ['value' => 'Diantar Polisi', 'label' => 'Diantar Polisi'],
-                ['value' => 'Rujukan Faskes', 'label' => 'Rujukan RS / Puskesmas Lain'],
+            'cara_masuk' => [
+                ['value' => 'Berjalan Sendiri', 'label' => 'Berjalan Sendiri'],
+                ['value' => 'Dengan Kursi Roda', 'label' => 'Dengan Kursi Roda'],
+                ['value' => 'Dengan Brankar', 'label' => 'Dengan Brankar'],
             ],
             'hubungan_penanggung' => [
                 ['value' => 'Keluarga Inti', 'label' => 'Keluarga Inti'],

@@ -19,7 +19,11 @@ class MenuController extends Controller
     {
         $menus = Menu::where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->with('modul')->orderBy('modul_id')->orderBy('urutan_menu')->get();
+        })->with(['modul' => function ($q) {
+            $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            });
+        }])->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
         return view('moduls.administrator.manajemen_master.menu.index', compact('menus'));
     }

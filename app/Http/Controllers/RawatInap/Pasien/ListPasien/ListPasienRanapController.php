@@ -43,11 +43,30 @@ class ListPasienRanapController extends Controller
                 ->join('pasien_nasabah as pn', 'r.pasien_nasabah_id', '=', 'pn.pasien_nasabah_id')
                 ->join('nasabah as n', 'pn.nasabah_id', '=', 'n.nasabah_id')
                 ->where('pr.rawat_user_id', auth()->user()->user_id)
-                ->whereNull('pr.status_batal')
+                ->where(function ($q) {
+                    $q->whereNull('pr.status_batal')->orWhere('pr.status_batal', 0);
+                })
                 ->where('r.jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
                 ->where('b.referensi_bagian', env('REF_BAGIAN_RANAP', 31))
                 ->whereNull('r.tgl_keluar')
-                ->whereNull('r.status_batal')
+                ->where(function ($q) {
+                    $q->whereNull('r.status_batal')->orWhere('r.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('bd.status_batal')->orWhere('bd.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('b.status_batal')->orWhere('b.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('p.status_batal')->orWhere('p.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('pn.status_batal')->orWhere('pn.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('n.status_batal')->orWhere('n.status_batal', 0);
+                })
                 ->when(!empty($ruanganId), function ($query) use ($ruanganId) {
                     $query->where('bd.bagian_id', $ruanganId);
                 })
@@ -95,17 +114,40 @@ class ListPasienRanapController extends Controller
                 ->leftJoin('emr_detail as ed_jk', function ($join) {
                     $join->on('e.emr_id', '=', 'ed_jk.emr_id')
                          ->where('ed_jk.objek_id', env('OBJEK_ID_JENIS_KONSULTASI', 151))
-                         ->whereNull('ed_jk.status_batal');
+                         ->where(function ($q) {
+                             $q->whereNull('ed_jk.status_batal')->orWhere('ed_jk.status_batal', 0);
+                         });
                 })
                 ->join('pasien_nasabah as pn', 'r.pasien_nasabah_id', '=', 'pn.pasien_nasabah_id')
                 ->join('nasabah as n', 'pn.nasabah_id', '=', 'n.nasabah_id')
                 ->where('e.form_id', env('FORM_ID_KONSULTASI', 26))
-                ->whereNull('e.status_batal')
+                ->where(function ($q) {
+                    $q->whereNull('e.status_batal')->orWhere('e.status_batal', 0);
+                })
                 ->where('r.jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
                 ->where('b.referensi_bagian', env('REF_BAGIAN_RANAP', 31))
                 ->whereNull('r.tgl_keluar')
-                ->whereNull('r.status_batal')
-                ->whereNull('ed.status_batal')
+                ->where(function ($q) {
+                    $q->whereNull('r.status_batal')->orWhere('r.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('ed.status_batal')->orWhere('ed.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('bd.status_batal')->orWhere('bd.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('b.status_batal')->orWhere('b.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('p.status_batal')->orWhere('p.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('pn.status_batal')->orWhere('pn.status_batal', 0);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('n.status_batal')->orWhere('n.status_batal', 0);
+                })
                 ->where('ed.value', (string) auth()->user()->user_id)
                 ->where('ed.objek_id', env('OBJEK_ID_DOKTER_PENERIMA_KONSUL', 303))
                 ->whereNotIn('r.pasien_id', function ($query) {
@@ -113,9 +155,13 @@ class ListPasienRanapController extends Controller
                           ->from('penanggung_rawat as pr2')
                           ->join('registrasi as r2', 'pr2.registrasi_id', '=', 'r2.registrasi_id')
                           ->where('pr2.rawat_user_id', auth()->user()->user_id)
-                          ->whereNull('pr2.status_batal')
+                          ->where(function ($q) {
+                              $q->whereNull('pr2.status_batal')->orWhere('pr2.status_batal', 0);
+                          })
                           ->whereNull('r2.tgl_keluar')
-                          ->whereNull('r2.status_batal');
+                          ->where(function ($q) {
+                              $q->whereNull('r2.status_batal')->orWhere('r2.status_batal', 0);
+                          });
                 })
                 ->when(!empty($ruanganId), function ($query) use ($ruanganId) {
                     $query->where('bd.bagian_id', $ruanganId);
@@ -143,7 +189,7 @@ class ListPasienRanapController extends Controller
                 ->fromSub($subQuery, 'x')
                 ->select(
                     'x.*',
-                    DB::raw("(SELECT MAX(rd.registrasi_detail_id) FROM registrasi_detail rd WHERE x.registrasi_id = rd.registrasi_id AND x.bagian_id = rd.bagian_id AND rd.status_batal IS NULL) as registrasi_detail_id")
+                    DB::raw("(SELECT MAX(rd.registrasi_detail_id) FROM registrasi_detail rd WHERE x.registrasi_id = rd.registrasi_id AND x.bagian_id = rd.bagian_id AND (rd.status_batal IS NULL OR rd.status_batal = 0)) as registrasi_detail_id")
                 )
                 ->orderBy('x.nama_bagian')
                 ->orderBy('x.nama_pasien')

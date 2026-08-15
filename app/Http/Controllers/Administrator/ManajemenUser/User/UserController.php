@@ -19,7 +19,11 @@ class UserController extends Controller
     {
         $users = User::where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->with('pegawai')->orderBy('user_id')->get();
+        })->with(['pegawai' => function ($q) {
+            $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            });
+        }])->orderBy('user_id')->get();
 
         return view('moduls.administrator.manajemen_user.user.index', compact('users'));
     }

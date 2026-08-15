@@ -25,23 +25,23 @@ class WilayahController extends Controller
 
         $data = match ($tab) {
             'kabupaten' => Kabupaten::aktif()
-                ->with('provinsi')
+                ->with(['provinsi' => fn ($q) => $q->aktif()])
                 ->when($request->filled('provinsi_id'), fn ($q) => $q->where('provinsi_id', $request->input('provinsi_id')))
-                ->withCount('kecamatan')
+                ->withCount(['kecamatan' => fn ($q) => $q->aktif()])
                 ->orderBy('nama_kabupaten')
                 ->get(),
             'kecamatan' => Kecamatan::aktif()
-                ->with('kabupaten')
+                ->with(['kabupaten' => fn ($q) => $q->aktif()])
                 ->when($request->filled('kabupaten_id'), fn ($q) => $q->where('kabupaten_id', $request->input('kabupaten_id')))
-                ->withCount('kelurahan')
+                ->withCount(['kelurahan' => fn ($q) => $q->aktif()])
                 ->orderBy('nama_kecamatan')
                 ->get(),
             'kelurahan' => Kelurahan::aktif()
-                ->with('kecamatan')
+                ->with(['kecamatan' => fn ($q) => $q->aktif()])
                 ->when($request->filled('kecamatan_id'), fn ($q) => $q->where('kecamatan_id', $request->input('kecamatan_id')))
                 ->orderBy('nama_kelurahan')
                 ->get(),
-            default => Provinsi::aktif()->withCount('kabupaten')->orderBy('nama_provinsi')->get(),
+            default => Provinsi::aktif()->withCount(['kabupaten' => fn ($q) => $q->aktif()])->orderBy('nama_provinsi')->get(),
         };
 
         $kabupatens = Kabupaten::aktif()->orderBy('nama_kabupaten')->get();

@@ -21,6 +21,7 @@ The 295 migrations were generated from a pre-existing SIMRS PostgreSQL database 
 - **`GenerateHelper::generateNoMr()`**: `MAX(no_mr)+1` over **all** `pasien` rows (no `status_batal` filter — the `unique_no_mr` constraint covers soft-deleted rows too), padded to 7 digits.
 - **No Laravel timestamps**: tables use `input_time`/`mod_time` (timestamp(6)) + `input_user_id`/`mod_user_id`. All models set `public $timestamps = false`.
 - **Soft delete via `status_batal`** (null = active, 1 = deleted), not `deleted_at`.
+- **Semua query GET (index/dropdown/opsi/relasi) wajib memfilter `status_batal`**: record aktif hanya yang `status_batal IS NULL` **atau** `status_batal = 0`; selain itu (1, dst.) berarti batal/terhapus. Pakai pola `where(function ($q) { $q->whereNull('status_batal')->orWhere('status_batal', 0); })` (atau `->where('status_batal', '!=', 1)` yang setara) — **jangan hanya `whereNull`** (record seeder bisa ber-`status_batal=0`). Berlaku juga untuk `join`/`whereHas`/relasi, kecuali ada alasan eksplisit menyertakan record batal (mis. `generateNoMr()`).
 - Model PKs are custom (`user_id`, `menu_id`, ...) and some use `$primaryKey`, `$fillable` — check the model before assuming column names.
 
 ## Migrations gotchas

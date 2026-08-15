@@ -2,8 +2,16 @@
     // Jika tidak ada data emr_data yang di-passing, kita ambil berdasarkan emr_id
     if (!isset($emr_data)) {
         $emr_data = \Illuminate\Support\Facades\DB::table('emr')
-            ->leftJoin('pegawai', 'emr.pegawai_id', '=', 'pegawai.pegawai_id')
+            ->leftJoin('pegawai', function ($join) {
+                $join->on('emr.pegawai_id', '=', 'pegawai.pegawai_id')
+                    ->where(function ($q) {
+                        $q->whereNull('pegawai.status_batal')->orWhere('pegawai.status_batal', 0);
+                    });
+            })
             ->where('emr.emr_id', $emr_id)
+            ->where(function ($q) {
+                $q->whereNull('emr.status_batal')->orWhere('emr.status_batal', 0);
+            })
             ->select('emr.*', 'pegawai.nama_pegawai')
             ->first();
     }
@@ -11,6 +19,9 @@
     // Ambil detail SOAP
     $details = \Illuminate\Support\Facades\DB::table('emr_detail')
         ->where('emr_id', $emr_id)
+        ->where(function ($q) {
+            $q->whereNull('status_batal')->orWhere('status_batal', 0);
+        })
         ->pluck('value', 'variabel')
         ->toArray();
         

@@ -93,6 +93,9 @@ class GenerateHelper
         $urutanTerakhir = DB::table('registrasi_urut')
             ->where('pegawai_id', $pegawaiId)
             ->where('bagian_id', $bagianId)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
             ->whereDate('tgl_urut', $tglKunjungan)
             ->max('urutan');
 

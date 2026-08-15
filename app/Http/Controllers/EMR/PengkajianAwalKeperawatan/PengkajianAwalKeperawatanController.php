@@ -22,10 +22,17 @@ class PengkajianAwalKeperawatanController extends Controller
 
         // Ambil riwayat untuk sidebar
         $riwayatPengkajianAwal = DB::table('emr')
-            ->leftJoin('pegawai', 'emr.pegawai_id', '=', 'pegawai.pegawai_id')
+            ->leftJoin('pegawai', function ($join) {
+                $join->on('emr.pegawai_id', '=', 'pegawai.pegawai_id')
+                    ->where(function ($q) {
+                        $q->whereNull('pegawai.status_batal')->orWhere('pegawai.status_batal', 0);
+                    });
+            })
             ->where('emr.registrasi_id', $registrasi_detail->registrasi_id)
             ->where('emr.form_id', $form_id)
-            ->whereNull('emr.status_batal')
+            ->where(function ($q) {
+                $q->whereNull('emr.status_batal')->orWhere('emr.status_batal', 0);
+            })
             ->select('emr.*', 'pegawai.nama_pegawai')
             ->orderBy('emr.tgl_jam', 'desc')
             ->paginate(5)
@@ -33,10 +40,19 @@ class PengkajianAwalKeperawatanController extends Controller
 
         $history_kunjungan = DB::table('registrasi_detail')
             ->join('registrasi', 'registrasi_detail.registrasi_id', '=', 'registrasi.registrasi_id')
-            ->leftJoin('bagian', 'registrasi_detail.bagian_id', '=', 'bagian.bagian_id')
+            ->leftJoin('bagian', function ($join) {
+                $join->on('registrasi_detail.bagian_id', '=', 'bagian.bagian_id')
+                    ->where(function ($q) {
+                        $q->whereNull('bagian.status_batal')->orWhere('bagian.status_batal', 0);
+                    });
+            })
             ->where('registrasi.pasien_id', $registrasi_detail->registrasi->pasien_id)
-            ->whereNull('registrasi.status_batal')
-            ->whereNull('registrasi_detail.status_batal')
+            ->where(function ($q) {
+                $q->whereNull('registrasi.status_batal')->orWhere('registrasi.status_batal', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('registrasi_detail.status_batal')->orWhere('registrasi_detail.status_batal', 0);
+            })
             ->select('registrasi.tgl_masuk', 'bagian.nama_bagian', 'registrasi_detail.registrasi_detail_id')
             ->orderBy('registrasi.tgl_masuk', 'desc')
             ->get();
@@ -55,8 +71,14 @@ class PengkajianAwalKeperawatanController extends Controller
         # Jika emr_id null artinya user input data baru
         if(empty($emr_id)){
             # Data Pasien
-            $data_pasien = Pasien::whereNull('status_batal')->where('pasien_id', $registrasi_detail->registrasi->pasien_id)->first();
-            $diagnosa_rawat = DiagnosaRawat::with('icd')->whereNull('status_batal')->where('registrasi_id', $registrasi_detail->registrasi->registrasi_id)->first();
+            $data_pasien = Pasien::where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })->where('pasien_id', $registrasi_detail->registrasi->pasien_id)->first();
+            $diagnosa_rawat = DiagnosaRawat::with(['icd' => function ($q) {
+                $q->aktif();
+            }])->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })->where('registrasi_id', $registrasi_detail->registrasi->registrasi_id)->first();
             
             $emr_data[env('OBJEK_ID_AGAMA')]['agama'] = $data_pasien->agama;
             $emr_data[env('OBJEK_ID_TINKAT_PENDIDIKAN')]['tingkat_pendidikan'] = $data_pasien->pendidikan;
@@ -141,7 +163,9 @@ class PengkajianAwalKeperawatanController extends Controller
             # Jika emr_id ada artinya user mengedit data atau melihat data
             $details = DB::table('emr_detail')
                 ->where('emr_id', $emr_id)
-                ->whereNull('status_batal')
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
                 ->get();
             
             foreach ($details as $d) {

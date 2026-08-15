@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Registrasi\Pendaftaran\ListPelayanan;
 
 use App\Http\Controllers\Controller;
-use App\Models\Registrasi;
+use App\Models\BillTemp;
+use App\Models\DiagnosaRawat;
 use App\Models\Pasien;
+use App\Models\PenanggungRawat;
+use App\Models\Registrasi;
+use App\Models\RegistrasiUrut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,19 +22,46 @@ class ListPelayananController extends Controller
         $pasienId = $request->input('pasien_id');
 
         $query = Registrasi::with([
-            'pasien',
-            'registrasiDetails' => function($q) {
-                $q->where(function($sq) {
+            'pasien' => function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNull('status_batal')->orWhere('status_batal', 0);
-                })->with(['bagian', 'billTemp']);
+                });
+            },
+            'registrasiDetails' => function ($q) {
+                $q->where(function ($sq) {
+                    $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+                })->with([
+                    'bagian' => function ($sq) {
+                        $sq->where(function ($sqq) {
+                            $sqq->whereNull('status_batal')->orWhere('status_batal', 0);
+                        });
+                    },
+                    'billTemp' => function ($sq) {
+                        $sq->where(function ($sqq) {
+                            $sqq->whereNull('status_batal')->orWhere('status_batal', 0);
+                        });
+                    },
+                ]);
             },
             'rujukanSep',
-            'pasienNasabah.nasabah',
-            'penanggungRawat.user'
+            'pasienNasabah' => function ($q) {
+                $q->where(function ($sq) {
+                    $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+                })->with(['nasabah' => function ($sq) {
+                    $sq->where(function ($sqq) {
+                        $sqq->whereNull('status_batal')->orWhere('status_batal', 0);
+                    });
+                }]);
+            },
+            'penanggungRawat.user' => function ($q) {
+                $q->where(function ($sq) {
+                    $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+                });
+            },
         ])
-        ->where(function($q) {
-            $q->whereNull('status_batal')->orWhere('status_batal', 0);
-        });
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            });
 
         // Filter Tanggal
         if ($tanggalAwal) {
@@ -61,22 +92,70 @@ class ListPelayananController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             $registrasi = Registrasi::findOrFail($id);
             $registrasi->status_batal = 1;
+            $registrasi->mod_time = now();
+            $registrasi->mod_user_id = auth()->id();
             $registrasi->save();
 
             // Cancel details
             foreach ($registrasi->registrasiDetails as $detail) {
                 $detail->status_batal = 1;
+                $detail->mod_time = now();
+                $detail->mod_user_id = auth()->id();
                 $detail->save();
+
+                // Cancel bill_temp & registrasi_urut terkait
+                BillTemp::where('registrasi_detail_id', $detail->registrasi_detail_id)
+                    ->where(function ($q) {
+                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                    })
+                    ->update([
+                        'status_batal' => 1,
+                        'mod_time' => now(),
+                        'mod_user_id' => auth()->id(),
+                    ]);
+
+                RegistrasiUrut::where('registrasi_detail_id', $detail->registrasi_detail_id)
+                    ->where(function ($q) {
+                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                    })
+                    ->update([
+                        'status_batal' => 1,
+                        'mod_time' => now(),
+                        'mod_user_id' => auth()->id(),
+                    ]);
             }
 
+            // Cancel diagnosa_rawat & penanggung_rawat terkait
+            DiagnosaRawat::where('registrasi_id', $registrasi->registrasi_id)
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
+                ->update([
+                    'status_batal' => 1,
+                    'mod_time' => now(),
+                    'mod_user_id' => auth()->id(),
+                ]);
+
+            PenanggungRawat::where('registrasi_id', $registrasi->registrasi_id)
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
+                ->update([
+                    'status_batal' => 1,
+                    'mod_time' => now(),
+                    'mod_user_id' => auth()->id(),
+                ]);
+
             DB::commit();
+
             return redirect()->back()->with('success', 'Layanan berhasil dihapus/dibatalkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal membatalkan layanan: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Gagal membatalkan layanan: '.$e->getMessage());
         }
     }
 }

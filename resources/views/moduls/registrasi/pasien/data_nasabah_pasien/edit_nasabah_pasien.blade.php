@@ -70,8 +70,8 @@
 
                 <!-- Kelas Perawatan -->
                 <div>
-                    <label for="kelas_perawatan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kelas Hak Perawatan</label>
-                    <select id="kelas_perawatan" name="kelas_perawatan" 
+                    <label for="kelas_perawatan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kelas Hak Perawatan <span class="text-red-500">*</span></label>
+                    <select id="kelas_perawatan" name="kelas_perawatan" required
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Kelas --</option>
                         @foreach ($kelas as $kelasItem)

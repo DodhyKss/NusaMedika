@@ -17,7 +17,11 @@ class BagianController extends Controller
 {
     public function index()
     {
-        $bagians = Bagian::with('referensi')->where(function ($q) {
+        $bagians = Bagian::with(['referensi' => function ($q) {
+            $q->where(function ($sq) {
+                $sq->whereNull('status_batal')->orWhere('status_batal', 0);
+            });
+        }])->where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('nama_bagian')->get();
 
