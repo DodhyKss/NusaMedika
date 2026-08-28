@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\ReferensiBagian;
 
-use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Bagian;
 use App\Models\ReferensiBagian;
@@ -41,7 +40,6 @@ class ReferensiBagianController extends Controller
         DB::beginTransaction();
         try {
             $referensi = new ReferensiBagian;
-            $referensi->referensi_bagian_id = GenerateHelper::getNextId('referensi_bagian');
             $referensi->nama_referensi_bagian = $request->nama_referensi_bagian;
             $referensi->input_time = now();
             $referensi->input_user_id = Auth::id();

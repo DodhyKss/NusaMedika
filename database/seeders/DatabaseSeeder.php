@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\GenerateHelper;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -18,12 +19,29 @@ class DatabaseSeeder extends Seeder
             ReferensiBagianSeeder::class,
             BagianSeeder::class,
             ModulMenuSubMenuSeeder::class,
-            FormObjekSeeder::class,
             MasterPegawaiSeeder::class,
             UserSeeder::class,
             WilayahSeeder::class,
             KelasRuangSeeder::class,
             IcdSeeder::class,
         ]);
+
+        // Seeder di atas mengisi ID eksplisit (updateOrInsert), sehingga sequence
+        // auto-increment tidak ikut maju. Setel ulang sequence agar insert baru
+        // via aplikasi (yang memakai auto-increment) tidak bentrok dengan ID seeder.
+        $this->resetSequences();
+    }
+
+    private function resetSequences(): void
+    {
+        $tables = [
+            'referensi_bagian', 'bagian', 'modul', 'menu', 'sub_menu',
+            'profesi', 'jabatan', 'status_kepegawaian', 'pegawai', 'users',
+            'provinsi', 'kabupaten', 'kecamatan', 'kelurahan', 'kelas_ruang',
+        ];
+
+        foreach ($tables as $table) {
+            GenerateHelper::resetSequence($table);
+        }
     }
 }

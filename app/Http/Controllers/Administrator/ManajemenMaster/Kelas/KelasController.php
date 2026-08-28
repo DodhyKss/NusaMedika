@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Kelas;
 
-use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\KelasRuang;
 use Illuminate\Http\Request;
@@ -38,7 +37,6 @@ class KelasController extends Controller
         DB::beginTransaction();
         try {
             $kelas = new KelasRuang;
-            $kelas->kelas_ruang_id = GenerateHelper::getNextId('kelas_ruang');
             $kelas->nama_kelas_ruang = $data['nama_kelas_ruang'];
             $kelas->kelas_khusus = $data['kelas_khusus'];
             $kelas->kelas_bpjs = $data['kelas_bpjs'];

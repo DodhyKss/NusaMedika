@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Modul;
 
-use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Modul;
@@ -40,7 +39,6 @@ class ModulController extends Controller
         DB::beginTransaction();
         try {
             $modul = new Modul;
-            $modul->modul_id = GenerateHelper::getNextId('modul');
             $modul->nama_modul = $request->nama_modul;
             $modul->icon_modul = $request->icon_modul;
             $modul->urutan_modul = $request->urutan_modul;

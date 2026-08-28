@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Icd;
 
-use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ICD;
 use Illuminate\Http\Request;
@@ -41,7 +40,6 @@ class IcdController extends Controller
         DB::beginTransaction();
         try {
             $icd = new ICD;
-            $icd->icd_id = GenerateHelper::getNextId('icd');
             $icd->kode_diagnosa = $data['kode_diagnosa'];
             $icd->nama_diagnosa = $data['nama_diagnosa'];
             $icd->kategori = $data['kategori'];

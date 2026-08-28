@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Wilayah;
 
-use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Kabupaten;
 use App\Models\Kecamatan;
@@ -165,28 +164,24 @@ class WilayahController extends Controller
     {
         match ($tab) {
             'kabupaten' => $this->saveRecord(new Kabupaten, [
-                'kabupaten_id' => GenerateHelper::getNextId('kabupaten'),
                 'provinsi_id' => $data['provinsi_id'],
                 'nama_kabupaten' => $data['nama_kabupaten'],
                 'kode_wilayah_kabupaten' => $data['kode_wilayah_kabupaten'] ?? null,
                 'status_batal' => 0,
             ]),
             'kecamatan' => $this->saveRecord(new Kecamatan, [
-                'kecamatan_id' => GenerateHelper::getNextId('kecamatan'),
                 'kabupaten_id' => $data['kabupaten_id'],
                 'nama_kecamatan' => $data['nama_kecamatan'],
                 'kode_wilayah_kecamatan' => $data['kode_wilayah_kecamatan'] ?? null,
                 'status_batal' => 0,
             ]),
             'kelurahan' => $this->saveRecord(new Kelurahan, [
-                'kelurahan_id' => GenerateHelper::getNextId('kelurahan'),
                 'kecamatan_id' => $data['kecamatan_id'],
                 'nama_kelurahan' => $data['nama_kelurahan'],
                 'kode_wilayah_kelurahan' => $data['kode_wilayah_kelurahan'] ?? null,
                 'status_batal' => 0,
             ]),
             default => $this->saveRecord(new Provinsi, [
-                'provinsi_id' => GenerateHelper::getNextId('provinsi'),
                 'nama_provinsi' => $data['nama_provinsi'],
                 'kode_wilayah_provinsi' => $data['kode_wilayah_provinsi'] ?? null,
                 'status_batal' => 0,

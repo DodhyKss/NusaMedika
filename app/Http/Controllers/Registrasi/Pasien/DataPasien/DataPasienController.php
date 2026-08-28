@@ -53,7 +53,6 @@ class DataPasienController extends Controller
         DB::beginTransaction();
         try {
             $pasien = new Pasien;
-            $pasien->pasien_id = GenerateHelper::getNextId('pasien');
             $pasien->no_mr = GenerateHelper::generateNoMr();
             $this->fillData($pasien, $data);
             $pasien->input_time = now();

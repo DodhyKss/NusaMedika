@@ -11,15 +11,21 @@ class MasterPegawaiSeeder extends Seeder
     {
         $now = now();
 
+        // ========= Seeder Jabatan =========
         $jabatans = [
             ['jabatan_id' => 1, 'nama_jabatan' => 'Direktur'],
-            ['jabatan_id' => 2, 'nama_jabatan' => 'Wakil Direktur'],
-            ['jabatan_id' => 3, 'nama_jabatan' => 'Kepala Bagian'],
-            ['jabatan_id' => 4, 'nama_jabatan' => 'Kepala Ruangan'],
-            ['jabatan_id' => 5, 'nama_jabatan' => 'Dokter'],
-            ['jabatan_id' => 6, 'nama_jabatan' => 'Perawat'],
-            ['jabatan_id' => 7, 'nama_jabatan' => 'Bidan'],
-            ['jabatan_id' => 8, 'nama_jabatan' => 'Administrasi'],
+            ['jabatan_id' => 2, 'nama_jabatan' => 'Wakil Direktur Pelayanan'],
+            ['jabatan_id' => 3, 'nama_jabatan' => 'Wakil Direktur Keperawatan'],
+            ['jabatan_id' => 4, 'nama_jabatan' => 'Wakil Direktur Penunjang'],
+            ['jabatan_id' => 5, 'nama_jabatan' => 'Wakil Direktur Umum & Keuangan'],
+            ['jabatan_id' => 6, 'nama_jabatan' => 'Komite Medik'],
+            ['jabatan_id' => 7, 'nama_jabatan' => 'Komite Keperawatan'],
+            ['jabatan_id' => 8, 'nama_jabatan' => 'Komite Mutu'],
+            ['jabatan_id' => 9, 'nama_jabatan' => 'Kepala Bagian'],
+            ['jabatan_id' => 10, 'nama_jabatan' => 'Kepala Bidan'],
+            ['jabatan_id' => 11, 'nama_jabatan' => 'Kepala Seksi'],
+            ['jabatan_id' => 12, 'nama_jabatan' => 'Kepala Instalasi'],
+            ['jabatan_id' => 13, 'nama_jabatan' => 'Pegawai'],
         ];
 
         foreach ($jabatans as $jabatan) {
@@ -33,11 +39,40 @@ class MasterPegawaiSeeder extends Seeder
             );
         }
 
+        // ========== Seeder Profesi =============
+        $profesis = [
+            ['profesi_id' => 1, 'nama_profesi' => 'Dokter'],
+            ['profesi_id' => 2, 'nama_profesi' => 'Perawat'],
+            ['profesi_id' => 3, 'nama_profesi' => 'Bidan'],
+            ['profesi_id' => 4, 'nama_profesi' => 'Apoteker'],
+            ['profesi_id' => 5, 'nama_profesi' => 'Radiografer'],
+            ['profesi_id' => 6, 'nama_profesi' => 'IT Support'],
+            ['profesi_id' => 7, 'nama_profesi' => 'Perekam Medis'],
+            ['profesi_id' => 8, 'nama_profesi' => 'Fisioterapis'],
+            ['profesi_id' => 9, 'nama_profesi' => 'Sanitarian'],
+            ['profesi_id' => 10, 'nama_profesi' => 'Ahli Gizi'],
+            ['profesi_id' => 11, 'nama_profesi' => 'Security'],
+            ['profesi_id' => 12, 'nama_profesi' => 'Teknisi'],
+        ];
+
+        foreach ($profesis as $profesi) {
+            DB::table('profesi')->updateOrInsert(
+                ['profesi_id' => $profesi['profesi_id']],
+                array_merge($profesi, [
+                    'input_time' => $now,
+                    'input_user_id' => 1,
+                    'status_batal' => 0,
+                ])
+            );
+        }
+
+        // ========== Seeder Status Kepegawaian =============
         $statuses = [
             ['status_kepegawaian_id' => 1, 'nama_status_kepegawaian' => 'PNS'],
             ['status_kepegawaian_id' => 2, 'nama_status_kepegawaian' => 'PPPK'],
-            ['status_kepegawaian_id' => 3, 'nama_status_kepegawaian' => 'Kontrak'],
-            ['status_kepegawaian_id' => 4, 'nama_status_kepegawaian' => 'Honorer'],
+            ['status_kepegawaian_id' => 3, 'nama_status_kepegawaian' => 'PPPK PW'],
+            ['status_kepegawaian_id' => 4, 'nama_status_kepegawaian' => 'Kontrak'],
+            ['status_kepegawaian_id' => 5, 'nama_status_kepegawaian' => 'Honorer'],
         ];
 
         foreach ($statuses as $status) {
@@ -51,10 +86,11 @@ class MasterPegawaiSeeder extends Seeder
             );
         }
 
+        // ======== Seeder Pegawai ==========
         $pegawais = [
             [
                 'pegawai_id' => 1,
-                'nama_pegawai' => 'Administrator Sistem',
+                'nama_pegawai' => 'Superadmin',
                 'nip' => 'ADM001',
                 'bagian_id' => 1,
                 'profesi_id' => 3,

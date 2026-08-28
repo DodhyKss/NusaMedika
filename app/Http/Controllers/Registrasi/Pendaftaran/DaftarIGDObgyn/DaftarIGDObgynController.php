@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Registrasi\Pendaftaran\DaftarIGDObgyn;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class DaftarIGDObgynController extends Controller
 {

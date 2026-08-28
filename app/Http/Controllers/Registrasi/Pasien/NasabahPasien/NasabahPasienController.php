@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Registrasi\Pasien\NasabahPasien;
 
-use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\KelasRuang;
 use App\Models\Nasabah;
@@ -75,7 +74,6 @@ class NasabahPasienController extends Controller
             $nasabah = $this->resolveNasabah($data['nasabah_id']);
 
             $pasienNasabah = new PasienNasabah;
-            $pasienNasabah->pasien_nasabah_id = GenerateHelper::getNextId('pasien_nasabah');
             $pasienNasabah->pasien_id = $data['pasien_id'];
             $pasienNasabah->nasabah_id = $nasabah->nasabah_id;
             $pasienNasabah->no_peserta = $data['nomor_kartu'];

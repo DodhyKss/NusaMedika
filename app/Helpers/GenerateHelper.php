@@ -8,60 +8,24 @@ use Illuminate\Support\Facades\DB;
 class GenerateHelper
 {
     /**
-     * Mengambil ID berikutnya dari sequence PostgreSQL.
-     * Secara otomatis mencari dengan berbagai format nama sequence.
+     * Menyetel ulang sequence auto-increment agar mengikuti ID terbesar saat ini.
+     * Dipakai setelah seeder mengisi data dengan ID eksplisit agar insert baru
+     * (yang memakai auto-increment) tidak bentrok dengan ID yang sudah dipakai.
      *
      * @param  string  $tableName  Nama tabel
      * @param  string|null  $primaryKey  Kolom primary key (opsional)
-     * @return int
-     *
-     * @throws \Exception
      */
-    public static function getNextId($tableName, $primaryKey = null)
+    public static function resetSequence($tableName, $primaryKey = null)
     {
-        if (! $primaryKey) {
-            $primaryKey = $tableName.'_id';
-        }
+        $primaryKey = $primaryKey ?: $tableName.'_id';
 
-        // Daftar kemungkinan format nama sequence (diurutkan berdasarkan prioritas)
-        $possibleSequences = [
-            $tableName.'_'.$primaryKey.'_seq', // Format standar Postgres (paling sering digunakan)
-            $tableName.'_squence',           // Format typo squence
-            $tableName.'_sequence',          // Format standar english
-            $primaryKey.'_seq',              // Format bawaan alternatif
-        ];
-
-        foreach ($possibleSequences as $seq) {
-            try {
-                // Cek eksistensi sequence terlebih dahulu agar nextval tidak
-                // memicu error yang bisa mengabort transaksi PostgreSQL aktif.
-                $exists = DB::selectOne(
-                    "SELECT 1 FROM pg_class c WHERE c.relkind = 'S' AND c.relname = ? AND pg_table_is_visible(c.oid)",
-                    [$seq]
-                );
-
-                if (! $exists) {
-                    continue;
-                }
-
-                // Gunakan query select nextval
-                $result = DB::selectOne('SELECT nextval(?) as next_id', [$seq]);
-                if ($result && $result->next_id) {
-                    return (int) $result->next_id;
-                }
-            } catch (\Exception $e) {
-                // Jika error (sequence tidak ada), lanjut ke format nama berikutnya
-                continue;
-            }
-        }
-
-        // Jika semua format gagal, gunakan MAX + 1 sebagai fallback terakhir
         try {
-            $max = DB::table($tableName)->max($primaryKey);
-
-            return ($max ? (int) $max : 0) + 1;
+            DB::statement(
+                'SELECT setval(pg_get_serial_sequence(?, ?), COALESCE((SELECT MAX('.$primaryKey.') FROM '.$tableName.') + 1, 1), false)',
+                [$tableName, $primaryKey]
+            );
         } catch (\Exception $e) {
-            throw new \Exception("Gagal mendapatkan sequence ID untuk tabel {$tableName}. Pastikan sequence atau tabel valid.");
+            // Abaikan jika sequence tidak ditemukan.
         }
     }
 

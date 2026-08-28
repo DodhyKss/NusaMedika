@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\EMR\Soap;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Models\RegistrasiDetail;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SoapController extends Controller
 {
@@ -14,10 +14,10 @@ class SoapController extends Controller
     {
 
         $registrasi_detail = RegistrasiDetail::with('registrasi.pasien')->findOrFail($registrasi_detail_id);
-        
+
         // Form ID untuk SOAP biasanya 3
         $form_id = env('FORM_ID_SOAP');
-        
+
         // Ambil riwayat SOAP untuk pasien ini (dari registrasi_id)
         $riwayat_soap = DB::table('emr')
             ->leftJoin('pegawai', function ($join) {
@@ -44,12 +44,11 @@ class SoapController extends Controller
                 $q->whereNull('status_batal')->orWhere('status_batal', 0);
             })
             ->get();
-            
+
         $riwayat_details = [];
         foreach ($riwayat_details_raw as $rd) {
             $riwayat_details[$rd->emr_id][$rd->objek_id] = $rd->value;
         }
-
 
         // ambil riwayat pengkajian
         $riwayat_pengkajian = [];
@@ -90,7 +89,7 @@ class SoapController extends Controller
                     env('OBJEK_ID_ETT'),
                     env('OBJEK_ID_SATURASI'),
                     env('OBJEK_ID_EWS'),
-                    env('OBJEK_ID_GCS_SCORE')
+                    env('OBJEK_ID_GCS_SCORE'),
                 ])
                 ->where(function ($q) {
                     $q->whereNull('status_batal')->orWhere('status_batal', 0);
@@ -114,7 +113,7 @@ class SoapController extends Controller
                     env('OBJEK_ID_ETT'),
                     env('OBJEK_ID_SATURASI'),
                     env('OBJEK_ID_EWS'),
-                    env('OBJEK_ID_GCS_SCORE')
+                    env('OBJEK_ID_GCS_SCORE'),
                 ])
                 ->where(function ($q) {
                     $q->whereNull('status_batal')->orWhere('status_batal', 0);
@@ -145,7 +144,7 @@ class SoapController extends Controller
                     $q->whereNull('status_batal')->orWhere('status_batal', 0);
                 })
                 ->first();
-                
+
             if ($edit_soap) {
                 $details = DB::table('emr_detail')
                     ->where('emr_id', $edit_soap->emr_id)
@@ -154,13 +153,13 @@ class SoapController extends Controller
                     })
                     ->pluck('value', 'objek_id')
                     ->toArray();
-                
+
                 $formData = [
                     's' => $details[env('OBJEK_ID_SUBJECTIVE')] ?? '',
                     'o' => $details[env('OBJEK_ID_OBJECTIVE')] ?? '',
                     'a' => $details[env('OBJEK_ID_ASSESSMENT')] ?? '',
                     'p' => $details[env('OBJEK_ID_PLANNING')] ?? '',
-                    'i' => $details[env('OBJEK_ID_INSTRUKSI')] ?? ''
+                    'i' => $details[env('OBJEK_ID_INSTRUKSI')] ?? '',
                 ];
 
                 // Fallback untuk data lama yang hanya tersimpan di JSON
@@ -171,7 +170,7 @@ class SoapController extends Controller
                         'o' => $jsonData['o'] ?? '',
                         'a' => $jsonData['a'] ?? '',
                         'p' => $jsonData['p'] ?? '',
-                        'i' => $jsonData['i'] ?? ''
+                        'i' => $jsonData['i'] ?? '',
                     ];
                 }
             }
@@ -200,7 +199,7 @@ class SoapController extends Controller
         $history_grouped = [];
         foreach ($history_kunjungan as $hk) {
             $date = date('Y-m-d', strtotime($hk->tgl_masuk));
-            if (!isset($history_grouped[$date])) {
+            if (! isset($history_grouped[$date])) {
                 $history_grouped[$date] = [];
             }
             if ($hk->nama_bagian) {
@@ -226,7 +225,7 @@ class SoapController extends Controller
             'objective' => 'nullable|string',
             'assessment' => 'nullable|string',
             'plan' => 'nullable|string',
-            'instruction' => 'nullable|string'
+            'instruction' => 'nullable|string',
         ]);
 
         $registrasi_detail = RegistrasiDetail::findOrFail($registrasi_detail_id);
@@ -236,17 +235,14 @@ class SoapController extends Controller
         $now = now();
 
         // jika pegawai_id atau user_id null, maka redirect ke halaman login
-        if($pegawai_id == null || $user_id == null) {
+        if ($pegawai_id == null || $user_id == null) {
             return redirect()->back()->with('error', 'Sesi Anda Telah Habis Silahkan Login Kembali!');
         }
 
         DB::beginTransaction();
         try {
-            $emr_id = \App\Helpers\GenerateHelper::getNextId('emr');
-
             // Insert ke tabel emr
-            DB::table('emr')->insert([
-                'emr_id' => $emr_id,
+            $emr_id = DB::table('emr')->insertGetId([
                 'form_id' => $form_id,
                 'pegawai_id' => $pegawai_id,
                 'tgl_jam' => $now,
@@ -255,7 +251,7 @@ class SoapController extends Controller
                 'registrasi_id' => $registrasi_detail->registrasi_id,
                 'input_time' => $now,
                 'input_user_id' => $user_id,
-            ]);
+            ], 'emr_id');
 
             // Insert ke tabel emr_detail (S, O, A, P, I)
             $details = [
@@ -267,9 +263,7 @@ class SoapController extends Controller
             ];
 
             foreach ($details as $d) {
-                $emr_detail_id = \App\Helpers\GenerateHelper::getNextId('emr_detail');
                 DB::table('emr_detail')->insert([
-                    'emr_detail_id' => $emr_detail_id,
                     'emr_id' => $emr_id,
                     'objek_id' => $d['objek_id'],
                     'variabel' => $d['variabel'],
@@ -280,10 +274,12 @@ class SoapController extends Controller
             }
 
             DB::commit();
+
             return redirect()->route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil disimpan');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan SOAP: ' . $e->getMessage())->withInput();
+
+            return back()->with('error', 'Gagal menyimpan SOAP: '.$e->getMessage())->withInput();
         }
     }
 
@@ -325,9 +321,7 @@ class SoapController extends Controller
             ];
 
             foreach ($details as $d) {
-                $emr_detail_id = \App\Helpers\GenerateHelper::getNextId('emr_detail');
                 DB::table('emr_detail')->insert([
-                    'emr_detail_id' => $emr_detail_id,
                     'emr_id' => $emr_id,
                     'objek_id' => $d['objek_id'],
                     'variabel' => $d['variabel'],
@@ -338,10 +332,12 @@ class SoapController extends Controller
             }
 
             DB::commit();
+
             return redirect()->route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal memperbarui SOAP: ' . $e->getMessage())->withInput();
+
+            return back()->with('error', 'Gagal memperbarui SOAP: '.$e->getMessage())->withInput();
         }
     }
 
@@ -369,10 +365,12 @@ class SoapController extends Controller
                 ]);
 
             DB::commit();
+
             return redirect()->route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil dibatalkan');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal membatalkan SOAP: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal membatalkan SOAP: '.$e->getMessage());
         }
     }
 }

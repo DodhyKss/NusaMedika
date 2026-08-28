@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\EMR\EmrDashboard;
 
 use App\Http\Controllers\Controller;
-use App\Models\Registrasi;
+use App\Models\RegistrasiDetail;
 use Illuminate\Support\Facades\DB;
 
 class EmrDashboardController extends Controller
 {
     public function index($registrasi_detail_id)
     {
-        $registrasi_detail = \App\Models\RegistrasiDetail::with('registrasi')->findOrFail($registrasi_detail_id);
+        $registrasi_detail = RegistrasiDetail::with('registrasi')->findOrFail($registrasi_detail_id);
         $registrasi = $registrasi_detail->registrasi;
 
         $profesi_id = session('profesi_id', 1); // Fallback ke profesi ID 1 (Dokter)

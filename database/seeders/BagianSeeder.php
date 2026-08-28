@@ -24,33 +24,24 @@ class BagianSeeder extends Seeder
             'POLI PARU',
             'POLI KULIT DAN KELAMIN',
             'POLI GIGI DAN MULUT',
-            'POLI UROLOGI',
             'POLI ORTOPEDI',
-            'POLI UMUM',
             'POLI REHABILITASI MEDIK',
             'POLI JIWA',
             'POLI GIZI',
-            'POLI KIA',
         ];
 
         $ruangPerawatan = [
-            'RUANG MAWAR',
-            'RUANG MELATI',
-            'RUANG ANGGREK',
-            'RUANG CEMPAKA',
-            'RUANG DAHLIA',
-            'RUANG KENANGA',
-            'RUANG FLAMBOYAN',
-            'RUANG TERATAI',
-            'RUANG NUSA INDAH',
-            'RUANG IRIS',
-            'RUANG BOUGENVILLE',
-            'RUANG CENDANA',
+            'RUANG PERAWATAN MAWAR',
+            'RUANG PERAWATAN MELATI',
+            'RUANG PERAWATAN ANGGREK',
+            'RUANG PERAWATAN DAHLIA',
+            'RUANG PERAWATAN KENANGA',
+            'RUANG PERAWATAN BOUGENVILLE',
             'RUANG ICU',
             'RUANG NICU',
             'RUANG PICU',
             'RUANG BERSALIN',
-            'RUANG OPERASI',
+            'INSTALASI BEDAH SENTRAL',
             'RUANG ISOLASI',
             'RUANG PERAWATAN KHUSUS',
         ];
@@ -64,13 +55,13 @@ class BagianSeeder extends Seeder
         $bagians = [];
         $id = 1;
         foreach ($polies as $nama) {
-            $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian' => 1, 'group_bagian' => 'RJ'];
+            $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 1];
         }
         foreach ($ruangPerawatan as $nama) {
-            $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian' => 2, 'group_bagian' => 'RI'];
+            $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 2];
         }
         foreach ($igd as $nama) {
-            $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian' => 3, 'group_bagian' => 'IGD'];
+            $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 3];
         }
 
         // Hapus permanen record lama (placeholder Rawat Jalan/Rawat Inap/IGD + data lama) lalu seed ulang

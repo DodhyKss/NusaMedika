@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Helpers\GenerateHelper;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +12,7 @@ class UserSeeder extends Seeder
         $now = now();
 
         $users = [
-            ['user_id' => 1, 'user_name' => 'admin', 'user_password' => 'admin', 'pegawai_id' => 1],
+            ['user_id' => 1, 'user_name' => 'superadmin', 'user_password' => 'admin', 'pegawai_id' => 1],
             ['user_id' => 2, 'user_name' => 'perawat', 'user_password' => 'perawat', 'pegawai_id' => 2],
             ['user_id' => 3, 'user_name' => 'dokter', 'user_password' => 'dokter', 'pegawai_id' => 3],
         ];
@@ -59,7 +58,6 @@ class UserSeeder extends Seeder
                         ]);
                 } else {
                     DB::table('user_akses')->insert([
-                        'user_akses_id' => GenerateHelper::getNextId('user_akses'),
                         'user_id' => $userId,
                         'sub_menu_id' => $subMenuId,
                         'input_time' => $now,

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\JadwalDokter;
 
-use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\JadwalDokter;
 use Illuminate\Http\Request;
@@ -66,7 +65,6 @@ class JadwalDokterController extends Controller
         DB::beginTransaction();
         try {
             $jadwal = new JadwalDokter;
-            $jadwal->jadwal_dokter_id = GenerateHelper::getNextId('jadwal_dokter');
             $jadwal->pegawai_id = $data['pegawai_id'];
             $jadwal->hari = $data['hari'];
             $jadwal->waktu_mulai = $data['waktu_mulai'];

@@ -11,6 +11,7 @@ class ModulMenuSubMenuSeeder extends Seeder
     {
         $now = now();
 
+        // ======== Seeder Module =========
         $moduls = [
             [
                 'modul_id' => 1,
@@ -20,30 +21,24 @@ class ModulMenuSubMenuSeeder extends Seeder
             ],
             [
                 'modul_id' => 2,
-                'nama_modul' => 'EMR',
-                'icon_modul' => 'fa-solid fa-notes-medical',
-                'urutan_modul' => 2,
-            ],
-            [
-                'modul_id' => 3,
                 'nama_modul' => 'Rawat Jalan',
                 'icon_modul' => 'fa-solid fa-user-injured',
                 'urutan_modul' => 3,
             ],
             [
-                'modul_id' => 4,
+                'modul_id' => 3,
                 'nama_modul' => 'Rawat Inap',
                 'icon_modul' => 'fa-solid fa-bed',
                 'urutan_modul' => 4,
             ],
             [
-                'modul_id' => 5,
+                'modul_id' => 4,
                 'nama_modul' => 'Gawat Darurat',
                 'icon_modul' => 'fa-solid fa-truck-medical',
                 'urutan_modul' => 5,
             ],
             [
-                'modul_id' => 6,
+                'modul_id' => 5,
                 'nama_modul' => 'Administrator',
                 'icon_modul' => 'fa-solid fa-gear',
                 'urutan_modul' => 6,
@@ -61,23 +56,20 @@ class ModulMenuSubMenuSeeder extends Seeder
             );
         }
 
+        // ========= Seeder Menu ==========
         $menus = [
             // Modul Registrasi (1)
             ['menu_id' => 1, 'modul_id' => 1, 'nama_menu' => 'Pasien', 'urutan_menu' => 1],
             ['menu_id' => 2, 'modul_id' => 1, 'nama_menu' => 'Pendaftaran', 'urutan_menu' => 2],
-            // Modul EMR (2)
-            ['menu_id' => 3, 'modul_id' => 2, 'nama_menu' => 'Dashboard Pasien', 'urutan_menu' => 1],
-            ['menu_id' => 4, 'modul_id' => 2, 'nama_menu' => 'SOAP (CPPT)', 'urutan_menu' => 2],
-            ['menu_id' => 5, 'modul_id' => 2, 'nama_menu' => 'Pengkajian Keperawatan', 'urutan_menu' => 3],
-            // Modul Rawat Jalan (3)
-            ['menu_id' => 6, 'modul_id' => 3, 'nama_menu' => 'Pasien', 'urutan_menu' => 1],
-            // Modul Rawat Inap (4)
-            ['menu_id' => 7, 'modul_id' => 4, 'nama_menu' => 'Pasien', 'urutan_menu' => 1],
-            // Modul Gawat Darurat (5)
-            ['menu_id' => 8, 'modul_id' => 5, 'nama_menu' => 'Pasien', 'urutan_menu' => 1],
-            // Modul Administrator (6)
-            ['menu_id' => 9, 'modul_id' => 6, 'nama_menu' => 'Manajemen Master', 'urutan_menu' => 1],
-            ['menu_id' => 10, 'modul_id' => 6, 'nama_menu' => 'Manajemen User', 'urutan_menu' => 2],
+            // Modul Rawat Jalan (2)
+            ['menu_id' => 3, 'modul_id' => 2, 'nama_menu' => 'Pasien', 'urutan_menu' => 1],
+            // Modul Rawat Inap (3)
+            ['menu_id' => 4, 'modul_id' => 3, 'nama_menu' => 'Pasien', 'urutan_menu' => 1],
+            // Modul Gawat Darurat (4)
+            ['menu_id' => 5, 'modul_id' => 4, 'nama_menu' => 'Pasien', 'urutan_menu' => 1],
+            // Modul Administrator (5)
+            ['menu_id' => 6, 'modul_id' => 5, 'nama_menu' => 'Manajemen Master', 'urutan_menu' => 1],
+            ['menu_id' => 7, 'modul_id' => 5, 'nama_menu' => 'Manajemen User', 'urutan_menu' => 2],
         ];
 
         foreach ($menus as $menu) {
@@ -91,6 +83,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             );
         }
 
+        // ========= Seeder Sub Menu ==========
         $subMenus = [
             // Menu Pasien (1) - Registrasi
             ['sub_menu_id' => 1, 'menu_id' => 1, 'nama_sub_menu' => 'Daftar Pasien', 'file_sub_menu' => 'daftar_pasien', 'urutan_sub_menu' => 1],
@@ -103,18 +96,13 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 7, 'menu_id' => 2, 'nama_sub_menu' => 'Registrasi IGD Obgyn', 'file_sub_menu' => 'registrasi_igd_obgyn', 'urutan_sub_menu' => 5],
             // Menu Dashboard Pasien (3) - EMR
             ['sub_menu_id' => 8, 'menu_id' => 3, 'nama_sub_menu' => 'Dashboard Pasien', 'file_sub_menu' => '#', 'urutan_sub_menu' => 1],
-            // Menu SOAP (4) - EMR
-            ['sub_menu_id' => 9, 'menu_id' => 4, 'nama_sub_menu' => 'SOAP (CPPT)', 'file_sub_menu' => '#', 'urutan_sub_menu' => 1],
-            // Menu Pengkajian Keperawatan (5) - EMR
-            ['sub_menu_id' => 10, 'menu_id' => 5, 'nama_sub_menu' => 'Pengkajian Awal Keperawatan', 'file_sub_menu' => '#', 'urutan_sub_menu' => 1],
-            ['sub_menu_id' => 11, 'menu_id' => 5, 'nama_sub_menu' => 'Pengkajian Harian Keperawatan', 'file_sub_menu' => '#', 'urutan_sub_menu' => 2],
-            // Menu Pasien (6) - Rawat Jalan
+            // Menu Pasien (4) - Rawat Jalan
             ['sub_menu_id' => 12, 'menu_id' => 6, 'nama_sub_menu' => 'List Pasien Dokter', 'file_sub_menu' => 'list_pasien_dokter', 'urutan_sub_menu' => 1],
-            // Menu Pasien (7) - Rawat Inap
+            // Menu Pasien (5) - Rawat Inap
             ['sub_menu_id' => 13, 'menu_id' => 7, 'nama_sub_menu' => 'List Pasien Ranap', 'file_sub_menu' => 'list_pasien_ranap', 'urutan_sub_menu' => 1],
-            // Menu Pasien (8) - Gawat Darurat
+            // Menu Pasien (6) - Gawat Darurat
             ['sub_menu_id' => 14, 'menu_id' => 8, 'nama_sub_menu' => 'List Pasien IGD', 'file_sub_menu' => 'list_pasien_igd', 'urutan_sub_menu' => 1],
-            // Menu Manajemen Master (9) - Administrator
+            // Menu Manajemen Master (7) - Administrator
             ['sub_menu_id' => 15, 'menu_id' => 9, 'nama_sub_menu' => 'Modul', 'file_sub_menu' => 'modul', 'urutan_sub_menu' => 1],
             ['sub_menu_id' => 16, 'menu_id' => 9, 'nama_sub_menu' => 'Menu', 'file_sub_menu' => 'menu', 'urutan_sub_menu' => 2],
             ['sub_menu_id' => 17, 'menu_id' => 9, 'nama_sub_menu' => 'Sub Menu', 'file_sub_menu' => 'sub_menu', 'urutan_sub_menu' => 3],
@@ -128,7 +116,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 26, 'menu_id' => 9, 'nama_sub_menu' => 'Master Kelas', 'file_sub_menu' => 'kelas', 'urutan_sub_menu' => 11],
             ['sub_menu_id' => 27, 'menu_id' => 9, 'nama_sub_menu' => 'Jadwal Dokter', 'file_sub_menu' => 'jadwal_dokter', 'urutan_sub_menu' => 12],
             ['sub_menu_id' => 28, 'menu_id' => 9, 'nama_sub_menu' => 'ICD', 'file_sub_menu' => 'icd', 'urutan_sub_menu' => 13],
-            // Menu Manajemen User (10) - Administrator
+            // Menu Manajemen User (8) - Administrator
             ['sub_menu_id' => 18, 'menu_id' => 10, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'user', 'urutan_sub_menu' => 1],
         ];
 

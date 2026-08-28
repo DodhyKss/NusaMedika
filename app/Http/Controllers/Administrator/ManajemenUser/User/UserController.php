@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenUser\User;
 
-use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Modul;
 use App\Models\Pegawai;
@@ -51,7 +50,6 @@ class UserController extends Controller
             $pegawai = Pegawai::findOrFail($request->pegawai_id);
 
             $user = new User;
-            $user->user_id = GenerateHelper::getNextId('users', 'user_id');
             $user->user_name = $request->user_name;
             $user->user_password = $request->user_password;
             $user->nama_pegawai = $pegawai->nama_pegawai;
@@ -193,7 +191,6 @@ class UserController extends Controller
             'mod_user_id' => Auth::id(),
         ]);
 
-        $nextId = GenerateHelper::getNextId('user_akses');
         foreach ($subMenuIds as $subMenuId) {
             $exists = UserAkses::where('user_id', $userId)
                 ->where('sub_menu_id', $subMenuId)
@@ -205,14 +202,13 @@ class UserController extends Controller
                 $exists->mod_user_id = Auth::id();
                 $exists->save();
             } else {
-                DB::table('user_akses')->insert([
-                    'user_akses_id' => $nextId++,
-                    'user_id' => $userId,
-                    'sub_menu_id' => $subMenuId,
-                    'input_time' => now(),
-                    'input_user_id' => Auth::id(),
-                    'status_batal' => 0,
-                ]);
+                $akses = new UserAkses;
+                $akses->user_id = $userId;
+                $akses->sub_menu_id = $subMenuId;
+                $akses->input_time = now();
+                $akses->input_user_id = Auth::id();
+                $akses->status_batal = 0;
+                $akses->save();
             }
         }
     }

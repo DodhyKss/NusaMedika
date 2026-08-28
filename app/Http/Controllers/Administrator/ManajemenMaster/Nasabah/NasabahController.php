@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Nasabah;
 
-use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Nasabah;
 use Illuminate\Http\Request;
@@ -44,7 +43,6 @@ class NasabahController extends Controller
         DB::beginTransaction();
         try {
             $nasabah = new Nasabah;
-            $nasabah->nasabah_id = GenerateHelper::getNextId('nasabah');
             $nasabah->nama_nasabah = $data['nama_nasabah'];
             $nasabah->email_nasabah = $data['email_nasabah'];
             $nasabah->alamat_nasabah = $data['alamat_nasabah'];

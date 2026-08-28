@@ -101,9 +101,7 @@ class DaftarRajalController extends Controller
                 ->first();
 
             if (! $pasienNasabah) {
-                $pasienNasabahId = GenerateHelper::getNextId('pasien_nasabah');
                 $pasienNasabah = new PasienNasabah;
-                $pasienNasabah->pasien_nasabah_id = $pasienNasabahId;
                 $pasienNasabah->pasien_id = $request->pasien_id;
                 $pasienNasabah->nasabah_id = $request->nasabah_id;
                 $pasienNasabah->save();
@@ -115,9 +113,7 @@ class DaftarRajalController extends Controller
                 ? KelasRuang::aktif()->where('kelas_ruang_id', $hakKelasId)->value('kelas_bpjs')
                 : null;
 
-            $registrasiId = GenerateHelper::getNextId('registrasi');
             $registrasi = new Registrasi;
-            $registrasi->registrasi_id = $registrasiId;
             $registrasi->pasien_id = $request->pasien_id;
             $registrasi->tgl_masuk = $request->tgl_kunjungan.' '.date('H:i:s');
             $registrasi->jenis_rawat = env('JENIS_RAWAT_RJ');
@@ -140,10 +136,8 @@ class DaftarRajalController extends Controller
                 ->first();
             $rawatUserId = $userDokter ? $userDokter->user_id : auth()->id();
 
-            $registrasiDetailId = GenerateHelper::getNextId('registrasi_detail');
             $registrasiDetail = new RegistrasiDetail;
-            $registrasiDetail->registrasi_detail_id = $registrasiDetailId;
-            $registrasiDetail->registrasi_id = $registrasiId;
+            $registrasiDetail->registrasi_id = $registrasi->registrasi_id;
             $registrasiDetail->bagian_id = $request->poliklinik;
             $registrasiDetail->kelas_id = $kelasId;
             $registrasiDetail->hak_kelas_id = $hakKelasId;
@@ -154,10 +148,8 @@ class DaftarRajalController extends Controller
             $registrasiDetail->input_user_id = auth()->id();
             $registrasiDetail->save();
 
-            $billTempId = GenerateHelper::getNextId('bill_temp');
             $billTemp = new BillTemp;
-            $billTemp->bill_temp_id = $billTempId;
-            $billTemp->registrasi_detail_id = $registrasiDetailId;
+            $billTemp->registrasi_detail_id = $registrasiDetail->registrasi_detail_id;
             $billTemp->pasien_id = $request->pasien_id;
             $billTemp->bagian_id = $request->poliklinik;
             $billTemp->nasabah_id = $request->nasabah_id;
@@ -176,10 +168,8 @@ class DaftarRajalController extends Controller
 
             $estimasi = GenerateHelper::hitungEstimasi($tglKunjungan, $jadwal->waktu_mulai, $urutan);
 
-            $registrasiUrutId = GenerateHelper::getNextId('registrasi_urut');
             $registrasiUrut = new RegistrasiUrut;
-            $registrasiUrut->registrasi_urut_id = $registrasiUrutId;
-            $registrasiUrut->registrasi_detail_id = $registrasiDetailId;
+            $registrasiUrut->registrasi_detail_id = $registrasiDetail->registrasi_detail_id;
             $registrasiUrut->pegawai_id = $dokter_id;
             $registrasiUrut->bagian_id = $request->poliklinik;
             $registrasiUrut->urutan = $urutan;
@@ -189,10 +179,8 @@ class DaftarRajalController extends Controller
             $registrasiUrut->input_user_id = auth()->id();
             $registrasiUrut->save();
 
-            $diagnosaRawatId = GenerateHelper::getNextId('diagnosa_rawat');
             $diagnosaRawat = new DiagnosaRawat;
-            $diagnosaRawat->diagnosa_rawat_id = $diagnosaRawatId;
-            $diagnosaRawat->registrasi_id = $registrasiId;
+            $diagnosaRawat->registrasi_id = $registrasi->registrasi_id;
             $diagnosaRawat->icd_id = $request->icd_id;
             $diagnosaRawat->jenis_diagnosa = 1;
             $diagnosaRawat->status_batal = 0;
@@ -200,10 +188,8 @@ class DaftarRajalController extends Controller
             $diagnosaRawat->input_user_id = auth()->id();
             $diagnosaRawat->save();
 
-            $penanggungRawatId = GenerateHelper::getNextId('penanggung_rawat');
             $penanggungRawat = new PenanggungRawat;
-            $penanggungRawat->penanggung_rawat_id = $penanggungRawatId;
-            $penanggungRawat->registrasi_id = $registrasiId;
+            $penanggungRawat->registrasi_id = $registrasi->registrasi_id;
             $penanggungRawat->rawat_user_id = $rawatUserId;
             $penanggungRawat->status_batal = 0;
             $penanggungRawat->input_time = now();
