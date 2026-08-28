@@ -37,7 +37,7 @@ class SelectPoliklinik extends Component
         $this->required = $required;
 
         $this->poliklinik = Bagian::orderBy('nama_bagian')
-            ->where('referensi_bagian', env('REF_BAGIAN_RAJAL'))
+            ->where('referensi_bagian_id', env('REF_BAGIAN_RAJAL'))
             ->where(function ($q) {
                 $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
             })

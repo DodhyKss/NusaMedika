@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
     private function resetSequences(): void
     {
         $tables = [
-            'referensi_bagian', 'bagian', 'modul', 'menu', 'sub_menu',
+            'referensi_bagian_id', 'bagian', 'modul', 'menu', 'sub_menu',
             'profesi', 'jabatan', 'status_kepegawaian', 'pegawai', 'users',
             'provinsi', 'kabupaten', 'kecamatan', 'kelurahan', 'kelas_ruang',
         ];

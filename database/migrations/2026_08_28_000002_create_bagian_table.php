@@ -16,8 +16,8 @@ return new class extends Migration
             $table->integer('mod_user_id')->nullable();
             $table->smallInteger('status_batal')->nullable();
             $table->string('nama_bagian', 100)->nullable();
-            $table->integer('referensi_bagian_id')->nullable();
-            $table->index('referensi_bagian_id');
+            $table->integer('referensi_bagian_id_id')->nullable();
+            $table->index('referensi_bagian_id_id');
         });
     }
 

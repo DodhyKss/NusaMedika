@@ -21,7 +21,7 @@ class SelectRuangPerawatan extends Component
         $this->id = $id;
         $this->ruangan = Bagian::where(function ($q) {
             $q->whereNull('status_batal')->orWhere('status_batal', 0);
-        })->where('referensi_bagian', env('REF_BAGIAN_RANAP'))->orderBy('nama_bagian')->get();
+        })->where('referensi_bagian_id', env('REF_BAGIAN_RANAP'))->orderBy('nama_bagian')->get();
     }
 
     /**

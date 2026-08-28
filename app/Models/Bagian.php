@@ -14,7 +14,7 @@ class Bagian extends Model
 
     protected $fillable = [
         'nama_bagian',
-        'referensi_bagian',
+        'referensi_bagian_id',
         'group_bagian',
         'seri_bagian',
         'id_satu_sehat',
@@ -25,7 +25,7 @@ class Bagian extends Model
 
     public function referensi()
     {
-        return $this->belongsTo(ReferensiBagian::class, 'referensi_bagian', 'referensi_bagian_id');
+        return $this->belongsTo(ReferensiBagian::class, 'referensi_bagian_id', 'referensi_bagian_id_id');
     }
 
     public function pegawais()

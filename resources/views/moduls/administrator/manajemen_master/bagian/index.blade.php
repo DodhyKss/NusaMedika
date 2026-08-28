@@ -34,7 +34,7 @@
                 <tr class="hover:bg-blue-50/40 transition-colors">
                     <td class="px-3 py-3 text-center text-slate-500">{{ $i + 1 }}</td>
                     <td class="px-3 py-3 font-semibold text-slate-800">{{ $bagian->nama_bagian }}</td>
-                    <td class="px-3 py-3 text-slate-600">{{ $bagian->referensi?->nama_referensi_bagian ?? '-' }}</td>
+                    <td class="px-3 py-3 text-slate-600">{{ $bagian->referensi?->nama_referensi_bagian_id ?? '-' }}</td>
                     <td class="px-3 py-3 text-slate-600">{{ $bagian->group_bagian ?? '-' }}</td>
                     <td class="px-3 py-3 text-center">
                         @if ($bagian->flag_eksekutif)

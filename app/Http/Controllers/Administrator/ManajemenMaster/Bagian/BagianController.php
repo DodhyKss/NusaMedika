@@ -36,7 +36,7 @@ class BagianController extends Controller
     {
         $request->validate([
             'nama_bagian' => 'required|string|max:100',
-            'referensi_bagian' => 'required|integer|exists:referensi_bagian,referensi_bagian_id',
+            'referensi_bagian_id' => 'required|integer|exists:referensi_bagian_id,referensi_bagian_id_id',
             'group_bagian' => 'nullable|string|max:10',
             'seri_bagian' => 'nullable|string|max:20',
             'id_satu_sehat' => 'nullable|string|max:50',
@@ -48,7 +48,7 @@ class BagianController extends Controller
         try {
             $bagian = new Bagian;
             $bagian->nama_bagian = Str::upper($request->nama_bagian);
-            $bagian->referensi_bagian = $request->referensi_bagian;
+            $bagian->referensi_bagian_id = $request->referensi_bagian_id;
             $bagian->group_bagian = $request->group_bagian;
             $bagian->seri_bagian = $request->seri_bagian;
             $bagian->id_satu_sehat = $request->id_satu_sehat;
@@ -81,7 +81,7 @@ class BagianController extends Controller
     {
         $request->validate([
             'nama_bagian' => 'required|string|max:100',
-            'referensi_bagian' => 'nullable|integer|exists:referensi_bagian,referensi_bagian_id',
+            'referensi_bagian_id' => 'nullable|integer|exists:referensi_bagian_id,referensi_bagian_id_id',
             'group_bagian' => 'nullable|string|max:10',
             'seri_bagian' => 'nullable|string|max:20',
             'id_satu_sehat' => 'nullable|string|max:50',
@@ -93,7 +93,7 @@ class BagianController extends Controller
         try {
             $bagian = Bagian::findOrFail($id);
             $bagian->nama_bagian = Str::upper($request->nama_bagian);
-            $bagian->referensi_bagian = $request->referensi_bagian;
+            $bagian->referensi_bagian_id = $request->referensi_bagian_id;
             $bagian->group_bagian = $request->group_bagian;
             $bagian->seri_bagian = $request->seri_bagian;
             $bagian->id_satu_sehat = $request->id_satu_sehat;
@@ -139,7 +139,7 @@ class BagianController extends Controller
     {
         $referensiBagians = ReferensiBagian::where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->orderBy('referensi_bagian_id')->get();
+        })->orderBy('referensi_bagian_id_id')->get();
 
         return compact('referensiBagians');
     }

@@ -21,26 +21,26 @@ class ReferensiBagianController extends Controller
             });
         }])->where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->orderBy('referensi_bagian_id')->get();
+        })->orderBy('referensi_bagian_id_id')->get();
 
-        return view('moduls.administrator.manajemen_master.referensi_bagian.index', compact('referensiBagians'));
+        return view('moduls.administrator.manajemen_master.referensi_bagian_id.index', compact('referensiBagians'));
     }
 
     public function create()
     {
-        return view('moduls.administrator.manajemen_master.referensi_bagian.create');
+        return view('moduls.administrator.manajemen_master.referensi_bagian_id.create');
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nama_referensi_bagian' => 'required|string|max:100',
+            'nama_referensi_bagian_id' => 'required|string|max:100',
         ]);
 
         DB::beginTransaction();
         try {
             $referensi = new ReferensiBagian;
-            $referensi->nama_referensi_bagian = $request->nama_referensi_bagian;
+            $referensi->nama_referensi_bagian_id = $request->nama_referensi_bagian_id;
             $referensi->input_time = now();
             $referensi->input_user_id = Auth::id();
             $referensi->status_batal = 0;
@@ -49,7 +49,7 @@ class ReferensiBagianController extends Controller
             DB::commit();
             $this->clearSidebarCache();
 
-            return redirect()->route('admin.referensi_bagian.index')->with('success', 'Referensi bagian berhasil ditambahkan.');
+            return redirect()->route('admin.referensi_bagian_id.index')->with('success', 'Referensi bagian berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -61,19 +61,19 @@ class ReferensiBagianController extends Controller
     {
         $referensi = ReferensiBagian::findOrFail($id);
 
-        return view('moduls.administrator.manajemen_master.referensi_bagian.edit', compact('referensi'));
+        return view('moduls.administrator.manajemen_master.referensi_bagian_id.edit', compact('referensi'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_referensi_bagian' => 'required|string|max:100',
+            'nama_referensi_bagian_id' => 'required|string|max:100',
         ]);
 
         DB::beginTransaction();
         try {
             $referensi = ReferensiBagian::findOrFail($id);
-            $referensi->nama_referensi_bagian = $request->nama_referensi_bagian;
+            $referensi->nama_referensi_bagian_id = $request->nama_referensi_bagian_id;
             $referensi->mod_time = now();
             $referensi->mod_user_id = Auth::id();
             $referensi->save();
@@ -81,7 +81,7 @@ class ReferensiBagianController extends Controller
             DB::commit();
             $this->clearSidebarCache();
 
-            return redirect()->route('admin.referensi_bagian.index')->with('success', 'Referensi bagian berhasil diperbarui.');
+            return redirect()->route('admin.referensi_bagian_id.index')->with('success', 'Referensi bagian berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -95,7 +95,7 @@ class ReferensiBagianController extends Controller
         try {
             $referensi = ReferensiBagian::findOrFail($id);
 
-            $used = Bagian::where('referensi_bagian', $id)->where(function ($q) {
+            $used = Bagian::where('referensi_bagian_id', $id)->where(function ($q) {
                 $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
             })->count();
 
@@ -111,7 +111,7 @@ class ReferensiBagianController extends Controller
             DB::commit();
             $this->clearSidebarCache();
 
-            return redirect()->route('admin.referensi_bagian.index')->with('success', 'Referensi bagian berhasil dihapus.');
+            return redirect()->route('admin.referensi_bagian_id.index')->with('success', 'Referensi bagian berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
 

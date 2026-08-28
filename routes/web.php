@@ -134,7 +134,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('menu', MenuController::class)->names('admin.menu');
     Route::resource('sub_menu', SubMenuController::class)->names('admin.sub_menu');
     Route::resource('bagian', BagianController::class)->names('admin.bagian');
-    Route::resource('referensi_bagian', ReferensiBagianController::class)->names('admin.referensi_bagian');
+    Route::resource('referensi_bagian_id', ReferensiBagianController::class)->names('admin.referensi_bagian_id');
     Route::resource('profesi', ProfesiController::class)->names('admin.profesi');
     Route::resource('jabatan', JabatanController::class)->names('admin.jabatan');
     Route::resource('pegawai', PegawaiController::class)->names('admin.pegawai');

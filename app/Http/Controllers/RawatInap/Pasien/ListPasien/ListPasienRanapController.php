@@ -47,7 +47,7 @@ class ListPasienRanapController extends Controller
                     $q->whereNull('pr.status_batal')->orWhere('pr.status_batal', 0);
                 })
                 ->where('r.jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
-                ->where('b.referensi_bagian', env('REF_BAGIAN_RANAP', 31))
+                ->where('b.referensi_bagian_id', env('REF_BAGIAN_RANAP', 31))
                 ->whereNull('r.tgl_keluar')
                 ->where(function ($q) {
                     $q->whereNull('r.status_batal')->orWhere('r.status_batal', 0);
@@ -125,7 +125,7 @@ class ListPasienRanapController extends Controller
                     $q->whereNull('e.status_batal')->orWhere('e.status_batal', 0);
                 })
                 ->where('r.jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
-                ->where('b.referensi_bagian', env('REF_BAGIAN_RANAP', 31))
+                ->where('b.referensi_bagian_id', env('REF_BAGIAN_RANAP', 31))
                 ->whereNull('r.tgl_keluar')
                 ->where(function ($q) {
                     $q->whereNull('r.status_batal')->orWhere('r.status_batal', 0);

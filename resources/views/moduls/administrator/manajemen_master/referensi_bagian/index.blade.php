@@ -8,7 +8,7 @@
         <p class="text-sm text-slate-500 mt-1">Kelola referensi bagian (RAWAT JALAN, RAWAT INAP, IGD).</p>
     </div>
     <div class="flex gap-2">
-        <a href="{{ route('admin.referensi_bagian.create') }}" class="px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-600/20 transition-all hover:-translate-y-0.5 flex items-center gap-2">
+        <a href="{{ route('admin.referensi_bagian_id.create') }}" class="px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-600/20 transition-all hover:-translate-y-0.5 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             Tambah Referensi Bagian
         </a>
@@ -31,16 +31,16 @@
                 @forelse ($referensiBagians as $i => $referensi)
                 <tr class="hover:bg-blue-50/40 transition-colors">
                     <td class="px-3 py-3 text-center text-slate-500">{{ $i + 1 }}</td>
-                    <td class="px-3 py-3 font-semibold text-slate-800">{{ $referensi->nama_referensi_bagian }}</td>
+                    <td class="px-3 py-3 font-semibold text-slate-800">{{ $referensi->nama_referensi_bagian_id }}</td>
                     <td class="px-3 py-3 text-center">
                         <span class="inline-flex px-2 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700">{{ $referensi->bagians_count }}</span>
                     </td>
                     <td class="px-3 py-3 text-center">
                         <div class="flex items-center justify-center gap-1">
-                            <a href="{{ route('admin.referensi_bagian.edit', $referensi->referensi_bagian_id) }}" class="cursor-pointer p-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors" title="Edit Referensi Bagian">
+                            <a href="{{ route('admin.referensi_bagian_id.edit', $referensi->referensi_bagian_id_id) }}" class="cursor-pointer p-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors" title="Edit Referensi Bagian">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                             </a>
-                            <form action="{{ route('admin.referensi_bagian.destroy', $referensi->referensi_bagian_id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus referensi bagian {{ $referensi->nama_referensi_bagian }}?')">
+                            <form action="{{ route('admin.referensi_bagian_id.destroy', $referensi->referensi_bagian_id_id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus referensi bagian {{ $referensi->nama_referensi_bagian_id }}?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="cursor-pointer p-1.5 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors" title="Hapus Referensi Bagian">
