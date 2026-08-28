@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Registrasi\Pendaftaran\ListPelayanan;
+namespace App\Http\Controllers\Registrasi\Pendaftaran\ListPelayananPasien;
 
 use App\Http\Controllers\Controller;
 use App\Models\BillTemp;
@@ -12,7 +12,7 @@ use App\Models\RegistrasiUrut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class ListPelayananController extends Controller
+class ListPelayananPasienController extends Controller
 {
     public function index(Request $request)
     {
@@ -83,7 +83,7 @@ class ListPelayananController extends Controller
 
         $kunjungan = $query->orderBy('tgl_masuk', 'desc')->paginate(15)->withQueryString();
 
-        return view('moduls.Registrasi.Pendaftaran.ListPelayanan.ListPelayanan', compact(
+        return view('moduls.Registrasi.Pendaftaran.ListPelayananPasien.index', compact(
             'kunjungan', 'tanggalAwal', 'tanggalAkhir', 'jenisLayanan', 'pasienId'
         ));
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Administrator\ManajemenMaster\ReferensiBagian;
+namespace App\Http\Controllers\Administrator\ManajemenMaster\ReferensiBagianId;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bagian;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-class ReferensiBagianController extends Controller
+class ReferensiBagianIdController extends Controller
 {
     public function index()
     {
@@ -23,12 +23,12 @@ class ReferensiBagianController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('referensi_bagian_id_id')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.ReferensiBagian.index', compact('referensiBagians'));
+        return view('moduls.Administrator.ManajemenMaster.ReferensiBagianId.index', compact('referensiBagians'));
     }
 
     public function create()
     {
-        return view('moduls.Administrator.ManajemenMaster.ReferensiBagian.create');
+        return view('moduls.Administrator.ManajemenMaster.ReferensiBagianId.create');
     }
 
     public function store(Request $request)
@@ -61,7 +61,7 @@ class ReferensiBagianController extends Controller
     {
         $referensi = ReferensiBagian::findOrFail($id);
 
-        return view('moduls.Administrator.ManajemenMaster.ReferensiBagian.edit', compact('referensi'));
+        return view('moduls.Administrator.ManajemenMaster.ReferensiBagianId.edit', compact('referensi'));
     }
 
     public function update(Request $request, $id)

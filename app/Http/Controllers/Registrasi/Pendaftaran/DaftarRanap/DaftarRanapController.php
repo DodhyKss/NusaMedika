@@ -11,6 +11,6 @@ class DaftarRanapController extends Controller
     {
         $kelasList = KelasRuang::aktif()->orderBy('kelas_ruang_id')->get();
 
-        return view('moduls.Registrasi.Pendaftaran.DaftarRanap.DaftarRanap', compact('kelasList'));
+        return view('moduls.Registrasi.Pendaftaran.DaftarRanap.index', compact('kelasList'));
     }
 }

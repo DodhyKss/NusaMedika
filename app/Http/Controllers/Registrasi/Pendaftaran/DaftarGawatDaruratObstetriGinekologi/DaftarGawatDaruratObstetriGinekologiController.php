@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Registrasi\Pendaftaran\DaftarIGDObgyn;
+namespace App\Http\Controllers\Registrasi\Pendaftaran\DaftarGawatDaruratObstetriGinekologi;
 
 use App\Http\Controllers\Controller;
 
-class DaftarIGDObgynController extends Controller
+class DaftarGawatDaruratObstetriGinekologiController extends Controller
 {
     public function index()
     {
-        return view('moduls.Registrasi.Pendaftaran.DaftarIGDObgyn.DaftarIGDObgyn');
+        return view('moduls.Registrasi.Pendaftaran.DaftarGawatDaruratObstetriGinekologi.index');
     }
 }

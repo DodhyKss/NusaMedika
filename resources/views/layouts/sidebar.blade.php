@@ -58,9 +58,11 @@
                                         <svg class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200 group-open/menu:rotate-180 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </summary>
                                     <div class="mt-1 ml-3 pl-3 border-l border-slate-700/30 space-y-0.5 pb-1">
-                                        @php $subMenusList = $menu->subMenus ?? $menu->sub_menus ?? []; @endphp
+                                        @php
+                                            $subMenusList = $menu->subMenus ?? $menu->sub_menus ?? [];
+                                        @endphp
                                         @foreach($subMenusList as $subMenu)
-                                            <a href="{{ $subMenu->file_sub_menu == '#' ? '#' : url($subMenu->file_sub_menu) }}" class="block px-3 py-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors submenu-item border-b border-slate-800/20 last:border-b-0">
+                                            <a href="{{ \App\Providers\SubMenuRouteServiceProvider::url($subMenu->file_sub_menu) }}" class="block px-3 py-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors submenu-item border-b border-slate-800/20 last:border-b-0">
                                                 {{ $subMenu->nama_sub_menu }}
                                             </a>
                                         @endforeach

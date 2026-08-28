@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Registrasi\Pendaftaran\DaftarIGD;
+namespace App\Http\Controllers\Registrasi\Pendaftaran\DaftarGawatDarurat;
 
 use App\Http\Controllers\Controller;
 
-class DaftarIGDController extends Controller
+class DaftarGawatDaruratController extends Controller
 {
     public function index()
     {
-        return view('moduls.Registrasi.Pendaftaran.DaftarIGD.DaftarIGD');
+        return view('moduls.Registrasi.Pendaftaran.DaftarGawatDarurat.index');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Registrasi\Pasien\DataPasien;
+namespace App\Http\Controllers\Registrasi\Pasien\DaftarPasien;
 
 use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
-class DataPasienController extends Controller
+class DaftarPasienController extends Controller
 {
     public function index(Request $request)
     {
@@ -38,12 +38,12 @@ class DataPasienController extends Controller
             })
             ->first() : null;
 
-        return view('moduls.Registrasi.Pasien.DataPasien.DaftarPasien', compact('pasiens', 'pasienId', 'jenisKelamin', 'selectedPasien'));
+        return view('moduls.Registrasi.Pasien.DaftarPasien.index', compact('pasiens', 'pasienId', 'jenisKelamin', 'selectedPasien'));
     }
 
     public function create()
     {
-        return view('moduls.Registrasi.Pasien.DataPasien.TambahPasien');
+        return view('moduls.Registrasi.Pasien.DaftarPasien.create');
     }
 
     public function store(Request $request)
@@ -90,7 +90,7 @@ class DataPasienController extends Controller
             'kelurahan_nama' => $kelurahan?->nama_kelurahan,
         ];
 
-        return view('moduls.Registrasi.Pasien.DataPasien.EditPasien', compact('pasien', 'prefill'));
+        return view('moduls.Registrasi.Pasien.DaftarPasien.edit', compact('pasien', 'prefill'));
     }
 
     public function update(Request $request, $id)

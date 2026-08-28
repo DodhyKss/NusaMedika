@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\GawatDarurat\Pasien\ListPasienIGD;
+namespace App\Http\Controllers\GawatDarurat\Pasien\ListPasienGawatDarurat;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
-class ListPasienIGDController extends Controller
+class ListPasienGawatDaruratController extends Controller
 {
     public function index()
     {
-        return view('moduls.GawatDarurat.Pasien.ListPasienIGD.ListPasienIGD');
+        return view('moduls.GawatDarurat.Pasien.ListPasienGawatDarurat.index');
     }
 }
