@@ -64,7 +64,7 @@ class DaftarRajalController extends Controller
             $q->whereNull('status_batal')->orWhere('status_batal', 0);
         })->orderBy('nama_nasabah')->get();
 
-        return view('moduls.registrasi.pendaftaran.daftar_rj.daftar_rajal', compact('polikliniks', 'nasabahs', 'jadwalsByPoli'));
+        return view('moduls.Registrasi.Pendaftaran.DaftarRajal.DaftarRajal', compact('polikliniks', 'nasabahs', 'jadwalsByPoli'));
     }
 
     public function store(Request $request)

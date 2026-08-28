@@ -28,12 +28,12 @@ class NasabahController extends Controller
 
         $nasabahs = $query->orderBy('nama_nasabah')->paginate(10)->withQueryString();
 
-        return view('moduls.administrator.manajemen_master.nasabah.index', compact('nasabahs', 'search'));
+        return view('moduls.Administrator.ManajemenMaster.Nasabah.index', compact('nasabahs', 'search'));
     }
 
     public function create()
     {
-        return view('moduls.administrator.manajemen_master.nasabah.create');
+        return view('moduls.Administrator.ManajemenMaster.Nasabah.create');
     }
 
     public function store(Request $request)
@@ -75,7 +75,7 @@ class NasabahController extends Controller
     {
         $nasabah = Nasabah::findOrFail($nasabah);
 
-        return view('moduls.administrator.manajemen_master.nasabah.edit', compact('nasabah'));
+        return view('moduls.Administrator.ManajemenMaster.Nasabah.edit', compact('nasabah'));
     }
 
     public function update(Request $request, $nasabah)

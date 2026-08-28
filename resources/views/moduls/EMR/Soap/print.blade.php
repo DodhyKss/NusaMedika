@@ -12,6 +12,6 @@
     </style>
 </head>
 <body onload="setTimeout(() => { window.print(); window.close(); }, 500);">
-    @include('moduls.emr.soap.cetak_soap', ['emr_id' => $emr_id])
+    @include('moduls.EMR.Soap.CetakSoap', ['emr_id' => $emr_id])
 </body>
 </html>

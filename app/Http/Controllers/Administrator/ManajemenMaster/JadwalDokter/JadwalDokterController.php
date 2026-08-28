@@ -46,12 +46,12 @@ class JadwalDokterController extends Controller
         $jadwals = $query->orderBy('hari')->orderBy('waktu_mulai')->paginate(10)->withQueryString();
         $hariMap = self::HARI;
 
-        return view('moduls.administrator.manajemen_master.jadwal_dokter.index', compact('jadwals', 'search', 'hariMap'));
+        return view('moduls.Administrator.ManajemenMaster.JadwalDokter.index', compact('jadwals', 'search', 'hariMap'));
     }
 
     public function create()
     {
-        return view('moduls.administrator.manajemen_master.jadwal_dokter.create', ['hariMap' => self::HARI]);
+        return view('moduls.Administrator.ManajemenMaster.JadwalDokter.create', ['hariMap' => self::HARI]);
     }
 
     public function store(Request $request)
@@ -91,7 +91,7 @@ class JadwalDokterController extends Controller
     {
         $jadwal = JadwalDokter::findOrFail($jadwal);
 
-        return view('moduls.administrator.manajemen_master.jadwal_dokter.edit', ['jadwal' => $jadwal, 'hariMap' => self::HARI]);
+        return view('moduls.Administrator.ManajemenMaster.JadwalDokter.edit', ['jadwal' => $jadwal, 'hariMap' => self::HARI]);
     }
 
     public function update(Request $request, $jadwal)

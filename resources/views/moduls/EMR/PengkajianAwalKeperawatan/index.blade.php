@@ -69,12 +69,12 @@
 
         <!-- Form Partials (A-F) -->
         <fieldset class="space-y-3" {{ $isView ? 'disabled' : '' }}>
-            @include('moduls.emr.partial_form.informasi_pasien')
-            @include('moduls.emr.partial_form.riwayat_penyakit')
-            @include('moduls.emr.partial_form.pemeriksaan_fisik')
-            @include('moduls.emr.partial_form.pengkajian_nyeri')
-            @include('moduls.emr.partial_form.riwayat_alergi')
-            @include('moduls.emr.partial_form.pengkajian_up_go')
+            @include('moduls.EMR.PartialForm.informasi_pasien')
+            @include('moduls.EMR.PartialForm.riwayat_penyakit')
+            @include('moduls.EMR.PartialForm.pemeriksaan_fisik')
+            @include('moduls.EMR.PartialForm.pengkajian_nyeri')
+            @include('moduls.EMR.PartialForm.riwayat_alergi')
+            @include('moduls.EMR.PartialForm.pengkajian_up_go')
         </fieldset>
         
     </x-emr-split-layout>

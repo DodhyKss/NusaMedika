@@ -24,12 +24,12 @@ class BagianController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('nama_bagian')->get();
 
-        return view('moduls.administrator.manajemen_master.bagian.index', compact('bagians'));
+        return view('moduls.Administrator.ManajemenMaster.Bagian.index', compact('bagians'));
     }
 
     public function create()
     {
-        return view('moduls.administrator.manajemen_master.bagian.create', $this->dropdownData());
+        return view('moduls.Administrator.ManajemenMaster.Bagian.create', $this->dropdownData());
     }
 
     public function store(Request $request)
@@ -74,7 +74,7 @@ class BagianController extends Controller
     {
         $bagian = Bagian::findOrFail($id);
 
-        return view('moduls.administrator.manajemen_master.bagian.edit', array_merge(compact('bagian'), $this->dropdownData()));
+        return view('moduls.Administrator.ManajemenMaster.Bagian.edit', array_merge(compact('bagian'), $this->dropdownData()));
     }
 
     public function update(Request $request, $id)

@@ -46,10 +46,10 @@ class DynamicFormController extends Controller
         }
 
         // 4. Cek apakah file index.blade.php ada di dalam folder tersebut
-        if (view()->exists("moduls.emr.{$folder_name}.index")) {
+        if (view()->exists("moduls.EMR.{$folder_name}.index")) {
 
             // 5. Return view dinamis dari folder tersebut beserta datanya
-            return view("moduls.emr.{$folder_name}.index", array_merge([
+            return view("moduls.EMR.{$folder_name}.index", array_merge([
                 'registrasi_detail_id' => $registrasi_detail_id,
                 'emr_id' => $emr_id,
                 'form_name' => $form_name,
@@ -58,9 +58,9 @@ class DynamicFormController extends Controller
         }
 
         // 5. Jika folder/file belum dibuat oleh developer, tampilkan halaman under construction
-        return view('moduls.emr.unsupported', [
+        return view('moduls.EMR.Unsupported', [
             'form_name' => $form_name,
-            'folder_expected' => "resources/views/moduls/emr/{$folder_name}/index.blade.php",
+            'folder_expected' => "resources/views/moduls/EMR/{$folder_name}/index.blade.php",
         ]);
     }
 }

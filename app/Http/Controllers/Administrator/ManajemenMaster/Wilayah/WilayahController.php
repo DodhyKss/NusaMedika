@@ -46,14 +46,14 @@ class WilayahController extends Controller
         $kabupatens = Kabupaten::aktif()->orderBy('nama_kabupaten')->get();
         $kecamatans = Kecamatan::aktif()->orderBy('nama_kecamatan')->get();
 
-        return view('moduls.administrator.manajemen_master.wilayah.index', compact('tab', 'data', 'provinsis', 'kabupatens', 'kecamatans'));
+        return view('moduls.Administrator.ManajemenMaster.Wilayah.index', compact('tab', 'data', 'provinsis', 'kabupatens', 'kecamatans'));
     }
 
     public function create(Request $request)
     {
         $tab = $this->resolveTab($request->input('tab'));
 
-        return view('moduls.administrator.manajemen_master.wilayah.form', $this->formData($tab));
+        return view('moduls.Administrator.ManajemenMaster.Wilayah.form', $this->formData($tab));
     }
 
     public function store(Request $request)
@@ -80,7 +80,7 @@ class WilayahController extends Controller
         $tab = $this->resolveTab($request->input('tab'));
         $wilayah = $this->findRecord($tab, $id);
 
-        return view('moduls.administrator.manajemen_master.wilayah.form', array_merge(['wilayah' => $wilayah], $this->formData($tab)));
+        return view('moduls.Administrator.ManajemenMaster.Wilayah.form', array_merge(['wilayah' => $wilayah], $this->formData($tab)));
     }
 
     public function update(Request $request, $id)

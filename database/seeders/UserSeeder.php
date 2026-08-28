@@ -41,8 +41,15 @@ class UserSeeder extends Seeder
             3 => [1, 8, 9, 10, 11, 12, 13, 14],
         ];
 
+        // Hanya berikan akses ke sub_menu yang benar-benar ada (hindari referensi id tak ada, mis. 8-11)
+        $validSubMenuIds = DB::table('sub_menu')->pluck('sub_menu_id')->all();
+
         foreach ($akses as $userId => $subMenuIds) {
             foreach ($subMenuIds as $subMenuId) {
+                if (! in_array($subMenuId, $validSubMenuIds)) {
+                    continue;
+                }
+
                 $existing = DB::table('user_akses')
                     ->where('user_id', $userId)
                     ->where('sub_menu_id', $subMenuId)
@@ -66,6 +73,22 @@ class UserSeeder extends Seeder
                     ]);
                 }
             }
+        }
+
+        // Soft-delete user_akses yang merujuk sub_menu yang sudah tidak ada (mis. 8-11)
+        $missingIds = array_values(array_diff(
+            collect($akses)->flatten()->unique()->all(),
+            $validSubMenuIds
+        ));
+
+        if ($missingIds) {
+            DB::table('user_akses')
+                ->whereIn('sub_menu_id', $missingIds)
+                ->update([
+                    'status_batal' => 1,
+                    'mod_time' => $now,
+                    'mod_user_id' => 1,
+                ]);
         }
     }
 }

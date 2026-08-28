@@ -14,7 +14,7 @@ Laravel 13 (PHP 8.3) SIMRS app ("MediTechV2") — an Indonesian hospital EMR. Al
 
 ## Schema conventions (28 model + 9 EMR tables + 1 view)
 
-The original 295 migrations (generated via `kitloong/laravel-migrations-generator` from a legacy SQL dump) were **deleted and recreated from scratch**. Now there are **38 clean migrations** — one per table referenced by the 28 Models in `app/Models/` plus the 9 EMR tables used via `DB::table()` (`emr`, `emr_detail`, `form`, `objek`, `objek_form_control`, `dashboard_menu`, `dashboard_menu_sub`, `dashboard_menu_sub_extra`, `akses_ehr`) plus the `header_ehr` view. The 227 legacy non-model tables and all legacy views were dropped.
+The original 295 migrations (generated via `kitloong/laravel-migrations-generator` from a legacy SQL dump) were **deleted and recreated from scratch**. Now there are **39 clean migrations** — one per table referenced by the 28 Models in `app/Models/` plus the 9 EMR tables used via `DB::table()` (`emr`, `emr_detail`, `form`, `objek`, `objek_form_control`, `dashboard_menu`, `dashboard_menu_sub`, `dashboard_menu_sub_extra`, `akses_ehr`) plus the `header_ehr` view plus `bed` (tabel legacy tanpa Model, dipakai query filter `ListPasienRanapController` — lihat catatan di bawah). The 227 legacy non-model tables and all legacy views were dropped.
 
 - **Auto-increment PKs**: every PK (`{table}_id`) uses `$table->increments(...)` (Postgres `serial`). **Jangan set PK secara manual** di controller/seeder — biarkan Eloquent/DB mengisinya via auto-increment. `GenerateHelper::getNextId()` sudah dihapus.
 - **`GenerateHelper::resetSequence($table, $pk = null)`**: dipanggil di akhir `DatabaseSeeder` untuk menyetel ulang sequence mengikuti ID maksimal setelah seeder mengisi ID eksplisit (sefault PK = `{table}_id`). Ini penting agar insert baru lewat aplikasi (auto-increment) tidak bentrok dengan ID seeder.
@@ -23,7 +23,7 @@ The original 295 migrations (generated via `kitloong/laravel-migrations-generato
 - **Soft delete via `status_batal`** (null = active, 1 = deleted), not `deleted_at`.
 - **Semua query GET (index/dropdown/opsi/relasi) wajib memfilter `status_batal`**: record aktif hanya yang `status_batal IS NULL` **atau** `status_batal = 0`; selain itu (1, dst.) berarti batal/terhapus. Pakai pola `where(function ($q) { $q->whereNull('status_batal')->orWhere('status_batal', 0); })` (atau `->where('status_batal', '!=', 1)` yang setara) — **jangan hanya `whereNull`** (record seeder bisa ber-`status_batal=0`). Berlaku juga untuk `join`/`whereHas`/relasi, kecuali ada alasan eksplisit menyertakan record batal (mis. `generateNoMr()`).
 - Model PKs are custom (`user_id`, `menu_id`, ...) and some use `$primaryKey`, `$fillable` — check the model before assuming column names. Semua model membiarkan `$incrementing` default `true` (PK auto-increment).
-- Tabel legacy yang **tidak** ada Model (mis. `bed` di `ListPasienRanapController`, dan 227 tabel lain) **tidak dibuatkan migration** — halaman/pemakaian yang menyentuh tabel tersebut akan error sampai migration/schema-nya ditambahkan.
+- Tabel legacy yang **tidak** ada Model (mis. `bed` dan 227 tabel lain) **tidak dibuatkan migration** — halaman/pemakaian yang menyentuh tabel tersebut akan error sampai migration/schema-nya ditambahkan. Catatan: `bed` (dipakai `ListPasienRanapController`) sudah dibuatkan migration `2026_08_28_000039_create_bed_table` karena dibutuhkan fitur filter ranap.
 
 ## Migrations & view
 
@@ -48,8 +48,21 @@ Daftar pilihan dropdown yang **tidak** tersimpan di database (19 key di `App\Hel
 The same modular layout applies to **every** modul, menu, and sub_menu in the sidebar:
 
 - **Controllers**: `app/Http/Controllers/{Modul}/{Menu}/{SubMenu}/{SubMenu}Controller.php` — folder = StudlyCase of the modul name, the menu name, then the sub-menu. Examples: `Registrasi/Pendaftaran/DaftarRajal/DaftarRajalController.php`, `Registrasi/Pasien/DataPasien/DataPasienController.php`, `EMR/EmrDashboard/EmrDashboardController.php`, `Administrator/ManajemenUser/User/UserController.php`.
-- **Views**: `resources/views/moduls/{modul}/{menu}/{sub_menu}/...` — folders are snake_case: e.g. `moduls/registrasi/pendaftaran/daftar_rj/daftar_rajal.blade.php`, `moduls/emr/soap/index.blade.php`, `moduls/administrator/manajemen_master/pegawai/index.blade.php`. The sub-menu's landing view file is named after `file_sub_menu`.
-- **`sub_menu.file_sub_menu`** stores the sub-menu file name (e.g. `daftar_rajal`, `modul`, `pegawai`), not a path — the sidebar renders it via `url($subMenu->file_sub_menu)` and a matching route exists at the same URI. Use `'#'` only for sub-menus that need a dynamic id (EMR forms).
+- **Views**: `resources/views/moduls/{modul}/{menu}/{sub_menu}/...` — folder **sama persis dengan path controller PascalCase** (misal `moduls/Registrasi/Pendaftaran/DaftarRajal/`, `moduls/EMR/Soap/`, `moduls/Administrator/ManajemenMaster/Pegawai/`). File blade CRUD memakai nama `index/create/edit.blade.php`; view landing non-CRUD memakai nama Pascal ala controller (misal `DaftarRajal.blade.php`, `ListPasienRanap.blade.php`, `NasabahPasien.blade.php`). Panggil via `view('moduls.{PascalPath}.{File}')` (titik, bukan slash), contoh `view('moduls.RawatInap.Pasien.ListPasien.ListPasienRanap')`. Sub-folder partial EMR tetap di `moduls/EMR/PartialForm/`.
+- **`sub_menu.file_sub_menu`** sekarang menyimpan **path relatif ke view** (bisa ber-slash, misal `master/users`), bukan sekadar nama file. Sidebar merender link via `url($subMenu->file_sub_menu)`. Dua sumber route yang tersedia untuk path tsb:
+  - Route **eksplisit** di `routes/web.php` (prioritas lebih tinggi) — untuk menu yang butuh data dari controller.
+  - Route **otomatis** (lihat section *Auto-route sub_menu*) — untuk view statis/landing tanpa controller.
+  Gunakan `'#'` hanya untuk sub-menu yang butuh id dinamis (EMR forms).
+
+## Auto-route sub_menu (buat menu tanpa route manual di web.php)
+
+`SubMenuRouteServiceProvider` (`bootstrap/providers.php`) mendaftarkan route GET secara otomatis untuk setiap `sub_menu` aktif yang `file_sub_menu`-nya bukan `'#'`:
+
+- **Cara kerja**: di `$this->app->booted()` (sehabis web.php dimuat, jadi route eksplisit selalu menang), ia mengecek daftar `file_sub_menu` aktif dari tabel `sub_menu` (cache 24h, key `sub_menu_route_paths`), lalu untuk tiap path yang **belum** ada route-nya, daftarkan `Route::get('/{path}', SubMenuViewController::class)` dengan middleware `web`+`auth` dan nama `modul_view.{slug}`.
+- **Cara pakai**: cukup buat view `resources/views/moduls/{path}.blade.php` (misal `moduls/master/users.blade.php` untuk `file_sub_menu='master/users'`), lalu isi `file_sub_menu` sebesar path itu di form Sub Menu. Route `/master/users` langsung tersedia — **tanpa** menulis route di web.php. View tetap wajib `@extends('layouts.app')` + `@section('content')`.
+- `SubMenuViewController` (invokable, `App\Http\Controllers\SubMenu`) me-render view `moduls.{path}` dari path yang diminta; memakai `.web`, path yang invalid/traversal (`..`, dll.) ditolak (404), dan view yang tidak ada → 404.
+- **Cache**: simpan/ubah/hapus sub_menu di `SubMenuController` memanggil `SubMenuRouteServiceProvider::flushPathCache()` (bersamaan dengan clear sidebar cache) → path otomatis ter-refresh. Route list dibangun per request, jadi tak perlu `php artisan route:cache` untuk dev (`artisan serve`).
+- **Route cache manual** (`php artisan route:cache`) didukung penuh karena route memakai controller (bukan closure) — setelah `route:cache`, daftar path di-*snap*; tambah/ubah sub_menu baru lalu jalankan ulang `route:cache`. Jangan lupa `route:clear` saat kembali ke dev.
 
 ## Sidebar / menu behavior
 

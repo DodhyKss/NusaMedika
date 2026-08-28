@@ -210,12 +210,12 @@ class SoapController extends Controller
 
         $isView = request('action') === 'view';
 
-        return view('moduls.emr.soap.index', compact('registrasi_detail', 'riwayat_soap', 'riwayat_details', 'edit_soap', 'formData', 'form_id', 'history_grouped', 'riwayat_pengkajian', 'assesment_terakhir', 'isView'));
+        return view('moduls.EMR.Soap.index', compact('registrasi_detail', 'riwayat_soap', 'riwayat_details', 'edit_soap', 'formData', 'form_id', 'history_grouped', 'riwayat_pengkajian', 'assesment_terakhir', 'isView'));
     }
 
     public function print($emr_id)
     {
-        return view('moduls.emr.soap.print', compact('emr_id'));
+        return view('moduls.EMR.Soap.print', compact('emr_id'));
     }
 
     public function store(Request $request, $registrasi_detail_id)

@@ -8,6 +8,6 @@ class DaftarIGDController extends Controller
 {
     public function index()
     {
-        return view('moduls.registrasi.pendaftaran.daftar_igd.registrasi_igd');
+        return view('moduls.Registrasi.Pendaftaran.DaftarIGD.DaftarIGD');
     }
 }

@@ -14,9 +14,9 @@ use App\Http\Controllers\Administrator\ManajemenMaster\ReferensiBagian\Referensi
 use App\Http\Controllers\Administrator\ManajemenMaster\SubMenu\SubMenuController;
 use App\Http\Controllers\Administrator\ManajemenMaster\Wilayah\WilayahController;
 use App\Http\Controllers\Administrator\ManajemenUser\User\UserController;
+use App\Http\Controllers\API\ApiIcdController;
 use App\Http\Controllers\API\ApiPasienController;
 use App\Http\Controllers\API\ApiWilayahController;
-use App\Http\Controllers\API\ApiIcdController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\EMR\DynamicFormController;
@@ -91,10 +91,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/emr/form/{form_name}/{registrasi_detail_id}/{emr_id?}', [DynamicFormController::class, 'index'])->name('emr.dynamic.index');
 
     // ============ SOAP (CPPT) ============== #
-    Route::get('/emr/unsupported', function () {
-        return view('moduls.emr.unsupported');
-    })->name('emr.unsupported');
-
     Route::get('/emr/soap/print/{emr_id}', [SoapController::class, 'print'])->name('emr.soap.print');
     // Route::get('/emr/{registrasi_detail_id}/soap/{emr_id?}', [\App\Http\Controllers\EMR\Soap\SoapController::class, 'index'])->name('emr.soap.index');
     Route::post('/emr/{registrasi_detail_id}/soap', [SoapController::class, 'store'])->name('emr.soap.store');
@@ -154,4 +150,3 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/wilayah/kelurahan', [ApiWilayahController::class, 'kelurahan'])->name('api.wilayah.kelurahan');
     Route::get('/api/icd/search', [ApiIcdController::class, 'searchIcd'])->name('api.icd.search');
 });
-Route::get('/api/test/pasien/search', [ApiPasienController::class, 'searchPasien']);

@@ -18,12 +18,12 @@ class ProfesiController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('nama_profesi')->get();
 
-        return view('moduls.administrator.manajemen_master.profesi.index', compact('profesis'));
+        return view('moduls.Administrator.ManajemenMaster.Profesi.index', compact('profesis'));
     }
 
     public function create()
     {
-        return view('moduls.administrator.manajemen_master.profesi.create');
+        return view('moduls.Administrator.ManajemenMaster.Profesi.create');
     }
 
     public function store(Request $request)
@@ -58,7 +58,7 @@ class ProfesiController extends Controller
     {
         $profesi = Profesi::findOrFail($id);
 
-        return view('moduls.administrator.manajemen_master.profesi.edit', compact('profesi'));
+        return view('moduls.Administrator.ManajemenMaster.Profesi.edit', compact('profesi'));
     }
 
     public function update(Request $request, $id)

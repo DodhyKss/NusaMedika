@@ -8,6 +8,6 @@ class DaftarIGDObgynController extends Controller
 {
     public function index()
     {
-        return view('moduls.registrasi.pendaftaran.daftar_igd_obgyn.registrasi_igd_obgyn');
+        return view('moduls.Registrasi.Pendaftaran.DaftarIGDObgyn.DaftarIGDObgyn');
     }
 }

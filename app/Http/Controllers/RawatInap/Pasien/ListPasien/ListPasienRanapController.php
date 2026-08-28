@@ -196,6 +196,6 @@ class ListPasienRanapController extends Controller
                 ->paginate(10)
                 ->withQueryString();
         }
-        return view('moduls.rawat_inap.pasien.list_pasien.list_pasien_ranap', compact('ruanganId', 'listPasien'));
+        return view('moduls.RawatInap.Pasien.ListPasien.ListPasienRanap', compact('ruanganId', 'listPasien'));
     }
 }

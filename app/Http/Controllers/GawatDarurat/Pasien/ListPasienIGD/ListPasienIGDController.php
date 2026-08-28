@@ -9,6 +9,6 @@ class ListPasienIGDController extends Controller
 {
     public function index()
     {
-        return view('moduls.gawat_darurat.pasien.list_pasien_igd.list_pasien_igd');
+        return view('moduls.GawatDarurat.Pasien.ListPasienIGD.ListPasienIGD');
     }
 }

@@ -70,7 +70,7 @@ class ListPasienRajalController extends Controller
             }
         }
 
-        return view('moduls.rawat_jalan.pasien.list_pasien.list_pasien_dokter', compact(
+        return view('moduls.RawatJalan.Pasien.ListPasien.ListPasienDokter', compact(
             'listPasien',
             'tanggalKunjungan',
             'poliklinikId'

@@ -94,30 +94,28 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 5, 'menu_id' => 2, 'nama_sub_menu' => 'Daftar Rawat Inap', 'file_sub_menu' => 'daftar_ranap', 'urutan_sub_menu' => 3],
             ['sub_menu_id' => 6, 'menu_id' => 2, 'nama_sub_menu' => 'Registrasi IGD', 'file_sub_menu' => 'registrasi_igd', 'urutan_sub_menu' => 4],
             ['sub_menu_id' => 7, 'menu_id' => 2, 'nama_sub_menu' => 'Registrasi IGD Obgyn', 'file_sub_menu' => 'registrasi_igd_obgyn', 'urutan_sub_menu' => 5],
-            // Menu Dashboard Pasien (3) - EMR
-            ['sub_menu_id' => 8, 'menu_id' => 3, 'nama_sub_menu' => 'Dashboard Pasien', 'file_sub_menu' => '#', 'urutan_sub_menu' => 1],
             // Menu Pasien (4) - Rawat Jalan
-            ['sub_menu_id' => 12, 'menu_id' => 6, 'nama_sub_menu' => 'List Pasien Dokter', 'file_sub_menu' => 'list_pasien_dokter', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 12, 'menu_id' => 3, 'nama_sub_menu' => 'List Pasien Dokter', 'file_sub_menu' => 'list_pasien_dokter', 'urutan_sub_menu' => 1],
             // Menu Pasien (5) - Rawat Inap
-            ['sub_menu_id' => 13, 'menu_id' => 7, 'nama_sub_menu' => 'List Pasien Ranap', 'file_sub_menu' => 'list_pasien_ranap', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 13, 'menu_id' => 4, 'nama_sub_menu' => 'List Pasien Ranap', 'file_sub_menu' => 'list_pasien_ranap', 'urutan_sub_menu' => 1],
             // Menu Pasien (6) - Gawat Darurat
-            ['sub_menu_id' => 14, 'menu_id' => 8, 'nama_sub_menu' => 'List Pasien IGD', 'file_sub_menu' => 'list_pasien_igd', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 14, 'menu_id' => 5, 'nama_sub_menu' => 'List Pasien IGD', 'file_sub_menu' => 'list_pasien_igd', 'urutan_sub_menu' => 1],
             // Menu Manajemen Master (7) - Administrator
-            ['sub_menu_id' => 15, 'menu_id' => 9, 'nama_sub_menu' => 'Modul', 'file_sub_menu' => 'modul', 'urutan_sub_menu' => 1],
-            ['sub_menu_id' => 16, 'menu_id' => 9, 'nama_sub_menu' => 'Menu', 'file_sub_menu' => 'menu', 'urutan_sub_menu' => 2],
-            ['sub_menu_id' => 17, 'menu_id' => 9, 'nama_sub_menu' => 'Sub Menu', 'file_sub_menu' => 'sub_menu', 'urutan_sub_menu' => 3],
-            ['sub_menu_id' => 19, 'menu_id' => 9, 'nama_sub_menu' => 'Bagian', 'file_sub_menu' => 'bagian', 'urutan_sub_menu' => 4],
-            ['sub_menu_id' => 20, 'menu_id' => 9, 'nama_sub_menu' => 'Profesi', 'file_sub_menu' => 'profesi', 'urutan_sub_menu' => 5],
-            ['sub_menu_id' => 21, 'menu_id' => 9, 'nama_sub_menu' => 'Jabatan', 'file_sub_menu' => 'jabatan', 'urutan_sub_menu' => 6],
-            ['sub_menu_id' => 22, 'menu_id' => 9, 'nama_sub_menu' => 'Pegawai', 'file_sub_menu' => 'pegawai', 'urutan_sub_menu' => 7],
-            ['sub_menu_id' => 23, 'menu_id' => 9, 'nama_sub_menu' => 'Referensi Bagian', 'file_sub_menu' => 'referensi_bagian_id', 'urutan_sub_menu' => 8],
-            ['sub_menu_id' => 24, 'menu_id' => 9, 'nama_sub_menu' => 'Wilayah', 'file_sub_menu' => 'wilayah', 'urutan_sub_menu' => 9],
-            ['sub_menu_id' => 25, 'menu_id' => 9, 'nama_sub_menu' => 'Master Nasabah', 'file_sub_menu' => 'nasabah', 'urutan_sub_menu' => 10],
-            ['sub_menu_id' => 26, 'menu_id' => 9, 'nama_sub_menu' => 'Master Kelas', 'file_sub_menu' => 'kelas', 'urutan_sub_menu' => 11],
-            ['sub_menu_id' => 27, 'menu_id' => 9, 'nama_sub_menu' => 'Jadwal Dokter', 'file_sub_menu' => 'jadwal_dokter', 'urutan_sub_menu' => 12],
-            ['sub_menu_id' => 28, 'menu_id' => 9, 'nama_sub_menu' => 'ICD', 'file_sub_menu' => 'icd', 'urutan_sub_menu' => 13],
+            ['sub_menu_id' => 15, 'menu_id' => 6, 'nama_sub_menu' => 'Modul', 'file_sub_menu' => 'modul', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 16, 'menu_id' => 6, 'nama_sub_menu' => 'Menu', 'file_sub_menu' => 'menu', 'urutan_sub_menu' => 2],
+            ['sub_menu_id' => 17, 'menu_id' => 6, 'nama_sub_menu' => 'Sub Menu', 'file_sub_menu' => 'sub_menu', 'urutan_sub_menu' => 3],
+            ['sub_menu_id' => 19, 'menu_id' => 6, 'nama_sub_menu' => 'Bagian', 'file_sub_menu' => 'bagian', 'urutan_sub_menu' => 4],
+            ['sub_menu_id' => 20, 'menu_id' => 6, 'nama_sub_menu' => 'Profesi', 'file_sub_menu' => 'profesi', 'urutan_sub_menu' => 5],
+            ['sub_menu_id' => 21, 'menu_id' => 6, 'nama_sub_menu' => 'Jabatan', 'file_sub_menu' => 'jabatan', 'urutan_sub_menu' => 6],
+            ['sub_menu_id' => 22, 'menu_id' => 6, 'nama_sub_menu' => 'Pegawai', 'file_sub_menu' => 'pegawai', 'urutan_sub_menu' => 7],
+            ['sub_menu_id' => 23, 'menu_id' => 6, 'nama_sub_menu' => 'Referensi Bagian', 'file_sub_menu' => 'referensi_bagian_id', 'urutan_sub_menu' => 8],
+            ['sub_menu_id' => 24, 'menu_id' => 6, 'nama_sub_menu' => 'Wilayah', 'file_sub_menu' => 'wilayah', 'urutan_sub_menu' => 9],
+            ['sub_menu_id' => 25, 'menu_id' => 6, 'nama_sub_menu' => 'Master Nasabah', 'file_sub_menu' => 'nasabah', 'urutan_sub_menu' => 10],
+            ['sub_menu_id' => 26, 'menu_id' => 6, 'nama_sub_menu' => 'Master Kelas', 'file_sub_menu' => 'kelas', 'urutan_sub_menu' => 11],
+            ['sub_menu_id' => 27, 'menu_id' => 6, 'nama_sub_menu' => 'Jadwal Dokter', 'file_sub_menu' => 'jadwal_dokter', 'urutan_sub_menu' => 12],
+            ['sub_menu_id' => 28, 'menu_id' => 6, 'nama_sub_menu' => 'ICD', 'file_sub_menu' => 'icd', 'urutan_sub_menu' => 13],
             // Menu Manajemen User (8) - Administrator
-            ['sub_menu_id' => 18, 'menu_id' => 10, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'user', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 18, 'menu_id' => 7, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'user', 'urutan_sub_menu' => 1],
         ];
 
         foreach ($subMenus as $subMenu) {

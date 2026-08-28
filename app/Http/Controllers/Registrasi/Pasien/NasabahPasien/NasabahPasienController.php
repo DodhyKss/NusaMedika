@@ -50,7 +50,7 @@ class NasabahPasienController extends Controller
             ->map(fn ($nama) => (string) $nama)
             ->all();
 
-        return view('moduls.registrasi.pasien.data_nasabah_pasien.nasabah_pasien', compact('nasabahPasiens', 'search', 'kelasMap'));
+        return view('moduls.Registrasi.Pasien.NasabahPasien.NasabahPasien', compact('nasabahPasiens', 'search', 'kelasMap'));
     }
 
     public function create()
@@ -58,7 +58,7 @@ class NasabahPasienController extends Controller
         $nasabahs = $this->nasabahAktif();
         $kelas = KelasRuang::aktif()->orderBy('kelas_ruang_id')->get();
 
-        return view('moduls.registrasi.pasien.data_nasabah_pasien.tambah_nasabah_pasien', compact('nasabahs', 'kelas'));
+        return view('moduls.Registrasi.Pasien.NasabahPasien.TambahNasabahPasien', compact('nasabahs', 'kelas'));
     }
 
     public function store(Request $request)
@@ -100,7 +100,7 @@ class NasabahPasienController extends Controller
         $nasabahs = $this->nasabahAktif();
         $kelas = KelasRuang::aktif()->orderBy('kelas_ruang_id')->get();
 
-        return view('moduls.registrasi.pasien.data_nasabah_pasien.edit_nasabah_pasien', compact('pasienNasabah', 'nasabahs', 'kelas'));
+        return view('moduls.Registrasi.Pasien.NasabahPasien.EditNasabahPasien', compact('pasienNasabah', 'nasabahs', 'kelas'));
     }
 
     public function update(Request $request, $id)

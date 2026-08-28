@@ -7,6 +7,7 @@ use App\Models\Menu;
 use App\Models\SubMenu;
 use App\Models\User;
 use App\Models\UserAkses;
+use App\Providers\SubMenuRouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -28,7 +29,7 @@ class SubMenuController extends Controller
             }]);
         }])->orderBy('menu_id')->orderBy('urutan_sub_menu')->get();
 
-        return view('moduls.administrator.manajemen_master.sub_menu.index', compact('subMenus'));
+        return view('moduls.Administrator.ManajemenMaster.SubMenu.index', compact('subMenus'));
     }
 
     public function create()
@@ -41,7 +42,7 @@ class SubMenuController extends Controller
             });
         }])->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
-        return view('moduls.administrator.manajemen_master.sub_menu.create', compact('menus'));
+        return view('moduls.Administrator.ManajemenMaster.SubMenu.create', compact('menus'));
     }
 
     public function store(Request $request)
@@ -87,7 +88,7 @@ class SubMenuController extends Controller
             });
         }])->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
-        return view('moduls.administrator.manajemen_master.sub_menu.edit', compact('subMenu', 'menus'));
+        return view('moduls.Administrator.ManajemenMaster.SubMenu.edit', compact('subMenu', 'menus'));
     }
 
     public function update(Request $request, $id)
@@ -150,6 +151,8 @@ class SubMenuController extends Controller
 
     private function clearSidebarCache()
     {
+        SubMenuRouteServiceProvider::flushPathCache();
+
         User::pluck('user_id')->each(function ($userId) {
             Cache::forget('sidebar_moduls_user_'.$userId);
         });

@@ -180,7 +180,7 @@ class PengkajianAwalKeperawatanController extends Controller
 
         $printUrl = ''; // Bisa ditambahkan rute cetak nanti
 
-        return view('moduls.emr.pengkajian_awal_keperawatan.index', compact(
+        return view('moduls.EMR.PengkajianAwalKeperawatan.index', compact(
             'registrasi_detail',
             'riwayatPengkajianAwal',
             'emr_data',
