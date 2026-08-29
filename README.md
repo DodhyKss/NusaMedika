@@ -1,6 +1,6 @@
-# Panduan Menjalankan MediTechV2 dengan Docker
+# Panduan Menjalankan NusaMedika dengan Docker
 
-Aplikasi MediTechV2 (Laravel + Vite + PostgreSQL) telah siap dijalankan menggunakan **Docker** dan **Docker Compose**. Struktur yang disiapkan menggunakan arsitektur multi-stage build yang otomatis melakukan kompilasi aset frontend (Node 22) dan mengemas aplikasi backend (PHP 8.3 FPM + Nginx + Supervisor) dalam lingkungan Alpine yang ringan dan optimal.
+Aplikasi NusaMedika (Laravel + Vite + PostgreSQL) telah siap dijalankan menggunakan **Docker** dan **Docker Compose**. Struktur yang disiapkan menggunakan arsitektur multi-stage build yang otomatis melakukan kompilasi aset frontend (Node 22) dan mengemas aplikasi backend (PHP 8.3 FPM + Nginx + Supervisor) dalam lingkungan Alpine yang ringan dan optimal.
 
 ---
 
