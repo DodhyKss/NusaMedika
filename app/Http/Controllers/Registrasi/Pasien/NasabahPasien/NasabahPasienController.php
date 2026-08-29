@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Registrasi\Pasien\NasabahPasien;
 use App\Http\Controllers\Controller;
 use App\Models\KelasRuang;
 use App\Models\Nasabah;
+use App\Models\Pasien;
 use App\Models\PasienNasabah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ class NasabahPasienController extends Controller
 {
     public function index(Request $request)
     {
-        $search = trim((string) $request->input('search'));
+        $pasienId = (int) $request->input('pasien_id');
 
         $query = PasienNasabah::query()
             ->where(function ($q) {
@@ -29,20 +30,17 @@ class NasabahPasienController extends Controller
                 }),
             ]);
 
-        if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->where('no_peserta', 'ilike', "%{$search}%")
-                    ->orWhereHas('pasien', function ($q2) use ($search) {
-                        $q2->where('nama_pasien', 'ilike', "%{$search}%")
-                            ->orWhere('no_mr', 'ilike', "%{$search}%");
-                    })
-                    ->orWhereHas('nasabah', function ($q2) use ($search) {
-                        $q2->where('nama_nasabah', 'ilike', "%{$search}%");
-                    });
-            });
+        if ($pasienId > 0) {
+            $query->where('pasien_id', $pasienId);
         }
 
         $nasabahPasiens = $query->orderByDesc('pasien_nasabah_id')->paginate(10)->withQueryString();
+
+        $selectedPasien = $pasienId > 0 ? Pasien::where('pasien_id', $pasienId)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->first() : null;
 
         $kelasMap = KelasRuang::aktif()
             ->orderBy('kelas_ruang_id')
@@ -50,7 +48,7 @@ class NasabahPasienController extends Controller
             ->map(fn ($nama) => (string) $nama)
             ->all();
 
-        return view('moduls.Registrasi.Pasien.NasabahPasien.index', compact('nasabahPasiens', 'search', 'kelasMap'));
+        return view('moduls.Registrasi.Pasien.NasabahPasien.index', compact('nasabahPasiens', 'kelasMap', 'selectedPasien'));
     }
 
     public function create()

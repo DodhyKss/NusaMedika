@@ -23,16 +23,13 @@
     </div>
     <form action="{{ route('nasabah_pasien.index') }}" method="GET" id="filterForm">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <!-- Pencarian -->
-            <div class="col-span-1 md:col-span-3">
-                <label for="search" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Pencarian</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                    <input type="text" id="search" name="search" value="{{ old('search', $search) }}" placeholder="Cari Nama / No. RM / No. Kartu..." 
-                           class="w-full text-sm border border-slate-200 rounded-lg pl-9 pr-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                </div>
+            <!-- Pencarian Pasien -->
+            <div class="md:col-span-2">
+                <x-select_pasien 
+                    label="Pencarian Pasien (No. RM / NIK / Nama)"
+                    placeholder="-- Ketik No. RM / NIK / Nama --"
+                    :selected="$selectedPasien?->pasien_id"
+                ></x-select_pasien>
             </div>
 
             <!-- Action Buttons -->

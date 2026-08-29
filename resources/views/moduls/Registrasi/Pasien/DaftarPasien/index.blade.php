@@ -28,7 +28,7 @@
                     label="Pencarian Pasien (No. RM / NIK / Nama)"
                     placeholder="-- Ketik No. RM / NIK / Nama --"
                     :selected="$selectedPasien?->pasien_id"
-                />
+                ></x-select_pasien>
             </div>
 
             <div>

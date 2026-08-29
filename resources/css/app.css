@@ -3,6 +3,18 @@
 @import 'select2/dist/css/select2.min.css';
 @import 'tailwindcss';
 
+/* Workaround: Lightning CSS (Tailwind v4) memotong selector `:before`
+   pada CSS Font Awesome 7, sehingga glyph tidak tampil. Regenerasi aturan
+   ::before agar semua ikon Font Awesome (solid/regular/brands) muncul. */
+.fa-solid::before,
+.fa-regular::before,
+.fa-brands::before,
+.fa-classic::before,
+.fa::before {
+    content: var(--fa);
+}
+
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 

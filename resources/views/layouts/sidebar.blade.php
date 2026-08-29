@@ -12,7 +12,7 @@
     <div class="relative z-10 px-4 py-4 flex-shrink-0">
         <div class="relative">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <i class="fa-solid fa-magnifying-glass text-sm text-slate-400"></i>
             </div>
             <input type="text" id="sidebar-search" class="block w-full py-2.5 pl-10 pr-3 text-sm text-white bg-slate-800/50 border border-slate-700/50 rounded-lg focus:ring-1 focus:ring-slate-500 focus:border-slate-500 placeholder-slate-400/80 transition-all outline-none backdrop-blur-sm" placeholder="Cari menu...">
         </div>
