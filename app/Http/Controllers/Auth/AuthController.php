@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class AuthController extends Controller
 {
@@ -14,6 +15,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
+
         return view('auth.login');
     }
 
@@ -37,7 +39,7 @@ class AuthController extends Controller
                 $q->whereNull('status_batal')->orWhere('status_batal', 0);
             })
             ->first();
-        
+
         if ($user) {
             // Check plain text password directly
             $valid = ($request->user_password === $user->user_password);
@@ -45,6 +47,7 @@ class AuthController extends Controller
             if ($valid) {
                 Auth::login($user);
                 $request->session()->regenerate();
+
                 return redirect()->intended('dashboard');
             }
         }
@@ -56,10 +59,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        \Illuminate\Support\Facades\Cache::forget('sidebar_moduls_user_' . Auth::id());
+        Cache::forget('sidebar_moduls_user_'.Auth::id());
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('login');
     }
 }

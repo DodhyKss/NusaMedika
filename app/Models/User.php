@@ -32,9 +32,9 @@ class User extends Authenticatable
     public function akses()
     {
         return $this->hasMany(UserAkses::class, 'user_id', 'user_id')
-                    ->where(function ($q) {
-                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                    });
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            });
     }
 
     public function pegawai()

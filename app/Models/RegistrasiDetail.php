@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class RegistrasiDetail extends Model
 {
     protected $table = 'registrasi_detail';
+
     protected $primaryKey = 'registrasi_detail_id';
+
     public $timestamps = false;
 
     protected $fillable = [
         'registrasi_id',
         'bagian_id',
-        'status_batal'
+        'status_batal',
     ];
 
     public function bagian()

@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class RegistrasiUrut extends Model
 {
     protected $table = 'registrasi_urut';
+
     protected $primaryKey = 'registrasi_urut_id';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -34,6 +36,6 @@ class RegistrasiUrut extends Model
         'input_user_id',
         'mod_time',
         'mod_user_id',
-        'status_batal'
+        'status_batal',
     ];
 }

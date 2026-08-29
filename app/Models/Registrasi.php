@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Registrasi extends Model
 {
     protected $table = 'registrasi';
+
     protected $primaryKey = 'registrasi_id';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -19,7 +21,7 @@ class Registrasi extends Model
         'pasien_nasabah_id_3',
         'status_batal',
         'memo',
-        'flag_online'
+        'flag_online',
     ];
 
     public function pasien()
@@ -35,9 +37,9 @@ class Registrasi extends Model
     public function rujukanSep()
     {
         return $this->hasOne(RujukanSep::class, 'registrasi_id', 'registrasi_id')
-                    ->where(function($q) {
-                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                    });
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            });
     }
 
     public function pasienNasabah()
@@ -48,8 +50,8 @@ class Registrasi extends Model
     public function penanggungRawat()
     {
         return $this->hasMany(PenanggungRawat::class, 'registrasi_id', 'registrasi_id')
-                    ->where(function($q) {
-                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                    });
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            });
     }
 }

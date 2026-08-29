@@ -7,14 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Modul extends Model
 {
     protected $table = 'modul';
+
     protected $primaryKey = 'modul_id';
+
     public $timestamps = false;
 
     protected $fillable = [
         'nama_modul',
         'icon_modul',
         'urutan_modul',
-        'status_batal'
+        'status_batal',
     ];
 
     public function menus()

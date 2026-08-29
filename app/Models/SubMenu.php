@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class SubMenu extends Model
 {
     protected $table = 'sub_menu';
+
     protected $primaryKey = 'sub_menu_id';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -15,7 +17,7 @@ class SubMenu extends Model
         'nama_sub_menu',
         'file_sub_menu',
         'urutan_sub_menu',
-        'status_batal'
+        'status_batal',
     ];
 
     public function menu()

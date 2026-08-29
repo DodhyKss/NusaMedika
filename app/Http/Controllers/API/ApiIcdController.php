@@ -17,7 +17,7 @@ class ApiIcdController extends Controller
         if ($term) {
             $query->where(function ($q) use ($term) {
                 $q->where('kode_diagnosa', 'ILIKE', "%{$term}%")
-                  ->orWhere('nama_diagnosa', 'ILIKE', "%{$term}%");
+                    ->orWhere('nama_diagnosa', 'ILIKE', "%{$term}%");
             });
         }
 
@@ -25,12 +25,12 @@ class ApiIcdController extends Controller
         $results = $query->limit($limit)->get()->map(function ($icd) {
             return [
                 'id' => $icd->icd_id,
-                'text' => $icd->kode_diagnosa . ' - ' . $icd->nama_diagnosa,
+                'text' => $icd->kode_diagnosa.' - '.$icd->nama_diagnosa,
             ];
         });
 
         return response()->json([
-            'results' => $results
+            'results' => $results,
         ]);
     }
 }

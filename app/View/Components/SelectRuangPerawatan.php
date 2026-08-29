@@ -10,8 +10,11 @@ use Illuminate\View\Component;
 class SelectRuangPerawatan extends Component
 {
     public $ruangan;
+
     public $selected;
+
     public $name;
+
     public $id;
 
     public function __construct($selected = '', $name = 'ruangan', $id = 'ruangan')

@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: meditech-app:dev
-    container_name: meditech_app
+    image: nusamedika-app:dev
+    container_name: nusamedika_app
     network_mode: "host"
     env_file:
       - .env
@@ -28,7 +28,7 @@ services:
 
   vite:
     image: node:22-alpine
-    container_name: meditech_vite
+    container_name: nusamedika_vite
     working_dir: /var/www/html
     env_file:
       - .env

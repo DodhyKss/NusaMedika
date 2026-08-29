@@ -11,7 +11,7 @@ class ApiPasienController extends Controller
 {
     public function searchPasien(Request $request)
     {
-        \Illuminate\Support\Facades\Log::info('DIAG.pasien.search', [
+        Log::info('DIAG.pasien.search', [
             'q' => $request->input('q'),
             'field' => $request->input('field'),
             'user' => $request->user()?->user_id,
@@ -22,8 +22,8 @@ class ApiPasienController extends Controller
         $column = in_array($field, ['no_mr', 'ktp', 'nama'], true) ? ($field === 'nama' ? 'nama_pasien' : $field) : null;
 
         $query = Pasien::select(
-            'pasien_id', 'nama_pasien', 'no_mr', 'ktp', 'jenis_kelamin', 
-            'tempat_lahir', 'tgl_lahir', 'alamat', 'no_hp', 'agama', 
+            'pasien_id', 'nama_pasien', 'no_mr', 'ktp', 'jenis_kelamin',
+            'tempat_lahir', 'tgl_lahir', 'alamat', 'no_hp', 'agama',
             'gol_darah', 'status_perkawinan', 'pekerjaan', 'nama_ibu_kandung'
         )->where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
@@ -66,14 +66,14 @@ class ApiPasienController extends Controller
                         : ($field === 'ktp'
                             ? "{$pasien->ktp} - {$pasien->nama_pasien}"
                             : "{$pasien->no_mr} - {$pasien->nama_pasien}"),
-                    'extra' => $extra
+                    'extra' => $extra,
                 ];
             }
 
             return [
                 'id' => (string) $pasien->pasien_id,
                 'text' => "{$pasien->no_mr} - {$pasien->nama_pasien}",
-                'extra' => $extra
+                'extra' => $extra,
             ];
         });
 

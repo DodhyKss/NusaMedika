@@ -2,10 +2,10 @@
 
 namespace App\Http\View\Composers;
 
-use Illuminate\View\View;
+use App\Models\Modul;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Modul;
+use Illuminate\View\View;
 
 class SidebarComposer
 {
@@ -16,39 +16,39 @@ class SidebarComposer
     {
         if (Auth::check()) {
             $user = Auth::user();
-            $cacheKey = 'sidebar_moduls_user_' . $user->user_id; // Using user_id based on previous convention, but let's check what auth user uses for ID. Actually in Laravel $user->id works for the primary key. Let's use $user->id. wait. User model uses string IDs? Auth::id() is safe.
+            $cacheKey = 'sidebar_moduls_user_'.$user->user_id; // Using user_id based on previous convention, but let's check what auth user uses for ID. Actually in Laravel $user->id works for the primary key. Let's use $user->id. wait. User model uses string IDs? Auth::id() is safe.
 
             // Cache data sidebar selama 24 jam untuk user ini sebagai JSON murni
-            $jsonModuls = Cache::remember('sidebar_moduls_user_' . Auth::id(), now()->addHours(24), function () use ($user) {
+            $jsonModuls = Cache::remember('sidebar_moduls_user_'.Auth::id(), now()->addHours(24), function () use ($user) {
                 $aksesSubMenuIds = $user->akses()->pluck('sub_menu_id')->toArray();
 
-                return Modul::where(function($q) {
-                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                    })
+                return Modul::where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
                     ->with(['menus' => function ($query) use ($aksesSubMenuIds) {
-                        $query->where(function($q) {
-                                  $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                              })
-                              ->with(['subMenus' => function ($query) use ($aksesSubMenuIds) {
-                                  $query->whereIn('sub_menu_id', $aksesSubMenuIds)
-                                        ->where(function($q) {
-                                            $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                                        })
-                                        ->orderBy('urutan_sub_menu');
-                              }])
-                              ->whereHas('subMenus', function ($query) use ($aksesSubMenuIds) {
-                                  $query->whereIn('sub_menu_id', $aksesSubMenuIds)
-                                        ->where(function($q) {
-                                            $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                                        });
-                              })
-                              ->orderBy('urutan_menu');
+                        $query->where(function ($q) {
+                            $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                        })
+                            ->with(['subMenus' => function ($query) use ($aksesSubMenuIds) {
+                                $query->whereIn('sub_menu_id', $aksesSubMenuIds)
+                                    ->where(function ($q) {
+                                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                                    })
+                                    ->orderBy('urutan_sub_menu');
+                            }])
+                            ->whereHas('subMenus', function ($query) use ($aksesSubMenuIds) {
+                                $query->whereIn('sub_menu_id', $aksesSubMenuIds)
+                                    ->where(function ($q) {
+                                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                                    });
+                            })
+                            ->orderBy('urutan_menu');
                     }])
                     ->whereHas('menus.subMenus', function ($query) use ($aksesSubMenuIds) {
                         $query->whereIn('sub_menu_id', $aksesSubMenuIds)
-                              ->where(function($q) {
-                                  $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                              });
+                            ->where(function ($q) {
+                                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                            });
                     })
                     ->orderBy('urutan_modul')
                     ->get()

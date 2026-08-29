@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
 class DiagnosaRawat extends Model
 {
     protected $table = 'diagnosa_rawat';
+
     protected $primaryKey = 'diagnosa_rawat_id';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -16,7 +19,7 @@ class DiagnosaRawat extends Model
         'mod_user_id',
         'mod_time',
         'status_batal',
-        'icd_id'
+        'icd_id',
     ];
 
     public function icd()
