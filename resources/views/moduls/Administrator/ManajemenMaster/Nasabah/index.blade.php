@@ -1,14 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-@php
-    $instalasiLabel = array_filter([
-        env('JENIS_RAWAT_RJ') => 'Rawat Jalan',
-        env('JENIS_RAWAT_RI') => 'Rawat Inap',
-        env('JENIS_RAWAT_IGD') => 'IGD',
-        env('JENIS_RAWAT_MCU') => 'MCU',
-    ]);
-@endphp
 <!-- Page Header -->
 <div class="mb-6 flex justify-between items-end">
     <div>
@@ -32,15 +24,13 @@
     <form action="{{ route('admin.nasabah.index') }}" method="GET" id="filterForm">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <!-- Pencarian -->
-            <div class="col-span-1 md:col-span-3">
-                <label for="search" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Pencarian</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                    <input type="text" id="search" name="search" value="{{ old('search', $search) }}" placeholder="Cari Nama / Email / Telepon..." 
-                           class="w-full text-sm border border-slate-200 rounded-lg pl-9 pr-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                </div>
+            <div class="md:col-span-3">
+                <x-select_ajax
+                    placeholder="-- Ketik Nama Nasabah --"
+                    name="nasabah_id"
+                    id="nasabah_id"
+                    url="/api/nasabah/search"
+                ></x-select_ajax>
             </div>
 
             <!-- Action Buttons -->
@@ -66,8 +56,6 @@
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">No.</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nama Nasabah</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
-                    <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Telepon</th>
-                    <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Instalasi</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Aksi</th>
                 </tr>
             </thead>
@@ -82,20 +70,6 @@
                             <div class="font-semibold text-slate-800">{{ $ns->nama_nasabah }}</div>
                         </td>
                         <td class="px-3 py-3 text-slate-600">{{ $ns->email_nasabah ?? '-' }}</td>
-                        <td class="px-3 py-3 text-slate-600">{{ $ns->telp_nasabah ?? '-' }}</td>
-                        <td class="px-3 py-3">
-                            @if (!empty($ns->instalasi))
-                                <div class="flex flex-wrap gap-1">
-                                    @foreach ($ns->instalasi as $inst)
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-600 border border-blue-200">
-                                            {{ $instalasiLabel[$inst] ?? $inst }}
-                                        </span>
-                                    @endforeach
-                                </div>
-                            @else
-                                <span class="text-slate-400 italic text-[11px]">-</span>
-                            @endif
-                        </td>
                         <td class="px-3 py-3 text-center">
                             <div class="flex items-center justify-center gap-1">
                                 <a href="{{ route('admin.nasabah.edit', $ns->nasabah_id) }}" class="cursor-pointer p-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors" title="Edit Data">

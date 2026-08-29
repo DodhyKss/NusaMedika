@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Nasabah extends Model
@@ -19,4 +20,11 @@ class Nasabah extends Model
     protected $fillable = [
         'nama_nasabah',
     ];
+
+    public function scopeAktif(Builder $query): Builder
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('status_batal')->orWhere('status_batal', 0);
+        });
+    }
 }

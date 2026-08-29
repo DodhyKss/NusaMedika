@@ -126,6 +126,45 @@ $(function () {
             });
         });
     });
+
+
+    // select via ajax
+    $('.select2-ajax').each(function () {
+        var $el = $(this);
+        var url = $el.data('url');
+        console.log('[select2] #' + ($el.attr('id') || '?') + ' -> muat dari: ' + url);
+        
+        $.getJSON(url, { limit: 1000 }, function (res) {
+            var results = (res && res.results) || [];
+            
+            if (!$el.find('option[value=""]').length) {
+                $el.append(new Option('', ''));
+            }
+
+            results.forEach(function (p) {
+                if (p && p.id != null && !$el.find('option[value="' + p.id + '"]').length) {
+                    $el.append(new Option(p.text, p.id));
+                }
+            });
+
+            $el.val(null);
+
+            pasangSelect2($el, {
+                placeholder: $el.data('placeholder') || 'Cari Data...',
+                allowClear: true,
+                width: '100%',
+                matcher: function (params, data) {
+                    if (!params.term) {
+                        return data;
+                    }
+                    var term = params.term.toLowerCase();
+                    var text = String(data.text || '').toLowerCase();
+                    return text.indexOf(term) !== -1 ? data : null;
+                }
+            });
+        });
+    });
+
     // Select2 untuk select statis (mis. pilih Bagian pada form pegawai / Poliklinik / Ruang Perawatan / Dokter)
     $('.select2, .select2-poliklinik, .select2-ruangan, .select2-dokter').not('.select2-pasien').each(function () {
         var placeholder = $(this).find('option[value=""]').first().text() || 'Pilih...';

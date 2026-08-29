@@ -1,15 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-@php
-    $instalasiOptions = array_filter([
-        env('JENIS_RAWAT_RJ') => 'Rawat Jalan',
-        env('JENIS_RAWAT_RI') => 'Rawat Inap',
-        env('JENIS_RAWAT_IGD') => 'IGD',
-        env('JENIS_RAWAT_MCU') => 'MCU',
-    ]);
-    $selectedInstalasi = old('instalasi', $nasabah->instalasi ?? []) ?? [];
-@endphp
 <!-- Page Header -->
 <div class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
     <div>
@@ -73,118 +64,6 @@
                     @enderror
                 </div>
 
-                <!-- Telepon 1 -->
-                <div>
-                    <label for="telp_nasabah" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Telepon 1</label>
-                    <input type="text" id="telp_nasabah" name="telp_nasabah" value="{{ old('telp_nasabah', $nasabah->telp_nasabah) }}" placeholder="021-0000000" 
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('telp_nasabah')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Telepon 2 -->
-                <div>
-                    <label for="telp_nasabah_2" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Telepon 2</label>
-                    <input type="text" id="telp_nasabah_2" name="telp_nasabah_2" value="{{ old('telp_nasabah_2', $nasabah->telp_nasabah_2) }}" placeholder="0812-00000000" 
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('telp_nasabah_2')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="md:col-span-2">
-                    <hr class="border-slate-200 my-2">
-                </div>
-
-                <!-- Tipe Biaya -->
-                <div>
-                    <label for="tipe_biaya" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Tipe Biaya</label>
-                    <input type="number" id="tipe_biaya" name="tipe_biaya" value="{{ old('tipe_biaya', $nasabah->tipe_biaya) }}" placeholder="Contoh: 1" 
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('tipe_biaya')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Biaya Administrasi -->
-                <div>
-                    <label for="biaya_administrasi" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Biaya Administrasi</label>
-                    <input type="number" id="biaya_administrasi" name="biaya_administrasi" value="{{ old('biaya_administrasi', $nasabah->biaya_administrasi) }}" step="0.01" placeholder="Contoh: 50000" 
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('biaya_administrasi')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Batas Atas -->
-                <div>
-                    <label for="batas_atas" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Batas Atas</label>
-                    <input type="number" id="batas_atas" name="batas_atas" value="{{ old('batas_atas', $nasabah->batas_atas) }}" step="0.01" placeholder="Batas maksimal klaim" 
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('batas_atas')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Instalasi -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Instalasi</label>
-                    <div class="flex flex-wrap gap-3">
-                        @foreach ($instalasiOptions as $kode => $label)
-                            <label class="inline-flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="instalasi[]" value="{{ $kode }}" @checked(in_array($kode, $selectedInstalasi))
-                                       class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20">
-                                <span class="text-sm text-slate-600">{{ $label }}</span>
-                            </label>
-                        @endforeach
-                    </div>
-                    @error('instalasi')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="md:col-span-2">
-                    <hr class="border-slate-200 my-2">
-                </div>
-
-                <!-- Contact Person 1 -->
-                <div>
-                    <label for="cp_nama" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Contact Person (Nama)</label>
-                    <input type="text" id="cp_nama" name="cp_nama" value="{{ old('cp_nama', $nasabah->cp_nama) }}" placeholder="Nama CP utama" 
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('cp_nama')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="cp_telp" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Contact Person (Telepon)</label>
-                    <input type="text" id="cp_telp" name="cp_telp" value="{{ old('cp_telp', $nasabah->cp_telp) }}" placeholder="Telepon CP utama" 
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('cp_telp')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Contact Person 2 -->
-                <div>
-                    <label for="cp_nama_2" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Contact Person 2 (Nama)</label>
-                    <input type="text" id="cp_nama_2" name="cp_nama_2" value="{{ old('cp_nama_2', $nasabah->cp_nama_2) }}" placeholder="Nama CP kedua (opsional)" 
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('cp_nama_2')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="cp_telp_2" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Contact Person 2 (Telepon)</label>
-                    <input type="text" id="cp_telp_2" name="cp_telp_2" value="{{ old('cp_telp_2', $nasabah->cp_telp_2) }}" placeholder="Telepon CP kedua (opsional)" 
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('cp_telp_2')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
             </div>
 
             <hr class="my-6 border-slate-200">

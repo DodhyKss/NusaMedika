@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\ApiIcdController;
+use App\Http\Controllers\API\ApiNasabahController;
 use App\Http\Controllers\API\ApiPasienController;
 use App\Http\Controllers\API\ApiWilayahController;
 use App\Http\Controllers\Auth\AuthController;
@@ -61,4 +62,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/wilayah/kecamatan', [ApiWilayahController::class, 'kecamatan'])->name('api.wilayah.kecamatan');
     Route::get('/api/wilayah/kelurahan', [ApiWilayahController::class, 'kelurahan'])->name('api.wilayah.kelurahan');
     Route::get('/api/icd/search', [ApiIcdController::class, 'searchIcd'])->name('api.icd.search');
+    Route::get('/api/nasabah/search', [ApiNasabahController::class, 'searchNasabah'])->name('api.nasabah.search');
 });
