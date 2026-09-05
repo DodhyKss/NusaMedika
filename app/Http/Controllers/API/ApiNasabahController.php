@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class ApiNasabahController extends Controller
 {
     public function searchNasabah(Request $request)
-    {   
+    {
         $term = $request->input('q');
 
         $query = Nasabah::aktif();

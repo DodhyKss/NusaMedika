@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\EMR\EmrDashboard;
 
+use App\Helpers\AksesEhr;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrasiDetail;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,7 @@ class EmrDashboardController extends Controller
         $registrasi_detail = RegistrasiDetail::with('registrasi')->findOrFail($registrasi_detail_id);
         $registrasi = $registrasi_detail->registrasi;
 
-        $profesi_id = session('profesi_id', 1); // Fallback ke profesi ID 1 (Dokter)
+        $profesi_id = AksesEhr::profesiId(); // Profesi user login (session fallback, pegawai)
 
         $query = DB::table('header_ehr')
             ->join('form', 'header_ehr.id_dash_menu', '=', 'form.id_dash_menu')

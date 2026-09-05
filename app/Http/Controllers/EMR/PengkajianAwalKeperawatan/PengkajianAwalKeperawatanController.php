@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\EMR\PengkajianAwalKeperawatan;
 
+use App\Helpers\AksesEhr;
 use App\Http\Controllers\Controller;
 use App\Models\DiagnosaRawat;
 use App\Models\Pasien;
@@ -19,6 +20,10 @@ class PengkajianAwalKeperawatanController extends Controller
         $emr_data = [];
 
         $form_id = env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN');
+
+        abort_unless(AksesEhr::can((int) $form_id, 'read'), 403);
+
+        $aksesCrud = AksesEhr::flags((int) $form_id);
 
         // Ambil riwayat untuk sidebar
         $riwayatPengkajianAwal = DB::table('emr')
@@ -190,12 +195,15 @@ class PengkajianAwalKeperawatanController extends Controller
             'deleteAction',
             'isView',
             'printUrl',
-            'emr_id'
+            'emr_id',
+            'aksesCrud'
         ));
     }
 
     public function store(Request $request, $registrasi_detail_id)
     {
+        abort_unless(AksesEhr::can((int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN'), 'create'), 403);
+
         $registrasi_detail = RegistrasiDetail::findOrFail($registrasi_detail_id);
         $user_id = Auth::user()->user_id;
         $pegawai_id = Auth::user()->pegawai_id;
@@ -323,6 +331,8 @@ class PengkajianAwalKeperawatanController extends Controller
 
     public function update(Request $request, $registrasi_detail_id, $emr_id)
     {
+        abort_unless(AksesEhr::can((int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN'), 'update'), 403);
+
         $user_id = Auth::user()->user_id;
         $now = now();
 
@@ -443,6 +453,8 @@ class PengkajianAwalKeperawatanController extends Controller
 
     public function destroy($registrasi_detail_id, $emr_id)
     {
+        abort_unless(AksesEhr::can((int) env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN'), 'delete'), 403);
+
         $user_id = Auth::user()->user_id;
         $now = now();
 

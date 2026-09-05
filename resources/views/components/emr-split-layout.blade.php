@@ -11,7 +11,11 @@
     'deleteAction' => '',
     'emrId' => '',
     'printUrl' => '',
-    'isView' => false
+    'isView' => false,
+    'canCreate' => true,
+    'canRead' => true,
+    'canUpdate' => true,
+    'canDelete' => true
 ])
 
 @php
@@ -89,10 +93,12 @@
                     </div>
                 </div>
 
+                @if($canCreate)
                 <a href="{{ $getLink($registrasiDetailId) }}" onclick="document.getElementById('save_loader').classList.remove('hidden'); document.querySelector('#save_loader div:nth-child(2)').innerText='Memuat Data...';" class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm transition-colors">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Baru
                 </a>
+                @endif
                 
                 <button type="button" onclick="togglePanel('kiri')" title="Maximize/Minimize" class="inline-flex items-center justify-center p-1.5 text-slate-500 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-700 rounded-lg transition-colors shadow-sm ml-1">
                     <svg id="icon-maximize-kiri" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
@@ -124,7 +130,7 @@
                         <svg id="icon-maximize-kanan" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
                     </button>
                     
-                    @if($isEdit && $deleteAction)
+                    @if($isEdit && $deleteAction && $canDelete)
                         <button type="button" onclick="confirmDelete('{{ $emrId }}')" class="inline-flex items-center px-3 py-2 text-sm font-semibold text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors border border-red-200">
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             Batalkan
@@ -138,7 +144,7 @@
 
             <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end gap-3">
                 @if($isView)
-                    @if($printUrl)
+                    @if($canRead && $printUrl)
                         <button type="button" onclick="window.open('{{ $printUrl }}', '_blank')" class="inline-flex items-center px-6 py-2.5 bg-white border border-slate-300 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                             Print
@@ -147,17 +153,21 @@
                     <a href="{{ $getLink($registrasiDetailId) }}" class="inline-flex items-center px-6 py-2.5 bg-slate-800 text-white text-sm font-semibold rounded-lg hover:bg-slate-700 transition-all shadow-sm">
                         Tutup
                     </a>
-                @else
+                @elseif($canCreate || $canUpdate)
                     <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-500/20 transition-all shadow-sm">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         Simpan {{ $isEdit ? 'Perubahan' : 'Data' }}
                     </button>
+                @else
+                    <a href="{{ $getLink($registrasiDetailId) }}" class="inline-flex items-center px-6 py-2.5 bg-slate-800 text-white text-sm font-semibold rounded-lg hover:bg-slate-700 transition-all shadow-sm">
+                        Tutup
+                    </a>
                 @endif
             </div>
         </form>
         
         <!-- Delete Form (Hidden) -->
-        @if($isEdit && $deleteAction)
+        @if($isEdit && $deleteAction && $canDelete)
             <form id="delete-form-{{ $emrId }}" action="{{ $deleteAction }}" method="POST" class="hidden" onsubmit="document.getElementById('save_loader').classList.remove('hidden'); document.querySelector('#save_loader div:nth-child(2)').innerText='Membatalkan Data...';">
                 @csrf
                 @method('DELETE')

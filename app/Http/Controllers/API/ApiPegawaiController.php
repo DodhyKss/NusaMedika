@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class ApiPegawaiController extends Controller
 {
-    public function searchPegawai(Request $request) 
+    public function searchPegawai(Request $request)
     {
         $term = $request->input('q');
 

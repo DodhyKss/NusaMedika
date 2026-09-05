@@ -32,17 +32,24 @@ class UserSeeder extends Seeder
             );
         }
 
+        // Hanya berikan akses ke sub_menu yang benar-benar ada (hindari referensi id tak ada, mis. 8-11)
+        $validSubMenuIds = DB::table('sub_menu')->pluck('sub_menu_id')->all();
+
+        $validAktifSubMenuIds = DB::table('sub_menu')
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->pluck('sub_menu_id')
+            ->all();
+
         $akses = [
-            // Admin: semua sub menu
-            1 => range(1, 28),
+            // Admin: semua sub menu aktif (dinamis agar sub menu baru otomatis terakses)
+            1 => $validAktifSubMenuIds,
             // Perawat: registrasi, dashboard pasien, pengkajian, list pasien
             2 => [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14],
             // Dokter: daftar pasien, dashboard pasien, SOAP, pengkajian, list pasien
             3 => [1, 8, 9, 10, 11, 12, 13, 14],
         ];
-
-        // Hanya berikan akses ke sub_menu yang benar-benar ada (hindari referensi id tak ada, mis. 8-11)
-        $validSubMenuIds = DB::table('sub_menu')->pluck('sub_menu_id')->all();
 
         foreach ($akses as $userId => $subMenuIds) {
             foreach ($subMenuIds as $subMenuId) {

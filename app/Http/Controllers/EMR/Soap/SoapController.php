@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\EMR\Soap;
 
+use App\Helpers\AksesEhr;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrasiDetail;
 use Illuminate\Http\Request;
@@ -17,6 +18,10 @@ class SoapController extends Controller
 
         // Form ID untuk SOAP biasanya 3
         $form_id = env('FORM_ID_SOAP');
+
+        abort_unless(AksesEhr::can((int) $form_id, 'read'), 403);
+
+        $aksesCrud = AksesEhr::flags((int) $form_id);
 
         // Ambil riwayat SOAP untuk pasien ini (dari registrasi_id)
         $riwayat_soap = DB::table('emr')
@@ -210,16 +215,20 @@ class SoapController extends Controller
 
         $isView = request('action') === 'view';
 
-        return view('moduls.EMR.Soap.index', compact('registrasi_detail', 'riwayat_soap', 'riwayat_details', 'edit_soap', 'formData', 'form_id', 'history_grouped', 'riwayat_pengkajian', 'assesment_terakhir', 'isView'));
+        return view('moduls.EMR.Soap.index', compact('registrasi_detail', 'riwayat_soap', 'riwayat_details', 'edit_soap', 'formData', 'form_id', 'history_grouped', 'riwayat_pengkajian', 'assesment_terakhir', 'isView', 'aksesCrud'));
     }
 
     public function print($emr_id)
     {
+        abort_unless(AksesEhr::can((int) env('FORM_ID_SOAP'), 'read'), 403);
+
         return view('moduls.EMR.Soap.print', compact('emr_id'));
     }
 
     public function store(Request $request, $registrasi_detail_id)
     {
+        abort_unless(AksesEhr::can((int) env('FORM_ID_SOAP'), 'create'), 403);
+
         $request->validate([
             'subjective' => 'nullable|string',
             'objective' => 'nullable|string',
@@ -285,6 +294,8 @@ class SoapController extends Controller
 
     public function update(Request $request, $registrasi_detail_id, $emr_id)
     {
+        abort_unless(AksesEhr::can((int) env('FORM_ID_SOAP'), 'update'), 403);
+
         $request->validate([
             'subjective' => 'nullable|string',
             'objective' => 'nullable|string',
@@ -343,6 +354,8 @@ class SoapController extends Controller
 
     public function destroy($registrasi_detail_id, $emr_id)
     {
+        abort_unless(AksesEhr::can((int) env('FORM_ID_SOAP'), 'delete'), 403);
+
         $user_id = Auth::user()->user_id;
         $now = now();
 

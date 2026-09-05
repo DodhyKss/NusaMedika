@@ -14,6 +14,8 @@
             : '';
 
         $formData = $formData ?? [];
+
+        $aksesCrud = $aksesCrud ?? ['create' => true, 'read' => true, 'update' => true, 'delete' => true];
         
         $titleForm = 'Form SOAP Baru';
         $subtitleForm = 'Isi form rekam medis di bawah ini.';
@@ -40,6 +42,10 @@
         :emrId="($isEdit || $isView) ? $edit_soap->emr_id : ''" 
         :printUrl="$isView ? route('emr.soap.print', $edit_soap->emr_id) : ''"
         :isView="$isView"
+        :canCreate="$aksesCrud['create']"
+        :canRead="$aksesCrud['read']"
+        :canUpdate="$aksesCrud['update']"
+        :canDelete="$aksesCrud['delete']"
     >
         <x-slot name="listRiwayat">
             <!-- Search Bar -->
@@ -88,14 +94,19 @@
                     </div>
 
                     <div class="flex items-center gap-2 pt-3 border-t border-slate-100">
+                        @if($aksesCrud['read'])
                         <a href="{{ route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $item->emr_id, 'action' => 'view']) }}" class="flex-1 inline-flex justify-center items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 hover:text-slate-800 transition-colors">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                             Lihat
                         </a>
+                        @endif
+                        @if($aksesCrud['update'])
                         <a href="{{ route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $item->emr_id]) }}" onclick="document.getElementById('save_loader').classList.remove('hidden'); document.querySelector('#save_loader div:nth-child(2)').innerText='Memuat Data...';" class="flex-1 inline-flex justify-center items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:text-blue-800 transition-colors">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                             Edit
                         </a>
+                        @endif
+                        @if($aksesCrud['delete'])
                         <form action="{{ route('emr.soap.destroy', ['registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $item->emr_id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus riwayat SOAP ini?');" class="flex-1">
                             @csrf
                             @method('DELETE')
@@ -104,6 +115,7 @@
                                 Hapus
                             </button>
                         </form>
+                        @endif
                     </div>
                 </div>
             @empty

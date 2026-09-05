@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             WilayahSeeder::class,
             KelasRuangSeeder::class,
             IcdSeeder::class,
+            EmrMasterSeeder::class,
         ]);
 
         // Seeder di atas mengisi ID eksplisit (updateOrInsert), sehingga sequence
@@ -38,6 +39,7 @@ class DatabaseSeeder extends Seeder
             'referensi_bagian', 'bagian', 'modul', 'menu', 'sub_menu',
             'profesi', 'jabatan', 'status_kepegawaian', 'pegawai', 'users',
             'provinsi', 'kabupaten', 'kecamatan', 'kelurahan', 'kelas_ruang',
+            'dashboard_menu', 'dashboard_menu_sub', 'dashboard_menu_sub_extra', 'form', 'akses_ehr',
         ];
 
         foreach ($tables as $table) {

@@ -45,6 +45,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             // Modul Administrator (5)
             ['menu_id' => 6, 'modul_id' => 5, 'nama_menu' => 'Manajemen Master', 'urutan_menu' => 1],
             ['menu_id' => 7, 'modul_id' => 5, 'nama_menu' => 'Manajemen User', 'urutan_menu' => 2],
+            ['menu_id' => 8, 'modul_id' => 5, 'nama_menu' => 'Manajemen EMR', 'urutan_menu' => 3],
         ];
 
         foreach ($menus as $menu) {
@@ -94,6 +95,9 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 28, 'menu_id' => 6, 'nama_sub_menu' => 'ICD', 'file_sub_menu' => 'Administrator/ManajemenMaster/Icd/icd', 'urutan_sub_menu' => 13],
             // Menu Manajemen User (7) - Administrator
             ['sub_menu_id' => 18, 'menu_id' => 7, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'Administrator/ManajemenUser/User/user', 'urutan_sub_menu' => 1],
+            // Menu Manajemen EMR (8) - Administrator
+            ['sub_menu_id' => 30, 'menu_id' => 8, 'nama_sub_menu' => 'Dashboard Menu', 'file_sub_menu' => 'Administrator/ManajemenEMR/DashboardMenu/dashboard_menu', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 31, 'menu_id' => 8, 'nama_sub_menu' => 'Akses EHR', 'file_sub_menu' => 'Administrator/ManajemenEMR/AksesEhr/akses_ehr', 'urutan_sub_menu' => 2],
         ];
 
         foreach ($subMenus as $subMenu) {
