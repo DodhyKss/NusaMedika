@@ -162,6 +162,9 @@ class FormController extends Controller
             'tab' => $tab,
             'forms' => $this->aktif('form')->orderBy('form_id')->get(),
             'objeks' => $this->aktif('objek')->orderBy('objek_id')->get(),
+            'menus' => $this->aktif('dashboard_menu')->orderBy('dashboard_menu_id')->get(),
+            'subs' => $this->aktif('dashboard_menu_sub')->orderBy('dashboard_menu_sub_id')->get(),
+            'extras' => $this->aktif('dashboard_menu_sub_extra')->orderBy('dashboard_menu_sub_extra_id')->get(),
         ];
     }
 
