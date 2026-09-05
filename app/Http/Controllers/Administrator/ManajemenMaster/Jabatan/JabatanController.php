@@ -18,12 +18,12 @@ class JabatanController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('nama_jabatan')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.Jabatan.index', compact('jabatans'));
+        return view('moduls.Administrator.ManajemenMaster.Jabatan.jabatan', compact('jabatans'));
     }
 
     public function create()
     {
-        return view('moduls.Administrator.ManajemenMaster.Jabatan.create');
+        return view('moduls.Administrator.ManajemenMaster.Jabatan.jabatan_create');
     }
 
     public function store(Request $request)
@@ -56,7 +56,7 @@ class JabatanController extends Controller
     {
         $jabatan = Jabatan::findOrFail($id);
 
-        return view('moduls.Administrator.ManajemenMaster.Jabatan.edit', compact('jabatan'));
+        return view('moduls.Administrator.ManajemenMaster.Jabatan.jabatan_edit', compact('jabatan'));
     }
 
     public function update(Request $request, $id)

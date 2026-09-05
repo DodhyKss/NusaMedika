@@ -83,7 +83,7 @@ class ListPelayananPasienController extends Controller
 
         $kunjungan = $query->orderBy('tgl_masuk', 'desc')->paginate(15)->withQueryString();
 
-        return view('moduls.Registrasi.Pendaftaran.ListPelayananPasien.index', compact(
+        return view('moduls.Registrasi.Pendaftaran.ListPelayananPasien.list_pelayanan_pasien', compact(
             'kunjungan', 'tanggalAwal', 'tanggalAkhir', 'jenisLayanan', 'pasienId'
         ));
     }

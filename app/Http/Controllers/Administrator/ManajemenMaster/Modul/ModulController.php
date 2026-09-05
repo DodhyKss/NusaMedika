@@ -20,12 +20,12 @@ class ModulController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('urutan_modul')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.Modul.index', compact('moduls'));
+        return view('moduls.Administrator.ManajemenMaster.Modul.modul', compact('moduls'));
     }
 
     public function create()
     {
-        return view('moduls.Administrator.ManajemenMaster.Modul.create');
+        return view('moduls.Administrator.ManajemenMaster.Modul.modul_create');
     }
 
     public function store(Request $request)
@@ -62,7 +62,7 @@ class ModulController extends Controller
     {
         $modul = Modul::findOrFail($id);
 
-        return view('moduls.Administrator.ManajemenMaster.Modul.edit', compact('modul'));
+        return view('moduls.Administrator.ManajemenMaster.Modul.modul_edit', compact('modul'));
     }
 
     public function update(Request $request, $id)

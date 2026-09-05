@@ -23,12 +23,12 @@ class ReferensiBagianIdController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('referensi_bagian_id_id')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.ReferensiBagianId.index', compact('referensiBagians'));
+        return view('moduls.Administrator.ManajemenMaster.ReferensiBagianId.referensi_bagian_id', compact('referensiBagians'));
     }
 
     public function create()
     {
-        return view('moduls.Administrator.ManajemenMaster.ReferensiBagianId.create');
+        return view('moduls.Administrator.ManajemenMaster.ReferensiBagianId.referensi_bagian_id_create');
     }
 
     public function store(Request $request)
@@ -61,7 +61,7 @@ class ReferensiBagianIdController extends Controller
     {
         $referensi = ReferensiBagian::findOrFail($id);
 
-        return view('moduls.Administrator.ManajemenMaster.ReferensiBagianId.edit', compact('referensi'));
+        return view('moduls.Administrator.ManajemenMaster.ReferensiBagianId.referensi_bagian_id_edit', compact('referensi'));
     }
 
     public function update(Request $request, $id)

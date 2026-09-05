@@ -25,12 +25,12 @@ class IcdController extends Controller
 
         $icdList = $query->orderBy('kode_diagnosa')->paginate(10)->withQueryString();
 
-        return view('moduls.Administrator.ManajemenMaster.Icd.index', compact('icdList', 'search'));
+        return view('moduls.Administrator.ManajemenMaster.Icd.icd', compact('icdList', 'search'));
     }
 
     public function create()
     {
-        return view('moduls.Administrator.ManajemenMaster.Icd.create');
+        return view('moduls.Administrator.ManajemenMaster.Icd.icd_create');
     }
 
     public function store(Request $request)
@@ -64,7 +64,7 @@ class IcdController extends Controller
     {
         $icd = ICD::findOrFail($icd);
 
-        return view('moduls.Administrator.ManajemenMaster.Icd.edit', compact('icd'));
+        return view('moduls.Administrator.ManajemenMaster.Icd.icd_edit', compact('icd'));
     }
 
     public function update(Request $request, $icd)

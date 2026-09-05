@@ -91,7 +91,7 @@ class ListPasienDokterController extends Controller
             }
         }
 
-        return view('moduls.RawatJalan.Pasien.ListPasienDokter.index', compact(
+        return view('moduls.RawatJalan.Pasien.ListPasienDokter.list_pasien_dokter', compact(
             'listPasien',
             'tanggalKunjungan',
             'poliklinikId'

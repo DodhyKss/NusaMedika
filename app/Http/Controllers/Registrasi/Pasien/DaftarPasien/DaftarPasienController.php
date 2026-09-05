@@ -38,12 +38,12 @@ class DaftarPasienController extends Controller
             })
             ->first() : null;
 
-        return view('moduls.Registrasi.Pasien.DaftarPasien.index', compact('pasiens', 'pasienId', 'jenisKelamin', 'selectedPasien'));
+        return view('moduls.Registrasi.Pasien.DaftarPasien.daftar_pasien', compact('pasiens', 'pasienId', 'jenisKelamin', 'selectedPasien'));
     }
 
     public function create()
     {
-        return view('moduls.Registrasi.Pasien.DaftarPasien.create');
+        return view('moduls.Registrasi.Pasien.DaftarPasien.daftar_pasien_create');
     }
 
     public function store(Request $request)
@@ -90,7 +90,7 @@ class DaftarPasienController extends Controller
             'kelurahan_nama' => $kelurahan?->nama_kelurahan,
         ];
 
-        return view('moduls.Registrasi.Pasien.DaftarPasien.edit', compact('pasien', 'prefill'));
+        return view('moduls.Registrasi.Pasien.DaftarPasien.daftar_pasien_edit', compact('pasien', 'prefill'));
     }
 
     public function update(Request $request, $id)

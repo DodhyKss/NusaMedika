@@ -34,12 +34,12 @@ class PegawaiController extends Controller
             }),
         ])->orderBy('nama_pegawai')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.Pegawai.index', compact('pegawais'));
+        return view('moduls.Administrator.ManajemenMaster.Pegawai.pegawai', compact('pegawais'));
     }
 
     public function create()
     {
-        return view('moduls.Administrator.ManajemenMaster.Pegawai.create', $this->dropdownData());
+        return view('moduls.Administrator.ManajemenMaster.Pegawai.pegawai_create', $this->dropdownData());
     }
 
     public function store(Request $request)
@@ -100,7 +100,7 @@ class PegawaiController extends Controller
     {
         $pegawai = Pegawai::findOrFail($id);
 
-        return view('moduls.Administrator.ManajemenMaster.Pegawai.edit', array_merge(compact('pegawai'), $this->dropdownData()));
+        return view('moduls.Administrator.ManajemenMaster.Pegawai.pegawai_edit', array_merge(compact('pegawai'), $this->dropdownData()));
     }
 
     public function update(Request $request, $id)

@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 
 class SubMenuRouteServiceProvider extends ServiceProvider
 {
@@ -17,8 +16,13 @@ class SubMenuRouteServiceProvider extends ServiceProvider
 
     /**
      * Derive URI / nama route / controller / param dari file_sub_menu (path view).
-     * Folder leaf diasumsikan PascalCase kata-kata utuh (tanpa akronim), sehingga
-     * Str::snake(leaf) menghasilkan URI yang benar tanpa tabel override.
+     *
+     * file_sub_menu kini menyimpan path view lengkap BESERTA nama file blade (tanpa
+     * ekstensi), misal `Registrasi/Pasien/DaftarPasien/daftar_pasien`. Segmen
+     * terakhir = basename blade file (= URI), sedangkan folder di depannya
+     * (`Registrasi/Pasien/DaftarPasien`) dipakai untuk namespace controller dan
+     * path view. Dengan begini URL & route selalu identik dengan nama file blade,
+     * memudahkan debugging.
      *
      * @return array{uri: string, route_name: string, controller: ?string, resource: bool, param: string}
      */
@@ -30,23 +34,28 @@ class SubMenuRouteServiceProvider extends ServiceProvider
             return ['uri' => '', 'route_name' => '', 'controller' => null, 'resource' => false, 'param' => 'id'];
         }
 
-        $leaf = (string) end($segments);
-        $namespace = implode('\\', $segments);
-        $uri = Str::snake($leaf);
-        $controller = 'App\\Http\\Controllers\\'.$namespace.'\\'.$leaf.'Controller';
+        $uri = (string) end($segments);
 
-        $isAdmin = str_starts_with($namespace, 'Administrator');
+        $dirSegments = $segments;
+        array_pop($dirSegments);
+        $folderLeaf = $dirSegments !== [] ? (string) end($dirSegments) : '';
+
+        $controller = null;
+        if ($dirSegments !== [] && $folderLeaf !== '') {
+            $namespace = implode('\\', $dirSegments);
+            $controller = 'App\\Http\\Controllers\\'.$namespace.'\\'.$folderLeaf.'Controller';
+        }
+
+        $isAdmin = $dirSegments !== [] && str_starts_with((string) $dirSegments[0], 'Administrator');
         $routeName = $isAdmin ? 'admin.'.$uri : $uri;
-        $controllerExists = class_exists($controller);
-        $uriSegments = array_values(array_filter(explode('/', $uri)));
-        $param = Str::snake((string) end($uriSegments));
+        $controllerExists = $controller !== null && class_exists($controller);
 
         return [
             'uri' => $uri,
             'route_name' => $routeName,
             'controller' => $controllerExists ? $controller : null,
             'resource' => $controllerExists,
-            'param' => $param,
+            'param' => $uri,
         ];
     }
 
@@ -136,8 +145,8 @@ class SubMenuRouteServiceProvider extends ServiceProvider
 
     private function registerViewRoute(string $path, array $existing): void
     {
-        $uri = trim($path, '/');
-        $segments = explode('/', $uri);
+        $segments = array_values(array_filter(explode('/', trim($path, '/'))));
+        $uri = (string) end($segments);
 
         if (in_array($uri, $existing, true) || ! $this->viewExistsFor($path)) {
             return;
@@ -150,11 +159,7 @@ class SubMenuRouteServiceProvider extends ServiceProvider
 
     private function viewExistsFor(string $path): bool
     {
-        $base = str_replace('/', '.', trim($path, '/'));
-
-        return view()->exists('moduls.'.($base.'.index'))
-            || view()->exists('moduls.'.$base)
-            || view()->exists('moduls.'.($base.'.form'));
+        return view()->exists('moduls.'.str_replace('/', '.', trim($path, '/')));
     }
 
     private function subMenus(): array

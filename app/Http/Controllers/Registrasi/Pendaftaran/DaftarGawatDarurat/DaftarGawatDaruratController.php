@@ -8,6 +8,6 @@ class DaftarGawatDaruratController extends Controller
 {
     public function index()
     {
-        return view('moduls.Registrasi.Pendaftaran.DaftarGawatDarurat.index');
+        return view('moduls.Registrasi.Pendaftaran.DaftarGawatDarurat.daftar_gawat_darurat');
     }
 }

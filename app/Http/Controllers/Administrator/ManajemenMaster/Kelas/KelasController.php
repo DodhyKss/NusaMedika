@@ -22,12 +22,12 @@ class KelasController extends Controller
 
         $kelasList = $query->orderBy('kelas_ruang_id')->paginate(10)->withQueryString();
 
-        return view('moduls.Administrator.ManajemenMaster.Kelas.index', compact('kelasList', 'search'));
+        return view('moduls.Administrator.ManajemenMaster.Kelas.kelas', compact('kelasList', 'search'));
     }
 
     public function create()
     {
-        return view('moduls.Administrator.ManajemenMaster.Kelas.create');
+        return view('moduls.Administrator.ManajemenMaster.Kelas.kelas_create');
     }
 
     public function store(Request $request)
@@ -59,7 +59,7 @@ class KelasController extends Controller
     {
         $kelas = KelasRuang::findOrFail($kelas);
 
-        return view('moduls.Administrator.ManajemenMaster.Kelas.edit', compact('kelas'));
+        return view('moduls.Administrator.ManajemenMaster.Kelas.kelas_edit', compact('kelas'));
     }
 
     public function update(Request $request, $kelas)

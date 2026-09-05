@@ -43,18 +43,10 @@ class SubMenuViewController extends Controller
             abort(404);
         }
 
-        $view = str_replace('/', '.', trim($fileSubMenu, '/'));
+        $view = 'moduls.'.str_replace('/', '.', trim($fileSubMenu, '/'));
 
-        if (view()->exists('moduls.'.$view.'.index')) {
-            return view('moduls.'.$view.'.index');
-        }
-
-        if (view()->exists('moduls.'.$view)) {
-            return view('moduls.'.$view);
-        }
-
-        if (view()->exists('moduls.'.$view.'.form')) {
-            return view('moduls.'.$view.'.form');
+        if (view()->exists($view)) {
+            return view($view);
         }
 
         abort(404);

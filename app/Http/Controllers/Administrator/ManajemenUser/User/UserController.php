@@ -24,7 +24,7 @@ class UserController extends Controller
             });
         }])->orderBy('user_id')->get();
 
-        return view('moduls.Administrator.ManajemenUser.User.index', compact('users'));
+        return view('moduls.Administrator.ManajemenUser.User.user', compact('users'));
     }
 
     public function create()
@@ -32,7 +32,7 @@ class UserController extends Controller
         $moduls = $this->modulsWithSubMenus();
         $pegawais = $this->activePegawais();
 
-        return view('moduls.Administrator.ManajemenUser.User.create', compact('moduls', 'pegawais'));
+        return view('moduls.Administrator.ManajemenUser.User.user_create', compact('moduls', 'pegawais'));
     }
 
     public function store(Request $request)
@@ -85,7 +85,7 @@ class UserController extends Controller
             ->pluck('sub_menu_id')
             ->toArray();
 
-        return view('moduls.Administrator.ManajemenUser.User.edit', compact('user', 'moduls', 'pegawais', 'userAkses'));
+        return view('moduls.Administrator.ManajemenUser.User.user_edit', compact('user', 'moduls', 'pegawais', 'userAkses'));
     }
 
     public function update(Request $request, $id)

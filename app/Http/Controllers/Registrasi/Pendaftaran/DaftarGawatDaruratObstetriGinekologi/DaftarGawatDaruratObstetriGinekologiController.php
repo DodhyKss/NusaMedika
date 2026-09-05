@@ -8,6 +8,6 @@ class DaftarGawatDaruratObstetriGinekologiController extends Controller
 {
     public function index()
     {
-        return view('moduls.Registrasi.Pendaftaran.DaftarGawatDaruratObstetriGinekologi.index');
+        return view('moduls.Registrasi.Pendaftaran.DaftarGawatDaruratObstetriGinekologi.daftar_gawat_darurat_obstetri_ginekologi');
     }
 }

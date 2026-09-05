@@ -8,6 +8,6 @@ class ListPasienGawatDaruratController extends Controller
 {
     public function index()
     {
-        return view('moduls.GawatDarurat.Pasien.ListPasienGawatDarurat.index');
+        return view('moduls.GawatDarurat.Pasien.ListPasienGawatDarurat.list_pasien_gawat_darurat');
     }
 }

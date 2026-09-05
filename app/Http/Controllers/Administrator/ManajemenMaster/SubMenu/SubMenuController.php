@@ -29,7 +29,7 @@ class SubMenuController extends Controller
             }]);
         }])->orderBy('menu_id')->orderBy('urutan_sub_menu')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.SubMenu.index', compact('subMenus'));
+        return view('moduls.Administrator.ManajemenMaster.SubMenu.sub_menu', compact('subMenus'));
     }
 
     public function create()
@@ -42,7 +42,7 @@ class SubMenuController extends Controller
             });
         }])->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.SubMenu.create', compact('menus'));
+        return view('moduls.Administrator.ManajemenMaster.SubMenu.sub_menu_create', compact('menus'));
     }
 
     public function store(Request $request)
@@ -88,7 +88,7 @@ class SubMenuController extends Controller
             });
         }])->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.SubMenu.edit', compact('subMenu', 'menus'));
+        return view('moduls.Administrator.ManajemenMaster.SubMenu.sub_menu_edit', compact('subMenu', 'menus'));
     }
 
     public function update(Request $request, $id)

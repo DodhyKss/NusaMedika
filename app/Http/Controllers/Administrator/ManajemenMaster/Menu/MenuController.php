@@ -24,7 +24,7 @@ class MenuController extends Controller
             });
         }])->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.Menu.index', compact('menus'));
+        return view('moduls.Administrator.ManajemenMaster.Menu.menu', compact('menus'));
     }
 
     public function create()
@@ -33,7 +33,7 @@ class MenuController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('urutan_modul')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.Menu.create', compact('moduls'));
+        return view('moduls.Administrator.ManajemenMaster.Menu.menu_create', compact('moduls'));
     }
 
     public function store(Request $request)
@@ -73,7 +73,7 @@ class MenuController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('urutan_modul')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.Menu.edit', compact('menu', 'moduls'));
+        return view('moduls.Administrator.ManajemenMaster.Menu.menu_edit', compact('menu', 'moduls'));
     }
 
     public function update(Request $request, $id)

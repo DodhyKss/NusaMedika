@@ -197,6 +197,6 @@ class ListPasienRanapController extends Controller
                 ->withQueryString();
         }
 
-        return view('moduls.RawatInap.Pasien.ListPasienRanap.index', compact('ruanganId', 'listPasien'));
+        return view('moduls.RawatInap.Pasien.ListPasienRanap.list_pasien_ranap', compact('ruanganId', 'listPasien'));
     }
 }
