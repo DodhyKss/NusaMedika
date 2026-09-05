@@ -6,8 +6,8 @@
 
     <div class="relative">
         <select
-            id="{{ $id }}"
-            name="{{ $name }}"
+            id="{{ $id ?? 'dokter_id' }}"
+            name="{{ $name ?? 'dokter_id' }}"
             {!! $required ? 'required' : '' !!}
             class="select2-dokter w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
 

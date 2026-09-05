@@ -11,15 +11,26 @@ class ListPasienRajalController extends Controller
 {
     public function index(Request $request)
     {
+
+        if (count($request->query()) > 0) {
+            $request->validate([
+                'tanggal_kunjungan' => 'required|date',
+                'poliklinik' => 'required|required',
+                'dokter_id' => 'nullable|required',
+            ]);
+        }
+
         $tanggalKunjungan = $request->input('tanggal_kunjungan', date('Y-m-d'));
         $poliklinikId = $request->input('poliklinik', '');
+        $dokter = $request->input('dokter_id', '');
 
         $listPasien = collect([]);
 
         if (! empty($tanggalKunjungan) && ! empty($poliklinikId)) {
-            $listPasien = DB::table('registrasi as r')
+            $query = DB::table('registrasi as r')
                 ->select(
                     'r.prioritas',
+                    'r.tgl_masuk',
                     'rd.registrasi_detail_id',
                     'p.no_mr',
                     'p.tgl_lahir',
@@ -64,11 +75,15 @@ class ListPasienRajalController extends Controller
                 ->where(function ($q) {
                     $q->whereNull('pr.status_batal')->orWhere('pr.status_batal', 0);
                 })
-                ->where('pr.rawat_user_id', auth()->user()->user_id)
                 ->whereDate('r.tgl_masuk', $tanggalKunjungan)
                 ->where('rd.bagian_id', $poliklinikId)
-                ->where('r.jenis_rawat', env('JENIS_RAWAT_RJ'))
-                ->orderBy('ru.urutan', 'asc')
+                ->where('r.jenis_rawat', env('JENIS_RAWAT_RJ'));
+
+            if (! empty($dokter)) {
+                $query->where('pr.rawat_user_id', $dokter);
+            }
+
+            $listPasien = $query->orderBy('ru.urutan', 'asc')
                 ->paginate(10)->withQueryString();
 
             if ($listPasien->isNotEmpty()) {
@@ -99,7 +114,8 @@ class ListPasienRajalController extends Controller
         return view('moduls.RawatJalan.Pasien.ListPasienRajal.list_pasien_rajal', compact(
             'listPasien',
             'tanggalKunjungan',
-            'poliklinikId'
+            'poliklinikId',
+            'dokter'
         ));
     }
 }
