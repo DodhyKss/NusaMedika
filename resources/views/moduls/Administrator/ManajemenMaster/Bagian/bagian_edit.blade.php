@@ -34,7 +34,7 @@
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Referensi --</option>
                         @foreach ($referensiBagians as $referensi)
-                            <option value="{{ $referensi->referensi_bagian_id_id }}" {{ old('referensi_bagian_id', $bagian->referensi_bagian_id) == $referensi->referensi_bagian_id_id ? 'selected' : '' }}>{{ $referensi->nama_referensi_bagian_id }}</option>
+                            <option value="{{ $referensi->referensi_bagian_id }}" {{ old('referensi_bagian_id', $bagian->referensi_bagian_id) == $referensi->referensi_bagian_id ? 'selected' : '' }}>{{ $referensi->nama_referensi_bagian }}</option>
                         @endforeach
                     </select>
                     @error('referensi_bagian_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror

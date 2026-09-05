@@ -22,14 +22,12 @@
     <form action="{{ route('admin.jadwal_dokter.index') }}" method="GET" id="filterForm">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div class="col-span-1 md:col-span-3">
-                <label for="search" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Pencarian</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                    <input type="text" id="search" name="search" value="{{ old('search', $search) }}" placeholder="Cari Dokter / Poliklinik / Ruang Praktek..."
-                           class="w-full text-sm border border-slate-200 rounded-lg pl-9 pr-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                </div>
+                <x-select_ajax
+                    placeholder="-- Ketik Nama Dokter --"
+                    name="pegawai_id"
+                    id="pegawai_id"
+                    url="/api/pegawai/search"
+                ></x-select_ajax>
             </div>
             <div class="flex justify-end gap-2 mt-2 md:mt-0">
                 <a href="{{ route('admin.jadwal_dokter.index') }}" title="Reset Filter" class="inline-flex items-center justify-center bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 text-sm font-semibold py-2.5 px-4 rounded-lg shadow-sm transition-colors">

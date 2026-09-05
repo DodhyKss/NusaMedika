@@ -34,7 +34,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                 <!-- Pilih Pasien -->
                 <div class="md:col-span-2">
-                    <x-select_pasien label="Cari Pasien" required />
+                    <x-select_pasien label="Cari Pasien" cardInfo="true" required />
                 </div>
             </div>
         </div>

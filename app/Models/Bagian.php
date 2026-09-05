@@ -25,7 +25,7 @@ class Bagian extends Model
 
     public function referensi()
     {
-        return $this->belongsTo(ReferensiBagian::class, 'referensi_bagian_id', 'referensi_bagian_id_id');
+        return $this->belongsTo(ReferensiBagian::class, 'referensi_bagian_id', 'referensi_bagian_id');
     }
 
     public function pegawais()

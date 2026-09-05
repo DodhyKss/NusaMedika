@@ -17,15 +17,15 @@
 
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
     <div class="p-6">
-        <form action="{{ route('admin.referensi_bagian_id.update', $referensi->referensi_bagian_id_id) }}" method="POST" id="formEditReferensiBagian">
+        <form action="{{ route('admin.referensi_bagian_id.update', $referensi->referensi_bagian_id) }}" method="POST" id="formEditReferensiBagian">
             @csrf
             @method('PUT')
             <div class="grid grid-cols-1 gap-x-6 gap-y-5">
                 <div>
-                    <label for="nama_referensi_bagian_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nama Referensi Bagian <span class="text-red-500">*</span></label>
-                    <input type="text" id="nama_referensi_bagian_id" name="nama_referensi_bagian_id" value="{{ old('nama_referensi_bagian_id', $referensi->nama_referensi_bagian_id) }}" placeholder="Contoh: RAWAT JALAN"
+                    <label for="nama_referensi_bagian" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nama Referensi Bagian <span class="text-red-500">*</span></label>
+                    <input type="text" id="nama_referensi_bagian" name="nama_referensi_bagian" value="{{ old('nama_referensi_bagian', $referensi->nama_referensi_bagian) }}" placeholder="Contoh: RAWAT JALAN"
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
-                    @error('nama_referensi_bagian_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                    @error('nama_referensi_bagian')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                 </div>
             </div>
 

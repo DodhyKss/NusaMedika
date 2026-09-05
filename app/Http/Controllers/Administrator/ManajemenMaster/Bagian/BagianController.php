@@ -36,7 +36,7 @@ class BagianController extends Controller
     {
         $request->validate([
             'nama_bagian' => 'required|string|max:100',
-            'referensi_bagian_id' => 'required|integer|exists:referensi_bagian_id,referensi_bagian_id_id',
+            'referensi_bagian_id' => 'required|integer|exists:referensi_bagian,referensi_bagian_id',
             'group_bagian' => 'nullable|string|max:10',
             'seri_bagian' => 'nullable|string|max:20',
             'id_satu_sehat' => 'nullable|string|max:50',
@@ -81,7 +81,7 @@ class BagianController extends Controller
     {
         $request->validate([
             'nama_bagian' => 'required|string|max:100',
-            'referensi_bagian_id' => 'nullable|integer|exists:referensi_bagian_id,referensi_bagian_id_id',
+            'referensi_bagian_id' => 'nullable|integer|exists:referensi_bagian,referensi_bagian_id',
             'group_bagian' => 'nullable|string|max:10',
             'seri_bagian' => 'nullable|string|max:20',
             'id_satu_sehat' => 'nullable|string|max:50',
@@ -139,7 +139,7 @@ class BagianController extends Controller
     {
         $referensiBagians = ReferensiBagian::where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->orderBy('referensi_bagian_id_id')->get();
+        })->orderBy('referensi_bagian_id')->get();
 
         return compact('referensiBagians');
     }

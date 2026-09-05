@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Pegawai extends Model
@@ -60,5 +61,12 @@ class Pegawai extends Model
     public function users()
     {
         return $this->hasMany(User::class, 'pegawai_id', 'pegawai_id');
+    }
+
+    public function scopeAktif(Builder $query): Builder
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('status_batal')->orWhere('status_batal', 0);
+        });
     }
 }

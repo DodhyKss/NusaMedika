@@ -21,7 +21,7 @@ class ReferensiBagianIdController extends Controller
             });
         }])->where(function ($q) {
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
-        })->orderBy('referensi_bagian_id_id')->get();
+        })->orderBy('referensi_bagian_id')->get();
 
         return view('moduls.Administrator.ManajemenMaster.ReferensiBagianId.referensi_bagian_id', compact('referensiBagians'));
     }
@@ -34,13 +34,13 @@ class ReferensiBagianIdController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_referensi_bagian_id' => 'required|string|max:100',
+            'nama_referensi_bagian' => 'required|string|max:100',
         ]);
 
         DB::beginTransaction();
         try {
             $referensi = new ReferensiBagian;
-            $referensi->nama_referensi_bagian_id = $request->nama_referensi_bagian_id;
+            $referensi->nama_referensi_bagian = $request->nama_referensi_bagian;
             $referensi->input_time = now();
             $referensi->input_user_id = Auth::id();
             $referensi->status_batal = 0;
@@ -67,13 +67,13 @@ class ReferensiBagianIdController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_referensi_bagian_id' => 'required|string|max:100',
+            'nama_referensi_bagian' => 'required|string|max:100',
         ]);
 
         DB::beginTransaction();
         try {
             $referensi = ReferensiBagian::findOrFail($id);
-            $referensi->nama_referensi_bagian_id = $request->nama_referensi_bagian_id;
+            $referensi->nama_referensi_bagian = $request->nama_referensi_bagian;
             $referensi->mod_time = now();
             $referensi->mod_user_id = Auth::id();
             $referensi->save();
