@@ -146,3 +146,58 @@ Menu 8 "Manajemen EMR" (modul 5 Administrator) berisi dua master CRUD; keduanya 
 - Tests are phpunit (only the two `ExampleTest` stubs exist). `phpunit.xml` forces `sqlite :memory:`, so DB-bound code won't run under tests as-is; use `php artisan test` inside the container (`docker compose exec app php artisan test`).
 - Formatting: `vendor/bin/pint` (no config file committed). No PHPStan/Psalm, no CI.
 - `composer dev` runs `artisan serve` + queue + pail + vite via concurrently — only useful inside the app container.
+
+## Form EMR (Administrator → Manajemen EMR → Form)
+
+- Sub-menu 32 "Form" (`file_sub_menu='Administrator/ManajemenEMR/Form/form'`, route `admin.form.*`) mengelola **tiga entitas** dalam satu halaman multi-tab:
+  1. **Form** (`tab=form`): master tabel `form` — `form_id` (PK), `nama_form`, `slug` (basename folder EMR / `form_name` di URL), `id_dash_menu` (opsional, `"menu.sub.extra"` agar form tampil di dashboard pasien), checkbox `ri`/`rj`/`igd`/`mcu`, `status_batal`.
+  2. **Objek** (`tab=objek`): master tabel `objek` — `objek_id` (PK), `nama_objek`, `status_batal`.
+  3. **Mapping** (`tab=mapping`): tabel `objek_form_control` — `objek_form_control_id` (PK), `form_id`, `objek_id` (nullable, kalau kosong = variabel tanpa objek), `variabel` (nama field di blade & request, wajib), `status_batal`. Filter `form_id` via dropdown untuk mempermudah mapping per form.
+
+- Controller: `Administrator\ManajemenEMR\Form\FormController` (multi-tab CRUD, soft-delete berantai: hapus Form → hapus mapping & akses_ehr terkait; hapus Objek → hapus mapping; hapus Mapping → dirinya sendiri). Views: `moduls/Administrator/ManajemenEMR/Form/{form,form_form}.blade.php`.
+
+- **Slug Form**: digunakan di URL dinamis `/emr/form/{form_name}/...` (mis. `soap`, `pengkajian_awal_keperawatan`). Wajib unik.
+
+- **Seeding**: `EmrMasterSeeder` sudah isi baseline form 1–4 (slug), objek 1–68 (ikuti nomor `.env.example`), mapping `objek_form_control` per form (variabel → objek_id), lalu panggil `EmrHelper::backfillObjekId(1..4)` untuk memperbaiki data legacy (`objek_id` NULL).
+
+- **Reset sequence**: `DatabaseSeeder` memanggil `GenerateHelper::resetSequence()` untuk tabel `objek` & `objek_form_control` agar auto-increment tidak bentrok.
+
+## EmrHelper (pusat operasi EMR)
+
+`App\Helpers\EmrHelper` menggantikan **semua** pemakaian `env('FORM_ID_*')` dan `env('OBJEK_ID_*')` di controller & blade. Semua method statis:
+
+- **Form lookup**: `formBySlug($slug)`, `formById($id)`, `formIdBySlug($slug)`, `forms()`.
+- **Objek & mapping**: `objeks()`, `objekMap($formId)` → array {objek_form_control_id, form_id, objek_id, variabel, nama_objek}, `objekVariabels($formId)` → daftar variabel string, `objekId($formId, $variabel)` → objek_id (nullable), `objekIdsByVariabels($formId, $variabels[])` → array unik objek_id untuk query `whereIn`.
+- **Baca EMR**: `emrList($formId, $registrasiId, $perPage=5)` (paginate + nama pegawai), `emrById($emrId)`, `emrDetailByVariabel($emrId)` → array `['variabel' => value]` (kompatibel data lama objek_id NULL), `emrDetailByObjek($emrId)` → array `[objek_id => value]`, `latestEmr($formId, $registrasiDetailId)`, `latestValuesByVariabel($formId, $registrasiDetailId, $variabels[])`.
+- **Tulis EMR**: `insert($formId, $data[], $registrasiDetailId)` → simpan `emr` + `emr_detail` (hanya variabel yang ada di mapping, objek_id dari mapping, otomatis transaksi), `update($emrId, $formId, $data[])` → soft-delete detail lama + re-insert, `delete($emrId)` → soft-delete emr + detail.
+- **Utilitas**: `backfillObjekId($formId)` → isi `objek_id` NULL pada `emr_detail` lama sesuai mapping variabel (idempotent).
+
+**Pola migrasi controller lama**:
+```php
+// Sebelum (env)
+$form_id = env('FORM_ID_SOAP');
+$details[env('OBJEK_ID_SUBJECTIVE')]
+
+// Sesudah (EmrHelper)
+$form_id = EmrHelper::formIdBySlug('soap');
+$details = EmrHelper::emrDetailByVariabel($emr_id); // keyed by variabel
+$details['subjective']
+```
+
+- **Partial blade EMR** (`moduls/EMR/PartialForm/*.blade.php`): pola `$emr_data[env('OBJEK_ID_X')]['variabel']` diganti ke `$emr_data['variabel']` (flat keyed by variabel). Refactor otomatis via regex.
+
+- **SOAP / Pengkajian Awal**: controller (`SoapController`, `PengkajianAwalKeperawatanController`) sudah memakai `EmrHelper`; gate akses via `AksesEhr::can($formId, 'read|create|update|delete')`.
+
+## Generic EMR routes (DynamicFormController)
+
+Selain `GET /emr/form/{form_name}/{registrasi_detail_id}/{emr_id?}` (`emr.dynamic.index`), kini tersedia route generik **untuk SEMUA form baru yang dibuat lewat Manajemen EMR → Form** (tanpa perlu nambah route manual):
+
+- `POST /emr/form-store/{form_name}/{registrasi_detail_id}` (`emr.form.store`)
+- `PUT /emr/form-update/{form_name}/{registrasi_detail_id}/{emr_id}` (`emr.form.update`)
+- `DELETE /emr/form-delete/{form_name}/{registrasi_detail_id}/{emr_id}` (`emr.form.destroy`)
+
+`DynamicFormController` resolve form via slug (`Str::slug($form_name, '_')`), cek gate `AksesEhr`, lalu delegasikan ke `EmrHelper::insert/update/delete`. Jika ada controller spesifik (SOAP, Pengkajian Awal) dia dipakai; jika tidak, fallback ke view `moduls.EMR.{slug}.index` dengan data generik: `emr_form`, `objek_map`, `emr_data` (variabel-keyed), `riwayat`, `aksesCrud`.
+
+## Legacy Konsultasi (ListPasienRanapController)
+
+Query `ListPasienRanapController` baris 116/123/152 masih memakai `env('OBJEK_ID_JENIS_KONSULTASI', 151)`, `env('FORM_ID_KONSULTASI', 26)`, `env('OBJEK_ID_DOKTER_PENERIMA_KONSUL', 303)` dengan default numerik — **tidak** dimigrasikan ke EmrHelper karena form/objek konsultasi bukan bagian dari baseline EMR (1–4) dan belum ada di tabel `form`/`objek`. Biarkan default numerik; akan dibersihkan saat fitur konsultasi dipindahkan ke form dinamis.

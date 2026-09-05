@@ -18,12 +18,12 @@
                             <div class="space-y-2">
                                 <label class="flex items-start gap-2 cursor-pointer">
                                     <span class="font-medium mr-1">a.</span>
-                                    <input type="checkbox" name="up_go_1_a" class="mt-1 rounded-sm text-blue-500 focus:ring-blue-500 w-4 h-4" {{ ($emr_data[env('OBJEK_ID_UP_GO_1_A')]['up_go_1_a'] ?? '') == 'on' ? 'checked' : '' }}>
+                                    <input type="checkbox" name="up_go_1_a" class="mt-1 rounded-sm text-blue-500 focus:ring-blue-500 w-4 h-4" {{ ($emr_data ?? '') == 'on' ? 'checked' : '' }}>
                                     <span>Tidak seimbang / sempoyongan / pincang</span>
                                 </label>
                                 <label class="flex items-start gap-2 cursor-pointer">
                                     <span class="font-medium mr-1">b.</span>
-                                    <input type="checkbox" name="up_go_1_b" class="mt-1 rounded-sm text-blue-500 focus:ring-blue-500 w-4 h-4" {{ ($emr_data[env('OBJEK_ID_UP_GO_1_B')]['up_go_1_b'] ?? '') == 'on' ? 'checked' : '' }}>
+                                    <input type="checkbox" name="up_go_1_b" class="mt-1 rounded-sm text-blue-500 focus:ring-blue-500 w-4 h-4" {{ ($emr_data ?? '') == 'on' ? 'checked' : '' }}>
                                     <span>Jalan dengan menggunakan alat bantu (kruk, tripot, kursi, orang lain)</span>
                                 </label>
                             </div>
@@ -33,7 +33,7 @@
                         <td class="border border-slate-300 p-2 text-center align-top font-medium">2</td>
                         <td class="border border-slate-300 p-3">
                             <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" name="up_go_2" class="mt-1 rounded-sm text-blue-500 focus:ring-blue-500 w-4 h-4" {{ ($emr_data[env('OBJEK_ID_UP_GO_2')]['up_go_2'] ?? '') == 'on' ? 'checked' : '' }}>
+                                <input type="checkbox" name="up_go_2" class="mt-1 rounded-sm text-blue-500 focus:ring-blue-500 w-4 h-4" {{ ($emr_data ?? '') == 'on' ? 'checked' : '' }}>
                                 <span>Menopang pada saat akan duduk: tampak memegang pinggiran kursi, meja, atau benda lain sebagi penopang akan duduk</span>
                             </label>
                         </td>

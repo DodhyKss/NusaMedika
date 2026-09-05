@@ -6,11 +6,11 @@
         $isEdit = isset($edit_soap) && !$isView;
         
         $actionUrl = $isEdit
-            ? route('emr.soap.update', ['registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $edit_soap->emr_id])
-            : route('emr.soap.store', ['registrasi_detail_id' => $registrasi_detail->registrasi_detail_id]);
+            ? route('emr.form.update', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $edit_soap->emr_id])
+            : route('emr.form.store', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail->registrasi_detail_id]);
 
         $deleteUrl = $isEdit
-            ? route('emr.soap.destroy', ['registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $edit_soap->emr_id])
+            ? route('emr.form.destroy', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $edit_soap->emr_id])
             : '';
 
         $formData = $formData ?? [];
@@ -59,11 +59,11 @@
                     $details = $riwayat_details[$item->emr_id] ?? [];
                     if (!empty($details)) {
                         $data = [
-                            's' => $details[env('OBJEK_ID_SUBJECTIVE')] ?? '',
-                            'o' => $details[env('OBJEK_ID_OBJECTIVE')] ?? '',
-                            'a' => $details[env('OBJEK_ID_ASSESSMENT')] ?? '',
-                            'p' => $details[env('OBJEK_ID_PLANNING')] ?? '',
-                            'i' => $details[env('OBJEK_ID_INSTRUKSI')] ?? '',
+                            's' => $details['subjective'] ?? '',
+                            'o' => $details['objective'] ?? '',
+                            'a' => $details['assessment'] ?? '',
+                            'p' => $details['planning'] ?? '',
+                            'i' => $details['instruksi'] ?? '',
                         ];
                     } else {
                         $data = json_decode($item->data, true) ?? [];
@@ -107,7 +107,7 @@
                         </a>
                         @endif
                         @if($aksesCrud['delete'])
-                        <form action="{{ route('emr.soap.destroy', ['registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $item->emr_id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus riwayat SOAP ini?');" class="flex-1">
+                        <form action="{{ route('emr.form.destroy', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $item->emr_id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus riwayat SOAP ini?');" class="flex-1">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="w-full inline-flex justify-center items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-800 transition-colors">
@@ -153,53 +153,53 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-sm">
                         <div class="space-y-1">
                             <p class="text-slate-500 text-xs">Tekanan Darah</p>
-                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_SISTOLIK')] ?? '-' }} /
-                                {{ $riwayat_pengkajian[env('OBJEK_ID_DIASTOLIK')] ?? '-' }} <span
+                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian['sistolik'] ?? '-' }} /
+                                {{ $riwayat_pengkajian['diastolik'] ?? '-' }} <span
                                     class="text-xs text-slate-400 font-normal">mmHg</span></p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-slate-500 text-xs">Nadi</p>
-                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_NADI')] ?? '-' }} <span
+                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian['nadi'] ?? '-' }} <span
                                     class="text-xs text-slate-400 font-normal">x/mnt</span></p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-slate-500 text-xs">Suhu</p>
-                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_SUHU')] ?? '-' }} <span
+                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian['suhu'] ?? '-' }} <span
                                     class="text-xs text-slate-400 font-normal">°C</span></p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-slate-500 text-xs">Pernapasan</p>
-                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_PERNAPASAN')] ?? '-' }}
+                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian['pernapasan'] ?? '-' }}
                                 <span class="text-xs text-slate-400 font-normal">x/mnt</span></p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-slate-500 text-xs">Saturasi O2</p>
-                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_SATURASI')] ?? '-' }}
+                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian['saturasi'] ?? '-' }}
                                 <span class="text-xs text-slate-400 font-normal">%</span></p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-slate-500 text-xs">Berat Badan</p>
-                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_BERAT_BADAN')] ?? '-' }}
+                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian['berat_badan'] ?? '-' }}
                                 <span class="text-xs text-slate-400 font-normal">kg</span></p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-slate-500 text-xs">Tinggi Badan</p>
-                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_TINGGI_BADAN')] ?? '-' }}
+                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian['tinggi_badan'] ?? '-' }}
                                 <span class="text-xs text-slate-400 font-normal">cm</span></p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-slate-500 text-xs">EWS / GCS</p>
-                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_EWS')] ?? '-' }} /
-                                {{ $riwayat_pengkajian[env('OBJEK_ID_GCS_SCORE')] ?? '-' }}</p>
+                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian['ews'] ?? '-' }} /
+                                {{ $riwayat_pengkajian['gcs_score'] ?? '-' }}</p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-slate-500 text-xs">Oksigen</p>
-                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_OKSIGEN')] ?? '-' }}
-                                ({{ $riwayat_pengkajian[env('OBJEK_ID_CARA_PEMBERIAN')] ?? '-' }})</p>
+                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian['oksigen'] ?? '-' }}
+                                ({{ $riwayat_pengkajian['cara_pemberian'] ?? '-' }})</p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-slate-500 text-xs">ETT</p>
-                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian[env('OBJEK_ID_ETT')] ?? '-' }}</p>
+                            <p class="font-medium text-slate-800">{{ $riwayat_pengkajian['ett'] ?? '-' }}</p>
                         </div>
                     </div>
                 </div>

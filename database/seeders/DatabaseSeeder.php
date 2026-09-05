@@ -40,6 +40,7 @@ class DatabaseSeeder extends Seeder
             'profesi', 'jabatan', 'status_kepegawaian', 'pegawai', 'users',
             'provinsi', 'kabupaten', 'kecamatan', 'kelurahan', 'kelas_ruang',
             'dashboard_menu', 'dashboard_menu_sub', 'dashboard_menu_sub_extra', 'form', 'akses_ehr',
+            'objek', 'objek_form_control',
         ];
 
         foreach ($tables as $table) {

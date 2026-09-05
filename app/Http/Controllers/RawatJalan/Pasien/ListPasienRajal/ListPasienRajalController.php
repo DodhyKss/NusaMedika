@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\RawatJalan\Pasien\ListPasienRajal;
 
+use App\Helpers\EmrHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -78,7 +79,11 @@ class ListPasienRajalController extends Controller
                     ->where(function ($q) {
                         $q->whereNull('status_batal')->orWhere('status_batal', 0);
                     })
-                    ->whereIn('form_id', [env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN'), env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN'), env('FORM_ID_SOAP')])
+                    ->whereIn('form_id', array_filter([
+                        EmrHelper::formIdBySlug('pengkajian_awal_keperawatan'),
+                        EmrHelper::formIdBySlug('pengkajian_harian_keperawatan'),
+                        EmrHelper::formIdBySlug('soap'),
+                    ]))
                     ->select('registrasi_detail_id', 'form_id')
                     ->get()
                     ->groupBy('registrasi_detail_id');

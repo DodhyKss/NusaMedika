@@ -98,6 +98,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             // Menu Manajemen EMR (8) - Administrator
             ['sub_menu_id' => 30, 'menu_id' => 8, 'nama_sub_menu' => 'Dashboard Menu', 'file_sub_menu' => 'Administrator/ManajemenEMR/DashboardMenu/dashboard_menu', 'urutan_sub_menu' => 1],
             ['sub_menu_id' => 31, 'menu_id' => 8, 'nama_sub_menu' => 'Akses EHR', 'file_sub_menu' => 'Administrator/ManajemenEMR/AksesEhr/akses_ehr', 'urutan_sub_menu' => 2],
+            ['sub_menu_id' => 32, 'menu_id' => 8, 'nama_sub_menu' => 'Form', 'file_sub_menu' => 'Administrator/ManajemenEMR/Form/form', 'urutan_sub_menu' => 3],
         ];
 
         foreach ($subMenus as $subMenu) {

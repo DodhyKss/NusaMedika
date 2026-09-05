@@ -63,7 +63,7 @@
                         </a>
                         @endif
                         @if($aksesCrud['delete'])
-                        <form action="{{ route('emr.pengkajian_awal_keperawatan.destroy', ['registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $item->emr_id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus riwayat ini?');" class="flex-1">
+                        <form action="{{ route('emr.form.destroy', ['form_name' => 'pengkajian_awal_keperawatan', 'registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $item->emr_id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus riwayat ini?');" class="flex-1">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="w-full inline-flex justify-center items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-800 transition-colors">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\EMR\Soap;
 
 use App\Helpers\AksesEhr;
+use App\Helpers\EmrHelper;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrasiDetail;
 use Illuminate\Http\Request;
@@ -16,30 +17,15 @@ class SoapController extends Controller
 
         $registrasi_detail = RegistrasiDetail::with('registrasi.pasien')->findOrFail($registrasi_detail_id);
 
-        // Form ID untuk SOAP biasanya 3
-        $form_id = env('FORM_ID_SOAP');
-
+        // Form ID SOAP: dari tabel form (slug 'soap'), bukan env('FORM_ID_SOAP')
+        $form_id = EmrHelper::formIdBySlug('soap');
+        abort_unless($form_id, 404);
         abort_unless(AksesEhr::can((int) $form_id, 'read'), 403);
 
         $aksesCrud = AksesEhr::flags((int) $form_id);
 
         // Ambil riwayat SOAP untuk pasien ini (dari registrasi_id)
-        $riwayat_soap = DB::table('emr')
-            ->leftJoin('pegawai', function ($join) {
-                $join->on('emr.pegawai_id', '=', 'pegawai.pegawai_id')
-                    ->where(function ($q) {
-                        $q->whereNull('pegawai.status_batal')->orWhere('pegawai.status_batal', 0);
-                    });
-            })
-            ->where('emr.registrasi_id', $registrasi_detail->registrasi_id)
-            ->where('emr.form_id', $form_id)
-            ->where(function ($q) {
-                $q->whereNull('emr.status_batal')->orWhere('emr.status_batal', 0);
-            })
-            ->select('emr.*', 'pegawai.nama_pegawai')
-            ->orderBy('emr.tgl_jam', 'desc')
-            ->paginate(5)
-            ->withQueryString();
+        $riwayat_soap = EmrHelper::emrList((int) $form_id, (int) $registrasi_detail->registrasi_id);
 
         // Ambil emr_detail untuk riwayat_soap yang sedang tampil (hindari N+1 query)
         $emr_ids = $riwayat_soap->pluck('emr_id')->toArray();
@@ -52,119 +38,50 @@ class SoapController extends Controller
 
         $riwayat_details = [];
         foreach ($riwayat_details_raw as $rd) {
-            $riwayat_details[$rd->emr_id][$rd->objek_id] = $rd->value;
+            $riwayat_details[$rd->emr_id][$rd->variabel] = $rd->value;
         }
 
-        // ambil riwayat pengkajian
+        // ambil riwayat pengkajian (vital sign terakhir dari pengkajian awal/harian)
         $riwayat_pengkajian = [];
+        $pengkajian_variabels = [
+            'sistolik', 'diastolik', 'nadi', 'suhu', 'pernapasan', 'berat_badan',
+            'tinggi_badan', 'oksigen', 'cara_pemberian', 'ett', 'saturasi', 'ews', 'gcs_score',
+        ];
 
         // pengkajian awal keperawatan
-        $emr_pengkajian_awal_keperawatan = DB::table('emr')
-            ->where('registrasi_detail_id', $registrasi_detail_id)
-            ->where('form_id', env('FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN'))
-            ->where(function ($q) {
-                $q->whereNull('status_batal')->orWhere('status_batal', 0);
-            })
-            ->orderBy('tgl_jam', 'desc')
-            ->first();
-
-        // pengkajian harian keperawatan
-        $emr_pengkajian_harian_keperawatan = DB::table('emr')
-            ->where('registrasi_detail_id', $registrasi_detail_id)
-            ->where('form_id', env('FORM_ID_PENGKAJIAN_HARIAN_KEPERAWATAN'))
-            ->where(function ($q) {
-                $q->whereNull('status_batal')->orWhere('status_batal', 0);
-            })
-            ->orderBy('tgl_jam', 'desc')
-            ->first();
-
-        if ($emr_pengkajian_awal_keperawatan) {
-            $riwayat_pengkajian = DB::table('emr_detail')
-                ->where('emr_id', $emr_pengkajian_awal_keperawatan->emr_id)
-                ->whereIn('objek_id', [
-                    env('OBJEK_ID_SISTOLIK'),
-                    env('OBJEK_ID_DIASTOLIK'),
-                    env('OBJEK_ID_NADI'),
-                    env('OBJEK_ID_SUHU'),
-                    env('OBJEK_ID_PERNAPASAN'),
-                    env('OBJEK_ID_BERAT_BADAN'),
-                    env('OBJEK_ID_TINGGI_BADAN'),
-                    env('OBJEK_ID_OKSIGEN'),
-                    env('OBJEK_ID_CARA_PEMBERIAN'),
-                    env('OBJEK_ID_ETT'),
-                    env('OBJEK_ID_SATURASI'),
-                    env('OBJEK_ID_EWS'),
-                    env('OBJEK_ID_GCS_SCORE'),
-                ])
-                ->where(function ($q) {
-                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                })
-                ->pluck('value', 'objek_id');
+        $form_pengkajian_awal = EmrHelper::formIdBySlug('pengkajian_awal_keperawatan');
+        if ($form_pengkajian_awal && EmrHelper::latestEmr((int) $form_pengkajian_awal, (int) $registrasi_detail_id)) {
+            $riwayat_pengkajian = EmrHelper::latestValuesByVariabel((int) $form_pengkajian_awal, (int) $registrasi_detail_id, $pengkajian_variabels);
         }
 
-        if ($emr_pengkajian_harian_keperawatan) {
-            $riwayat_pengkajian = DB::table('emr_detail')
-                ->where('emr_id', $emr_pengkajian_harian_keperawatan->emr_id)
-                ->whereIn('objek_id', [
-                    env('OBJEK_ID_SISTOLIK'),
-                    env('OBJEK_ID_DIASTOLIK'),
-                    env('OBJEK_ID_NADI'),
-                    env('OBJEK_ID_SUHU'),
-                    env('OBJEK_ID_PERNAPASAN'),
-                    env('OBJEK_ID_BERAT_BADAN'),
-                    env('OBJEK_ID_TINGGI_BADAN'),
-                    env('OBJEK_ID_OKSIGEN'),
-                    env('OBJEK_ID_CARA_PEMBERIAN'),
-                    env('OBJEK_ID_ETT'),
-                    env('OBJEK_ID_SATURASI'),
-                    env('OBJEK_ID_EWS'),
-                    env('OBJEK_ID_GCS_SCORE'),
-                ])
-                ->where(function ($q) {
-                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                })
-                ->pluck('value', 'objek_id');
+        // pengkajian harian keperawatan (menang bila ada)
+        $form_pengkajian_harian = EmrHelper::formIdBySlug('pengkajian_harian_keperawatan');
+        if ($form_pengkajian_harian && EmrHelper::latestEmr((int) $form_pengkajian_harian, (int) $registrasi_detail_id)) {
+            $riwayat_pengkajian = EmrHelper::latestValuesByVariabel((int) $form_pengkajian_harian, (int) $registrasi_detail_id, $pengkajian_variabels);
         }
 
         // Ambil assesment terakhir (dari riwayat SOAP paling baru)
         $assesment_terakhir = null;
         if ($riwayat_soap->isNotEmpty()) {
             $last_soap = $riwayat_soap->first();
-            $assesment_terakhir = DB::table('emr_detail')
-                ->where('emr_id', $last_soap->emr_id)
-                ->where('objek_id', env('OBJEK_ID_ASSESSMENT'))
-                ->where(function ($q) {
-                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                })
-                ->value('value');
+            $assesment_terakhir = EmrHelper::emrDetailByVariabel((int) $last_soap->emr_id)['assessment'] ?? null;
         }
 
         // Jika sedang edit, ambil data
         $edit_soap = null;
         $formData = [];
         if ($emr_id) {
-            $edit_soap = DB::table('emr')
-                ->where('emr_id', $emr_id)
-                ->where(function ($q) {
-                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                })
-                ->first();
+            $edit_soap = EmrHelper::emrById((int) $emr_id);
 
             if ($edit_soap) {
-                $details = DB::table('emr_detail')
-                    ->where('emr_id', $edit_soap->emr_id)
-                    ->where(function ($q) {
-                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                    })
-                    ->pluck('value', 'objek_id')
-                    ->toArray();
+                $details = EmrHelper::emrDetailByVariabel((int) $edit_soap->emr_id);
 
                 $formData = [
-                    's' => $details[env('OBJEK_ID_SUBJECTIVE')] ?? '',
-                    'o' => $details[env('OBJEK_ID_OBJECTIVE')] ?? '',
-                    'a' => $details[env('OBJEK_ID_ASSESSMENT')] ?? '',
-                    'p' => $details[env('OBJEK_ID_PLANNING')] ?? '',
-                    'i' => $details[env('OBJEK_ID_INSTRUKSI')] ?? '',
+                    's' => $details['subjective'] ?? '',
+                    'o' => $details['objective'] ?? '',
+                    'a' => $details['assessment'] ?? '',
+                    'p' => $details['planning'] ?? '',
+                    'i' => $details['instruksi'] ?? '',
                 ];
 
                 // Fallback untuk data lama yang hanya tersimpan di JSON
@@ -220,14 +137,19 @@ class SoapController extends Controller
 
     public function print($emr_id)
     {
-        abort_unless(AksesEhr::can((int) env('FORM_ID_SOAP'), 'read'), 403);
+        $form_id = EmrHelper::formIdBySlug('soap');
+        abort_unless($form_id, 404);
+
+        abort_unless(AksesEhr::can((int) $form_id, 'read'), 403);
 
         return view('moduls.EMR.Soap.print', compact('emr_id'));
     }
 
     public function store(Request $request, $registrasi_detail_id)
     {
-        abort_unless(AksesEhr::can((int) env('FORM_ID_SOAP'), 'create'), 403);
+        $form_id = EmrHelper::formIdBySlug('soap');
+        abort_unless($form_id, 404);
+        abort_unless(AksesEhr::can((int) $form_id, 'create'), 403);
 
         $request->validate([
             'subjective' => 'nullable|string',
@@ -238,63 +160,27 @@ class SoapController extends Controller
         ]);
 
         $registrasi_detail = RegistrasiDetail::findOrFail($registrasi_detail_id);
-        $user_id = Auth::user()->user_id;
-        $pegawai_id = Auth::user()->pegawai_id;
-        $form_id = env('FORM_ID_SOAP');
-        $now = now();
 
         // jika pegawai_id atau user_id null, maka redirect ke halaman login
-        if ($pegawai_id == null || $user_id == null) {
+        $user = Auth::user();
+        if ($user == null || $user->pegawai_id == null || $user->user_id == null) {
             return redirect()->back()->with('error', 'Sesi Anda Telah Habis Silahkan Login Kembali!');
         }
 
-        DB::beginTransaction();
         try {
-            // Insert ke tabel emr
-            $emr_id = DB::table('emr')->insertGetId([
-                'form_id' => $form_id,
-                'pegawai_id' => $pegawai_id,
-                'tgl_jam' => $now,
-                'registrasi_detail_id' => $registrasi_detail_id,
-                'pasien_id' => $registrasi_detail->registrasi->pasien_id,
-                'registrasi_id' => $registrasi_detail->registrasi_id,
-                'input_time' => $now,
-                'input_user_id' => $user_id,
-            ], 'emr_id');
-
-            // Insert ke tabel emr_detail (S, O, A, P, I)
-            $details = [
-                ['objek_id' => env('OBJEK_ID_SUBJECTIVE'), 'variabel' => 'subjective', 'value' => $request->subjective],
-                ['objek_id' => env('OBJEK_ID_OBJECTIVE'), 'variabel' => 'objective', 'value' => $request->objective],
-                ['objek_id' => env('OBJEK_ID_ASSESSMENT'), 'variabel' => 'assessment', 'value' => $request->assessment],
-                ['objek_id' => env('OBJEK_ID_PLANNING'), 'variabel' => 'planning', 'value' => $request->plan],
-                ['objek_id' => env('OBJEK_ID_INSTRUKSI'), 'variabel' => 'instruksi', 'value' => $request->instruction],
-            ];
-
-            foreach ($details as $d) {
-                DB::table('emr_detail')->insert([
-                    'emr_id' => $emr_id,
-                    'objek_id' => $d['objek_id'],
-                    'variabel' => $d['variabel'],
-                    'value' => $d['value'],
-                    'input_time' => $now,
-                    'input_user_id' => $user_id,
-                ]);
-            }
-
-            DB::commit();
+            EmrHelper::insert((int) $form_id, $this->soapData($request), (int) $registrasi_detail_id);
 
             return redirect()->route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil disimpan');
         } catch (\Exception $e) {
-            DB::rollback();
-
             return back()->with('error', 'Gagal menyimpan SOAP: '.$e->getMessage())->withInput();
         }
     }
 
     public function update(Request $request, $registrasi_detail_id, $emr_id)
     {
-        abort_unless(AksesEhr::can((int) env('FORM_ID_SOAP'), 'update'), 403);
+        $form_id = EmrHelper::formIdBySlug('soap');
+        abort_unless($form_id, 404);
+        abort_unless(AksesEhr::can((int) $form_id, 'update'), 403);
 
         $request->validate([
             'subjective' => 'nullable|string',
@@ -304,86 +190,42 @@ class SoapController extends Controller
             'instruction' => 'nullable|string',
         ]);
 
-        $user_id = Auth::user()->user_id;
-        $now = now();
-
-        DB::beginTransaction();
         try {
-            // Update emr
-            DB::table('emr')
-                ->where('emr_id', $emr_id)
-                ->update([
-                    'mod_time' => $now,
-                    'mod_user_id' => $user_id,
-                ]);
-
-            // Delete existing details and re-insert
-            DB::table('emr_detail')
-                ->where('emr_id', $emr_id)
-                ->update(['status_batal' => 1, 'mod_time' => $now, 'mod_user_id' => $user_id]);
-
-            // Insert new details
-            $details = [
-                ['objek_id' => env('OBJEK_ID_SUBJECTIVE'), 'variabel' => 'subjective', 'value' => $request->subjective],
-                ['objek_id' => env('OBJEK_ID_OBJECTIVE'), 'variabel' => 'objective', 'value' => $request->objective],
-                ['objek_id' => env('OBJEK_ID_ASSESSMENT'), 'variabel' => 'assessment', 'value' => $request->assessment],
-                ['objek_id' => env('OBJEK_ID_PLANNING'), 'variabel' => 'planning', 'value' => $request->plan],
-                ['objek_id' => env('OBJEK_ID_INSTRUKSI'), 'variabel' => 'instruksi', 'value' => $request->instruction],
-            ];
-
-            foreach ($details as $d) {
-                DB::table('emr_detail')->insert([
-                    'emr_id' => $emr_id,
-                    'objek_id' => $d['objek_id'],
-                    'variabel' => $d['variabel'],
-                    'value' => $d['value'],
-                    'input_time' => $now,
-                    'input_user_id' => $user_id,
-                ]);
-            }
-
-            DB::commit();
+            EmrHelper::update((int) $emr_id, (int) $form_id, $this->soapData($request));
 
             return redirect()->route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil diperbarui');
         } catch (\Exception $e) {
-            DB::rollback();
-
             return back()->with('error', 'Gagal memperbarui SOAP: '.$e->getMessage())->withInput();
         }
     }
 
     public function destroy($registrasi_detail_id, $emr_id)
     {
-        abort_unless(AksesEhr::can((int) env('FORM_ID_SOAP'), 'delete'), 403);
+        $form_id = EmrHelper::formIdBySlug('soap');
+        abort_unless($form_id, 404);
+        abort_unless(AksesEhr::can((int) $form_id, 'delete'), 403);
 
-        $user_id = Auth::user()->user_id;
-        $now = now();
-
-        DB::beginTransaction();
         try {
-            DB::table('emr')
-                ->where('emr_id', $emr_id)
-                ->update([
-                    'status_batal' => 1,
-                    'mod_time' => $now,
-                    'mod_user_id' => $user_id,
-                ]);
-
-            DB::table('emr_detail')
-                ->where('emr_id', $emr_id)
-                ->update([
-                    'status_batal' => 1,
-                    'mod_time' => $now,
-                    'mod_user_id' => $user_id,
-                ]);
-
-            DB::commit();
+            EmrHelper::delete((int) $emr_id);
 
             return redirect()->route('emr.dynamic.index', ['form_name' => 'soap', 'registrasi_detail_id' => $registrasi_detail_id])->with('success', 'SOAP berhasil dibatalkan');
         } catch (\Exception $e) {
-            DB::rollback();
-
             return back()->with('error', 'Gagal membatalkan SOAP: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Petakan field form SOAP (s/o/a/p/i) ke variabel yang tersimpan di emr_detail
+     * (subjective, objective, assessment, planning, instruksi).
+     */
+    private function soapData(Request $request): array
+    {
+        return [
+            'subjective' => $request->input('subjective'),
+            'objective' => $request->input('objective'),
+            'assessment' => $request->input('assessment'),
+            'planning' => $request->input('plan'),
+            'instruksi' => $request->input('instruction'),
+        ];
     }
 }

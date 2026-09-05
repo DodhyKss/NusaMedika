@@ -5,11 +5,11 @@
         </label>
         <div class="flex gap-4">
             <label class="inline-flex items-center cursor-pointer">
-                <input type="radio" name="nyeri" value="ya" class="text-blue-500 focus:ring-blue-500 w-4 h-4" {{ ($emr_data[env('OBJEK_ID_NYERI')]['nyeri'] ?? '') == 'ya' ? 'checked' : '' }}>
+                <input type="radio" name="nyeri" value="ya" class="text-blue-500 focus:ring-blue-500 w-4 h-4" {{ ($emr_data ?? '') == 'ya' ? 'checked' : '' }}>
                 <span class="ml-2 text-slate-600">Ya</span>
             </label>
             <label class="inline-flex items-center cursor-pointer">
-                <input type="radio" name="nyeri" value="tidak" class="text-blue-500 focus:ring-blue-500 w-4 h-4" {{ ($emr_data[env('OBJEK_ID_NYERI')]['nyeri'] ?? 'tidak') == 'tidak' ? 'checked' : '' }}>
+                <input type="radio" name="nyeri" value="tidak" class="text-blue-500 focus:ring-blue-500 w-4 h-4" {{ ($emr_data ?? 'tidak') == 'tidak' ? 'checked' : '' }}>
                 <span class="ml-2 text-slate-600">Tidak</span>
             </label>
         </div>
