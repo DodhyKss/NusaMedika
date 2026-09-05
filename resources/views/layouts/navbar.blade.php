@@ -42,12 +42,19 @@
         <div class="w-px h-8 bg-slate-200 mx-2"></div>
 
         <!-- User Profile -->
+        @php
+            $profesiName = '-';
+            $profesiId = \App\Helpers\AksesEhr::profesiId();
+            if ($profesiId) {
+                $profesiName = \Illuminate\Support\Facades\DB::table('profesi')->where('profesi_id', $profesiId)->value('nama_profesi') ?? '-';
+            }
+        @endphp
         <div class="flex items-center gap-3">
             <div class="hidden sm:block text-right">
                 <p class="text-sm font-semibold text-slate-800 leading-tight">
                     {{ Auth::user()->nama_pegawai ?? Auth::user()->user_name }}
                 </p>
-                <p class="text-[11px] text-slate-400 font-medium">Administrator</p>
+                <p class="text-[11px] text-slate-400 font-medium">{{ $profesiName }}</p>
             </div>
             <div class="relative">
                 <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">

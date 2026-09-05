@@ -27,18 +27,13 @@ class SoapController extends Controller
         // Ambil riwayat SOAP untuk pasien ini (dari registrasi_id)
         $riwayat_soap = EmrHelper::emrList((int) $form_id, (int) $registrasi_detail->registrasi_id);
 
-        // Ambil emr_detail untuk riwayat_soap yang sedang tampil (hindari N+1 query)
-        $emr_ids = $riwayat_soap->pluck('emr_id')->toArray();
-        $riwayat_details_raw = DB::table('emr_detail')
-            ->whereIn('emr_id', $emr_ids)
-            ->where(function ($q) {
-                $q->whereNull('status_batal')->orWhere('status_batal', 0);
-            })
-            ->get();
-
-        $riwayat_details = [];
-        foreach ($riwayat_details_raw as $rd) {
-            $riwayat_details[$rd->emr_id][$rd->variabel] = $rd->value;
+        if (!$emr_id && !($aksesCrud['create'] ?? false) && $riwayat_soap->isNotEmpty()) {
+            return redirect()->route('emr.dynamic.index', [
+                'form_name' => 'soap',
+                'registrasi_detail_id' => $registrasi_detail_id,
+                'emr_id' => $riwayat_soap->first()->emr_id,
+                'action' => 'view'
+            ]);
         }
 
         // ambil riwayat pengkajian (vital sign terakhir dari pengkajian awal/harian)
@@ -132,7 +127,7 @@ class SoapController extends Controller
 
         $isView = request('action') === 'view';
 
-        return view('moduls.EMR.Soap.index', compact('registrasi_detail', 'riwayat_soap', 'riwayat_details', 'edit_soap', 'formData', 'form_id', 'history_grouped', 'riwayat_pengkajian', 'assesment_terakhir', 'isView', 'aksesCrud'));
+        return view('moduls.EMR.Soap.index', compact('registrasi_detail', 'edit_soap', 'formData', 'form_id', 'history_grouped', 'riwayat_pengkajian', 'assesment_terakhir', 'isView', 'aksesCrud'));
     }
 
     public function print($emr_id)

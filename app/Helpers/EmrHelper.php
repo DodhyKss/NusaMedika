@@ -167,15 +167,22 @@ class EmrHelper
     /**
      * detail aktif sebuah emr, keyed by variabel (kompatibel data lama objek_id null).
      */
-    public static function emrDetailByVariabel(int $emrId): array
+    public static function emrDetailByVariabel(int $emrId): EmrDataWrapper
     {
-        return DB::table('emr_detail')
+        $arr = DB::table('emr_detail')
             ->where('emr_id', $emrId)
             ->where(function ($q) {
                 $q->whereNull('status_batal')->orWhere('status_batal', 0);
             })
             ->pluck('value', 'variabel')
             ->all();
+
+        return new EmrDataWrapper($arr);
+    }
+
+    public static function wrapData($data): EmrDataWrapper
+    {
+        return new EmrDataWrapper(is_array($data) ? $data : []);
     }
 
     /**
@@ -291,6 +298,41 @@ class EmrHelper
         });
     }
 
+    public static function getHistoryForForm(string $slug, int $registrasiDetailId)
+    {
+        $registrasiDetail = RegistrasiDetail::with('registrasi')->find($registrasiDetailId);
+        if (! $registrasiDetail) {
+            return ['form' => null, 'riwayat' => collect(), 'details' => []];
+        }
+
+        $form = static::formBySlug($slug);
+        if (! $form) {
+            return ['form' => null, 'riwayat' => collect(), 'details' => []];
+        }
+
+        $riwayat = static::emrList((int) $form->form_id, (int) $registrasiDetail->registrasi_id);
+
+        $emrIds = collect($riwayat->items())->pluck('emr_id')->toArray();
+        $detailsRaw = DB::table('emr_detail')
+            ->whereIn('emr_id', $emrIds)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->get();
+
+        $details = [];
+        foreach ($detailsRaw as $rd) {
+            $details[$rd->emr_id][$rd->variabel] = $rd->value;
+        }
+
+        return [
+            'form' => $form,
+            'registrasiDetail' => $registrasiDetail,
+            'riwayat' => $riwayat,
+            'details' => $details,
+        ];
+    }
+
     public static function delete(int $emrId): void
     {
         $emr = static::emrById($emrId);
@@ -381,5 +423,45 @@ class EmrHelper
         }
 
         return $affected;
+    }
+}
+
+class EmrDataWrapper implements \ArrayAccess
+{
+    protected array $data;
+
+    public function __construct(array $data)
+    {
+        $this->data = $data;
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return $this->data[$offset] ?? '';
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->data[$offset] = $value;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->data[$offset]);
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->data[$offset]);
+    }
+
+    public function __toString(): string
+    {
+        return '';
+    }
+
+    public function toArray(): array
+    {
+        return $this->data;
     }
 }

@@ -15,6 +15,15 @@ class UserSeeder extends Seeder
             ['user_id' => 1, 'user_name' => 'superadmin', 'user_password' => 'admin', 'pegawai_id' => 1],
             ['user_id' => 2, 'user_name' => 'perawat', 'user_password' => 'perawat', 'pegawai_id' => 2],
             ['user_id' => 3, 'user_name' => 'dokter', 'user_password' => 'dokter', 'pegawai_id' => 3],
+            ['user_id' => 4, 'user_name' => 'bidan', 'user_password' => 'bidan', 'pegawai_id' => 4],
+            ['user_id' => 5, 'user_name' => 'apoteker', 'user_password' => 'apoteker', 'pegawai_id' => 5],
+            ['user_id' => 6, 'user_name' => 'radiografer', 'user_password' => 'radiografer', 'pegawai_id' => 6],
+            ['user_id' => 7, 'user_name' => 'perekam_medis', 'user_password' => 'perekam_medis', 'pegawai_id' => 7],
+            ['user_id' => 8, 'user_name' => 'fisioterapis', 'user_password' => 'fisioterapis', 'pegawai_id' => 8],
+            ['user_id' => 9, 'user_name' => 'sanitarian', 'user_password' => 'sanitarian', 'pegawai_id' => 9],
+            ['user_id' => 10, 'user_name' => 'ahli_gizi', 'user_password' => 'ahli_gizi', 'pegawai_id' => 10],
+            ['user_id' => 11, 'user_name' => 'security', 'user_password' => 'security', 'pegawai_id' => 11],
+            ['user_id' => 12, 'user_name' => 'teknisi', 'user_password' => 'teknisi', 'pegawai_id' => 12],
         ];
 
         foreach ($users as $user) {
@@ -43,12 +52,18 @@ class UserSeeder extends Seeder
             ->all();
 
         $akses = [
-            // Admin: semua sub menu aktif (dinamis agar sub menu baru otomatis terakses)
             1 => $validAktifSubMenuIds,
-            // Perawat: registrasi, dashboard pasien, pengkajian, list pasien
-            2 => [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14],
-            // Dokter: daftar pasien, dashboard pasien, SOAP, pengkajian, list pasien
-            3 => [1, 8, 9, 10, 11, 12, 13, 14],
+            2 => $validAktifSubMenuIds,
+            3 => $validAktifSubMenuIds,
+            4 => $validAktifSubMenuIds,
+            5 => $validAktifSubMenuIds,
+            6 => $validAktifSubMenuIds,
+            7 => $validAktifSubMenuIds,
+            8 => $validAktifSubMenuIds,
+            9 => $validAktifSubMenuIds,
+            10 => $validAktifSubMenuIds,
+            11 => $validAktifSubMenuIds,
+            12 => $validAktifSubMenuIds,
         ];
 
         foreach ($akses as $userId => $subMenuIds) {

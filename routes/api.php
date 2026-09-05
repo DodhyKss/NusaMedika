@@ -7,7 +7,7 @@ use App\Http\Controllers\API\ApiPegawaiController;
 use App\Http\Controllers\API\ApiWilayahController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('api')->middleware('auth')->group(function () {
+Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/pasien/search', [ApiPasienController::class, 'searchPasien'])->name('api.pasien.search');
     Route::get('/wilayah/provinsi', [ApiWilayahController::class, 'provinsi'])->name('api.wilayah.provinsi');
     Route::get('/wilayah/kabupaten', [ApiWilayahController::class, 'kabupaten'])->name('api.wilayah.kabupaten');

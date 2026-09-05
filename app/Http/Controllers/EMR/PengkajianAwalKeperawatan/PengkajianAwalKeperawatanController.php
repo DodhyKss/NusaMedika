@@ -27,6 +27,15 @@ class PengkajianAwalKeperawatanController extends Controller
         // Ambil riwayat untuk sidebar
         $riwayatPengkajianAwal = EmrHelper::emrList((int) $form_id, (int) $registrasi_detail->registrasi_id);
 
+        if (empty($emr_id) && !($aksesCrud['create'] ?? false) && $riwayatPengkajianAwal->isNotEmpty()) {
+            return redirect()->route('emr.dynamic.index', [
+                'form_name' => 'pengkajian_awal_keperawatan',
+                'registrasi_detail_id' => $registrasi_detail_id,
+                'emr_id' => $riwayatPengkajianAwal->first()->emr_id,
+                'action' => 'view'
+            ]);
+        }
+
         $history_kunjungan = DB::table('registrasi_detail')
             ->join('registrasi', 'registrasi_detail.registrasi_id', '=', 'registrasi.registrasi_id')
             ->leftJoin('bagian', function ($join) {
@@ -71,7 +80,7 @@ class PengkajianAwalKeperawatanController extends Controller
                 $q->whereNull('status_batal')->orWhere('status_batal', 0);
             })->where('registrasi_id', $registrasi_detail->registrasi->registrasi_id)->first();
 
-            $emr_data = [
+            $emr_data = EmrHelper::wrapData([
                 // Informasi Dasar Pasien
                 'agama' => $data_pasien->agama,
                 'kegiatan_ibadah' => '',
@@ -122,7 +131,7 @@ class PengkajianAwalKeperawatanController extends Controller
                 // Pengkajian Nyeri / Alergi / UP GO
                 'nyeri' => 'tidak', 'alergi' => 'tidak',
                 'up_go_1_a' => '', 'up_go_1_b' => '', 'up_go_2' => '',
-            ];
+            ]);
 
             $formAction = route('emr.form.store', ['form_name' => 'pengkajian_awal_keperawatan', 'registrasi_detail_id' => $registrasi_detail_id]);
             $isEdit = false;

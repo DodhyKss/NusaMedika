@@ -94,10 +94,15 @@
                 </div>
 
                 @if($canCreate)
-                <a href="{{ $getLink($registrasiDetailId) }}" onclick="document.getElementById('save_loader').classList.remove('hidden'); document.querySelector('#save_loader div:nth-child(2)').innerText='Memuat Data...';" class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm transition-colors">
+                <a href="{{ $getLink($registrasiDetailId) }}" onclick="document.getElementById('save_loader').classList.remove('hidden'); document.querySelector('#save_loader div:nth-child(2)').innerText='Memuat Data...';" class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm transition-colors" title="Tambah Data Baru">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Baru
                 </a>
+                @else
+                <span class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-semibold text-slate-400 bg-slate-100 border border-slate-200 rounded-lg cursor-not-allowed opacity-60 shadow-sm select-none" title="Anda tidak memiliki akses Tambah (Create)">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Baru
+                </span>
                 @endif
                 
                 <button type="button" onclick="togglePanel('kiri')" title="Maximize/Minimize" class="inline-flex items-center justify-center p-1.5 text-slate-500 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-700 rounded-lg transition-colors shadow-sm ml-1">
@@ -140,11 +145,19 @@
             </div>
 
             <!-- Isi Form Custom Disini -->
-            {{ $slot }}
+            @if(!$isEdit && !$isView && !$canCreate)
+                <div class="flex flex-col items-center justify-center h-64 text-center p-6 bg-white rounded-2xl border border-slate-200 shadow-sm my-auto">
+                    <svg class="w-12 h-12 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <h3 class="text-base font-bold text-slate-700">Akses Tambah Tidak Tersedia</h3>
+                    <p class="text-sm text-slate-500 mt-1">Anda tidak memiliki hak akses untuk menambah data baru pada form ini. Silakan pilih riwayat di panel sebelah kiri untuk melihat detail.</p>
+                </div>
+            @else
+                {{ $slot }}
+            @endif
 
             <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end gap-3">
-                @if($isView)
-                    @if($canRead && $printUrl)
+                @if($isView || (!$isEdit && !$canCreate))
+                    @if($isView && $canRead && $printUrl)
                         <button type="button" onclick="window.open('{{ $printUrl }}', '_blank')" class="inline-flex items-center px-6 py-2.5 bg-white border border-slate-300 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                             Print

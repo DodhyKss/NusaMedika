@@ -29,6 +29,17 @@ class DynamicFormController extends Controller
         // Gate akses (read) bila form tercatat di tabel form
         if ($form) {
             abort_unless(AksesEhr::can((int) $form->form_id, 'read'), 403);
+            $aksesCrud = AksesEhr::flags((int) $form->form_id);
+            $riwayat = EmrHelper::emrList((int) $form->form_id, (int) $registrasi_detail->registrasi_id);
+
+            if (!$emr_id && !($aksesCrud['create'] ?? false) && $riwayat->isNotEmpty()) {
+                return redirect()->route('emr.dynamic.index', [
+                    'form_name' => $form_name,
+                    'registrasi_detail_id' => $registrasi_detail_id,
+                    'emr_id' => $riwayat->first()->emr_id,
+                    'action' => 'view'
+                ]);
+            }
         }
 
         // 1. Controller spesifik bila ada (SOAP, Pengkajian Awal, dst.)
@@ -62,7 +73,7 @@ class DynamicFormController extends Controller
                 'registrasi_detail' => $registrasi_detail,
                 'emr_form' => $form,
                 'objek_map' => $form ? EmrHelper::objekMap((int) $form->form_id) : [],
-                'emr_data' => $emr_id ? EmrHelper::emrDetailByVariabel((int) $emr_id) : [],
+                'emr_data' => $emr_id ? EmrHelper::emrDetailByVariabel((int) $emr_id) : EmrHelper::wrapData([]),
                 'riwayat' => $form ? EmrHelper::emrList((int) $form->form_id, (int) $registrasi_detail->registrasi_id) : collect(),
                 'aksesCrud' => $aksesCrud,
                 'isEdit' => (bool) $emr_id,
