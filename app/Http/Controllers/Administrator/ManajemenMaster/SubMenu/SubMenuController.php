@@ -42,7 +42,16 @@ class SubMenuController extends Controller
             });
         }])->orderBy('modul_id')->orderBy('urutan_menu')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.SubMenu.sub_menu_create', compact('menus'));
+        $nextUrutan = (int) SubMenu::where(function ($q) {
+            $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
+        })->max('urutan_sub_menu') + 1;
+
+        $urutanPerMenu = SubMenu::where(function ($q) {
+            $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
+        })->selectRaw('menu_id, MAX(urutan_sub_menu) AS max_urutan')
+            ->groupBy('menu_id')->pluck('max_urutan', 'menu_id');
+
+        return view('moduls.Administrator.ManajemenMaster.SubMenu.sub_menu_create', compact('menus', 'nextUrutan', 'urutanPerMenu'));
     }
 
     public function store(Request $request)

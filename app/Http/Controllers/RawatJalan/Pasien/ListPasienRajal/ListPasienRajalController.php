@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\RawatJalan\Pasien\ListPasienDokter;
+namespace App\Http\Controllers\RawatJalan\Pasien\ListPasienRajal;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class ListPasienDokterController extends Controller
+class ListPasienRajalController extends Controller
 {
     public function index(Request $request)
     {
@@ -91,7 +91,7 @@ class ListPasienDokterController extends Controller
             }
         }
 
-        return view('moduls.RawatJalan.Pasien.ListPasienDokter.list_pasien_dokter', compact(
+        return view('moduls.RawatJalan.Pasien.ListPasienRajal.list_pasien_rajal', compact(
             'listPasien',
             'tanggalKunjungan',
             'poliklinikId'

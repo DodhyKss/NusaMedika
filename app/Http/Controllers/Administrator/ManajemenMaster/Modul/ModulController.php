@@ -25,7 +25,11 @@ class ModulController extends Controller
 
     public function create()
     {
-        return view('moduls.Administrator.ManajemenMaster.Modul.modul_create');
+        $nextUrutan = (int) Modul::where(function ($q) {
+            $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
+        })->max('urutan_modul') + 1;
+
+        return view('moduls.Administrator.ManajemenMaster.Modul.modul_create', compact('nextUrutan'));
     }
 
     public function store(Request $request)

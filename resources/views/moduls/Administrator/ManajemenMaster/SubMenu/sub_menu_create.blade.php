@@ -26,7 +26,7 @@
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Menu --</option>
                         @foreach ($menus as $menu)
-                            <option value="{{ $menu->menu_id }}" {{ old('menu_id') == $menu->menu_id ? 'selected' : '' }}>[{{ $menu->modul?->nama_modul ?? 'Tanpa Modul' }}] {{ $menu->nama_menu }}</option>
+                            <option value="{{ $menu->menu_id }}" data-urutan="{{ ($urutanPerMenu[$menu->menu_id] ?? 0) + 1 }}" {{ old('menu_id') == $menu->menu_id ? 'selected' : '' }}>[{{ $menu->modul?->nama_modul ?? 'Tanpa Modul' }}] {{ $menu->nama_menu }}</option>
                         @endforeach
                     </select>
                     @error('menu_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
@@ -34,7 +34,7 @@
 
                 <div>
                     <label for="urutan_sub_menu" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Urutan <span class="text-red-500">*</span></label>
-                    <input type="number" id="urutan_sub_menu" name="urutan_sub_menu" value="{{ old('urutan_sub_menu') }}" placeholder="Contoh: 1"
+                    <input type="number" id="urutan_sub_menu" name="urutan_sub_menu" value="{{ old('urutan_sub_menu', $nextUrutan) }}" placeholder="Contoh: 1"
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
                     @error('urutan_sub_menu')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                 </div>
@@ -77,4 +77,18 @@
         background-size: 1.25em 1.25em;
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var select = document.getElementById('menu_id');
+        var input = document.getElementById('urutan_sub_menu');
+
+        select.addEventListener('change', function () {
+            var option = select.options[select.selectedIndex];
+            if (option && option.dataset.urutan) {
+                input.value = option.dataset.urutan;
+            }
+        });
+    });
+</script>
 @endsection

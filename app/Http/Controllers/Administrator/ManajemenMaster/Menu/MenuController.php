@@ -33,7 +33,16 @@ class MenuController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->orderBy('urutan_modul')->get();
 
-        return view('moduls.Administrator.ManajemenMaster.Menu.menu_create', compact('moduls'));
+        $nextUrutan = (int) Menu::where(function ($q) {
+            $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
+        })->max('urutan_menu') + 1;
+
+        $urutanPerModul = Menu::where(function ($q) {
+            $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
+        })->selectRaw('modul_id, MAX(urutan_menu) AS max_urutan')
+            ->groupBy('modul_id')->pluck('max_urutan', 'modul_id');
+
+        return view('moduls.Administrator.ManajemenMaster.Menu.menu_create', compact('moduls', 'nextUrutan', 'urutanPerModul'));
     }
 
     public function store(Request $request)

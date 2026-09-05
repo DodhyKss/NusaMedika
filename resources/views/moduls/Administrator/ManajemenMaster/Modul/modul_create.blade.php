@@ -29,7 +29,7 @@
 
                 <div>
                     <label for="urutan_modul" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Urutan <span class="text-red-500">*</span></label>
-                    <input type="number" id="urutan_modul" name="urutan_modul" value="{{ old('urutan_modul') }}" placeholder="Contoh: 6"
+                    <input type="number" id="urutan_modul" name="urutan_modul" value="{{ old('urutan_modul', $nextUrutan) }}" placeholder="Contoh: 6"
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
                     @error('urutan_modul')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                 </div>
