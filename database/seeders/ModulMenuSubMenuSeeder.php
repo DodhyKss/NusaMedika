@@ -18,6 +18,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['modul_id' => 3, 'nama_modul' => 'Rawat Inap', 'icon_modul' => 'fa-solid fa-bed', 'urutan_modul' => 4],
             ['modul_id' => 4, 'nama_modul' => 'Gawat Darurat', 'icon_modul' => 'fa-solid fa-truck-medical', 'urutan_modul' => 5],
             ['modul_id' => 5, 'nama_modul' => 'Administrator', 'icon_modul' => 'fa-solid fa-gear', 'urutan_modul' => 6],
+            ['modul_id' => 6, 'nama_modul' => 'Inventory', 'icon_modul' => 'fa-solid fa-box-archive', 'urutan_modul' => 7],
         ];
 
         foreach ($moduls as $modul) {
@@ -46,6 +47,8 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['menu_id' => 6, 'modul_id' => 5, 'nama_menu' => 'Manajemen Master', 'urutan_menu' => 1],
             ['menu_id' => 7, 'modul_id' => 5, 'nama_menu' => 'Manajemen User', 'urutan_menu' => 2],
             ['menu_id' => 8, 'modul_id' => 5, 'nama_menu' => 'Manajemen EMR', 'urutan_menu' => 3],
+            // Modul Inventory (6)
+            ['menu_id' => 9, 'modul_id' => 6, 'nama_menu' => 'Pesanan', 'urutan_menu' => 1],
         ];
 
         foreach ($menus as $menu) {
@@ -99,6 +102,8 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 30, 'menu_id' => 8, 'nama_sub_menu' => 'Dashboard Menu', 'file_sub_menu' => 'Administrator/ManajemenEMR/DashboardMenu/dashboard_menu', 'urutan_sub_menu' => 1],
             ['sub_menu_id' => 31, 'menu_id' => 8, 'nama_sub_menu' => 'Akses EHR', 'file_sub_menu' => 'Administrator/ManajemenEMR/AksesEhr/akses_ehr', 'urutan_sub_menu' => 2],
             ['sub_menu_id' => 32, 'menu_id' => 8, 'nama_sub_menu' => 'Form', 'file_sub_menu' => 'Administrator/ManajemenEMR/Form/form', 'urutan_sub_menu' => 3],
+            // Menu Pesanan (9) - Inventory
+            ['sub_menu_id' => 33, 'menu_id' => 9, 'nama_sub_menu' => 'Buat Pesanan', 'file_sub_menu' => 'Inventory/Pesanan/BuatPesanan/buat_pesanan', 'urutan_sub_menu' => 1],
         ];
 
         foreach ($subMenus as $subMenu) {

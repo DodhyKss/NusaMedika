@@ -36,9 +36,21 @@
                 </div>
 
                 <div class="md:col-span-2">
-                    <label for="icon_modul" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Icon (Font Awesome)</label>
-                    <input type="text" id="icon_modul" name="icon_modul" value="{{ old('icon_modul', $modul->icon_modul) }}" placeholder="Contoh: fa-solid fa-gear"
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Icon (Font Awesome)</label>
+                    <input type="hidden" name="icon_modul" id="icon_modul" value="{{ old('icon_modul', $modul->icon_modul) }}">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-xs font-medium text-slate-500">Pratinjau:</span>
+                        <span id="preview_icon" class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 text-lg text-blue-600"><i class="{{ old('icon_modul', $modul->icon_modul) }}"></i></span>
+                        <input type="text" id="icon_search" placeholder="Cari icon..." class="flex-1 text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
+                    </div>
+                    <div id="icon_grid" class="h-64 overflow-y-auto border border-slate-200 rounded-lg bg-white p-3 grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1.5 drag-scroll">
+                        @foreach ($icons as $icon)
+                        <button type="button" class="icon-option flex items-center justify-center h-10 rounded-md text-base text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer border border-transparent hover:border-blue-200" data-icon="{{ $icon }}" title="{{ $icon }}">
+                            <i class="{{ $icon }}"></i>
+                        </button>
+                        @endforeach
+                    </div>
+                    <p class="mt-1 text-[11px] text-slate-400">{{ count($icons) }} icon tersedia. Klik salah satu untuk memilih.</p>
                     @error('icon_modul')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                 </div>
             </div>
@@ -57,4 +69,49 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('icon_modul');
+        const preview = document.getElementById('preview_icon');
+        const search = document.getElementById('icon_search');
+        const grid = document.getElementById('icon_grid');
+        const options = Array.from(grid.querySelectorAll('.icon-option'));
+
+        function selectIcon(iconClass) {
+            input.value = iconClass;
+            preview.innerHTML = '<i class="' + iconClass + '"></i>';
+            options.forEach(o => {
+                o.classList.remove('bg-blue-100', 'text-blue-600', 'border-blue-300');
+                if (o.dataset.icon === iconClass) {
+                    o.classList.add('bg-blue-100', 'text-blue-600', 'border-blue-300');
+                }
+            });
+        }
+
+        options.forEach(btn => {
+            btn.addEventListener('click', () => selectIcon(btn.dataset.icon));
+        });
+
+        search.addEventListener('input', () => {
+            const q = search.value.trim().toLowerCase();
+            options.forEach(btn => {
+                const name = btn.dataset.icon.replace('fa-solid fa-', '').toLowerCase();
+                const show = q === '' || name.includes(q);
+                btn.style.display = show ? '' : 'none';
+            });
+        });
+
+        const current = input.value;
+        if (current) {
+            const match = options.find(o => o.dataset.icon === current);
+            if (match) {
+                match.classList.add('bg-blue-100', 'text-blue-600', 'border-blue-300');
+                match.scrollIntoView({ block: 'center' });
+            }
+        }
+    });
+</script>
+@endpush
 @endsection

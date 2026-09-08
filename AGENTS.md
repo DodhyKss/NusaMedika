@@ -11,6 +11,8 @@ Laravel 13 (PHP 8.3) SIMRS app ("MediTechV2") — an Indonesian hospital EMR. Al
 - `.env` is gitignored but required. `.env.example` has placeholder DB values. Never commit `.env` (it contains the DB password).
 - The `.env` file is injected at container start (`env_file`), so after editing it you must recreate the containers: `docker compose up -d --force-recreate app vite` — otherwise the running app keeps the old values (e.g. a changed `OBJEK_*`/`JENIS_RAWAT_*` constant or DB setting is not picked up).
 - Vite runs in its own container; frontend assets load via `@vite` dev server.
+- **Container `app` runs as the host user (`user: "1000:1000"`)** in `docker-compose.yml`, so any file written from inside the container (e.g. via `make:submenu`, `artisan`, caches) is owned by the host user (uid 1000) — editable/deletable from the host without `sudo`. Do **not** remove this `user:` line: without it the container runs as root and every created file becomes root-owned (hard to delete from the host). Note: if a teammate's host uid differs, they must adjust the value to their `id -u`/`id -g`.
+- Gotcha: after adding `user: 1000:1000`, ensure `vendor/` and writable dirs (`storage/`, `bootstrap/cache/`) are owned by uid 1000 too — otherwise `composer install` at container start fails with "Permission denied" (fix with a one-off `docker run --rm -v "$PWD":/var/www/html -w /var/www/html --user root <image> chown -R 1000:1000 vendor storage bootstrap`).
 
 ## Schema conventions (28 model + 9 EMR tables + 1 view)
 
@@ -36,6 +38,29 @@ The original 295 migrations (generated via `kitloong/laravel-migrations-generato
 `php artisan db:seed` runs (in order): `ReferensiBagianSeeder`, `BagianSeeder` (18 Poli ref=1/RJ + 19 Ruang Perawatan ref=2/RI + 2 IGD ref=3/IGD: Instalasi Gawat Darurat & IRD Obgyn; menghapus permanen record lama lalu seed ulang ber-id berurutan dari 1), `ModulMenuSubMenuSeeder` (6 modul → 10 menu → 28 sub_menu; **`file_sub_menu` kini menyimpan path view lengkap BESERTA nama file blade**, misal 24 "Wilayah" `Administrator/ManajemenMaster/Wilayah/wilayah`, 25 "Master Nasabah" `'...Nasabah/nasabah'`, 26 "Master Kelas" `'...Kelas/kelas'`, 27 "Jadwal Dokter" `'...JadwalDokter/jadwal_dokter'`, 28 "ICD" `'...Icd/icd'` — basename = snake_case folder leaf = URI, lihat section *Auto-route sub_menu*), `FormObjekSeeder` (form, objek, `objek_form_control`, plus `profesi`/`dashboard_menu`/`dashboard_menu_sub`/`akses_ehr` — bagian tidak lagi di sini, ada di `BagianSeeder`), `MasterPegawaiSeeder` (jabatan 1–8 + `status_kepegawaian` 1–4 + `pegawai` 1–3: Administrator Sistem/Perawat Jaga/Dokter Jaga), `UserSeeder` (admin/perawat/dokter + `user_akses`; admin diberi akses **semua sub_menu aktif** — dihitung dinamis di `UserSeeder` supaya sub_menu baru otomatis terakses), `WilayahSeeder` (data contoh master wilayah: 3 provinsi → 12 kabupaten → 10 kecamatan → 20 kelurahan), `KelasRuangSeeder`, `IcdSeeder`, `EmrMasterSeeder` (terakhir: baseline `dashboard_menu`/`dashboard_menu_sub`/`dashboard_menu_sub_extra` + `form` 1–4 + `akses_ehr` — lihat section *Manajemen EMR*). All are idempotent and safe to re-run (modul/menu/sub_menu/users use `updateOrInsert` keyed on the PK; `user_akses` uses plain auto-increment now — `getNextId` is gone). `DatabaseSeeder` calls `GenerateHelper::resetSequence()` (20 tabel) di akhir untuk menyetel ulang sequence setelah seeder mengisi ID eksplisit, agar insert auto-increment berikutnya dari aplikasi tidak bentrok. Users are linked to a `pegawai` via `users.pegawai_id` and `users.nama_pegawai` is copied from the pegawai record (admin→1, perawat→2, dokter→3).
 
 **`ModulMenuSubMenuSeeder.php` kini dihasilkan otomatis** oleh command `php artisan seeder:sync-master-menu` (`App\Console\Commands\SyncMasterMenuSeeder`) — membaca record **aktif** (`status_batal != 1 OR NULL`) dari tabel `modul`/`menu`/`sub_menu`, lalu menulis ulang file seeder dengan `updateOrInsert` + komentar pengelompokan per modul/menu. Jadi setelah membuat modul/menu/sub_menu baru lewat aplikasi (atau langsung di DB), jalankan command itu — jangan edit seeder manual. Jalankan ulang `db:seed` bila perlu; seeder idempotent, record yang di-mark `status_batal=1` otomatis tidak ikut di-seed.
+
+## Scaffold `make:submenu`
+
+Command `php artisan make:submenu {path} [--force]` (`App\Console\Commands\MakeSubmenu`, auto-discovered) membangkitkan **scaffold kosong** (template raw) untuk satu sub_menu baru. Bukan seeder/route — hanya menyiapkan file controller + view standar agar tinggal diisi:
+
+```bash
+docker compose exec app php artisan make:submenu Administrator/ManajemenMaster/Contoh --force
+```
+
+- **Argumen `{path}`** = path relatif `{Modul}/{Menu}/{SubMenu}` (PascalCase). Leaf folder = segmen terakhir; basename = snake_case leaf (contoh path `Administrator/ManajemenMaster/Contoh` → folder leaf `Contoh`, basename `contoh`, URI/route basis `contoh`). Wajib mengikuti kendala yang sama dengan section *Modular structure* (leaf unik, PascalCase kata-kata utuh, dst.).
+- **`--force`** melewati konfirmasi "file sudah ada?" (skip prompt saat controller/view sudah ada).
+- Yang dihasilkan (semua file punya komentar + template minimal, **bukan** logika):
+  - Controller `app/Http/Controllers/{Path}/{Leaf}Controller.php` — method `index/create/store/edit/update/destroy` **kosong, hanya komentar struktur** (import minimal `Controller` + model `Request`); tidak ada method `clearSidebarCache`. View call-nya (komentar) memakai `'moduls.{PascalPath}.{basename}'`.
+  - Views `resources/views/moduls/{PascalPath}/{basename}.blade.php` + `{basename}_create.blade.php` + `{basename}_edit.blade.php` — hanya `@extends('layouts.app')` + `@section('content')` + `<x-page-header title="..." subtitle="..." />` (komponen `resources/views/components/page-header.blade.php`); tidak ada markup lain.
+- **Langkah berikutnya** (dicetak command + wajib dikerjakan manual): isi Model & validasi di controller, isi view, buat record sub_menu dengan `file_sub_menu='{path}/{basename}'` (misal `Administrator/ManajemenMaster/Contoh/contoh`), lalu `php artisan route:clear && cache:clear` agar route/sidebar auto dibangun dari tabel `sub_menu` (lihat *Auto-route sub_menu*).
+- Route prefix: `admin.{basename}` bila path berawal `Administrator`, selain itu `{basename}`.
+
+## Icon picker Modul (Font Awesome)
+
+Form Modul (tambah/ubah) memakai **icon picker grid**, bukan text input: 2587 ikon `fa-solid` dari `node_modules/@fortawesome/fontawesome-free/css/all.css`.
+
+- `ModulController::iconOptions()` membaca `all.css`, regex `.fa-([a-z0-9-]+) \{...\}` difilter yang punya `--fa:` (agar hanya definisi solid), mengembalikan 2587 class `fa-solid fa-{name}`, di-cache dengan key `modul_icon_options_{filemtime}` (auto-invalidasi saat css berubah), ada fallback list bila file tidak ada.
+- Views `modul_create.blade.php`/`modul_edit.blade.php`: hidden `#icon_modul` (nilai yang disimpan) + span preview + input pencarian + `#icon_grid` (grid scrollable tombol ikon). JS di `@push('scripts')` (layout render `@stack('scripts')` sebelum `</body>`) menangani klik (pilih + highlight) + preview live + filter pencarian. `create()`/`edit()` mengirim `$icons` ke view.
 
 ## Auth is plain-text
 

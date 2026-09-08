@@ -29,7 +29,7 @@ class ModulController extends Controller
             $q->where('status_batal', '!=', 1)->orWhereNull('status_batal');
         })->max('urutan_modul') + 1;
 
-        return view('moduls.Administrator.ManajemenMaster.Modul.modul_create', compact('nextUrutan'));
+        return view('moduls.Administrator.ManajemenMaster.Modul.modul_create', compact('nextUrutan') + ['icons' => $this->iconOptions()]);
     }
 
     public function store(Request $request)
@@ -66,7 +66,7 @@ class ModulController extends Controller
     {
         $modul = Modul::findOrFail($id);
 
-        return view('moduls.Administrator.ManajemenMaster.Modul.modul_edit', compact('modul'));
+        return view('moduls.Administrator.ManajemenMaster.Modul.modul_edit', compact('modul') + ['icons' => $this->iconOptions()]);
     }
 
     public function update(Request $request, $id)
@@ -135,6 +135,31 @@ class ModulController extends Controller
     {
         User::pluck('user_id')->each(function ($userId) {
             Cache::forget('sidebar_moduls_user_'.$userId);
+        });
+    }
+
+    private function iconOptions()
+    {
+        $file = base_path('node_modules/@fortawesome/fontawesome-free/css/all.css');
+
+        if (! is_file($file)) {
+            return ['fa-solid fa-gear', 'fa-solid fa-house', 'fa-solid fa-user', 'fa-solid fa-gears'];
+        }
+
+        $key = 'modul_icon_options_'.(int) filemtime($file);
+
+        return Cache::remember($key, 86400, function () use ($file) {
+            $css = file_get_contents($file);
+            preg_match_all('/\.fa-([a-z0-9-]+) \{(.+?)\}/s', $css, $matches, PREG_SET_ORDER);
+
+            $icons = [];
+            foreach ($matches as $match) {
+                if (str_contains($match[2], '--fa:')) {
+                    $icons[] = 'fa-solid fa-'.$match[1];
+                }
+            }
+
+            return $icons;
         });
     }
 }

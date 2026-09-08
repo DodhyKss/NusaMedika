@@ -6,6 +6,10 @@ services:
     image: nusamedika-app:dev
     container_name: nusamedika_app
     network_mode: "host"
+    # Menjalankan proses sebagai user host (uid 1000) agar file yang dibuat
+    # dari dalam container (mis. via artisan) ber-owner user host, bukan root,
+    # sehingga mudah diedit/dihapus dari komputer lokal.
+    user: "1000:1000"
     env_file:
       - .env
     environment:

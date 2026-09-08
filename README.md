@@ -67,7 +67,8 @@ Dokumen ini adalah panduan lengkap: arsitektur, struktur proyek, cara kerja, lib
 NusaMedika/
 ├── app/
 │   ├── Console/Commands/
-│   │   └── SyncMasterMenuSeeder.php      # Command custom: seeder:sync-master-menu
+│   │   ├── SyncMasterMenuSeeder.php      # Command custom: seeder:sync-master-menu
+│   │   └── MakeSubmenu.php               # Command custom: make:submenu (scaffold controller + view)
 │   ├── Helpers/
 │   │   ├── GenerateHelper.php            # GenerateHelper: no_mr, urutan antrian, estimasi, reset sequence
 │   │   └── SelectOption.php              # SelectOption: daftar opsi dropdown tanpa tabel DB
@@ -142,6 +143,8 @@ Aturan yang berlaku:
 - Nama file blade = basename folder leaf dalam snake_case. URI dan nama route **identik dengan nama file blade tersebut** (misal URL `/daftar_pasien` = file `daftar_pasien.blade.php`).
 - Basename **wajib unik di seluruh aplikasi** karena menjadi URI/route (dua sub-menu dengan basename sama akan bentrok).
 - Sub-folder partial EMR berada di `moduls/EMR/PartialForm/`.
+
+Untuk membuat sub-menu baru, gunakan scaffold `make:submenu` (lihat §6.2) — membangkitkan controller + view (index/create/edit) kosong berkomentar dengan `<x-page-header>`, lalu isi logika & daftarkan record `sub_menu` dengan `file_sub_menu='{Modul}/{Menu}/{SubMenu}/{basename}'`.
 
 ---
 
@@ -313,6 +316,7 @@ Command ini (`App\Console\Commands\SyncMasterMenuSeeder`) membaca record **aktif
 | Jalankan semua seeder | `docker compose exec app php artisan db:seed` |
 | Jalankan satu seeder | `docker compose exec app php artisan db:seed --class=ModulMenuSubMenuSeeder` |
 | Sync seeder master menu (custom) | `docker compose exec app php artisan seeder:sync-master-menu` |
+| Scaffold sub_menu baru (controller + view kosong) | `docker compose exec app php artisan make:submenu Administrator/ManajemenMaster/Contoh --force` |
 | REPL interaktif | `docker compose exec app php artisan tinker` |
 | Daftar route | `docker compose exec app php artisan route:list` |
 | Cache route (wajib ulang setelah ubah sub_menu) | `docker compose exec app php artisan route:cache` |
@@ -428,7 +432,7 @@ Command ini (`App\Console\Commands\SyncMasterMenuSeeder`) membaca record **aktif
 
 `docker-compose.yml` hanya berisi **dua service**:
 
-- `app` — image khusus dari `Dockerfile` (PHP 8.3 CLI + ekstensi + composer), menjalankan `artisan serve` di port 8000. Volume `./:/var/www/html` dipasang langsung (hot reload untuk file PHP).
+- `app` — image khusus dari `Dockerfile` (PHP 8.3 CLI + ekstensi + composer), menjalankan `artisan serve` di port 8000. Volume `./:/var/www/html` dipasang langsung (hot reload untuk file PHP). Berjalan sebagai **user host (uid 1000)** via `user: "1000:1000"` — sehingga file yang dibuat dari dalam container (scaffold `make:submenu`, cache, dsb.) dimiliki uid 1000: bisa diedit/dihapus dari host tanpa `sudo`. Bila uid host teammate berbeda, sesuaikan nilai `user:` dengan `id -u`/`id -g` (jangan dihapus barisnya).
 - `vite` — image `node:22-alpine`, menjalankan Vite dev server di port 5173 untuk aset frontend.
 
 Tidak ada service `db`, `redis`, maupun `queue` di dalam compose — database PostgreSQL bersifat eksternal, dan pada development `CACHE_STORE=file`, `QUEUE_CONNECTION=sync`, `SESSION_DRIVER=file`.
