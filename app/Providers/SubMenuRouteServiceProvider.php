@@ -164,13 +164,21 @@ class SubMenuRouteServiceProvider extends ServiceProvider
 
     private function subMenus(): array
     {
-        return DB::table('sub_menu')
-            ->where('file_sub_menu', '!=', '#')
-            ->where(function ($q) {
-                $q->whereNull('status_batal')->orWhere('status_batal', 0);
-            })
-            ->get(['sub_menu_id', 'file_sub_menu'])
-            ->all();
+        try {
+            if (! \Illuminate\Support\Facades\Schema::hasTable('sub_menu')) {
+                return [];
+            }
+
+            return DB::table('sub_menu')
+                ->where('file_sub_menu', '!=', '#')
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
+                ->get(['sub_menu_id', 'file_sub_menu'])
+                ->all();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     public static function flushPathCache(): void
