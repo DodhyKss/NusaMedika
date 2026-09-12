@@ -6,6 +6,7 @@ use App\Http\Controllers\SubMenu\SubMenuViewController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class SubMenuRouteServiceProvider extends ServiceProvider
@@ -105,15 +106,15 @@ class SubMenuRouteServiceProvider extends ServiceProvider
                 $info = self::derive($path);
 
                 if ($info['controller'] !== null) {
-                    $this->registerControllerRoutes($info, $existing);
+                    $this->registerControllerRoutes($info, $existing, (int) $subMenu->sub_menu_id);
                 } else {
-                    $this->registerViewRoute($path, $existing);
+                    $this->registerViewRoute($path, $existing, (int) $subMenu->sub_menu_id);
                 }
             }
         });
     }
 
-    private function registerControllerRoutes(array $info, array $existing): void
+    private function registerControllerRoutes(array $info, array $existing, int $subMenuId): void
     {
         $controller = $info['controller'];
         $uri = trim($info['uri'], '/');
@@ -124,8 +125,10 @@ class SubMenuRouteServiceProvider extends ServiceProvider
             return;
         }
 
+        $middlewares = ['web', 'auth', 'submenu.access:'.$subMenuId];
+
         if (! in_array($uri, $existing, true)) {
-            Route::get('/'.$uri, [$controller, 'index'])->middleware('web', 'auth')->name($name.'.index');
+            Route::get('/'.$uri, [$controller, 'index'])->middleware($middlewares)->name($name.'.index');
         }
 
         $maps = [
@@ -138,12 +141,12 @@ class SubMenuRouteServiceProvider extends ServiceProvider
 
         foreach ($maps as $method => [$verb, $routeUri, $routeName]) {
             if (method_exists($controller, $method) && ! in_array(trim($routeUri, '/'), $existing, true)) {
-                Route::$verb($routeUri, [$controller, $method])->middleware('web', 'auth')->name($routeName);
+                Route::$verb($routeUri, [$controller, $method])->middleware($middlewares)->name($routeName);
             }
         }
     }
 
-    private function registerViewRoute(string $path, array $existing): void
+    private function registerViewRoute(string $path, array $existing, int $subMenuId): void
     {
         $segments = array_values(array_filter(explode('/', trim($path, '/'))));
         $uri = (string) end($segments);
@@ -153,7 +156,7 @@ class SubMenuRouteServiceProvider extends ServiceProvider
         }
 
         Route::get('/'.$uri, SubMenuViewController::class)
-            ->middleware('web', 'auth')
+            ->middleware(['web', 'auth', 'submenu.access:'.$subMenuId])
             ->name('modul_view.'.implode('.', $segments));
     }
 
@@ -165,7 +168,7 @@ class SubMenuRouteServiceProvider extends ServiceProvider
     private function subMenus(): array
     {
         try {
-            if (! \Illuminate\Support\Facades\Schema::hasTable('sub_menu')) {
+            if (! Schema::hasTable('sub_menu')) {
                 return [];
             }
 
