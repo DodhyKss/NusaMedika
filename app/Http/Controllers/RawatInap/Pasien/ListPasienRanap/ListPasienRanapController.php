@@ -32,8 +32,8 @@ class ListPasienRanapController extends Controller
                     'p.jenis_kelamin',
                     'p.tgl_lahir',
                     'n.nama_nasabah',
-                    DB::raw("date_trunc('second', age(current_timestamp, r.tgl_masuk)) as los"),
-                    DB::raw("case when age(current_timestamp, r.tgl_masuk) <= interval '3 days' then 'LOS <=3' when age(current_timestamp, r.tgl_masuk) <= interval '5 days' then 'LOS >3 & <=5' when age(current_timestamp, r.tgl_masuk) <= interval '7 days' then 'LOS >5 & <=7' when age(current_timestamp, r.tgl_masuk) <= interval '10 days' then 'LOS >7 & <=10' else 'LOS >10' end as kapasitas"),
+                    DB::raw("CONCAT(FLOOR(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()) / 86400), ' days ', LPAD(FLOOR(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400) / 3600), 2, '0'), ':', LPAD(FLOOR(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600) / 60), 2, '0'), ':', LPAD(MOD(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600), 60), 2, '0')) as los"),
+                    DB::raw("case when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 3 then 'LOS <=3' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 5 then 'LOS >3 & <=5' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 7 then 'LOS >5 & <=7' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 10 then 'LOS >7 & <=10' else 'LOS >10' end as kapasitas"),
                     DB::raw("'DPJP' as status_perawatan")
                 )
                 ->join('registrasi as r', 'pr.registrasi_id', '=', 'r.registrasi_id')
@@ -102,8 +102,8 @@ class ListPasienRanapController extends Controller
                     'p.jenis_kelamin',
                     'p.tgl_lahir',
                     'n.nama_nasabah',
-                    DB::raw("date_trunc('second', age(current_timestamp, r.tgl_masuk)) as los"),
-                    DB::raw("case when age(current_timestamp, r.tgl_masuk) <= interval '3 days' then 'LOS <=3' when age(current_timestamp, r.tgl_masuk) <= interval '5 days' then 'LOS >3 & <=5' when age(current_timestamp, r.tgl_masuk) <= interval '7 days' then 'LOS >5 & <=7' when age(current_timestamp, r.tgl_masuk) <= interval '10 days' then 'LOS >7 & <=10' else 'LOS >10' end as kapasitas"),
+                    DB::raw("CONCAT(FLOOR(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()) / 86400), ' days ', LPAD(FLOOR(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400) / 3600), 2, '0'), ':', LPAD(FLOOR(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600) / 60), 2, '0'), ':', LPAD(MOD(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600), 60), 2, '0')) as los"),
+                    DB::raw("case when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 3 then 'LOS <=3' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 5 then 'LOS >3 & <=5' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 7 then 'LOS >5 & <=7' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 10 then 'LOS >7 & <=10' else 'LOS >10' end as kapasitas"),
                     DB::raw("COALESCE(ed_jk.value, 'Konsul') as status_perawatan")
                 )
                 ->join('registrasi as r', 'e.registrasi_id', '=', 'r.registrasi_id')

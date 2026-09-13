@@ -6,13 +6,27 @@ Laravel 13 (PHP 8.3) SIMRS app ("MediTechV2") — an Indonesian hospital EMR. Al
 
 - No PHP is installed on the host. All PHP/artisan commands must run in the app container:
   `docker compose exec app php artisan <cmd>`
-- The compose file has only two services: `app` (php-cli + `artisan serve` on port 8000) and `vite`. Both use `network_mode: host`. There is **no** `db`/`redis`/`queue` service in `docker-compose.yml` — the README describes an outdated 4-service stack; ignore it.
-- The PostgreSQL server is **external** (`.env`: `DB_HOST=192.168.149.168`, DB `meditech`, user `postgres`). Only `pdo_pgsql` matters; there is no local DB to start.
+- The compose file has three services: `app` (php-cli + `artisan serve` on port 8000), `db` (mysql:8.0), and `vite`. `app` and `vite` use `network_mode: host`; `db` uses `ports: 3306:3306` + named volume `mysql_data` + healthcheck (`mysqladmin ping`).
+- **Database = MySQL 8.0 lokal** via service `db` (`.env`: `DB_CONNECTION=mysql`, `DB_HOST=127.0.0.1`, `DB_PORT=3306`, `DB_DATABASE=meditech`, `DB_USERNAME=meditech`, `DB_PASSWORD=meditech`). MySQL berdiri sendiri: `docker compose up -d db`, tunggu `healthy`, lalu `docker compose exec app php artisan migrate:fresh --seed`. PostgreSQL eksternal (192.168.149.168) **tidak lagi dipakai** — namun driver `pdo_pgsql` masih terpasang di image, jadi kedua driver didukung oleh kode (lihat section *Dual-driver MySQL/PostgreSQL*).
+- The `Dockerfile` installs both DB drivers: `pdo_mysql mysqlnd` (ditambah lebih dulu) dan `pgsql pdo_pgsql`.
 - `.env` is gitignored but required. `.env.example` has placeholder DB values. Never commit `.env` (it contains the DB password).
 - The `.env` file is injected at container start (`env_file`), so after editing it you must recreate the containers: `docker compose up -d --force-recreate app vite` — otherwise the running app keeps the old values (e.g. a changed `OBJEK_*`/`JENIS_RAWAT_*` constant or DB setting is not picked up).
 - Vite runs in its own container; frontend assets load via `@vite` dev server.
 - **Container `app` runs as the host user (`user: "1000:1000"`)** in `docker-compose.yml`, so any file written from inside the container (e.g. via `make:submenu`, `artisan`, caches) is owned by the host user (uid 1000) — editable/deletable from the host without `sudo`. Do **not** remove this `user:` line: without it the container runs as root and every created file becomes root-owned (hard to delete from the host). Note: if a teammate's host uid differs, they must adjust the value to their `id -u`/`id -g`.
 - Gotcha: after adding `user: 1000:1000`, ensure `vendor/` and writable dirs (`storage/`, `bootstrap/cache/`) are owned by uid 1000 too — otherwise `composer install` at container start fails with "Permission denied" (fix with a one-off `docker run --rm -v "$PWD":/var/www/html -w /var/www/html --user root <image> chown -R 1000:1000 vendor storage bootstrap`).
+
+## Dual-driver MySQL/PostgreSQL
+
+Kode mendukung dua driver (image punya `pdo_mysql` & `pdo_pgsql`), default **MySQL 8.0**. Saat memindahkan/membuat kode, jaga tetap kompatibel dua arah:
+
+- **`increments()`** → MySQL `AUTO_INCREMENT` / Postgres `serial` (sama-sama OK).
+- **JSON**: pakai `$table->json(...)`, **jangan** `jsonb` (tidak ada di MySQL).
+- **Case-insensitive**: pakai operator `'like'` (bukan `ilike` PG); kebenaran CI search di MySQL ditangani collation `utf8mb4_unicode_ci`.
+- **Regex**: `GenerateHelper::generateNoMr()` memilih operator `regexp` (mysql) vs `~` (pg) dari `config('database.default')`.
+- **`GenerateHelper::resetSequence()`**: cabang MySQL `ALTER TABLE ... AUTO_INCREMENT = max+1` vs PG `setval(pg_get_serial_sequence(...))`, dipilih per driver.
+- **View `header_ehr`** (`2026_08_28_000038`) memakai `CONCAT_WS('.', ...)` tanpa `::text`/kutip ganda — kompatibel kedua driver.
+- **Agregat durasi** (`ListPasienRanapController`): `date_trunc('second', age(...))`/`interval` (PG) diganti `TIMESTAMPDIFF(SECOND/*DAY*/, ...)` + `CONCAT`/`LPAD` bentuk `"N days HH:MM:SS"`; view `list_pasien_ranap.blade.php` memetakan `days/mons/years` → Hari/Bulan/Tahun.
+- Pindah dari PG ke MySQL: `migrate:fresh --seed` akan **drop semua tabel** — pastikan data lama sudah dibackup.
 
 ## Schema conventions (28 model + 9 EMR tables + 1 view)
 

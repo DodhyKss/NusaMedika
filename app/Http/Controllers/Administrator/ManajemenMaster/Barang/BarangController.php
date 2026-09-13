@@ -20,9 +20,9 @@ class BarangController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('nama_barang', 'ilike', "%{$search}%")
-                    ->orWhere('kode_barang', 'ilike', "%{$search}%")
-                    ->orWhereHas('jenis', fn ($jenis) => $jenis->where('nama_jenis_barang', 'ilike', "%{$search}%"));
+                $q->where('nama_barang', 'like', "%{$search}%")
+                    ->orWhere('kode_barang', 'like', "%{$search}%")
+                    ->orWhereHas('jenis', fn ($jenis) => $jenis->where('nama_jenis_barang', 'like', "%{$search}%"));
             });
         }
 

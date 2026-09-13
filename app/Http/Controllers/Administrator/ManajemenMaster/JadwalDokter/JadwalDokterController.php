@@ -36,10 +36,10 @@ class JadwalDokterController extends Controller
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->whereHas('pegawai', function ($q2) use ($search) {
-                    $q2->where('nama_pegawai', 'ilike', "%{$search}%");
+                    $q2->where('nama_pegawai', 'like', "%{$search}%");
                 })->orWhereHas('bagian', function ($q2) use ($search) {
-                    $q2->where('nama_bagian', 'ilike', "%{$search}%");
-                })->orWhere('ruang_praktek', 'ilike', "%{$search}%");
+                    $q2->where('nama_bagian', 'like', "%{$search}%");
+                })->orWhere('ruang_praktek', 'like', "%{$search}%");
             });
         }
 

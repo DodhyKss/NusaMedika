@@ -17,7 +17,7 @@ class JenisBarangController extends Controller
         $query = BarangJenis::aktif();
 
         if ($search !== '') {
-            $query->where('nama_jenis_barang', 'ilike', "%{$search}%");
+            $query->where('nama_jenis_barang', 'like', "%{$search}%");
         }
 
         $jenisBarangList = $query->orderBy('barang_jenis_id')->paginate(10)->withQueryString();

@@ -20,10 +20,15 @@ class GenerateHelper
         $primaryKey = $primaryKey ?: $tableName.'_id';
 
         try {
-            DB::statement(
-                'SELECT setval(pg_get_serial_sequence(?, ?), COALESCE((SELECT MAX('.$primaryKey.') FROM '.$tableName.') + 1, 1), false)',
-                [$tableName, $primaryKey]
-            );
+            if (in_array(config('database.default'), ['mysql', 'mariadb'], true)) {
+                $max = (int) DB::table($tableName)->max($primaryKey);
+                DB::statement("ALTER TABLE {$tableName} AUTO_INCREMENT = ".($max + 1));
+            } else {
+                DB::statement(
+                    'SELECT setval(pg_get_serial_sequence(?, ?), COALESCE((SELECT MAX('.$primaryKey.') FROM '.$tableName.') + 1, 1), false)',
+                    [$tableName, $primaryKey]
+                );
+            }
         } catch (\Exception $e) {
             // Abaikan jika sequence tidak ditemukan.
         }
@@ -36,8 +41,10 @@ class GenerateHelper
      */
     public static function generateNoMr(): string
     {
+        $regexOperator = in_array(config('database.default'), ['mysql', 'mariadb'], true) ? 'regexp' : '~';
+
         $max = (int) DB::table('pasien')
-            ->where('no_mr', '~', '^[0-9]+$')
+            ->where('no_mr', $regexOperator, '^[0-9]+$')
             ->max('no_mr');
 
         return str_pad((string) ($max + 1), 7, '0', STR_PAD_LEFT);

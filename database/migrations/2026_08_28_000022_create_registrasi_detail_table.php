@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('catatan_khusus')->nullable();
             $table->integer('verifikator_user_id')->nullable();
             $table->timestamp('verifikator_input_time', 6)->nullable();
-            $table->jsonb('handover')->nullable();
+            $table->json('handover')->nullable();
             $table->integer('lokasi_daftar')->nullable();
             $table->integer('lokasi_rawat')->nullable();
             $table->string('service_req_id')->nullable();

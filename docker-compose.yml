@@ -30,6 +30,24 @@ services:
     # Otomatis install dependency (jika belum ada) lalu jalankan built-in server PHP
     command: sh -c "composer install && php artisan serve --host=0.0.0.0 --port=8000"
 
+  db:
+    image: mysql:8.0
+    container_name: nusamedika_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: "${DB_DATABASE:-meditech}"
+      MYSQL_USER: "${DB_USERNAME:-meditech}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-meditech}"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   vite:
     image: node:22-alpine
     container_name: nusamedika_vite
@@ -41,3 +59,6 @@ services:
     # Otomatis install dependency npm lalu jalankan vite server
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     network_mode: "host"
+
+volumes:
+  mysql_data:

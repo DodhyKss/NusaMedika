@@ -18,8 +18,8 @@ class IcdController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('kode_diagnosa', 'ilike', "%{$search}%")
-                    ->orWhere('nama_diagnosa', 'ilike', "%{$search}%");
+                $q->where('kode_diagnosa', 'like', "%{$search}%")
+                    ->orWhere('nama_diagnosa', 'like', "%{$search}%");
             });
         }
 

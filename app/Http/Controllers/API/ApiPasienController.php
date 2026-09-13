@@ -31,12 +31,12 @@ class ApiPasienController extends Controller
 
         if ($search !== '') {
             if ($column !== null) {
-                $query->where($column, 'ilike', "%{$search}%");
+                $query->where($column, 'like', "%{$search}%");
             } else {
                 $query->where(function ($q) use ($search) {
-                    $q->where('nama_pasien', 'ilike', "%{$search}%")
-                        ->orWhere('no_mr', 'ilike', "%{$search}%")
-                        ->orWhere('ktp', 'ilike', "%{$search}%");
+                    $q->where('nama_pasien', 'like', "%{$search}%")
+                        ->orWhere('no_mr', 'like', "%{$search}%")
+                        ->orWhere('ktp', 'like', "%{$search}%");
                 });
             }
         }

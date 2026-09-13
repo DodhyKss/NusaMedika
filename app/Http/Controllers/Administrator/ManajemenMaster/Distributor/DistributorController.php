@@ -20,8 +20,8 @@ class DistributorController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('nama_supplier', 'ilike', "%{$search}%")
-                    ->orWhere('telepon', 'ilike', "%{$search}%");
+                $q->where('nama_supplier', 'like', "%{$search}%")
+                    ->orWhere('telepon', 'like', "%{$search}%");
             });
         }
 

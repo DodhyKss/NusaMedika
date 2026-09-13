@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install ekstensi PHP yang dibutuhkan Laravel
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions pdo_pgsql pgsql mbstring exif pcntl bcmath gd zip intl opcache
+RUN install-php-extensions pdo_mysql mysqlnd pgsql pdo_pgsql mbstring exif pcntl bcmath gd zip intl opcache
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

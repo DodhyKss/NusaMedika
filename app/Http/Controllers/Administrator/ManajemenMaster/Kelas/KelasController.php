@@ -17,7 +17,7 @@ class KelasController extends Controller
         $query = KelasRuang::aktif();
 
         if ($search !== '') {
-            $query->where('nama_kelas_ruang', 'ilike', "%{$search}%");
+            $query->where('nama_kelas_ruang', 'like', "%{$search}%");
         }
 
         $kelasList = $query->orderBy('kelas_ruang_id')->paginate(10)->withQueryString();
