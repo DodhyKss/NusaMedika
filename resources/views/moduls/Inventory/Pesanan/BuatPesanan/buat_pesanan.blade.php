@@ -56,13 +56,14 @@
 <!-- Data Table -->
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
     <div class="overflow-x-auto drag-scroll">
-        <table class="w-full text-left" style="min-width: 900px;">
+        <table class="w-full text-left" style="min-width: 1000px;">
             <thead>
                 <tr class="bg-slate-50 border-b border-slate-200">
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">No.</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">No. Pemesanan</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tanggal</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Supplier</th>
+                    <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Distributor</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Bagian Tujuan</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Jumlah Item</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Status</th>
@@ -71,21 +72,22 @@
             </thead>
             <tbody class="text-[12px] divide-y divide-slate-100">
                 @forelse ($pemesananList as $i => $p)
-                    @php
-                        $noUrut = ($pemesananList->firstItem() ?? 0) + $i;
-                        $badge = match ((int) $p->status_pemesanan) {
-                            1 => 'bg-blue-100 text-blue-700',
-                            2 => 'bg-emerald-100 text-emerald-700',
-                            3 => 'bg-red-100 text-red-600',
-                            default => 'bg-amber-100 text-amber-700',
-                        };
-                    @endphp
-                    <tr class="hover:bg-blue-50/40 transition-colors">
-                        <td class="px-3 py-3 text-center text-slate-500">{{ $noUrut }}</td>
-                        <td class="px-3 py-3 font-semibold text-slate-800">{{ $p->no_pemesanan }}</td>
-                        <td class="px-3 py-3 text-slate-600">{{ \Carbon\Carbon::parse($p->tanggal_pemesanan)->format('d-m-Y') }}</td>
-                        <td class="px-3 py-3 text-slate-600">{{ optional($p->supplier)->nama_supplier }}</td>
-                        <td class="px-3 py-3 text-slate-600">{{ optional($p->bagian)->nama_bagian }}</td>
+@php
+        $noUrut = ($pemesananList->firstItem() ?? 0) + $i;
+        $badge = match ((int) $p->status_pemesanan) {
+            1 => 'bg-blue-100 text-blue-700',
+            2 => 'bg-emerald-100 text-emerald-700',
+            3 => 'bg-red-100 text-red-600',
+            default => 'bg-amber-100 text-amber-700',
+        };
+    @endphp
+    <tr class="hover:bg-blue-50/40 transition-colors">
+        <td class="px-3 py-3 text-center text-slate-500">{{ $noUrut }}</td>
+        <td class="px-3 py-3 font-semibold text-slate-800">{{ $p->no_pemesanan }}</td>
+        <td class="px-3 py-3 text-slate-600">{{ \Carbon\Carbon::parse($p->tanggal_pemesanan)->format('d-m-Y') }}</td>
+        <td class="px-3 py-3 text-slate-600">{{ optional($p->supplier)->nama_supplier }}</td>
+        <td class="px-3 py-3 text-slate-600">{{ optional($p->distributor)->nama_supplier }}</td>
+        <td class="px-3 py-3 text-slate-600">{{ optional($p->bagian)->nama_bagian }}</td>
                         <td class="px-3 py-3 text-center text-slate-600">{{ $p->details->count() }}</td>
                         <td class="px-3 py-3 text-center">
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold {{ $badge }}">
@@ -119,7 +121,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="px-3 py-12 text-center">
+                        <td colspan="9" class="px-3 py-12 text-center">
                             <div class="flex flex-col items-center gap-2 text-slate-400">
                                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                                 <p class="text-sm font-medium">Belum ada data pemesanan.</p>

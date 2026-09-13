@@ -32,22 +32,7 @@
         <form action="{{ route('buat_pesanan.update', $pemesanan->pemesanan_id) }}" method="POST" id="formEditPemesanan">
             @csrf
             @method('PUT')
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5">
-
-                <!-- Supplier -->
-                <div>
-                    <label for="supplier_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Supplier <span class="text-red-500">*</span></label>
-                    <select id="supplier_id" name="supplier_id" required
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
-                        <option value="">-- Pilih Supplier --</option>
-                        @foreach ($suppliers as $s)
-                            <option value="{{ $s->supplier_id }}" @selected((string) old('supplier_id', $pemesanan->supplier_id) === (string) $s->supplier_id)>{{ $s->nama_supplier }} ({{ $s->jenis_supplier }})</option>
-                        @endforeach
-                    </select>
-                    @error('supplier_id')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
 
                 <!-- Bagian / Gudang Tujuan -->
                 <div>
@@ -95,10 +80,12 @@
                     </button>
                 </div>
                 <div class="overflow-x-auto rounded-lg border border-slate-200">
-                    <table class="w-full text-left" id="tabelItem" style="min-width: 900px;">
+                    <table class="w-full text-left" id="tabelItem" style="min-width: 1200px;">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200">
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Barang</th>
+                                <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Supplier</th>
+                                <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Distributor</th>
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Satuan</th>
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Jumlah</th>
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Beli</th>
@@ -112,11 +99,21 @@
                                 @php
                                     $pr = (float) $d->jumlah_pesan * (float) $d->harga_beli;
                                 @endphp
-                                <tr data-item="existing-{{ $d->pemesanan_detail_id }}" data-subtotal="{{ $pr }}">
+                                <tr data-item="existing-{{ $d->pemesanan_detail_id }}" data-subtotal="{{ $pr }}" data-supplier="{{ $d->supplier_id }}" data-supplier-label="{{ $d->supplier->nama_supplier ?? '-' }}" data-distributor="{{ $d->distributor_id }}" data-distributor-label="{{ $d->distributor->nama_supplier ?? '-' }}">
                                     <td class="px-3 py-2 align-top">
-                                        <select name="barang_id[]" class="barang-select text-sm w-full" style="min-width:220px;">
+                                        <select name="barang_id[]" class="barang-select text-sm w-full" style="min-width:200px;">
                                             <option value=""></option>
                                             <option value="{{ $d->barang_id }}" selected>{{ $d->barang->nama_barang ?? '-' }} ({{ $d->barang->textSatuan() ?? '-' }})</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <select name="supplier_id[]" class="sup-select text-sm w-full text-slate-700" style="min-width:150px;" disabled>
+                                            <option value="">-- Supplier --</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <select name="distributor_id[]" class="dist-select text-sm w-full text-slate-700" style="min-width:150px;" disabled>
+                                            <option value="">-- Distributor --</option>
                                         </select>
                                     </td>
                                     <td class="px-3 py-2 align-top text-center"><span class="text-satuan text-xs text-slate-600">{{ $d->barang->textSatuan() ?? '-' }}</span></td>
@@ -138,13 +135,13 @@
                                 </tr>
                             @empty
                                 <tr id="rowPlaceholder" class="text-center">
-                                    <td colspan="7" class="px-3 py-6 text-xs text-slate-400">Belum ada item.</td>
+                                    <td colspan="9" class="px-3 py-6 text-xs text-slate-400">Belum ada item. Klik "Tambah Item" untuk menambahkan barang.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                         <tfoot class="border-t border-slate-200 bg-slate-50/50">
                             <tr>
-                                <td colspan="5" class="px-3 py-3 text-right text-xs font-bold text-slate-600 uppercase tracking-wider">Total</td>
+                                <td colspan="7" class="px-3 py-3 text-right text-xs font-bold text-slate-600 uppercase tracking-wider">Total</td>
                                 <td class="px-3 py-3 text-right text-sm font-bold text-slate-800" id="totalPemesanan">Rp 0</td>
                                 <td></td>
                             </tr>
@@ -179,6 +176,87 @@
         var totalEl = document.getElementById('totalPemesanan');
         var counter = 0;
 
+        var supplierOptions = @json($suppliers->pluck('nama_supplier', 'supplier_id'));
+        var distributorOptions = @json($distributors->pluck('nama_supplier', 'supplier_id'));
+        var barangSupplierMap = @json($barangSupplierMap);
+        var supplierDistributorMap = @json($supplierDistributorMap);
+        var headerSupplier = @json($pemesanan->supplier_id);
+        var headerDistributor = @json($pemesanan->distributor_id);
+
+        function suppliersForBarang(barangId) {
+            var daftar = [];
+            (barangSupplierMap[barangId] || []).forEach(function (supId) {
+                if (supplierOptions[supId] !== undefined) {
+                    daftar.push(supId);
+                }
+            });
+            return daftar;
+        }
+
+        function distributorsForSupplier(supId) {
+            var daftar = [];
+            (supplierDistributorMap[supId] || []).forEach(function (distId) {
+                if (distributorOptions[distId] !== undefined) {
+                    daftar.push(distId);
+                }
+            });
+            return daftar;
+        }
+
+        function renderRowSupplier(tr) {
+            var $tr = $(tr);
+            var $sup = $tr.find('select.sup-select');
+            var barangId = $tr.find('select.barang-select').val();
+            var allowed = barangId ? suppliersForBarang(barangId) : [];
+
+            $sup.find('option[value]').not('[value=""]').remove();
+            allowed.forEach(function (supId) {
+                $sup.append($('<option>').val(supId).text(supplierOptions[supId]));
+            });
+            $sup.prop('disabled', !barangId);
+
+            if (!barangId) {
+                $sup.val('');
+            } else if (tr.dataset.supplier) {
+                if (allowed.indexOf(tr.dataset.supplier) !== -1) {
+                    $sup.val(tr.dataset.supplier);
+                } else if (!$sup.val()) {
+                    $sup.append($('<option>').val(tr.dataset.supplier).text(tr.dataset.supplierLabel || 'Supplier'));
+                    $sup.val(tr.dataset.supplier);
+                }
+            } else if (String(tr.dataset.item).indexOf('existing-') === 0 && headerSupplier && allowed.indexOf(String(headerSupplier)) !== -1) {
+                $sup.val(String(headerSupplier));
+            }
+
+            renderRowDistributor(tr);
+        }
+
+        function renderRowDistributor(tr) {
+            var $tr = $(tr);
+            var $dist = $tr.find('select.dist-select');
+            var supId = $tr.find('select.sup-select').val();
+            var allowed = supId ? distributorsForSupplier(supId) : [];
+
+            $dist.find('option[value]').not('[value=""]').remove();
+            allowed.forEach(function (distId) {
+                $dist.append($('<option>').val(distId).text(distributorOptions[distId]));
+            });
+            $dist.prop('disabled', !supId);
+
+            if (!supId) {
+                $dist.val('');
+            } else if (tr.dataset.distributor) {
+                if (allowed.indexOf(tr.dataset.distributor) !== -1) {
+                    $dist.val(tr.dataset.distributor);
+                } else if (!$dist.val()) {
+                    $dist.append($('<option>').val(tr.dataset.distributor).text(tr.dataset.distributorLabel || 'Distributor'));
+                    $dist.val(tr.dataset.distributor);
+                }
+            } else if (String(tr.dataset.item).indexOf('existing-') === 0 && headerDistributor && allowed.indexOf(String(headerDistributor)) !== -1) {
+                $dist.val(String(headerDistributor));
+            }
+        }
+
         function rupiah(v) {
             return 'Rp ' + Number(v || 0).toLocaleString('id-ID');
         }
@@ -201,9 +279,13 @@
                 var $harga = $tr.find('.inp-harga');
                 if (!$harga.val() || $harga.val() === '0') {
                     $harga.val(Number(harga).toLocaleString('id-ID'));
-                    tr.querySelector('.inp-harga').value = Number(harga).toLocaleString('id-ID');
                 }
                 hitungSubtotal(tr);
+                renderRowSupplier(tr);
+            });
+
+            $tr.find('.sup-select').on('change', function () {
+                renderRowDistributor(tr);
             });
 
             $tr.find('.inp-jumlah').on('input', function () { hitungSubtotal(tr); });
@@ -242,6 +324,7 @@
             var $sel = $tr.find('select.barang-select');
             window.initBarangSelect($sel, apiUrl);
             bindRow(tr, $tr);
+            renderRowSupplier(tr);
         });
 
         function addRow() {
@@ -251,7 +334,17 @@
             tr.dataset.subtotal = '0';
             tr.innerHTML = [
                 '<td class="px-3 py-2 align-top">',
-                '   <select name="barang_id[]" class="barang-select text-sm w-full" style="min-width:220px;"></select>',
+                '   <select name="barang_id[]" class="barang-select text-sm w-full" style="min-width:200px;"></select>',
+                '</td>',
+                '<td class="px-3 py-2 align-top">',
+                '   <select name="supplier_id[]" class="sup-select text-sm w-full text-slate-700" style="min-width:150px;" disabled>',
+                '       <option value="">-- Supplier --</option>',
+                '   </select>',
+                '</td>',
+                '<td class="px-3 py-2 align-top">',
+                '   <select name="distributor_id[]" class="dist-select text-sm w-full text-slate-700" style="min-width:150px;" disabled>',
+                '       <option value="">-- Distributor --</option>',
+                '   </select>',
                 '</td>',
                 '<td class="px-3 py-2 align-top text-center"><span class="text-satuan text-xs text-slate-600">-</span></td>',
                 '<td class="px-3 py-2 align-top">',

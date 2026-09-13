@@ -19,7 +19,7 @@ class BuatPesananController extends Controller
         $status = $request->input('status');
         $search = trim((string) $request->input('search'));
 
-        $query = Pemesanan::aktif()->with('supplier', 'bagian', 'details');
+        $query = Pemesanan::aktif()->with('supplier', 'distributor', 'bagian', 'details');
 
         if ($status !== null && $status !== '') {
             $query->where('status_pemesanan', (int) $status);
@@ -39,11 +39,13 @@ class BuatPesananController extends Controller
 
     public function create()
     {
-        $suppliers = Supplier::aktif()->orderBy('nama_supplier')->get();
+        [$barangSupplierMap, $supplierDistributorMap] = $this->relasiSupplierDistributor();
+        $suppliers = Supplier::aktif()->where('jenis_supplier', 'SUPPLIER')->orderBy('nama_supplier')->get();
+        $distributors = Supplier::aktif()->where('jenis_supplier', 'DISTRIBUTOR')->orderBy('nama_supplier')->get();
         $gudangs = $this->gudangOptions();
         $barangs = Barang::aktif()->with('satuan')->orderBy('nama_barang')->get();
 
-        return view('moduls.Inventory.Pesanan.BuatPesanan.buat_pesanan_create', compact('suppliers', 'gudangs', 'barangs'));
+        return view('moduls.Inventory.Pesanan.BuatPesanan.buat_pesanan_create', compact('suppliers', 'distributors', 'gudangs', 'barangs', 'barangSupplierMap', 'supplierDistributorMap'));
     }
 
     public function store(Request $request)
@@ -58,7 +60,8 @@ class BuatPesananController extends Controller
         DB::beginTransaction();
         try {
             $pemesanan = new Pemesanan;
-            $pemesanan->supplier_id = $data['supplier_id'];
+            $pemesanan->supplier_id = $items[0]['supplier_id'] ?? null;
+            $pemesanan->distributor_id = $items[0]['distributor_id'] ?? null;
             $pemesanan->bagian_id = $data['bagian_id'];
             $pemesanan->tanggal_pemesanan = $data['tanggal_pemesanan'];
             $pemesanan->status_pemesanan = 0;
@@ -85,17 +88,19 @@ class BuatPesananController extends Controller
 
     public function edit($pemesanan)
     {
-        $pemesanan = Pemesanan::aktif()->with(['details' => fn ($q) => $q->aktif(), 'supplier', 'bagian'])->findOrFail($pemesanan);
+        $pemesanan = Pemesanan::aktif()->with(['details' => fn ($q) => $q->aktif()->with('barang.satuan', 'supplier', 'distributor'), 'supplier', 'distributor', 'bagian'])->findOrFail($pemesanan);
 
         if ((int) $pemesanan->status_pemesanan !== 0) {
             return redirect()->route('buat_pesanan.index')->with('error', 'Pemesanan sudah diproses, tidak dapat diubah.');
         }
 
-        $suppliers = Supplier::aktif()->orderBy('nama_supplier')->get();
+        [$barangSupplierMap, $supplierDistributorMap] = $this->relasiSupplierDistributor();
+        $suppliers = Supplier::aktif()->where('jenis_supplier', 'SUPPLIER')->orderBy('nama_supplier')->get();
+        $distributors = Supplier::aktif()->where('jenis_supplier', 'DISTRIBUTOR')->orderBy('nama_supplier')->get();
         $gudangs = $this->gudangOptions();
         $barangs = Barang::aktif()->with('satuan')->orderBy('nama_barang')->get();
 
-        return view('moduls.Inventory.Pesanan.BuatPesanan.buat_pesanan_edit', compact('pemesanan', 'suppliers', 'gudangs', 'barangs'));
+        return view('moduls.Inventory.Pesanan.BuatPesanan.buat_pesanan_edit', compact('pemesanan', 'suppliers', 'distributors', 'gudangs', 'barangs', 'barangSupplierMap', 'supplierDistributorMap'));
     }
 
     public function update(Request $request, $pemesanan)
@@ -115,7 +120,8 @@ class BuatPesananController extends Controller
 
         DB::beginTransaction();
         try {
-            $pemesanan->supplier_id = $data['supplier_id'];
+            $pemesanan->supplier_id = $items[0]['supplier_id'] ?? $pemesanan->supplier_id;
+            $pemesanan->distributor_id = $items[0]['distributor_id'] ?? $pemesanan->distributor_id;
             $pemesanan->bagian_id = $data['bagian_id'];
             $pemesanan->tanggal_pemesanan = $data['tanggal_pemesanan'];
             $pemesanan->keterangan = $data['keterangan'];
@@ -209,6 +215,8 @@ class BuatPesananController extends Controller
             $detail = new PemesananDetail;
             $detail->pemesanan_id = $pemesananId;
             $detail->barang_id = $item['barang_id'];
+            $detail->supplier_id = $item['supplier_id'] ?? null;
+            $detail->distributor_id = $item['distributor_id'] ?? null;
             $detail->jumlah_pesan = $item['jumlah_pesan'];
             $detail->harga_beli = $harga;
             $detail->harga_jual = $item['harga_jual'] ?? null;
@@ -218,6 +226,29 @@ class BuatPesananController extends Controller
             $detail->status_batal = 0;
             $detail->save();
         }
+    }
+
+    private function relasiSupplierDistributor(): array
+    {
+        $barangSupplier = DB::table('barang_supplier')
+            ->where(fn ($q) => $q->whereNull('status_batal')->orWhere('status_batal', 0))
+            ->get(['barang_id', 'supplier_id']);
+
+        $supplierDistributor = DB::table('supplier_distributor')
+            ->where(fn ($q) => $q->whereNull('status_batal')->orWhere('status_batal', 0))
+            ->get(['supplier_id', 'distributor_id']);
+
+        $barangSupplierMap = [];
+        foreach ($barangSupplier as $row) {
+            $barangSupplierMap[$row->barang_id][] = $row->supplier_id;
+        }
+
+        $supplierDistributorMap = [];
+        foreach ($supplierDistributor as $row) {
+            $supplierDistributorMap[$row->supplier_id][] = $row->distributor_id;
+        }
+
+        return [$barangSupplierMap, $supplierDistributorMap];
     }
 
     private function gudangOptions()
@@ -233,7 +264,6 @@ class BuatPesananController extends Controller
             'tanggal_pemesanan' => now()->toDateTimeString(),
             'keterangan' => null,
         ], $request->validate([
-            'supplier_id' => 'required|integer|exists:supplier,supplier_id',
             'bagian_id' => 'nullable|integer|exists:bagian,bagian_id',
             'tanggal_pemesanan' => 'nullable|date',
             'keterangan' => 'nullable|string|max:255',
@@ -243,6 +273,8 @@ class BuatPesananController extends Controller
     private function validatedItems(Request $request): array
     {
         $barangIds = (array) $request->input('barang_id', []);
+        $supplierIds = (array) $request->input('supplier_id', []);
+        $distributorIds = (array) $request->input('distributor_id', []);
         $jumlahs = (array) $request->input('jumlah_pesan', []);
         $hargas = (array) $request->input('harga_beli', []);
         $hargaJuals = (array) $request->input('harga_jual', []);
@@ -258,9 +290,16 @@ class BuatPesananController extends Controller
                 continue;
             }
 
+            $supplierId = ($supplierIds[$i] ?? null);
+            if ($supplierId === null || $supplierId === '') {
+                continue;
+            }
+
             $hargaJual = ($hargaJuals[$i] ?? null);
             $items[] = [
                 'barang_id' => (int) $barangId,
+                'supplier_id' => (int) $supplierId,
+                'distributor_id' => ($distributorIds[$i] ?? null) !== '' && ($distributorIds[$i] ?? null) !== null ? (int) $distributorIds[$i] : null,
                 'jumlah_pesan' => $jumlah,
                 'harga_beli' => ($hargas[$i] ?? null) !== '' && ($hargas[$i] ?? null) !== null ? (float) $hargas[$i] : null,
                 'harga_jual' => $hargaJual !== '' && $hargaJual !== null ? (float) $hargaJual : null,
