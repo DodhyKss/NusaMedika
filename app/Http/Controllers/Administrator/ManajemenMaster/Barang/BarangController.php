@@ -52,6 +52,7 @@ class BarangController extends Controller
             $barang->satuan_id = $data['satuan_id'];
             $barang->is_racikan = (int) $data['is_racikan'];
             $barang->is_fornas = (int) $data['is_fornas'];
+            $barang->kategori_barang = (int) $data['kategori_barang'];
             $barang->input_time = now();
             $barang->input_user_id = Auth::id();
             $barang->status_batal = 0;
@@ -90,6 +91,7 @@ class BarangController extends Controller
             $barang->satuan_id = $data['satuan_id'];
             $barang->is_racikan = (int) $data['is_racikan'];
             $barang->is_fornas = (int) $data['is_fornas'];
+            $barang->kategori_barang = (int) $data['kategori_barang'];
             $barang->mod_time = now();
             $barang->mod_user_id = Auth::id();
             $barang->save();
@@ -140,6 +142,7 @@ class BarangController extends Controller
             'kode_barang' => null,
             'is_racikan' => 0,
             'is_fornas' => 0,
+            'kategori_barang' => 0,
         ], $request->validate([
             'kode_barang' => 'nullable|string|max:50',
             'nama_barang' => 'required|string|max:255',
@@ -147,6 +150,7 @@ class BarangController extends Controller
             'satuan_id' => 'nullable|integer|exists:satuan,satuan_id',
             'is_racikan' => 'nullable|in:0,1',
             'is_fornas' => 'nullable|in:0,1,2',
+            'kategori_barang' => 'nullable|in:0,1',
         ]));
     }
 }

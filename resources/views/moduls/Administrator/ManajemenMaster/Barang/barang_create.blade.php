@@ -109,6 +109,19 @@
                         <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <!-- Kategori Barang -->
+                <div>
+                    <label for="kategori_barang" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kategori Barang <span class="text-red-500">*</span></label>
+                    <select id="kategori_barang" name="kategori_barang" required
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
+                        <option value="0" @selected(old('kategori_barang', 0) === 0 || old('kategori_barang') === '0')>Non Medis</option>
+                        <option value="1" @selected((string) old('kategori_barang') === '1')>Medis</option>
+                    </select>
+                    @error('kategori_barang')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <hr class="my-6 border-slate-200">

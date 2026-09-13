@@ -21,6 +21,7 @@ class Barang extends Model
         'satuan_id',
         'is_racikan',
         'is_fornas',
+        'kategori_barang',
     ];
 
     public function scopeAktif(Builder $query): Builder
@@ -46,6 +47,11 @@ class Barang extends Model
         2 => 'Fornas Rumah Sakit',
     ];
 
+    public const KATEGORI_BARANG_LABEL = [
+        0 => 'Non Medis',
+        1 => 'Medis',
+    ];
+
     public function getRacikanLabelAttribute(): string
     {
         return $this->is_racikan ? 'Racikan' : 'Non Racikan';
@@ -54,6 +60,11 @@ class Barang extends Model
     public function getFornasLabelAttribute(): string
     {
         return self::FORNAS_LABEL[$this->is_fornas ?? 0] ?? 'Non Fornas';
+    }
+
+    public function getKategoriBarangLabelAttribute(): string
+    {
+        return self::KATEGORI_BARANG_LABEL[$this->kategori_barang ?? 0] ?? 'Non Medis';
     }
 
     public function textSatuan(): string
