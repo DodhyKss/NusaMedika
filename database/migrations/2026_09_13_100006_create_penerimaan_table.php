@@ -17,7 +17,6 @@ return new class extends Migration
             $table->smallInteger('status_batal')->nullable();
             $table->integer('pemesanan_id');
             $table->string('no_faktur', 50)->nullable();
-            $table->integer('supplier_id');
             $table->integer('bagian_id')->nullable();
             $table->timestamp('tanggal_terima', 6)->nullable();
             $table->string('keterangan')->nullable();

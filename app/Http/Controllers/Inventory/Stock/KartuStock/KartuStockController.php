@@ -38,6 +38,11 @@ class KartuStockController extends Controller
         $tanggalAkhir = $request->input('tanggal_akhir');
         $runningMap = [];
 
+        $hasFilter = ($barangId !== null && $barangId !== '')
+            || ($bagianId !== null && $bagianId !== '')
+            || ($tanggalAwal !== null && $tanggalAwal !== '')
+            || ($tanggalAkhir !== null && $tanggalAkhir !== '');
+
         $base = function () use ($barangId, $bagianId, $tanggalAwal, $tanggalAkhir) {
             return DB::table('kartu_stock')
                 ->where(function ($q) {
@@ -49,7 +54,11 @@ class KartuStockController extends Controller
                 ->when($tanggalAkhir !== null && $tanggalAkhir !== '', fn ($q) => $q->whereDate('tanggal', '<=', $tanggalAkhir));
         };
 
-        if ($jenis === self::JENIS_SUMMARY) {
+        if (! $hasFilter) {
+            $kartuList = $this->paginate([], $request);
+            $totMasuk = 0;
+            $totKeluar = 0;
+        } elseif ($jenis === self::JENIS_SUMMARY) {
             $rows = DB::table('kartu_stock as ks')
                 ->selectRaw('ks.barang_id, ks.no_batch, b.kode_barang, b.nama_barang, s.singkatan as satuan, COALESCE(SUM(ks.qty_masuk),0) as tot_masuk, COALESCE(SUM(ks.qty_keluar),0) as tot_keluar')
                 ->join('barang as b', 'b.barang_id', '=', 'ks.barang_id')
@@ -125,7 +134,7 @@ class KartuStockController extends Controller
 
         return view('moduls.Inventory.Stock.KartuStock.kartu_stock', compact(
             'jenis', 'jenisOpts', 'kartuList', 'barangId', 'bagianId', 'tanggalAwal', 'tanggalAkhir',
-            'totMasuk', 'totKeluar', 'runningMap', 'barangList', 'bagianList'
+            'totMasuk', 'totKeluar', 'runningMap', 'hasFilter', 'barangList', 'bagianList'
         ));
     }
 

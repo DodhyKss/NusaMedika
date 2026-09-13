@@ -16,7 +16,6 @@ return new class extends Migration
             $table->integer('mod_user_id')->nullable();
             $table->smallInteger('status_batal')->nullable();
             $table->string('no_pemesanan', 50)->nullable();
-            $table->integer('supplier_id');
             $table->integer('bagian_id')->nullable();
             $table->timestamp('tanggal_pemesanan', 6)->nullable();
             $table->smallInteger('status_pemesanan')->nullable()->default(0);

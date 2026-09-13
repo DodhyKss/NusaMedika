@@ -74,7 +74,6 @@ class PenerimaanBarangController extends Controller
         try {
             $penerimaan = new Penerimaan;
             $penerimaan->pemesanan_id = $pemesanan->pemesanan_id;
-            $penerimaan->supplier_id = $pemesanan->details->first()?->supplier_id;
             $penerimaan->bagian_id = $pemesanan->bagian_id;
             $penerimaan->no_faktur = $data['no_faktur'];
             $penerimaan->tanggal_terima = $data['tanggal_terima'];

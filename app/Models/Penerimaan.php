@@ -18,7 +18,6 @@ class Penerimaan extends Model
     protected $fillable = [
         'pemesanan_id',
         'no_faktur',
-        'supplier_id',
         'bagian_id',
         'tanggal_terima',
         'keterangan',
@@ -34,11 +33,6 @@ class Penerimaan extends Model
     public function pemesanan(): BelongsTo
     {
         return $this->belongsTo(Pemesanan::class, 'pemesanan_id', 'pemesanan_id');
-    }
-
-    public function supplier(): BelongsTo
-    {
-        return $this->belongsTo(Supplier::class, 'supplier_id', 'supplier_id');
     }
 
     public function bagian(): BelongsTo

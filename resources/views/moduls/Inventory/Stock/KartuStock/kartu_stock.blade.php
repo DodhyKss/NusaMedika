@@ -63,6 +63,7 @@
 </div>
 
 <!-- Summary -->
+@if ($hasFilter)
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
         <div class="p-2.5 bg-emerald-100 text-emerald-600 rounded-lg">
@@ -106,8 +107,6 @@
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Bagian</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">No. Batch</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tgl Expired</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Beli</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Jual</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Jenis Mutasi</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Stock Awal</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Masuk</th>
@@ -141,8 +140,6 @@
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold">{{ $k->no_batch ?: '-' }}</span>
                             </td>
                             <td class="px-3 py-3 text-slate-600 whitespace-nowrap">{{ $k->tgl_expired ? \Carbon\Carbon::parse($k->tgl_expired)->format('d-m-Y') : '-' }}</td>
-                            <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ $k->harga_beli !== null ? 'Rp '.number_format((float) $k->harga_beli, 0, ',', '.') : '-' }}</td>
-                            <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ $k->harga_jual !== null ? 'Rp '.number_format((float) $k->harga_jual, 0, ',', '.') : '-' }}</td>
                             <td class="px-3 py-3 text-center">
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ $badge }}">{{ $k->jenis_label }}</span>
                             </td>
@@ -154,7 +151,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="14" class="px-3 py-12 text-center">
+                            <td colspan="12" class="px-3 py-12 text-center">
                                 <div class="flex flex-col items-center gap-2 text-slate-400">
                                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 9h2m-2 4h2m-6-4h.01M6 13h.01"></path></svg>
                                     <p class="text-sm font-medium">Belum ada riwayat kartu stock.</p>
@@ -259,4 +256,12 @@
         {{ $kartuList->withQueryString()->links('components.pagination') }}
     </div>
 </div>
+@else
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm p-12 text-center">
+    <div class="flex flex-col items-center gap-3 text-slate-400">
+        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+        <p class="text-sm font-medium text-slate-500">Silakan lakukan filter terlebih dahulu (pilih Barang / Bagian / rentang tanggal), lalu klik "Cari Data" untuk menampilkan kartu stock.</p>
+    </div>
+</div>
+@endif
 @endsection

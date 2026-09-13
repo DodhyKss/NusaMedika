@@ -21,6 +21,13 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('referensi_bagian');
+        // Saat rollback penuh (migrate:refresh), down() migration rename
+        // legacy (2026_09_05_000001) mengembalikan nama referensi_bagian_id,
+        // jadi bersihkan kedua kemungkinan nama tabel.
+        foreach (['referensi_bagian', 'referensi_bagian_id'] as $tabel) {
+            if (Schema::hasTable($tabel)) {
+                Schema::dropIfExists($tabel);
+            }
+        }
     }
 };

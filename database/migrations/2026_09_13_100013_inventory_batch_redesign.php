@@ -58,15 +58,24 @@ return new class extends Migration
             }
         }
 
-        Schema::table('barang', function (Blueprint $table) {
-            $table->decimal('harga_beli', 15, 2)->nullable();
-            $table->decimal('harga_jual', 15, 2)->nullable();
-            $table->decimal('stok_minimum', 18, 2)->nullable()->default(0);
-        });
+        if (Schema::hasTable('barang')) {
+            foreach ([
+                ['harga_beli', 15, 2, null],
+                ['harga_jual', 15, 2, null],
+                ['stok_minimum', 18, 2, 0],
+            ] as [$nama, $p, $s, $default]) {
+                if (! Schema::hasColumn('barang', $nama)) {
+                    Schema::table('barang', function (Blueprint $table) use ($nama, $p, $s, $default) {
+                        $col = $table->decimal($nama, $p, $s)->nullable();
+                        if ($default !== null) {
+                            $col->default($default);
+                        }
+                    });
+                }
+            }
+        }
 
         Schema::dropIfExists('harga_barang');
-
-        $this->susunUniqueStock();
     }
 
     private function dropKolomHargaBarang(): void
