@@ -43,6 +43,22 @@
                     @enderror
                 </div>
 
+                <!-- Supplier Induk -->
+                <div>
+                    <label for="supplier_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Supplier Induk <span class="text-red-500">*</span></label>
+                    <select id="supplier_id" name="supplier_id" required
+                            class="select2 w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
+                        <option value="">-- Pilih Supplier --</option>
+                        @foreach ($supplierList as $s)
+                            <option value="{{ $s->supplier_id }}" @selected((string) old('supplier_id') === (string) $s->supplier_id)>{{ $s->nama_supplier }}</option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1 text-xs text-slate-400">Distributor ini menyalurkan barang dari supplier terpilih — satu supplier dapat memiliki banyak distributor.</p>
+                    @error('supplier_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Telepon -->
                 <div>
                     <label for="telepon" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Telepon</label>

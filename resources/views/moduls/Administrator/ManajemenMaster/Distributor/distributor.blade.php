@@ -47,7 +47,7 @@
 <!-- Data Table -->
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
     <div class="overflow-x-auto drag-scroll">
-        <table class="w-full text-left" style="min-width: 900px;">
+        <table class="w-full text-left" style="min-width: 1000px;">
             <thead>
                 <tr class="bg-slate-50 border-b border-slate-200">
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">No.</th>
@@ -56,6 +56,7 @@
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Telepon</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">NPWP</th>
+                    <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Supplier Induk</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Aksi</th>
                 </tr>
             </thead>
@@ -71,6 +72,13 @@
                         <td class="px-3 py-3 text-slate-600">{{ $s->telepon ?: '-' }}</td>
                         <td class="px-3 py-3 text-slate-600">{{ $s->email ?: '-' }}</td>
                         <td class="px-3 py-3 text-slate-600">{{ $s->npwp ?: '-' }}</td>
+                        <td class="px-3 py-3 text-slate-600">
+                            @if ($s->parentSupplier->count())
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">{{ $s->parentSupplier->first()->nama_supplier }}</span>
+                            @else
+                                <span class="text-slate-400">-</span>
+                            @endif
+                        </td>
                         <td class="px-3 py-3 text-center">
                             <div class="flex items-center justify-center gap-1">
                                 <a href="{{ route('admin.distributor.edit', $s->supplier_id) }}" class="cursor-pointer p-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors" title="Edit Data">
@@ -88,7 +96,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-3 py-12 text-center">
+                        <td colspan="8" class="px-3 py-12 text-center">
                             <div class="flex flex-col items-center gap-2 text-slate-400">
                                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v10m4-7l-4 4-4-4m4 11a5 5 0 004.546-2.916A5.001 5.001 0 0012 22a5.001 5.001 0 00-4.546-2.916A5 5 0 0012 14z"></path></svg>
                                 <p class="text-sm font-medium">Belum ada data distributor.</p>

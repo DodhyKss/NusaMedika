@@ -47,7 +47,7 @@
 <!-- Data Table -->
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
     <div class="overflow-x-auto drag-scroll">
-        <table class="w-full text-left" style="min-width: 900px;">
+        <table class="w-full text-left" style="min-width: 1000px;">
             <thead>
                 <tr class="bg-slate-50 border-b border-slate-200">
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">No.</th>
@@ -56,6 +56,7 @@
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Telepon</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">NPWP</th>
+                    <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Barang</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Aksi</th>
                 </tr>
             </thead>
@@ -71,6 +72,14 @@
                         <td class="px-3 py-3 text-slate-600">{{ $s->telepon ?: '-' }}</td>
                         <td class="px-3 py-3 text-slate-600">{{ $s->email ?: '-' }}</td>
                         <td class="px-3 py-3 text-slate-600">{{ $s->npwp ?: '-' }}</td>
+                        <td class="px-3 py-3 text-slate-600">
+                            @php $barangNama = $s->barangs->pluck('nama_barang')->all(); @endphp
+                            @if (count($barangNama))
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 cursor-default" title="{{ implode(', ', $barangNama) }}">{{ count($barangNama) }} Barang</span>
+                            @else
+                                <span class="text-slate-400">-</span>
+                            @endif
+                        </td>
                         <td class="px-3 py-3 text-center">
                             <div class="flex items-center justify-center gap-1">
                                 <a href="{{ route('admin.supplier.edit', $s->supplier_id) }}" class="cursor-pointer p-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors" title="Edit Data">
@@ -88,7 +97,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-3 py-12 text-center">
+                        <td colspan="8" class="px-3 py-12 text-center">
                             <div class="flex flex-col items-center gap-2 text-slate-400">
                                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                                 <p class="text-sm font-medium">Belum ada data supplier.</p>

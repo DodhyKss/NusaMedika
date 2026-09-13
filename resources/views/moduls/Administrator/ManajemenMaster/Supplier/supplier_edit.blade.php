@@ -85,6 +85,21 @@
                 @enderror
             </div>
 
+            <!-- Mapping Barang -->
+            <div class="mt-5">
+                <label for="barang_ids" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Mapping Barang</label>
+                <select id="barang_ids" name="barang_ids[]" multiple
+                        class="select2 w-full text-sm border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
+                    @foreach ($barangList as $barang)
+                        <option value="{{ $barang->barang_id }}" @selected(in_array((string) $barang->barang_id, old('barang_ids', $selectedBarangIds), true))>{{ $barang->nama_barang }}</option>
+                    @endforeach
+                </select>
+                <p class="mt-1 text-xs text-slate-400">Pilih barang yang dapat dipasok supplier ini — satu barang dapat dipasok oleh banyak supplier.</p>
+                @error('barang_ids')
+                    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
             <hr class="my-6 border-slate-200">
 
             <!-- Buttons -->

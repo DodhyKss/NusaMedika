@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Barang extends Model
 {
@@ -39,6 +40,17 @@ class Barang extends Model
     public function satuan(): BelongsTo
     {
         return $this->belongsTo(Satuan::class, 'satuan_id', 'satuan_id');
+    }
+
+    public function suppliers(): BelongsToMany
+    {
+        return $this->belongsToMany(Supplier::class, 'barang_supplier', 'barang_id', 'supplier_id')
+            ->wherePivot('status_batal', '!=', 1)
+            ->withPivot('barang_supplier_id')
+            ->where('jenis_supplier', 'SUPPLIER')
+            ->where(
+                fn ($q) => $q->where('supplier.status_batal', '!=', 1)->orWhereNull('supplier.status_batal')
+            );
     }
 
     public const FORNAS_LABEL = [

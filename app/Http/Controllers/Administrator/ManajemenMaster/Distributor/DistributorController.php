@@ -16,7 +16,7 @@ class DistributorController extends Controller
     {
         $search = trim((string) $request->input('search'));
 
-        $query = Supplier::aktif()->where('jenis_supplier', static::JENIS);
+        $query = Supplier::aktif()->where('jenis_supplier', static::JENIS)->with('parentSupplier');
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
@@ -32,7 +32,9 @@ class DistributorController extends Controller
 
     public function create()
     {
-        return view('moduls.Administrator.ManajemenMaster.Distributor.distributor_create');
+        $supplierList = $this->supplierOptions();
+
+        return view('moduls.Administrator.ManajemenMaster.Distributor.distributor_create', compact('supplierList'));
     }
 
     public function store(Request $request)
@@ -53,6 +55,8 @@ class DistributorController extends Controller
             $distributor->status_batal = 0;
             $distributor->save();
 
+            $this->syncSupplierMapping($distributor, $data['supplier_id']);
+
             DB::commit();
 
             return redirect()->route('admin.distributor.index')->with('success', 'Distributor berhasil ditambahkan.');
@@ -67,7 +71,10 @@ class DistributorController extends Controller
     {
         $distributor = Supplier::findOrFail($distributor);
 
-        return view('moduls.Administrator.ManajemenMaster.Distributor.distributor_edit', compact('distributor'));
+        $supplierList = $this->supplierOptions();
+        $selectedSupplierId = $distributor->parentSupplier()->first()?->supplier_id;
+
+        return view('moduls.Administrator.ManajemenMaster.Distributor.distributor_edit', compact('distributor', 'supplierList', 'selectedSupplierId'));
     }
 
     public function update(Request $request, $distributor)
@@ -85,6 +92,8 @@ class DistributorController extends Controller
             $distributor->mod_time = now();
             $distributor->mod_user_id = Auth::id();
             $distributor->save();
+
+            $this->syncSupplierMapping($distributor, $data['supplier_id']);
 
             DB::commit();
 
@@ -106,6 +115,8 @@ class DistributorController extends Controller
             $distributor->mod_user_id = Auth::id();
             $distributor->save();
 
+            $this->softDeleteSupplierMappings($distributor->supplier_id);
+
             DB::commit();
 
             return redirect()->route('admin.distributor.index')->with('success', 'Distributor berhasil dihapus.');
@@ -116,6 +127,38 @@ class DistributorController extends Controller
         }
     }
 
+    private function supplierOptions()
+    {
+        return Supplier::aktif()->where('jenis_supplier', 'SUPPLIER')->orderBy('nama_supplier')->get();
+    }
+
+    private function syncSupplierMapping(Supplier $distributor, int $supplierId): void
+    {
+        $this->softDeleteSupplierMappings($distributor->supplier_id);
+
+        DB::table('supplier_distributor')->insert([
+            'supplier_id' => $supplierId,
+            'distributor_id' => $distributor->supplier_id,
+            'input_time' => now(),
+            'input_user_id' => Auth::id(),
+            'status_batal' => 0,
+        ]);
+    }
+
+    private function softDeleteSupplierMappings(int $distributorId): void
+    {
+        DB::table('supplier_distributor')
+            ->where('distributor_id', $distributorId)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->update([
+                'status_batal' => 1,
+                'mod_time' => now(),
+                'mod_user_id' => Auth::id(),
+            ]);
+    }
+
     private function validated(Request $request)
     {
         return array_merge([
@@ -123,12 +166,14 @@ class DistributorController extends Controller
             'telepon' => null,
             'email' => null,
             'npwp' => null,
+            'supplier_id' => null,
         ], $request->validate([
             'nama_supplier' => 'required|string|max:255',
             'alamat' => 'nullable|string|max:255',
             'telepon' => 'nullable|string|max:30',
             'email' => 'nullable|email|max:100',
             'npwp' => 'nullable|string|max:30',
+            'supplier_id' => 'required|integer|exists:supplier,supplier_id',
         ]));
     }
 }

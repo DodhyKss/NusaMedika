@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Administrator\ManajemenMaster\Supplier;
 
 use App\Http\Controllers\Controller;
+use App\Models\Barang;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class SupplierController extends Controller
     {
         $search = trim((string) $request->input('search'));
 
-        $query = Supplier::aktif()->where('jenis_supplier', static::JENIS);
+        $query = Supplier::aktif()->where('jenis_supplier', static::JENIS)->with('barangs');
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
@@ -32,7 +33,9 @@ class SupplierController extends Controller
 
     public function create()
     {
-        return view('moduls.Administrator.ManajemenMaster.Supplier.supplier_create');
+        $barangList = $this->barangOptions();
+
+        return view('moduls.Administrator.ManajemenMaster.Supplier.supplier_create', compact('barangList'));
     }
 
     public function store(Request $request)
@@ -53,6 +56,8 @@ class SupplierController extends Controller
             $supplier->status_batal = 0;
             $supplier->save();
 
+            $this->syncBarangMappings($supplier, $data['barang_ids'] ?? []);
+
             DB::commit();
 
             return redirect()->route('admin.supplier.index')->with('success', 'Supplier berhasil ditambahkan.');
@@ -67,7 +72,10 @@ class SupplierController extends Controller
     {
         $supplier = Supplier::findOrFail($supplier);
 
-        return view('moduls.Administrator.ManajemenMaster.Supplier.supplier_edit', compact('supplier'));
+        $barangList = $this->barangOptions();
+        $selectedBarangIds = $supplier->barangs()->pluck('barang.barang_id')->map(fn ($id) => (string) $id)->all();
+
+        return view('moduls.Administrator.ManajemenMaster.Supplier.supplier_edit', compact('supplier', 'barangList', 'selectedBarangIds'));
     }
 
     public function update(Request $request, $supplier)
@@ -85,6 +93,8 @@ class SupplierController extends Controller
             $supplier->mod_time = now();
             $supplier->mod_user_id = Auth::id();
             $supplier->save();
+
+            $this->syncBarangMappings($supplier, $data['barang_ids'] ?? []);
 
             DB::commit();
 
@@ -106,6 +116,8 @@ class SupplierController extends Controller
             $supplier->mod_user_id = Auth::id();
             $supplier->save();
 
+            $this->softDeleteBarangMappings($supplier->supplier_id);
+
             DB::commit();
 
             return redirect()->route('admin.supplier.index')->with('success', 'Supplier berhasil dihapus.');
@@ -116,6 +128,40 @@ class SupplierController extends Controller
         }
     }
 
+    private function barangOptions()
+    {
+        return Barang::aktif()->orderBy('nama_barang')->get();
+    }
+
+    private function syncBarangMappings(Supplier $supplier, array $barangIds): void
+    {
+        $this->softDeleteBarangMappings($supplier->supplier_id);
+
+        foreach (array_unique($barangIds) as $barangId) {
+            DB::table('barang_supplier')->insert([
+                'barang_id' => $barangId,
+                'supplier_id' => $supplier->supplier_id,
+                'input_time' => now(),
+                'input_user_id' => Auth::id(),
+                'status_batal' => 0,
+            ]);
+        }
+    }
+
+    private function softDeleteBarangMappings(int $supplierId): void
+    {
+        DB::table('barang_supplier')
+            ->where('supplier_id', $supplierId)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->update([
+                'status_batal' => 1,
+                'mod_time' => now(),
+                'mod_user_id' => Auth::id(),
+            ]);
+    }
+
     private function validated(Request $request)
     {
         return array_merge([
@@ -123,12 +169,15 @@ class SupplierController extends Controller
             'telepon' => null,
             'email' => null,
             'npwp' => null,
+            'barang_ids' => [],
         ], $request->validate([
             'nama_supplier' => 'required|string|max:255',
             'alamat' => 'nullable|string|max:255',
             'telepon' => 'nullable|string|max:30',
             'email' => 'nullable|email|max:100',
             'npwp' => 'nullable|string|max:30',
+            'barang_ids' => 'nullable|array',
+            'barang_ids.*' => 'integer|exists:barang,barang_id',
         ]));
     }
 }
