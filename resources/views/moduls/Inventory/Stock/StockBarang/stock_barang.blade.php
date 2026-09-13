@@ -60,6 +60,7 @@
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Satuan</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Bagian</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">No. Batch</th>
+                    <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tgl Expired</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Beli</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Jual</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Stock</th>
@@ -70,7 +71,6 @@
                     @php
                         $noUrut = ($stockList->firstItem() ?? 0) + $i;
                         $jumlah = (float) $st->jumlah;
-                        $h = $hargaMap[$st->barang_id.'|'.$st->no_batch] ?? null;
                     @endphp
                     <tr class="hover:bg-blue-50/40 transition-colors">
                         <td class="px-3 py-3 text-center text-slate-500">{{ $noUrut }}</td>
@@ -82,13 +82,14 @@
                         <td class="px-3 py-3">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold">{{ $st->no_batch ?: '-' }}</span>
                         </td>
-                        <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ $h?->harga_beli !== null ? number_format((float) $h->harga_beli, 0, ',', '.') : '-' }}</td>
-                        <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ $h?->harga_jual !== null ? number_format((float) $h->harga_jual, 0, ',', '.') : '-' }}</td>
+                        <td class="px-3 py-3 text-slate-600 whitespace-nowrap">{{ $st->tgl_expired ? \Carbon\Carbon::parse($st->tgl_expired)->format('d-m-Y') : '-' }}</td>
+                        <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ $st->harga_beli !== null ? 'Rp '.number_format((float) $st->harga_beli, 0, ',', '.') : '-' }}</td>
+                        <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ $st->harga_jual !== null ? 'Rp '.number_format((float) $st->harga_jual, 0, ',', '.') : '-' }}</td>
                         <td class="px-3 py-3 text-right font-bold text-slate-800 tabular-nums">{{ rtrim(rtrim(number_format($jumlah, 2, ',', '.'), '0'), ',') }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="10" class="px-3 py-12 text-center">
+                        <td colspan="11" class="px-3 py-12 text-center">
                             <div class="flex flex-col items-center gap-2 text-slate-400">
                                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                                 <p class="text-sm font-medium">Belum ada data stock.</p>

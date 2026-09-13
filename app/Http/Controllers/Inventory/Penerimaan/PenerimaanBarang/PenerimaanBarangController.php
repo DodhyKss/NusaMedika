@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Inventory\Penerimaan\PenerimaanBarang;
 
 use App\Helpers\StockHelper;
 use App\Http\Controllers\Controller;
-use App\Models\HargaBarang;
 use App\Models\Pemesanan;
 use App\Models\Penerimaan;
 use App\Models\PenerimaanDetail;
@@ -105,8 +104,6 @@ class PenerimaanBarangController extends Controller
                 $detail->status_batal = 0;
                 $detail->save();
 
-                $this->simpanMasterHarga($item);
-
                 StockHelper::tambahMasuk(
                     $penerimaan->bagian_id,
                     $item['barang_id'],
@@ -117,6 +114,9 @@ class PenerimaanBarangController extends Controller
                         'ref_penerimaan_detail_id' => $detail->penerimaan_detail_id,
                         'tanggal' => $penerimaan->tanggal_terima,
                         'keterangan' => $penerimaan->no_faktur ?: 'Penerimaan barang',
+                        'harga_beli' => $item['harga_beli'],
+                        'harga_jual' => $item['harga_jual'],
+                        'tgl_expired' => $item['tgl_expired'],
                     ]
                 );
             }
@@ -180,6 +180,7 @@ class PenerimaanBarangController extends Controller
         $barangIds = (array) $request->input('barang_id', []);
         $jumlahs = (array) $request->input('jumlah_terima', []);
         $batches = (array) $request->input('no_batch', []);
+        $expireds = (array) $request->input('tgl_expired', []);
 
         $poDtl = $pemesanan->details->keyBy('barang_id');
 
@@ -204,6 +205,11 @@ class PenerimaanBarangController extends Controller
                 throw new \RuntimeException('No. Batch wajib diisi untuk '.($poDetail->barang->nama_barang ?? '#'.$barangId).'.');
             }
 
+            $tglExpired = trim((string) ($expireds[$i] ?? ''));
+            if ($tglExpired === '') {
+                throw new \RuntimeException('Tanggal expired wajib diisi untuk '.($poDetail->barang->nama_barang ?? '#'.$barangId).'.');
+            }
+
             $sisaPesan = max(0, (float) $poDetail->jumlah_pesan);
 
             if ($jumlah > $sisaPesan) {
@@ -216,36 +222,10 @@ class PenerimaanBarangController extends Controller
                 'jumlah_terima' => $jumlah,
                 'harga_beli' => (float) ($poDetail->harga_beli ?? 0),
                 'harga_jual' => ($poDetail->harga_jual ?? null) !== null ? (float) $poDetail->harga_jual : null,
+                'tgl_expired' => $tglExpired,
             ];
         }
 
         return $items;
-    }
-
-    private function simpanMasterHarga(array $item): void
-    {
-        $harga = HargaBarang::aktif()
-            ->where('barang_id', $item['barang_id'])
-            ->where('no_batch', $item['no_batch'])
-            ->first() ?? new HargaBarang;
-
-        $harga->barang_id = $item['barang_id'];
-        $harga->no_batch = $item['no_batch'];
-        $harga->harga_beli = $item['harga_beli'];
-
-        if ($harga->harga_jual === null || (float) $harga->harga_jual === 0) {
-            $harga->harga_jual = $item['harga_jual'];
-        }
-
-        if (! $harga->exists) {
-            $harga->input_time = now();
-            $harga->input_user_id = Auth::id();
-            $harga->status_batal = 0;
-        } else {
-            $harga->mod_time = now();
-            $harga->mod_user_id = Auth::id();
-        }
-
-        $harga->save();
     }
 }

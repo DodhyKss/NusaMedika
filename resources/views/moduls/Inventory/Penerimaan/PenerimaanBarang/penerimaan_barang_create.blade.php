@@ -86,6 +86,7 @@
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Jumlah Pesan</th>
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Jumlah Terima</th>
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-left">No. Batch <span class="text-red-500" title="Wajib diisi">*</span></th>
+                                <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-left">Tgl Expired <span class="text-red-500" title="Wajib diisi">*</span></th>
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Beli</th>
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Subtotal</th>
                             </tr>
@@ -113,6 +114,10 @@
                                     <td class="px-3 py-3 text-left">
                                         <input type="text" name="no_batch[]" value="" placeholder="mis. B001" maxlength="50"
                                                class="inp-batch text-sm w-full border border-slate-200 rounded-lg px-2.5 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder-slate-400" style="min-width:120px;">
+                                    </td>
+                                    <td class="px-3 py-3 text-left">
+                                        <input type="date" name="tgl_expired[]" value=""
+                                               class="inp-expired text-sm w-full border border-slate-200 rounded-lg px-2.5 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder-slate-400" style="min-width:130px;">
                                     </td>
                                     <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ number_format((float) $d->harga_beli, 0, ',', '.') }}</td>
                                     <td class="px-3 py-3 text-right font-semibold text-slate-800 tabular-nums"><span class="txt-subtotal">Rp {{ number_format($pr, 0, ',', '.') }}</span></td>

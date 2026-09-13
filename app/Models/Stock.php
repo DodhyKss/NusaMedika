@@ -19,6 +19,9 @@ class Stock extends Model
         'no_batch',
         'bagian_id',
         'jumlah',
+        'harga_beli',
+        'harga_jual',
+        'tgl_expired',
     ];
 
     public function scopeAktif(Builder $query): Builder

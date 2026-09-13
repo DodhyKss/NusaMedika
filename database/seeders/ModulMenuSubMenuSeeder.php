@@ -103,7 +103,6 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 36, 'menu_id' => 6, 'nama_sub_menu' => 'Jenis Barang', 'file_sub_menu' => 'Administrator/ManajemenMaster/JenisBarang/jenis_barang', 'urutan_sub_menu' => 15],
             ['sub_menu_id' => 37, 'menu_id' => 6, 'nama_sub_menu' => 'Supplier', 'file_sub_menu' => 'Administrator/ManajemenMaster/Supplier/supplier', 'urutan_sub_menu' => 16],
             ['sub_menu_id' => 38, 'menu_id' => 6, 'nama_sub_menu' => 'Distributor', 'file_sub_menu' => 'Administrator/ManajemenMaster/Distributor/distributor', 'urutan_sub_menu' => 17],
-            ['sub_menu_id' => 43, 'menu_id' => 6, 'nama_sub_menu' => 'Harga Barang', 'file_sub_menu' => 'Administrator/ManajemenMaster/HargaBarang/harga_barang', 'urutan_sub_menu' => 18],
             // Menu Manajemen User (7) - Administrator
             ['sub_menu_id' => 18, 'menu_id' => 7, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'Administrator/ManajemenUser/User/user', 'urutan_sub_menu' => 1],
             // Menu Manajemen EMR (8) - Administrator

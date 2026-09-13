@@ -26,6 +26,9 @@ class KartuStock extends Model
         'qty_keluar',
         'saldo_sebelum',
         'saldo_sesudah',
+        'harga_beli',
+        'harga_jual',
+        'tgl_expired',
         'keterangan',
     ];
 

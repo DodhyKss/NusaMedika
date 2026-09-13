@@ -181,9 +181,12 @@
             sel.appendChild(ph);
             opts.forEach(function (o) {
                 var opt = document.createElement('option');
-                opt.value = o.no_batch;
-                opt.textContent = o.no_batch + ' (stok ' + Number(o.jumlah).toLocaleString('id-ID') + ')';
-                if (String(current) === String(o.no_batch)) opt.selected = true;
+                opt.value = o.no_batch + '||' + (o.harga_jual === null ? '' : o.harga_jual);
+                var label = o.no_batch + ' (stok ' + Number(o.jumlah).toLocaleString('id-ID') + ')';
+                if (o.harga_jual !== null) label += ' - Harga Jual Rp ' + Number(o.harga_jual).toLocaleString('id-ID');
+                if (o.tgl_expired) label += ' - Exp ' + o.tgl_expired;
+                opt.textContent = label;
+                if (String(current) === o.no_batch) opt.selected = true;
                 sel.appendChild(opt);
             });
         }
