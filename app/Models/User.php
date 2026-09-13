@@ -41,4 +41,19 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Pegawai::class, 'pegawai_id', 'pegawai_id');
     }
+
+    /**
+     * Memeriksa apakah user memiliki hak akses ke sub_menu_id tertentu.
+     * User superadmin (user_id = 1 atau username 'superadmin') memiliki akses mutlak (bypass).
+     */
+    public function hasSubMenuAccess(int $subMenuId): bool
+    {
+        if ((int) $this->user_id === 1 || $this->user_name === 'superadmin') {
+            return true;
+        }
+
+        return $this->akses()
+            ->where('sub_menu_id', $subMenuId)
+            ->exists();
+    }
 }
