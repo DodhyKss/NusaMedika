@@ -96,6 +96,8 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 26, 'menu_id' => 6, 'nama_sub_menu' => 'Master Kelas', 'file_sub_menu' => 'Administrator/ManajemenMaster/Kelas/kelas', 'urutan_sub_menu' => 11],
             ['sub_menu_id' => 27, 'menu_id' => 6, 'nama_sub_menu' => 'Jadwal Dokter', 'file_sub_menu' => 'Administrator/ManajemenMaster/JadwalDokter/jadwal_dokter', 'urutan_sub_menu' => 12],
             ['sub_menu_id' => 28, 'menu_id' => 6, 'nama_sub_menu' => 'ICD', 'file_sub_menu' => 'Administrator/ManajemenMaster/Icd/icd', 'urutan_sub_menu' => 13],
+            ['sub_menu_id' => 35, 'menu_id' => 6, 'nama_sub_menu' => 'Barang', 'file_sub_menu' => 'Administrator/ManajemenMaster/Barang/barang', 'urutan_sub_menu' => 14],
+            ['sub_menu_id' => 36, 'menu_id' => 6, 'nama_sub_menu' => 'Jenis Barang', 'file_sub_menu' => 'Administrator/ManajemenMaster/JenisBarang/jenis_barang', 'urutan_sub_menu' => 15],
             // Menu Manajemen User (7) - Administrator
             ['sub_menu_id' => 18, 'menu_id' => 7, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'Administrator/ManajemenUser/User/user', 'urutan_sub_menu' => 1],
             // Menu Manajemen EMR (8) - Administrator
@@ -104,6 +106,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 32, 'menu_id' => 8, 'nama_sub_menu' => 'Form', 'file_sub_menu' => 'Administrator/ManajemenEMR/Form/form', 'urutan_sub_menu' => 3],
             // Menu Pesanan (9) - Inventory
             ['sub_menu_id' => 33, 'menu_id' => 9, 'nama_sub_menu' => 'Buat Pesanan', 'file_sub_menu' => 'Inventory/Pesanan/BuatPesanan/buat_pesanan', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 34, 'menu_id' => 9, 'nama_sub_menu' => 'Setujui Pesanan', 'file_sub_menu' => 'Inventory/Pesanan/SetujuiPesanan/setujui_pesanan', 'urutan_sub_menu' => 2],
         ];
 
         foreach ($subMenus as $subMenu) {
