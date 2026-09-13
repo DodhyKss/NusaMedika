@@ -49,6 +49,9 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['menu_id' => 8, 'modul_id' => 5, 'nama_menu' => 'Manajemen EMR', 'urutan_menu' => 3],
             // Modul Inventory (6)
             ['menu_id' => 9, 'modul_id' => 6, 'nama_menu' => 'Pesanan', 'urutan_menu' => 1],
+            ['menu_id' => 10, 'modul_id' => 6, 'nama_menu' => 'Penerimaan', 'urutan_menu' => 2],
+            ['menu_id' => 11, 'modul_id' => 6, 'nama_menu' => 'Stock', 'urutan_menu' => 3],
+            ['menu_id' => 12, 'modul_id' => 6, 'nama_menu' => 'Distribusi', 'urutan_menu' => 4],
         ];
 
         foreach ($menus as $menu) {
@@ -98,6 +101,9 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 28, 'menu_id' => 6, 'nama_sub_menu' => 'ICD', 'file_sub_menu' => 'Administrator/ManajemenMaster/Icd/icd', 'urutan_sub_menu' => 13],
             ['sub_menu_id' => 35, 'menu_id' => 6, 'nama_sub_menu' => 'Barang', 'file_sub_menu' => 'Administrator/ManajemenMaster/Barang/barang', 'urutan_sub_menu' => 14],
             ['sub_menu_id' => 36, 'menu_id' => 6, 'nama_sub_menu' => 'Jenis Barang', 'file_sub_menu' => 'Administrator/ManajemenMaster/JenisBarang/jenis_barang', 'urutan_sub_menu' => 15],
+            ['sub_menu_id' => 37, 'menu_id' => 6, 'nama_sub_menu' => 'Supplier', 'file_sub_menu' => 'Administrator/ManajemenMaster/Supplier/supplier', 'urutan_sub_menu' => 16],
+            ['sub_menu_id' => 38, 'menu_id' => 6, 'nama_sub_menu' => 'Distributor', 'file_sub_menu' => 'Administrator/ManajemenMaster/Distributor/distributor', 'urutan_sub_menu' => 17],
+            ['sub_menu_id' => 43, 'menu_id' => 6, 'nama_sub_menu' => 'Harga Barang', 'file_sub_menu' => 'Administrator/ManajemenMaster/HargaBarang/harga_barang', 'urutan_sub_menu' => 18],
             // Menu Manajemen User (7) - Administrator
             ['sub_menu_id' => 18, 'menu_id' => 7, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'Administrator/ManajemenUser/User/user', 'urutan_sub_menu' => 1],
             // Menu Manajemen EMR (8) - Administrator
@@ -107,6 +113,13 @@ class ModulMenuSubMenuSeeder extends Seeder
             // Menu Pesanan (9) - Inventory
             ['sub_menu_id' => 33, 'menu_id' => 9, 'nama_sub_menu' => 'Buat Pesanan', 'file_sub_menu' => 'Inventory/Pesanan/BuatPesanan/buat_pesanan', 'urutan_sub_menu' => 1],
             ['sub_menu_id' => 34, 'menu_id' => 9, 'nama_sub_menu' => 'Setujui Pesanan', 'file_sub_menu' => 'Inventory/Pesanan/SetujuiPesanan/setujui_pesanan', 'urutan_sub_menu' => 2],
+            // Menu Penerimaan (10) - Inventory
+            ['sub_menu_id' => 39, 'menu_id' => 10, 'nama_sub_menu' => 'Penerimaan Barang', 'file_sub_menu' => 'Inventory/Penerimaan/PenerimaanBarang/penerimaan_barang', 'urutan_sub_menu' => 1],
+            // Menu Stock (11) - Inventory
+            ['sub_menu_id' => 40, 'menu_id' => 11, 'nama_sub_menu' => 'Stock Barang', 'file_sub_menu' => 'Inventory/Stock/StockBarang/stock_barang', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 41, 'menu_id' => 11, 'nama_sub_menu' => 'Kartu Stock', 'file_sub_menu' => 'Inventory/Stock/KartuStock/kartu_stock', 'urutan_sub_menu' => 2],
+            // Menu Distribusi (12) - Inventory
+            ['sub_menu_id' => 42, 'menu_id' => 12, 'nama_sub_menu' => 'Mutasi Barang', 'file_sub_menu' => 'Inventory/Distribusi/MutasiBarang/mutasi_barang', 'urutan_sub_menu' => 1],
         ];
 
         foreach ($subMenus as $subMenu) {

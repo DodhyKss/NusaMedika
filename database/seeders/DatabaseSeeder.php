@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ReferensiBagianSeeder::class,
             BagianSeeder::class,
+            SatuanSeeder::class,
             ModulMenuSubMenuSeeder::class,
             MasterPegawaiSeeder::class,
             UserSeeder::class,

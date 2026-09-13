@@ -27,12 +27,12 @@ class PengkajianAwalKeperawatanController extends Controller
         // Ambil riwayat untuk sidebar
         $riwayatPengkajianAwal = EmrHelper::emrList((int) $form_id, (int) $registrasi_detail->registrasi_id);
 
-        if (empty($emr_id) && !($aksesCrud['create'] ?? false) && $riwayatPengkajianAwal->isNotEmpty()) {
+        if (empty($emr_id) && ! ($aksesCrud['create'] ?? false) && $riwayatPengkajianAwal->isNotEmpty()) {
             return redirect()->route('emr.dynamic.index', [
                 'form_name' => 'pengkajian_awal_keperawatan',
                 'registrasi_detail_id' => $registrasi_detail_id,
                 'emr_id' => $riwayatPengkajianAwal->first()->emr_id,
-                'action' => 'view'
+                'action' => 'view',
             ]);
         }
 

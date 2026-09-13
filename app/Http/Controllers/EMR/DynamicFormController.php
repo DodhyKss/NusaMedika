@@ -32,12 +32,12 @@ class DynamicFormController extends Controller
             $aksesCrud = AksesEhr::flags((int) $form->form_id);
             $riwayat = EmrHelper::emrList((int) $form->form_id, (int) $registrasi_detail->registrasi_id);
 
-            if (!$emr_id && !($aksesCrud['create'] ?? false) && $riwayat->isNotEmpty()) {
+            if (! $emr_id && ! ($aksesCrud['create'] ?? false) && $riwayat->isNotEmpty()) {
                 return redirect()->route('emr.dynamic.index', [
                     'form_name' => $form_name,
                     'registrasi_detail_id' => $registrasi_detail_id,
                     'emr_id' => $riwayat->first()->emr_id,
-                    'action' => 'view'
+                    'action' => 'view',
                 ]);
             }
         }

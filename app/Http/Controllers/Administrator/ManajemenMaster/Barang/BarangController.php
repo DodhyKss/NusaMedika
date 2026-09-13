@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Administrator\ManajemenMaster\Barang;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\BarangJenis;
+use App\Models\Satuan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,16 +16,17 @@ class BarangController extends Controller
     {
         $search = trim((string) $request->input('search'));
 
-        $query = Barang::aktif()->with('jenis');
+        $query = Barang::aktif()->with(['jenis', 'satuan']);
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('nama_barang', 'ilike', "%{$search}%")
+                    ->orWhere('kode_barang', 'ilike', "%{$search}%")
                     ->orWhereHas('jenis', fn ($jenis) => $jenis->where('nama_jenis_barang', 'ilike', "%{$search}%"));
             });
         }
 
-        $barangList = $query->orderBy('barang_id')->paginate(10)->withQueryString();
+        $barangList = $query->orderBy('nama_barang')->paginate(10)->withQueryString();
 
         return view('moduls.Administrator.ManajemenMaster.Barang.barang', compact('barangList', 'search'));
     }
@@ -32,8 +34,9 @@ class BarangController extends Controller
     public function create()
     {
         $barangJenisList = $this->jenisOptions();
+        $satuanList = $this->satuanOptions();
 
-        return view('moduls.Administrator.ManajemenMaster.Barang.barang_create', compact('barangJenisList'));
+        return view('moduls.Administrator.ManajemenMaster.Barang.barang_create', compact('barangJenisList', 'satuanList'));
     }
 
     public function store(Request $request)
@@ -43,8 +46,12 @@ class BarangController extends Controller
         DB::beginTransaction();
         try {
             $barang = new Barang;
+            $barang->kode_barang = $data['kode_barang'];
             $barang->nama_barang = $data['nama_barang'];
             $barang->jenis_barang_id = $data['jenis_barang_id'];
+            $barang->satuan_id = $data['satuan_id'];
+            $barang->is_racikan = (int) $data['is_racikan'];
+            $barang->is_fornas = (int) $data['is_fornas'];
             $barang->input_time = now();
             $barang->input_user_id = Auth::id();
             $barang->status_batal = 0;
@@ -65,8 +72,9 @@ class BarangController extends Controller
         $barang = Barang::findOrFail($barang);
 
         $barangJenisList = $this->jenisOptions();
+        $satuanList = $this->satuanOptions();
 
-        return view('moduls.Administrator.ManajemenMaster.Barang.barang_edit', compact('barang', 'barangJenisList'));
+        return view('moduls.Administrator.ManajemenMaster.Barang.barang_edit', compact('barang', 'barangJenisList', 'satuanList'));
     }
 
     public function update(Request $request, $barang)
@@ -76,8 +84,12 @@ class BarangController extends Controller
         DB::beginTransaction();
         try {
             $barang = Barang::findOrFail($barang);
+            $barang->kode_barang = $data['kode_barang'];
             $barang->nama_barang = $data['nama_barang'];
             $barang->jenis_barang_id = $data['jenis_barang_id'];
+            $barang->satuan_id = $data['satuan_id'];
+            $barang->is_racikan = (int) $data['is_racikan'];
+            $barang->is_fornas = (int) $data['is_fornas'];
             $barang->mod_time = now();
             $barang->mod_user_id = Auth::id();
             $barang->save();
@@ -117,11 +129,24 @@ class BarangController extends Controller
         return BarangJenis::aktif()->orderBy('nama_jenis_barang')->get();
     }
 
+    private function satuanOptions()
+    {
+        return Satuan::aktif()->orderBy('nama_satuan')->get();
+    }
+
     private function validated(Request $request)
     {
-        return $request->validate([
+        return array_merge([
+            'kode_barang' => null,
+            'is_racikan' => 0,
+            'is_fornas' => 0,
+        ], $request->validate([
+            'kode_barang' => 'nullable|string|max:50',
             'nama_barang' => 'required|string|max:255',
             'jenis_barang_id' => 'required|integer|exists:barang_jenis,barang_jenis_id',
-        ]);
+            'satuan_id' => 'nullable|integer|exists:satuan,satuan_id',
+            'is_racikan' => 'nullable|in:0,1',
+            'is_fornas' => 'nullable|in:0,1,2',
+        ]));
     }
 }

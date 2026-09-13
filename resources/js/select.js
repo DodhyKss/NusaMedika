@@ -256,3 +256,64 @@ $(function () {
         }, 0);
     });
 });
+
+// Helper global: Select2 barang untuk baris item dinamis (Pemesanan / Mutasi Barang).
+// Data dimuat sekali via API dan di-cache; option membawa atribut data-harga-beli/data-satuan
+// agar harga & satuan bisa diisi otomatis oleh skrip form.
+window.initBarangSelect = function ($select, url) {
+    if (!$select || !$select.length) return;
+
+    if ($select.data('select2')) {
+        $select.select2('destroy');
+    }
+
+    var cacheKey = url || 'default';
+    if (!window.__barangCache) window.__barangCache = {};
+
+    var load = function (cb) {
+        if (window.__barangCache[cacheKey]) {
+            return cb(window.__barangCache[cacheKey]);
+        }
+        $.getJSON(url || $select.data('url'), { limit: 1000 }, function (res) {
+            window.__barangCache[cacheKey] = (res && res.results) || [];
+            cb(window.__barangCache[cacheKey]);
+        });
+    };
+
+    load(function (results) {
+        var keep = $select.val();
+
+        $select.find('option[value]').not('[value=""]').remove();
+
+        results.forEach(function (b) {
+            if (!b || b.id == null) return;
+            if ($select.find('option[value="' + b.id + '"]').length) return;
+            var opt = new Option(b.text, b.id);
+            $(opt).attr('data-harga-beli', b.harga_beli || 0)
+                .attr('data-satuan', b.satuan || '')
+                .attr('data-kode', b.kode || '');
+            $select.append(opt);
+        });
+
+        $select.select2({
+            placeholder: 'Cari Barang...',
+            allowClear: true,
+            width: '100%',
+            matcher: function (params, data) {
+                if (!params.term) {
+                    return data;
+                }
+                var term = params.term.toLowerCase();
+                var text = String(data.text || '').toLowerCase();
+                return text.indexOf(term) !== -1 ? data : null;
+            }
+        });
+
+        if (keep) {
+            var $opt = $select.find('option[value="' + keep + '"]');
+            if ($opt.length) {
+                $select.val(keep);
+            }
+        }
+    });
+};

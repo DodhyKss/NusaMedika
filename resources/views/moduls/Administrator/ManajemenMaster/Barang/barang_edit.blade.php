@@ -23,7 +23,7 @@
         </div>
         <div>
             <h2 class="text-base font-semibold text-slate-800">Informasi Barang</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Perbaiki data nama dan jenis barang.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Perbaiki data barang, satuan, racikan, dan jenis fornas.</p>
         </div>
     </div>
 
@@ -33,6 +33,16 @@
             @csrf
             @method('PUT')
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+
+                <!-- Kode Barang -->
+                <div>
+                    <label for="kode_barang" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kode Barang</label>
+                    <input type="text" id="kode_barang" name="kode_barang" value="{{ old('kode_barang', $barang->kode_barang) }}" placeholder="Contoh: OBAT-0001"
+                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
+                    @error('kode_barang')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
 
                 <!-- Nama Barang -->
                 <div>
@@ -48,13 +58,55 @@
                 <div>
                     <label for="jenis_barang_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Jenis Barang <span class="text-red-500">*</span></label>
                     <select id="jenis_barang_id" name="jenis_barang_id" required
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
                         <option value="">-- Pilih Jenis Barang --</option>
                         @foreach ($barangJenisList as $jenis)
                             <option value="{{ $jenis->barang_jenis_id }}" @selected((string) old('jenis_barang_id', $barang->jenis_barang_id) === (string) $jenis->barang_jenis_id)>{{ $jenis->nama_jenis_barang }}</option>
                         @endforeach
                     </select>
                     @error('jenis_barang_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Satuan -->
+                <div>
+                    <label for="satuan_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Satuan</label>
+                    <select id="satuan_id" name="satuan_id"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
+                        <option value="">-- Pilih Satuan --</option>
+                        @foreach ($satuanList as $s)
+                            <option value="{{ $s->satuan_id }}" @selected((string) old('satuan_id', $barang->satuan_id) === (string) $s->satuan_id)>{{ $s->nama_satuan }}</option>
+                        @endforeach
+                    </select>
+                    @error('satuan_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Racikan -->
+                <div>
+                    <label for="is_racikan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Racikan</label>
+                    <select id="is_racikan" name="is_racikan"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
+                        <option value="0" @selected((string) old('is_racikan', $barang->is_racikan) === '0')>Tidak</option>
+                        <option value="1" @selected((string) old('is_racikan', $barang->is_racikan) === '1')>Ya</option>
+                    </select>
+                    @error('is_racikan')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Fornas -->
+                <div>
+                    <label for="is_fornas" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Fornas</label>
+                    <select id="is_fornas" name="is_fornas"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
+                        <option value="0" @selected((string) old('is_fornas', $barang->is_fornas) === '0')>Tidak / Non Fornas</option>
+                        <option value="1" @selected((string) old('is_fornas', $barang->is_fornas) === '1')>Fornas Nasional</option>
+                        <option value="2" @selected((string) old('is_fornas', $barang->is_fornas) === '2')>Fornas Rumah Sakit</option>
+                    </select>
+                    @error('is_fornas')
                         <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                     @enderror
                 </div>

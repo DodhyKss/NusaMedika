@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Bagian extends Model
@@ -22,6 +23,13 @@ class Bagian extends Model
         'id_location',
         'status_batal',
     ];
+
+    public function scopeAktif(Builder $query): Builder
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('status_batal')->orWhere('status_batal', 0);
+        });
+    }
 
     public function referensi()
     {

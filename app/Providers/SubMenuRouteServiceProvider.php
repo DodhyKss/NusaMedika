@@ -6,6 +6,7 @@ use App\Http\Controllers\SubMenu\SubMenuViewController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class SubMenuRouteServiceProvider extends ServiceProvider
@@ -165,7 +166,7 @@ class SubMenuRouteServiceProvider extends ServiceProvider
     private function subMenus(): array
     {
         try {
-            if (! \Illuminate\Support\Facades\Schema::hasTable('sub_menu')) {
+            if (! Schema::hasTable('sub_menu')) {
                 return [];
             }
 

@@ -11,7 +11,7 @@ class BagianSeeder extends Seeder
     {
         $now = now();
 
-        // referensi_bagian_id: 1 = Rawat Jalan (Poli), 2 = Rawat Inap (Ruang Perawatan), 3 = IGD
+        // referensi_bagian_id: 1 = Rawat Jalan (Poli), 2 = Rawat Inap (Ruang Perawatan), 3 = IGD, 4 = Gudang
         $polies = [
             'POLI INTERNA',
             'POLI ANAK',
@@ -52,6 +52,12 @@ class BagianSeeder extends Seeder
             'IRD OBGYN',
         ];
 
+        // Gudang/Depo: tujuan utama stok masuk (penerimaan barang) sebelum didistribusikan ke bagian lain
+        $gudangs = [
+            'GUDANG FARMASI',
+            'GUDANG LOGISTIK',
+        ];
+
         $bagians = [];
         $id = 1;
         foreach ($polies as $nama) {
@@ -62,6 +68,9 @@ class BagianSeeder extends Seeder
         }
         foreach ($igd as $nama) {
             $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 3];
+        }
+        foreach ($gudangs as $nama) {
+            $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 4];
         }
 
         // Hapus permanen record lama (placeholder Rawat Jalan/Rawat Inap/IGD + data lama) lalu seed ulang

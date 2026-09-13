@@ -27,12 +27,12 @@ class SoapController extends Controller
         // Ambil riwayat SOAP untuk pasien ini (dari registrasi_id)
         $riwayat_soap = EmrHelper::emrList((int) $form_id, (int) $registrasi_detail->registrasi_id);
 
-        if (!$emr_id && !($aksesCrud['create'] ?? false) && $riwayat_soap->isNotEmpty()) {
+        if (! $emr_id && ! ($aksesCrud['create'] ?? false) && $riwayat_soap->isNotEmpty()) {
             return redirect()->route('emr.dynamic.index', [
                 'form_name' => 'soap',
                 'registrasi_detail_id' => $registrasi_detail_id,
                 'emr_id' => $riwayat_soap->first()->emr_id,
-                'action' => 'view'
+                'action' => 'view',
             ]);
         }
 
