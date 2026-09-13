@@ -105,20 +105,21 @@
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nama Barang</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Bagian</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">No. Batch</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Beli</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Jual</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Jenis Mutasi</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Keterangan</th>
+                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Stock Awal</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Masuk</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Keluar</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Saldo Awal</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Saldo Akhir</th>
+                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Stock Akhir</th>
+                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Keterangan</th>
                     </tr>
                 </thead>
                 <tbody class="text-[12px] divide-y divide-slate-100">
                     @forelse ($kartuList as $i => $k)
                         @php
                             $noUrut = ($kartuList->firstItem() ?? 0) + $i;
+                            $run = $runningMap[$k->kartu_stock_id] ?? null;
+                            $stockAwal = $run ? $run[0] : (float) $k->saldo_sebelum;
+                            $stockAkhir = $run ? $run[1] : (float) $k->saldo_sesudah;
                             $badge = match ((int) $k->jenis_mutasi) {
                                 0 => 'bg-slate-100 text-slate-600',
                                 1 => 'bg-emerald-100 text-emerald-700',
@@ -127,7 +128,6 @@
                                 4 => 'bg-violet-100 text-violet-700',
                                 default => 'bg-slate-100 text-slate-600',
                             };
-                            $h = $hargaMap[$k->barang_id.'|'.($k->no_batch ?? '-')] ?? null;
                         @endphp
                         <tr class="hover:bg-blue-50/40 transition-colors">
                             <td class="px-3 py-3 text-center text-slate-500">{{ $noUrut }}</td>
@@ -137,20 +137,18 @@
                             <td class="px-3 py-3">
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold">{{ $k->no_batch ?: '-' }}</span>
                             </td>
-                            <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ $h?->harga_beli !== null ? number_format((float) $h->harga_beli, 0, ',', '.') : '-' }}</td>
-                            <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ $h?->harga_jual !== null ? number_format((float) $h->harga_jual, 0, ',', '.') : '-' }}</td>
                             <td class="px-3 py-3 text-center">
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ $badge }}">{{ $k->jenis_label }}</span>
                             </td>
-                            <td class="px-3 py-3 text-slate-500 max-w-[260px] truncate" title="{{ $k->keterangan }}">{{ $k->keterangan ?: '-' }}</td>
+                            <td class="px-3 py-3 text-right text-slate-600 tabular-nums">{{ rtrim(rtrim(number_format($stockAwal, 2, ',', '.'), '0'), ',') }}</td>
                             <td class="px-3 py-3 text-right text-emerald-600 font-semibold tabular-nums">{{ $k->qty_masuk ? rtrim(rtrim(number_format((float) $k->qty_masuk, 2, ',', '.'), '0'), ',') : '-' }}</td>
                             <td class="px-3 py-3 text-right text-red-600 font-semibold tabular-nums">{{ $k->qty_keluar ? rtrim(rtrim(number_format((float) $k->qty_keluar, 2, ',', '.'), '0'), ',') : '-' }}</td>
-                            <td class="px-3 py-3 text-right text-slate-600 tabular-nums">{{ number_format((float) $k->saldo_sebelum, 2, ',', '.') }}</td>
-                            <td class="px-3 py-3 text-right font-bold text-slate-800 tabular-nums">{{ number_format((float) $k->saldo_sesudah, 2, ',', '.') }}</td>
+                            <td class="px-3 py-3 text-right font-bold text-slate-800 tabular-nums">{{ rtrim(rtrim(number_format($stockAkhir, 2, ',', '.'), '0'), ',') }}</td>
+                            <td class="px-3 py-3 text-slate-500 max-w-[260px] truncate" title="{{ $k->keterangan }}">{{ $k->keterangan ?: '-' }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="13" class="px-3 py-12 text-center">
+                            <td colspan="11" class="px-3 py-12 text-center">
                                 <div class="flex flex-col items-center gap-2 text-slate-400">
                                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 9h2m-2 4h2m-6-4h.01M6 13h.01"></path></svg>
                                     <p class="text-sm font-medium">Belum ada riwayat kartu stock.</p>
@@ -169,18 +167,15 @@
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nama Barang</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Satuan</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">No. Batch</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Beli</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Jual</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Total Masuk</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Total Keluar</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Saldo</th>
+                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Stock Akhir</th>
                     </tr>
                 </thead>
                 <tbody class="text-[12px] divide-y divide-slate-100">
                     @forelse ($kartuList as $i => $k)
                         @php
                             $noUrut = ($kartuList->firstItem() ?? 0) + $i;
-                            $h = $hargaMap[$k->barang_id.'|'.($k->no_batch ?? '-')] ?? null;
                             $saldo = (float) $k->tot_masuk - (float) $k->tot_keluar;
                         @endphp
                         <tr class="hover:bg-blue-50/40 transition-colors">
@@ -191,15 +186,13 @@
                             <td class="px-3 py-3">
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold">{{ $k->no_batch ?: '-' }}</span>
                             </td>
-                            <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ $h?->harga_beli !== null ? number_format((float) $h->harga_beli, 0, ',', '.') : '-' }}</td>
-                            <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ $h?->harga_jual !== null ? number_format((float) $h->harga_jual, 0, ',', '.') : '-' }}</td>
                             <td class="px-3 py-3 text-right text-emerald-600 font-semibold tabular-nums">{{ rtrim(rtrim(number_format((float) $k->tot_masuk, 2, ',', '.'), '0'), ',') }}</td>
                             <td class="px-3 py-3 text-right text-red-600 font-semibold tabular-nums">{{ rtrim(rtrim(number_format((float) $k->tot_keluar, 2, ',', '.'), '0'), ',') }}</td>
                             <td class="px-3 py-3 text-right font-bold text-slate-800 tabular-nums">{{ rtrim(rtrim(number_format($saldo, 2, ',', '.'), '0'), ',') }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="px-3 py-12 text-center">
+                            <td colspan="8" class="px-3 py-12 text-center">
                                 <div class="flex flex-col items-center gap-2 text-slate-400">
                                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 9h2m-2 4h2m-6-4h.01M6 13h.01"></path></svg>
                                     <p class="text-sm font-medium">Belum ada ringkasan kartu stock.</p>
@@ -220,7 +213,7 @@
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Jumlah Batch</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Total Masuk</th>
                         <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Total Keluar</th>
-                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Saldo</th>
+                        <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Stock Akhir</th>
                     </tr>
                 </thead>
                 <tbody class="text-[12px] divide-y divide-slate-100">

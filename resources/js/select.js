@@ -295,6 +295,21 @@ window.initBarangSelect = function ($select, url) {
             $select.append(opt);
         });
 
+        // Atur nilai SEBELUM init select2: tanpa <option value=""> placeholder,
+        // browser otomatis menyeleksi option pertama. Kalau dibiarkan, Select2 akan
+        // menangkap barang pertama itu sebagai nilai awal (barang "langsung terpilih"
+        // dan supplier/distributor ikut terkunci). Restore keep hanya untuk baris edit.
+        if (keep) {
+            var $opt = $select.find('option[value="' + keep + '"]');
+            if ($opt.length) {
+                $select.val(keep);
+            } else {
+                $select.val(null);
+            }
+        } else {
+            $select.val(null);
+        }
+
         $select.select2({
             placeholder: 'Cari Barang...',
             allowClear: true,
@@ -308,12 +323,5 @@ window.initBarangSelect = function ($select, url) {
                 return text.indexOf(term) !== -1 ? data : null;
             }
         });
-
-        if (keep) {
-            var $opt = $select.find('option[value="' + keep + '"]');
-            if ($opt.length) {
-                $select.val(keep);
-            }
-        }
     });
 };

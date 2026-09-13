@@ -17,6 +17,8 @@ class PenerimaanDetail extends Model
     protected $fillable = [
         'penerimaan_id',
         'barang_id',
+        'supplier_id',
+        'distributor_id',
         'no_batch',
         'jumlah_terima',
         'harga_beli',
@@ -39,5 +41,15 @@ class PenerimaanDetail extends Model
     public function barang(): BelongsTo
     {
         return $this->belongsTo(Barang::class, 'barang_id', 'barang_id');
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'supplier_id');
+    }
+
+    public function distributor(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class, 'distributor_id', 'supplier_id');
     }
 }

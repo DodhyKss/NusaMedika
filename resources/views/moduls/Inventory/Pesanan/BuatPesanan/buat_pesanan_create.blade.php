@@ -160,6 +160,19 @@
             return daftar;
         }
 
+        function pasangRowSelect2($el, placeholder, enabled) {
+            if ($el.data('select2')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                placeholder: placeholder,
+                allowClear: true,
+                width: '100%'
+            });
+            $el.select2('enable', !!enabled);
+            $el.prop('disabled', !enabled);
+        }
+
         function renderRowSupplier(tr) {
             var $tr = $(tr);
             var $sup = $tr.find('select.sup-select');
@@ -170,11 +183,10 @@
             allowed.forEach(function (supId) {
                 $sup.append($('<option>').val(supId).text(supplierOptions[supId]));
             });
-            $sup.prop('disabled', !barangId);
 
-            if (!barangId) {
-                $sup.val('');
-            }
+            $sup.val('');
+            $sup.prop('disabled', !barangId);
+            pasangRowSelect2($sup, '-- Supplier --', !!barangId);
 
             renderRowDistributor(tr);
         }
@@ -189,11 +201,10 @@
             allowed.forEach(function (distId) {
                 $dist.append($('<option>').val(distId).text(distributorOptions[distId]));
             });
-            $dist.prop('disabled', !supId);
 
-            if (!supId) {
-                $dist.val('');
-            }
+            $dist.val('');
+            $dist.prop('disabled', !supId);
+            pasangRowSelect2($dist, '-- Distributor --', !!supId);
         }
 
         function rupiah(v) {
@@ -219,7 +230,7 @@
                 '   <select name="barang_id[]" class="barang-select text-sm w-full" style="min-width:200px;"></select>',
                 '</td>',
                 '<td class="px-3 py-2 align-top">',
-                '   <select name="supplier_id[]" class="sup-select text-sm w-full text-slate-700" style="min-width:150px;" disabled disabled>',
+                '   <select name="supplier_id[]" class="sup-select text-sm w-full text-slate-700" style="min-width:150px;" disabled>',
                 '       <option value="">-- Supplier --</option>',
                 '   </select>',
                 '</td>',
@@ -257,6 +268,7 @@
             }
 
             bindRow(tr);
+            renderRowSupplier(tr);
             updateTotal();
         }
 
@@ -321,8 +333,6 @@
                 if (hj) hj.value = (hj.value || '').replace(/[^\d]/g, '');
             });
         });
-
-        addRow();
     });
 </script>
 @endpush

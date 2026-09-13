@@ -23,7 +23,6 @@
                 <h2 class="text-base font-bold text-slate-800">{{ $p->no_pemesanan }}</h2>
                 <p class="text-xs text-slate-500 mt-0.5">
                     {{ \Carbon\Carbon::parse($p->tanggal_pemesanan)->format('d-m-Y') }}
-                    • {{ optional($p->supplier)->nama_supplier }}
                     @if ($p->bagian)
                         • {{ $p->bagian->nama_bagian }}
                     @endif
@@ -39,10 +38,12 @@
 
         <!-- Item Listing -->
         <div class="overflow-x-auto drag-scroll">
-            <table class="w-full text-left" style="min-width: 640px;">
+            <table class="w-full text-left" style="min-width: 800px;">
                 <thead>
                     <tr class="border-b border-slate-100">
                         <th class="px-5 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Barang</th>
+                        <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Supplier</th>
+                        <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Distributor</th>
                         <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Satuan</th>
                         <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Jumlah Pesan</th>
                         <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Harga Beli</th>
@@ -58,6 +59,8 @@
                                     <span class="block text-[10px] text-slate-400">{{ $d->barang->kode_barang }}</span>
                                 @endif
                             </td>
+                            <td class="px-3 py-3 text-slate-700">{{ $d->supplier->nama_supplier ?? '-' }}</td>
+                            <td class="px-3 py-3 text-slate-700">{{ $d->distributor->nama_supplier ?? '-' }}</td>
                             <td class="px-3 py-3 text-center text-slate-600">{{ $d->barang->textSatuan() ?? '-' }}</td>
                             <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ rtrim(rtrim(number_format((float) $d->jumlah_pesan, 2, ',', '.'), '0'), ',') }}</td>
                             <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ number_format((float) $d->harga_beli, 0, ',', '.') }}</td>
@@ -67,7 +70,7 @@
                 </tbody>
                 <tfoot class="border-t border-slate-200 bg-slate-50/60">
                     <tr>
-                        <td colspan="4" class="px-5 py-2.5 text-right text-xs font-bold text-slate-600 uppercase tracking-wider">Total Nilai</td>
+                        <td colspan="6" class="px-5 py-2.5 text-right text-xs font-bold text-slate-600 uppercase tracking-wider">Total Nilai</td>
                         <td class="px-5 py-2.5 text-right text-sm font-bold text-slate-800 tabular-nums">Rp {{ number_format($p->details->sum('subtotal'), 0, ',', '.') }}</td>
                     </tr>
                 </tfoot>

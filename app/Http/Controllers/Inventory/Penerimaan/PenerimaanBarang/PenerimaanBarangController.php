@@ -18,12 +18,12 @@ class PenerimaanBarangController extends Controller
     {
         $search = trim((string) $request->input('search'));
 
-        $query = Penerimaan::aktif()->with(['pemesanan', 'supplier', 'bagian', 'details']);
+        $query = Penerimaan::aktif()->with(['pemesanan', 'bagian', 'details']);
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('no_faktur', 'like', "%{$search}%")
-                    ->orWhereHas('supplier', fn ($s) => $s->where('nama_supplier', 'like', "%{$search}%"))
+                    ->orWhereHas('details.supplier', fn ($s) => $s->where('nama_supplier', 'like', "%{$search}%"))
                     ->orWhereHas('pemesanan', fn ($p) => $p->where('no_pemesanan', 'like', "%{$search}%"));
             });
         }
@@ -75,7 +75,7 @@ class PenerimaanBarangController extends Controller
         try {
             $penerimaan = new Penerimaan;
             $penerimaan->pemesanan_id = $pemesanan->pemesanan_id;
-            $penerimaan->supplier_id = $pemesanan->supplier_id;
+            $penerimaan->supplier_id = $pemesanan->details->first()?->supplier_id;
             $penerimaan->bagian_id = $pemesanan->bagian_id;
             $penerimaan->no_faktur = $data['no_faktur'];
             $penerimaan->tanggal_terima = $data['tanggal_terima'];
@@ -85,10 +85,16 @@ class PenerimaanBarangController extends Controller
             $penerimaan->status_batal = 0;
             $penerimaan->save();
 
+            $poDtl = $pemesanan->details->keyBy('barang_id');
+
             foreach ($items as $item) {
+                $poDetail = $poDtl->get($item['barang_id']);
+
                 $detail = new PenerimaanDetail;
                 $detail->penerimaan_id = $penerimaan->penerimaan_id;
                 $detail->barang_id = $item['barang_id'];
+                $detail->supplier_id = $poDetail?->supplier_id;
+                $detail->distributor_id = $poDetail?->distributor_id;
                 $detail->no_batch = $item['no_batch'];
                 $detail->jumlah_terima = $item['jumlah_terima'];
                 $detail->harga_beli = $item['harga_beli'];
@@ -135,7 +141,7 @@ class PenerimaanBarangController extends Controller
         $alreadyReceived = Penerimaan::aktif()->pluck('pemesanan_id');
 
         return Pemesanan::aktif()
-            ->with(['supplier', 'bagian', 'details' => fn ($q) => $q->aktif()->with('barang.satuan')])
+            ->with(['bagian', 'details' => fn ($q) => $q->aktif()->with('barang.satuan', 'supplier', 'distributor')])
             ->where('status_pemesanan', 1)
             ->whereNotIn('pemesanan_id', $alreadyReceived)
             ->orderBy('pemesanan_id')
@@ -146,7 +152,7 @@ class PenerimaanBarangController extends Controller
     {
         $alreadyReceived = Penerimaan::aktif()->pluck('pemesanan_id');
         $pemesanan = Pemesanan::aktif()
-            ->with(['supplier', 'bagian', 'details' => fn ($q) => $q->aktif()->with('barang.satuan')])
+            ->with(['bagian', 'details' => fn ($q) => $q->aktif()->with('barang.satuan', 'supplier', 'distributor')])
             ->where('status_pemesanan', 1)
             ->where('pemesanan_id', (int) $pemesananId)
             ->whereNotIn('pemesanan_id', $alreadyReceived)

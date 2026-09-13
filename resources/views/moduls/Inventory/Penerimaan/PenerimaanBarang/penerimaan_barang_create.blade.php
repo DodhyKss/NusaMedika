@@ -55,10 +55,9 @@
                     @enderror
                 </div>
 
-                <!-- PO / Supplier Info -->
+                <!-- PO Info -->
                 <div class="rounded-lg border border-slate-200 bg-slate-50 p-3.5 text-xs">
                     <p class="text-slate-500"><span class="font-semibold text-slate-600">No. Pemesanan:</span> {{ $pemesanan->no_pemesanan }}</p>
-                    <p class="text-slate-500 mt-1"><span class="font-semibold text-slate-600">Supplier:</span> {{ $pemesanan->supplier->nama_supplier ?? '-' }}</p>
                     <p class="text-slate-500 mt-1"><span class="font-semibold text-slate-600">Bagian:</span> {{ $pemesanan->bagian->nama_bagian ?? '-' }}</p>
                 </div>
             </div>
@@ -77,10 +76,12 @@
             <div class="mt-6">
                 <h3 class="text-sm font-semibold text-slate-800 mb-3">Item Penerimaan</h3>
                 <div class="overflow-x-auto rounded-lg border border-slate-200">
-                    <table class="w-full text-left" style="min-width: 900px;">
+                    <table class="w-full text-left" style="min-width: 1100px;">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200">
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Barang</th>
+                                <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Supplier</th>
+                                <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Distributor</th>
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Satuan</th>
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Jumlah Pesan</th>
                                 <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Jumlah Terima</th>
@@ -102,6 +103,8 @@
                                             <span class="block text-[10px] text-slate-400">{{ $d->barang->kode_barang }}</span>
                                         @endif
                                     </td>
+                                    <td class="px-3 py-3 text-slate-700">{{ $d->supplier->nama_supplier ?? '-' }}</td>
+                                    <td class="px-3 py-3 text-slate-700">{{ $d->distributor->nama_supplier ?? '-' }}</td>
                                     <td class="px-3 py-3 text-center text-slate-600">{{ $d->barang->textSatuan() ?? '-' }}</td>
                                     <td class="px-3 py-3 text-right text-slate-700 tabular-nums">{{ rtrim(rtrim(number_format((float) $d->jumlah_pesan, 2, ',', '.'), '0'), ',') }}</td>
                                     <td class="px-3 py-3 text-right">

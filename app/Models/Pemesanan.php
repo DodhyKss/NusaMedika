@@ -17,8 +17,6 @@ class Pemesanan extends Model
 
     protected $fillable = [
         'no_pemesanan',
-        'supplier_id',
-        'distributor_id',
         'bagian_id',
         'tanggal_pemesanan',
         'status_pemesanan',
@@ -37,16 +35,6 @@ class Pemesanan extends Model
         return $query->where(function ($q) {
             $q->whereNull('status_batal')->orWhere('status_batal', 0);
         });
-    }
-
-    public function supplier(): BelongsTo
-    {
-        return $this->belongsTo(Supplier::class, 'supplier_id', 'supplier_id');
-    }
-
-    public function distributor(): BelongsTo
-    {
-        return $this->belongsTo(Supplier::class, 'distributor_id', 'supplier_id');
     }
 
     public function bagian(): BelongsTo

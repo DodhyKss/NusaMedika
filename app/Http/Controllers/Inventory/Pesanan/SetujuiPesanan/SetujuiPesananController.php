@@ -13,7 +13,7 @@ class SetujuiPesananController extends Controller
     public function index(Request $request)
     {
         $query = Pemesanan::aktif()
-            ->with(['supplier', 'bagian', 'details' => fn ($q) => $q->aktif()->with('barang.satuan')])
+            ->with(['bagian', 'details' => fn ($q) => $q->aktif()->with('barang.satuan', 'supplier', 'distributor')])
             ->where('status_pemesanan', 0);
 
         $pemesananList = $query->orderBy('pemesanan_id')->paginate(10)->withQueryString();

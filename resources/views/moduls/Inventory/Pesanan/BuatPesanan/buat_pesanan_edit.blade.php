@@ -180,8 +180,6 @@
         var distributorOptions = @json($distributors->pluck('nama_supplier', 'supplier_id'));
         var barangSupplierMap = @json($barangSupplierMap);
         var supplierDistributorMap = @json($supplierDistributorMap);
-        var headerSupplier = @json($pemesanan->supplier_id);
-        var headerDistributor = @json($pemesanan->distributor_id);
 
         function suppliersForBarang(barangId) {
             var daftar = [];
@@ -203,6 +201,19 @@
             return daftar;
         }
 
+        function pasangRowSelect2($el, placeholder, enabled) {
+            if ($el.data('select2')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                placeholder: placeholder,
+                allowClear: true,
+                width: '100%'
+            });
+            $el.select2('enable', !!enabled);
+            $el.prop('disabled', !enabled);
+        }
+
         function renderRowSupplier(tr) {
             var $tr = $(tr);
             var $sup = $tr.find('select.sup-select');
@@ -213,7 +224,6 @@
             allowed.forEach(function (supId) {
                 $sup.append($('<option>').val(supId).text(supplierOptions[supId]));
             });
-            $sup.prop('disabled', !barangId);
 
             if (!barangId) {
                 $sup.val('');
@@ -224,9 +234,10 @@
                     $sup.append($('<option>').val(tr.dataset.supplier).text(tr.dataset.supplierLabel || 'Supplier'));
                     $sup.val(tr.dataset.supplier);
                 }
-            } else if (String(tr.dataset.item).indexOf('existing-') === 0 && headerSupplier && allowed.indexOf(String(headerSupplier)) !== -1) {
-                $sup.val(String(headerSupplier));
             }
+
+            $sup.prop('disabled', !barangId);
+            pasangRowSelect2($sup, '-- Supplier --', !!barangId);
 
             renderRowDistributor(tr);
         }
@@ -241,7 +252,6 @@
             allowed.forEach(function (distId) {
                 $dist.append($('<option>').val(distId).text(distributorOptions[distId]));
             });
-            $dist.prop('disabled', !supId);
 
             if (!supId) {
                 $dist.val('');
@@ -252,9 +262,10 @@
                     $dist.append($('<option>').val(tr.dataset.distributor).text(tr.dataset.distributorLabel || 'Distributor'));
                     $dist.val(tr.dataset.distributor);
                 }
-            } else if (String(tr.dataset.item).indexOf('existing-') === 0 && headerDistributor && allowed.indexOf(String(headerDistributor)) !== -1) {
-                $dist.val(String(headerDistributor));
             }
+
+            $dist.prop('disabled', !supId);
+            pasangRowSelect2($dist, '-- Distributor --', !!supId);
         }
 
         function rupiah(v) {
@@ -371,6 +382,7 @@
             var $sel = $tr.find('select.barang-select');
             window.initBarangSelect($sel, apiUrl);
             bindRow(tr, $tr);
+            renderRowSupplier(tr);
             updateTotal();
         }
 

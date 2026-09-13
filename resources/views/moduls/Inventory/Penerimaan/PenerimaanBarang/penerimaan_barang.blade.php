@@ -53,7 +53,6 @@
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">No.</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">No. Faktur</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">No. Pemesanan</th>
-                    <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Supplier</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Bagian</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tanggal Terima</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Jumlah Item</th>
@@ -68,14 +67,13 @@
                         <td class="px-3 py-3 text-center text-slate-500">{{ $noUrut }}</td>
                         <td class="px-3 py-3 font-semibold text-slate-800">{{ $r->no_faktur ?: '-' }}</td>
                         <td class="px-3 py-3 text-slate-600">{{ $r->pemesanan->no_pemesanan ?? '-' }}</td>
-                        <td class="px-3 py-3 text-slate-600">{{ $r->supplier->nama_supplier ?? '-' }}</td>
                         <td class="px-3 py-3 text-slate-600">{{ $r->bagian->nama_bagian ?? '-' }}</td>
                         <td class="px-3 py-3 text-slate-600">{{ \Carbon\Carbon::parse($r->tanggal_terima)->format('d-m-Y') }}</td>
                         <td class="px-3 py-3 text-center text-slate-600">{{ $r->details->count() }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-3 py-12 text-center">
+                        <td colspan="6" class="px-3 py-12 text-center">
                             <div class="flex flex-col items-center gap-2 text-slate-400">
                                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                                 <p class="text-sm font-medium">Belum ada data penerimaan barang.</p>

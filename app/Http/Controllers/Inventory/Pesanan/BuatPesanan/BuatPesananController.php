@@ -19,7 +19,7 @@ class BuatPesananController extends Controller
         $status = $request->input('status');
         $search = trim((string) $request->input('search'));
 
-        $query = Pemesanan::aktif()->with('supplier', 'distributor', 'bagian', 'details');
+        $query = Pemesanan::aktif()->with('bagian', 'details');
 
         if ($status !== null && $status !== '') {
             $query->where('status_pemesanan', (int) $status);
@@ -28,7 +28,7 @@ class BuatPesananController extends Controller
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('no_pemesanan', 'like', "%{$search}%")
-                    ->orWhereHas('supplier', fn ($s) => $s->where('nama_supplier', 'like', "%{$search}%"));
+                    ->orWhereHas('details.supplier', fn ($s) => $s->where('nama_supplier', 'like', "%{$search}%"));
             });
         }
 
@@ -60,8 +60,6 @@ class BuatPesananController extends Controller
         DB::beginTransaction();
         try {
             $pemesanan = new Pemesanan;
-            $pemesanan->supplier_id = $items[0]['supplier_id'] ?? null;
-            $pemesanan->distributor_id = $items[0]['distributor_id'] ?? null;
             $pemesanan->bagian_id = $data['bagian_id'];
             $pemesanan->tanggal_pemesanan = $data['tanggal_pemesanan'];
             $pemesanan->status_pemesanan = 0;
@@ -88,7 +86,7 @@ class BuatPesananController extends Controller
 
     public function edit($pemesanan)
     {
-        $pemesanan = Pemesanan::aktif()->with(['details' => fn ($q) => $q->aktif()->with('barang.satuan', 'supplier', 'distributor'), 'supplier', 'distributor', 'bagian'])->findOrFail($pemesanan);
+        $pemesanan = Pemesanan::aktif()->with(['details' => fn ($q) => $q->aktif()->with('barang.satuan', 'supplier', 'distributor'), 'bagian'])->findOrFail($pemesanan);
 
         if ((int) $pemesanan->status_pemesanan !== 0) {
             return redirect()->route('buat_pesanan.index')->with('error', 'Pemesanan sudah diproses, tidak dapat diubah.');
@@ -120,8 +118,6 @@ class BuatPesananController extends Controller
 
         DB::beginTransaction();
         try {
-            $pemesanan->supplier_id = $items[0]['supplier_id'] ?? $pemesanan->supplier_id;
-            $pemesanan->distributor_id = $items[0]['distributor_id'] ?? $pemesanan->distributor_id;
             $pemesanan->bagian_id = $data['bagian_id'];
             $pemesanan->tanggal_pemesanan = $data['tanggal_pemesanan'];
             $pemesanan->keterangan = $data['keterangan'];

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Inventory\Stock\KartuStock;
 use App\Http\Controllers\Controller;
 use App\Models\Bagian;
 use App\Models\Barang;
-use App\Models\HargaBarang;
 use App\Models\KartuStock;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -37,6 +36,7 @@ class KartuStockController extends Controller
         $bagianId = $request->input('bagian_id');
         $tanggalAwal = $request->input('tanggal_awal');
         $tanggalAkhir = $request->input('tanggal_akhir');
+        $runningMap = [];
 
         $base = function () use ($barangId, $bagianId, $tanggalAwal, $tanggalAkhir) {
             return DB::table('kartu_stock')
@@ -115,9 +115,9 @@ class KartuStockController extends Controller
             $kartuList = $query->paginate(50)->withQueryString();
             $totMasuk = $base()->sum('qty_masuk');
             $totKeluar = $base()->sum('qty_keluar');
-        }
 
-        $hargaMap = HargaBarang::aktif()->get()->keyBy(fn ($h) => $h->barang_id.'|'.($h->no_batch ?? '-'));
+            $runningMap = $this->runningBalancePerBarang($barangId, $bagianId);
+        }
 
         $barangList = Barang::aktif()->with('satuan')->orderBy('nama_barang')->get();
         $bagianList = Bagian::aktif()->orderBy('nama_bagian')->get();
@@ -125,8 +125,32 @@ class KartuStockController extends Controller
 
         return view('moduls.Inventory.Stock.KartuStock.kartu_stock', compact(
             'jenis', 'jenisOpts', 'kartuList', 'barangId', 'bagianId', 'tanggalAwal', 'tanggalAkhir',
-            'totMasuk', 'totKeluar', 'hargaMap', 'barangList', 'bagianList'
+            'totMasuk', 'totKeluar', 'runningMap', 'barangList', 'bagianList'
         ));
+    }
+
+    private function runningBalancePerBarang(?string $barangId, ?string $bagianId): array
+    {
+        $rows = DB::table('kartu_stock')
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->when($barangId !== null && $barangId !== '', fn ($q) => $q->where('barang_id', (int) $barangId))
+            ->when($bagianId !== null && $bagianId !== '', fn ($q) => $q->where('bagian_id', (int) $bagianId))
+            ->orderBy('tanggal')->orderBy('kartu_stock_id')
+            ->get(['kartu_stock_id', 'barang_id', 'qty_masuk', 'qty_keluar']);
+
+        $saldoPerBarang = [];
+        $map = [];
+
+        foreach ($rows as $r) {
+            $sebelum = (float) ($saldoPerBarang[$r->barang_id] ?? 0);
+            $sesudah = $sebelum + (float) $r->qty_masuk - (float) $r->qty_keluar;
+            $map[$r->kartu_stock_id] = [$sebelum, $sesudah];
+            $saldoPerBarang[$r->barang_id] = $sesudah;
+        }
+
+        return $map;
     }
 
     private function paginate($rows, Request $request, int $perPage = 50): LengthAwarePaginator
