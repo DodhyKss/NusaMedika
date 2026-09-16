@@ -155,7 +155,6 @@
         </div>
     </x-emr-split-layout>
 
-    @push('scripts')
     @php
         $existingItemsJson = $editDetails->map(fn ($d) => [
             'barang_id' => (string) $d->barang_id,
@@ -167,7 +166,7 @@
         ])->values();
     @endphp
     <script>
-        (function () {
+        document.addEventListener('DOMContentLoaded', function () {
             var apiUrl = "{{ route('api.barang.search') }}";
             var tbody = document.getElementById('tbodyItem');
             var placeholder = document.getElementById('rowPlaceholder');
@@ -183,7 +182,7 @@
                 tr.dataset.item = counter;
                 tr.innerHTML = [
                     '<td class="px-3 py-2 align-top">',
-                    '   <select name="barang_id[]" class="barang-select text-sm w-full" style="min-width:220px;"></select>',
+                    '   <select name="barang_id[]" class="barang-select text-sm w-full" style="min-width:220px;"' + (isView ? ' disabled' : '') + '></select>',
                     '</td>',
                     '<td class="px-3 py-2 align-top">',
                     '   <input type="number" name="jumlah[]" min="1" step="any" value="' + (item.jumlah || '1') + '" class="text-sm w-full text-right border border-slate-200 rounded-lg px-2 py-2 bg-slate-50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-slate-700" style="min-width:70px;"' + (isView ? ' readonly' : '') + '>',
@@ -221,7 +220,11 @@
                 }
 
                 $tr.find('.btn-hapus-item').on('click', function () {
-                    if ($sel.data('select2')) $sel.select2('destroy');
+                    try {
+                        if ($sel.data('select2')) {
+                            $sel.select2('destroy');
+                        }
+                    } catch (e) {}
                     tr.remove();
                     if (!tbody.querySelector('tr[data-item]')) {
                         placeholder.style.display = '';
@@ -233,12 +236,13 @@
                 var preload = @json($barangs);
                 if (!preload.length) return false;
                 $select.find('option[value]').not('[value=""]').remove();
+                $select.append($('<option value=""></option>'));
                 preload.forEach(function (b) {
                     var opt = new Option(b.nama_barang, b.barang_id);
                     $(opt).attr('data-satuan', b.textSatuan || '');
                     $select.append(opt);
                 });
-                if (barangId) $select.val(barangId);
+                $select.val(barangId || null);
                 return true;
             }
 
@@ -248,17 +252,17 @@
             });
 
             existingItems.forEach(function (item) { addRow(item); });
-            if (!counter) addRow();
-        })();
+        });
     </script>
 
     <script>
-        document.getElementById('searchInputResep').addEventListener('input', function () {
-            var filter = this.value.toLowerCase();
-            document.querySelectorAll('.riwayat-item').forEach(function (item) {
-                item.style.display = item.textContent.toLowerCase().includes(filter) ? '' : 'none';
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('searchInputResep').addEventListener('input', function () {
+                var filter = this.value.toLowerCase();
+                document.querySelectorAll('.riwayat-item').forEach(function (item) {
+                    item.style.display = item.textContent.toLowerCase().includes(filter) ? '' : 'none';
+                });
             });
         });
     </script>
-    @endpush
 @endsection

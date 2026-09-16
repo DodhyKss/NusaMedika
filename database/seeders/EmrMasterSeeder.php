@@ -35,8 +35,9 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_id' => 1, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Soap'],
             // Menu 2 "Pengkajian"
             ['dashboard_menu_sub_id' => 2, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Pengkajian Keperawatan'],
-            // Menu 3 "Resep"
-            ['dashboard_menu_sub_id' => 3, 'dashboard_menu_id' => 3, 'nama_sub_menu' => 'Resep'],
+            // Menu 3 "Resep" — nama sub menu harus sama dengan slug form (peresepan_obat)
+            // agar link dashboard meneruskan form_name yang benar ke PeresepanObatController.
+            ['dashboard_menu_sub_id' => 3, 'dashboard_menu_id' => 3, 'nama_sub_menu' => 'Peresepan Obat'],
         ];
 
         foreach ($subMenus as $subMenu) {

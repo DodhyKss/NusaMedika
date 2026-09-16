@@ -32,34 +32,38 @@ class ListPesananResepController extends Controller
         $pasienId = $request->input('pasien_id');
         $status = $request->input('status');
 
+        $hasFilter = $tglAwal || $tglAkhir || $jenisRawat || $noResep || $pasienId || $status !== null && $status !== '';
+
         $query = PeresepanObat::aktif()
             ->with(['pasien', 'dokter', 'registrasiDetail.bagian', 'registrasiDetail.registrasi', 'details'])
             ->when($status === null || $status === '', fn ($q) => $q->where('status_resep', '!=', 2))
             ->when($status !== null && $status !== '', fn ($q) => $q->where('status_resep', (int) $status));
 
-        if ($tglAwal !== null && $tglAwal !== '') {
-            $query->whereDate('tanggal_resep', '>=', $tglAwal);
+        if ($hasFilter) {
+            if ($tglAwal !== null && $tglAwal !== '') {
+                $query->whereDate('tanggal_resep', '>=', $tglAwal);
+            }
+
+            if ($tglAkhir !== null && $tglAkhir !== '') {
+                $query->whereDate('tanggal_resep', '<=', $tglAkhir);
+            }
+
+            if ($jenisRawat !== null && $jenisRawat !== '') {
+                $query->whereHas('registrasiDetail.registrasi', function ($rq) use ($jenisRawat) {
+                    $rq->where('jenis_rawat', $jenisRawat);
+                });
+            }
+
+            if ($noResep !== null && $noResep !== '') {
+                $query->where('no_resep', 'like', '%'.$noResep.'%');
+            }
+
+            if ($pasienId !== null && $pasienId !== '') {
+                $query->where('pasien_id', (int) $pasienId);
+            }
         }
 
-        if ($tglAkhir !== null && $tglAkhir !== '') {
-            $query->whereDate('tanggal_resep', '<=', $tglAkhir);
-        }
-
-        if ($jenisRawat !== null && $jenisRawat !== '') {
-            $query->whereHas('registrasiDetail.registrasi', function ($rq) use ($jenisRawat) {
-                $rq->where('jenis_rawat', $jenisRawat);
-            });
-        }
-
-        if ($noResep !== null && $noResep !== '') {
-            $query->where('no_resep', 'like', '%'.$noResep.'%');
-        }
-
-        if ($pasienId !== null && $pasienId !== '') {
-            $query->where('pasien_id', (int) $pasienId);
-        }
-
-        $resepList = $query->orderByDesc('peresepan_obat_id')->paginate(10)->withQueryString();
+        $resepList = $hasFilter ? $query->orderByDesc('peresepan_obat_id')->paginate(10)->withQueryString() : null;
 
         return view('moduls.Farmasi.Resep.ListPesananResep.list_pesanan_resep', compact(
             'depoList',

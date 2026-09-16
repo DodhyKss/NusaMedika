@@ -54,14 +54,24 @@
             
             if (toggleBtn && sidebar) {
                 toggleBtn.addEventListener('click', function() {
-                    if (sidebar.classList.contains('w-70')) {
+                    const collapsed = sidebar.classList.toggle('sidebar-collapsed');
+
+                    if (collapsed) {
                         sidebar.classList.remove('w-70');
-                        sidebar.classList.add('w-0');
-                        sidebar.classList.remove('border-r');
+                        sidebar.classList.add('w-[68px]');
+                        sidebar.querySelectorAll('details[open]').forEach(d => d.removeAttribute('open'));
                     } else {
-                        sidebar.classList.remove('w-0');
+                        sidebar.classList.remove('w-[68px]');
                         sidebar.classList.add('w-70');
-                        sidebar.classList.add('border-r');
+                    }
+                });
+
+                // Saat collapsed, klik ikon modul = kembalikan sidebar ke ukuran penuh.
+                sidebar.addEventListener('click', function(e) {
+                    const summary = e.target.closest('.modul-summary');
+                    if (summary && sidebar.classList.contains('sidebar-collapsed')) {
+                        e.preventDefault();
+                        toggleBtn.click();
                     }
                 });
             }

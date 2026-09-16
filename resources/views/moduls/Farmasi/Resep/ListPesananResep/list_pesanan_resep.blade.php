@@ -101,6 +101,7 @@
     </div>
 </form>
 
+@if($resepList !== null)
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
     <div class="overflow-x-auto drag-scroll">
         <table class="w-full text-left">
@@ -168,7 +169,7 @@
                 @empty
                     <tr>
                         <td colspan="7" class="px-5 py-12 text-center text-sm text-slate-400">
-                            Tidak ada resep yang menunggu dispense.
+                            Tidak ada resep ditemukan untuk filter ini.
                         </td>
                     </tr>
                 @endforelse
@@ -180,4 +181,12 @@
 <div class="mt-4">
     {{ $resepList->links('components.pagination') }}
 </div>
+@else
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm">
+    <div class="flex flex-col items-center gap-3 py-16 text-slate-400">
+        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <p class="text-sm font-medium">Gunakan filter pencarian di atas untuk menampilkan daftar resep.</p>
+    </div>
+</div>
+@endif
 @endsection
