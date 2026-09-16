@@ -22,6 +22,7 @@ class KartuStock extends Model
         'jenis_mutasi',
         'ref_penerimaan_detail_id',
         'ref_mutasi_barang_detail_id',
+        'ref_peresepan_obat_detail_id',
         'qty_masuk',
         'qty_keluar',
         'saldo_sebelum',
@@ -38,6 +39,7 @@ class KartuStock extends Model
         2 => 'Mutasi Masuk',
         3 => 'Mutasi Keluar',
         4 => 'Pemakaian',
+        5 => 'Dispense Obat',
     ];
 
     public function scopeAktif(Builder $query): Builder
@@ -65,6 +67,11 @@ class KartuStock extends Model
     public function mutasiBarangDetail(): BelongsTo
     {
         return $this->belongsTo(MutasiBarangDetail::class, 'ref_mutasi_barang_detail_id', 'mutasi_barang_detail_id');
+    }
+
+    public function peresepanObatDetail(): BelongsTo
+    {
+        return $this->belongsTo(PeresepanObatDetail::class, 'ref_peresepan_obat_detail_id', 'peresepan_obat_detail_id');
     }
 
     public function getJenisLabelAttribute(): string

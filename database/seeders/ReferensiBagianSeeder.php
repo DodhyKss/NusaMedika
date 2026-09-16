@@ -18,6 +18,7 @@ class ReferensiBagianSeeder extends Seeder
             ['referensi_bagian_id' => 2, 'nama_referensi_bagian' => 'RAWAT INAP'],
             ['referensi_bagian_id' => 3, 'nama_referensi_bagian' => 'IGD'],
             ['referensi_bagian_id' => 4, 'nama_referensi_bagian' => 'GUDANG'],
+            ['referensi_bagian_id' => 5, 'nama_referensi_bagian' => 'DEPO'],
         ];
 
         foreach ($referensiBagians as $referensi) {

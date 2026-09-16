@@ -19,6 +19,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['modul_id' => 4, 'nama_modul' => 'Gawat Darurat', 'icon_modul' => 'fa-solid fa-truck-medical', 'urutan_modul' => 5],
             ['modul_id' => 5, 'nama_modul' => 'Administrator', 'icon_modul' => 'fa-solid fa-gear', 'urutan_modul' => 6],
             ['modul_id' => 6, 'nama_modul' => 'Inventory', 'icon_modul' => 'fa-solid fa-box-archive', 'urutan_modul' => 7],
+            ['modul_id' => 7, 'nama_modul' => 'Farmasi', 'icon_modul' => 'fa-solid fa-prescription-bottle-medical', 'urutan_modul' => 2],
         ];
 
         foreach ($moduls as $modul) {
@@ -52,6 +53,8 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['menu_id' => 10, 'modul_id' => 6, 'nama_menu' => 'Penerimaan', 'urutan_menu' => 2],
             ['menu_id' => 11, 'modul_id' => 6, 'nama_menu' => 'Stock', 'urutan_menu' => 3],
             ['menu_id' => 12, 'modul_id' => 6, 'nama_menu' => 'Distribusi', 'urutan_menu' => 4],
+            // Modul Farmasi (7)
+            ['menu_id' => 13, 'modul_id' => 7, 'nama_menu' => 'Resep', 'urutan_menu' => 1],
         ];
 
         foreach ($menus as $menu) {
@@ -119,6 +122,8 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 41, 'menu_id' => 11, 'nama_sub_menu' => 'Kartu Stock', 'file_sub_menu' => 'Inventory/Stock/KartuStock/kartu_stock', 'urutan_sub_menu' => 2],
             // Menu Distribusi (12) - Inventory
             ['sub_menu_id' => 42, 'menu_id' => 12, 'nama_sub_menu' => 'Mutasi Barang', 'file_sub_menu' => 'Inventory/Distribusi/MutasiBarang/mutasi_barang', 'urutan_sub_menu' => 1],
+            // Menu Resep (13) - Farmasi
+            ['sub_menu_id' => 43, 'menu_id' => 13, 'nama_sub_menu' => 'List Pesanan Resep', 'file_sub_menu' => 'Farmasi/Resep/ListPesananResep/list_pesanan_resep', 'urutan_sub_menu' => 1],
         ];
 
         foreach ($subMenus as $subMenu) {

@@ -16,6 +16,7 @@ class EmrMasterSeeder extends Seeder
         $menus = [
             ['dashboard_menu_id' => 1, 'nama_menu' => 'Catatan Medis'],
             ['dashboard_menu_id' => 2, 'nama_menu' => 'Pengkajian'],
+            ['dashboard_menu_id' => 3, 'nama_menu' => 'Resep'],
         ];
 
         foreach ($menus as $menu) {
@@ -34,6 +35,8 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_id' => 1, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Soap'],
             // Menu 2 "Pengkajian"
             ['dashboard_menu_sub_id' => 2, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Pengkajian Keperawatan'],
+            // Menu 3 "Resep"
+            ['dashboard_menu_sub_id' => 3, 'dashboard_menu_id' => 3, 'nama_sub_menu' => 'Resep'],
         ];
 
         foreach ($subMenus as $subMenu) {
@@ -72,6 +75,7 @@ class EmrMasterSeeder extends Seeder
             ['form_id' => 2, 'nama_form' => 'SOAP / CPPT', 'slug' => 'soap', 'id_dash_menu' => '1.1', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 3, 'nama_form' => 'Pengkajian Awal Keperawatan', 'slug' => 'pengkajian_awal_keperawatan', 'id_dash_menu' => '2.2.1', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 4, 'nama_form' => 'Pengkajian Harian Keperawatan', 'slug' => 'pengkajian_harian_keperawatan', 'id_dash_menu' => '2.2.2', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            ['form_id' => 5, 'nama_form' => 'Peresepan Obat', 'slug' => 'peresepan_obat', 'id_dash_menu' => '3.3', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
         ];
 
         foreach ($forms as $form) {
@@ -102,6 +106,7 @@ class EmrMasterSeeder extends Seeder
             56 => 'GCS Verbal', 57 => 'GCS Score', 58 => 'BMI', 59 => 'DPO', 60 => 'Nomor Handphone',
             61 => 'Riwayat Operasi Kemo', 62 => 'Vaksin COVID', 63 => 'Alloanamnesa', 64 => 'Nama Alloanamnesa', 65 => 'Hubungan Alloanamnesa',
             66 => 'UP GO 1a', 67 => 'UP GO 1b', 68 => 'UP GO 2',
+            69 => 'Obat', 70 => 'Jumlah', 71 => 'S 1', 72 => 'S 2', 73 => 'Aturan Pakai', 74 => 'Rute Pemberian',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -159,6 +164,10 @@ class EmrMasterSeeder extends Seeder
                 'ews' => 16, 'gcs_jumlah' => 57, 'pemberian_o2' => 18,
                 'cara_pemberian_o2' => 19, 'ett' => 20,
             ],
+            5 => [
+                'barang_id' => 69, 'jumlah' => 70, 's_1' => 71, 's_2' => 72,
+                'aturan_pakai' => 73, 'rute_pemberian' => 74,
+            ],
         ];
 
         foreach ($mapping as $formId => $variabels) {
@@ -189,6 +198,7 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(2);
         EmrHelper::backfillObjekId(3);
         EmrHelper::backfillObjekId(4);
+        EmrHelper::backfillObjekId(5);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -198,6 +208,7 @@ class EmrMasterSeeder extends Seeder
             ['profesi_id' => 1, 'form_id' => 2, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 1, 'form_id' => 3, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 1, 'form_id' => 4, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 5, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             // Perawat (profesi 2): form pengkajian saja
             ['profesi_id' => 2, 'form_id' => 3, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 4, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],

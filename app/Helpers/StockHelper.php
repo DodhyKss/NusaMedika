@@ -12,7 +12,7 @@ class StockHelper
     /**
      * Mencatat stok masuk: update saldo tabel `stock` + tulis baris kartu_stock.
      *
-     * @param  array{jenis_mutasi?: int, ref_penerimaan_detail_id?: int|null, ref_mutasi_barang_detail_id?: int|null, tanggal?: \DateTimeInterface|Carbon|null, keterangan?: string|null, harga_beli?: float|null, harga_jual?: float|null, tgl_expired?: string|null}  $opts
+     * @param  array{jenis_mutasi?: int, ref_penerimaan_detail_id?: int|null, ref_mutasi_barang_detail_id?: int|null, ref_peresepan_obat_detail_id?: int|null, tanggal?: \DateTimeInterface|Carbon|null, keterangan?: string|null, harga_beli?: float|null, harga_jual?: float|null, tgl_expired?: string|null}  $opts
      */
     public static function tambahMasuk(int $bagianId, int $barangId, ?string $noBatch, float $qty, array $opts = []): void
     {
@@ -22,7 +22,7 @@ class StockHelper
     /**
      * Mencatat stok keluar: update saldo tabel `stock` + tulis baris kartu_stock.
      *
-     * @param  array{jenis_mutasi?: int, ref_penerimaan_detail_id?: int|null, ref_mutasi_barang_detail_id?: int|null, tanggal?: \DateTimeInterface|Carbon|null, keterangan?: string|null, harga_beli?: float|null, harga_jual?: float|null, tgl_expired?: string|null}  $opts
+     * @param  array{jenis_mutasi?: int, ref_penerimaan_detail_id?: int|null, ref_mutasi_barang_detail_id?: int|null, ref_peresepan_obat_detail_id?: int|null, tanggal?: \DateTimeInterface|Carbon|null, keterangan?: string|null, harga_beli?: float|null, harga_jual?: float|null, tgl_expired?: string|null}  $opts
      */
     public static function tambahKeluar(int $bagianId, int $barangId, ?string $noBatch, float $qty, array $opts = []): void
     {
@@ -67,6 +67,7 @@ class StockHelper
         $kartu->jenis_mutasi = $opts['jenis_mutasi'] ?? ($masuk > 0 ? 1 : 3);
         $kartu->ref_penerimaan_detail_id = $opts['ref_penerimaan_detail_id'] ?? null;
         $kartu->ref_mutasi_barang_detail_id = $opts['ref_mutasi_barang_detail_id'] ?? null;
+        $kartu->ref_peresepan_obat_detail_id = $opts['ref_peresepan_obat_detail_id'] ?? null;
         $kartu->qty_masuk = $masuk;
         $kartu->qty_keluar = $keluar;
         $kartu->saldo_sebelum = $sebelum;

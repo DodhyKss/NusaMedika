@@ -5,6 +5,7 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\EMR\DynamicFormController;
 use App\Http\Controllers\EMR\EmrDashboard\EmrDashboardController;
 use App\Http\Controllers\EMR\Soap\SoapController;
+use App\Http\Controllers\Farmasi\Resep\ListPesananResep\ListPesananResepController;
 use App\Http\Controllers\Inventory\Pesanan\BuatPesanan\BuatPesananController;
 use App\Http\Controllers\Inventory\Pesanan\SetujuiPesanan\SetujuiPesananController;
 use Illuminate\Support\Facades\Route;
@@ -50,4 +51,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/pemesanan/{pemesanan}/setujui', [SetujuiPesananController::class, 'setujui'])->name('pemesanan.setujui');
     Route::post('/pemesanan/{pemesanan}/tolak', [SetujuiPesananController::class, 'tolak'])->name('pemesanan.tolak');
     Route::post('/pemesanan/{pemesanan}/batal', [BuatPesananController::class, 'batal'])->name('pemesanan.batal');
+
+    // ============ ROUTE FARMASI ============= #
+    // Aksi non-CRUD peresepan (pilih depo / dispense / batal) didaftarkan manual.
+    Route::post('/list_pesanan_resep/depo', [ListPesananResepController::class, 'pilihDepo'])->name('list_pesanan_resep.depo');
+    Route::get('/list_pesanan_resep/{peresepan_obat}', [ListPesananResepController::class, 'detail'])->name('list_pesanan_resep.detail');
+    Route::get('/list_pesanan_resep/{peresepan_obat}/cetak-tiket', [ListPesananResepController::class, 'cetakTiket'])->name('list_pesanan_resep.cetak_tiket');
+    Route::get('/list_pesanan_resep/{peresepan_obat}/cetak-detail', [ListPesananResepController::class, 'cetakDetail'])->name('list_pesanan_resep.cetak_detail');
+    Route::get('/list_pesanan_resep/{peresepan_obat}/dispense', [ListPesananResepController::class, 'dispense'])->name('list_pesanan_resep.dispense');
+    Route::post('/list_pesanan_resep/{peresepan_obat}/dispense', [ListPesananResepController::class, 'dispenseStore'])->name('list_pesanan_resep.dispense_store');
+    Route::post('/list_pesanan_resep/{peresepan_obat}/batal', [ListPesananResepController::class, 'batal'])->name('list_pesanan_resep.batal');
 });

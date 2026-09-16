@@ -58,6 +58,14 @@ class BagianSeeder extends Seeder
             'GUDANG LOGISTIK',
         ];
 
+        // Depo: tempat apoteker bertugas & mengeluarkan obat (dispense resep)
+        $depos = [
+            'DEPO RAWAT JALAN',
+            'DEPO RAWAT INAP',
+            'DEPO IGD',
+            'DEPO LAIN',
+        ];
+
         $bagians = [];
         $id = 1;
         foreach ($polies as $nama) {
@@ -71,6 +79,9 @@ class BagianSeeder extends Seeder
         }
         foreach ($gudangs as $nama) {
             $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 4];
+        }
+        foreach ($depos as $nama) {
+            $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 5];
         }
 
         // Hapus permanen record lama (placeholder Rawat Jalan/Rawat Inap/IGD + data lama) lalu seed ulang
