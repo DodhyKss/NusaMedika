@@ -84,6 +84,14 @@ Form Modul (tambah/ubah) memakai **icon picker grid**, bukan text input: 2587 ik
 
 Daftar pilihan dropdown yang **tidak** tersimpan di database (19 key di `App\Helpers\SelectOption::all()`: `jenis_kelamin`, `agama`, `golongan_darah`, `status_perkawinan`, `kebangsaan`, `suku`, `pendidikan`, `pekerjaan`, `disabilitas`, `status_kepegawaian`, `triase_igd`, `triase_igd_obgyn`, `cara_masuk_igd`, `hubungan_penanggung`, `indikasi_igd_obgyn`, `hubungan_penanggung_obgyn`, `asal_pasien_ranap`, `hubungan_keluarga_ranap`, `kategori_icd`) dipusatkan di `App\Helpers\SelectOption`. Jangan hardcode `<option>` di blade — ambil via `\App\Helpers\SelectOption::get($key)` untuk datanya, atau `\App\Helpers\SelectOption::render($key, $selected = null, $placeholder = null)` untuk output `<option>` siap pakai. Tambah pilihan baru cukup di array `all()`. **Poliklinik/dokter/ruang TIDAK ada di sini** (18 key di atas; poliklinik/dokter diambil dari tabel `bagian`/`jadwal_dokter`/`pegawai` — lihat section Jadwal Dokter) dan **kelas perawatan juga TIDAK di sini** — diambil dari tabel `kelas_ruang` (lihat section Master Kelas).
 
+## Konvensi: jangan mengetik ulang kode berulang
+
+Aturan praktis saat menulis fitur **baru** maupun **memodifikasi** yang ada:
+
+- **Filter/pilihan yang sering dipakai → buat blade component** (`resources/views/components/`). Jangan salin- tempel markup filter di banyak blade. Contoh yang sudah ada: `x-select_poliklinik`, `x-select_dokter`, `x-select_pasien`, `x-select_ruang_perawatan`, `x-select_ajax`, `x-informasi-pasien` (komponen class-based opsional, mis. `app/View/Components/`). Kalau satu blok markup/jQuery diulang di ≥2 halaman, refactor jadi component.
+- **Fungsi/logika yang dipanggil berulang → taruh di helper**, bukan di setiap controller. Utama: `App\Helpers\EmrHelper` (operasi EMR), `App\Helpers\GenerateHelper` (no_mr, resetSequence), `App\Helpers\SelectOption` (opsi dropdown statis), `App\Helpers\AksesEhr` (gate akses EMR). Polanya: method statis tanpa state, dipanggil lintas controller/view.
+- **Opsi dropdown tidak harus disimpan di database.** Pilihan statis/baru yang sifatnya enumerasi (status, kategori, jenis, dst.) cukup ditambahkan ke `App\Helpers\SelectOption::all()` lalu dipakai via `get()`/`render()` — tabel baru hanya diperlukan bila piliannya butuh data CRUD dinamis (poliklinik, dokter, kelas, nasabah, barang, dst.).
+
 ## Modular structure (semua modul)
 
 The same modular layout applies to **every** modul, menu, and sub_menu in the sidebar:

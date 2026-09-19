@@ -24,10 +24,11 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             WilayahSeeder::class,
             KelasRuangSeeder::class,
+            NasabahSeeder::class,
             IcdSeeder::class,
+            JadwalDokterSeeder::class,
             EmrMasterSeeder::class,
         ]);
-
         // Seeder di atas mengisi ID eksplisit (updateOrInsert), sehingga sequence
         // auto-increment tidak ikut maju. Setel ulang sequence agar insert baru
         // via aplikasi (yang memakai auto-increment) tidak bentrok dengan ID seeder.
@@ -39,7 +40,8 @@ class DatabaseSeeder extends Seeder
         $tables = [
             'referensi_bagian', 'bagian', 'modul', 'menu', 'sub_menu',
             'profesi', 'jabatan', 'status_kepegawaian', 'pegawai', 'users',
-            'provinsi', 'kabupaten', 'kecamatan', 'kelurahan', 'kelas_ruang',
+            'provinsi', 'kabupaten', 'kecamatan', 'kelurahan', 'kelas_ruang', 'nasabah',
+            'jadwal_dokter',
             'dashboard_menu', 'dashboard_menu_sub', 'dashboard_menu_sub_extra', 'form', 'akses_ehr',
             'objek', 'objek_form_control',
         ];

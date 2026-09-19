@@ -52,10 +52,10 @@ class BagianSeeder extends Seeder
             'IRD OBGYN',
         ];
 
-        // Gudang/Depo: tujuan utama stok masuk (penerimaan barang) sebelum didistribusikan ke bagian lain
+        // Gudang/Depo: tujuan utama stok masuk (penerimaan barang) sebelum didistribusikan ke bagian lain.
+        // Gudang dibiarkan satu saja: GUDANG (referensi_bagian_id 4).
         $gudangs = [
-            'GUDANG FARMASI',
-            'GUDANG LOGISTIK',
+            'GUDANG',
         ];
 
         // Depo: tempat apoteker bertugas & mengeluarkan obat (dispense resep)
