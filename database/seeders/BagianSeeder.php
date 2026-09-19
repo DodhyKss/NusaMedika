@@ -66,6 +66,14 @@ class BagianSeeder extends Seeder
             'DEPO LAIN',
         ];
 
+        // Penunjang Medis (referensi_bagian_id 6): Lab & Radiologi.
+        // SELALU APPEND di akhir — jangan sisipkan di tengah list agar id existing
+        // (yang sudah direferensikan) tidak berubah.
+        $penunjangs = [
+            'INSTALASI LABORATORIUM',
+            'INSTALASI RADIOLOGI',
+        ];
+
         $bagians = [];
         $id = 1;
         foreach ($polies as $nama) {
@@ -82,6 +90,9 @@ class BagianSeeder extends Seeder
         }
         foreach ($depos as $nama) {
             $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 5];
+        }
+        foreach ($penunjangs as $nama) {
+            $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 6];
         }
 
         // Hapus permanen record lama (placeholder Rawat Jalan/Rawat Inap/IGD + data lama) lalu seed ulang

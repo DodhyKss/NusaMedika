@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\EMR\PeresepanObat;
+namespace App\Http\Controllers\EMR\OrderResep;
 
 use App\Helpers\AksesEhr;
 use App\Helpers\EmrHelper;
@@ -13,19 +13,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class PeresepanObatController extends Controller
+class OrderResepController extends Controller
 {
     /**
      * Form penulisan resep (EMR) untuk seorang pasien. Data tersimpan di
      * tabel `peresepan_obat` + `peresepan_obat_detail` (bukan emr/emr_detail).
-     * $emr_id pada URL /emr/form/peresepan_obat/{registrasi_detail_id}/{emr_id}
+     * $emr_id pada URL /emr/form/order_resep/{registrasi_detail_id}/{emr_id}
      * di sini bermakna peresepan_obat_id.
      */
     public function index($registrasi_detail_id, $emr_id = null, $form_name = null)
     {
         $registrasi_detail = RegistrasiDetail::with('registrasi.pasien')->findOrFail($registrasi_detail_id);
 
-        $form_id = EmrHelper::formIdBySlug('peresepan_obat');
+        $form_id = EmrHelper::formIdBySlug('order_resep');
         abort_unless($form_id, 404);
         abort_unless(AksesEhr::can((int) $form_id, 'read'), 403);
 
@@ -53,7 +53,7 @@ class PeresepanObatController extends Controller
 
         $isView = request('action') === 'view';
 
-        return view('moduls.EMR.PeresepanObat.index', compact(
+        return view('moduls.EMR.OrderResep.index', compact(
             'registrasi_detail',
             'barangs',
             'peresepans',
@@ -67,7 +67,7 @@ class PeresepanObatController extends Controller
 
     public function store(Request $request, $registrasi_detail_id)
     {
-        $form_id = EmrHelper::formIdBySlug('peresepan_obat');
+        $form_id = EmrHelper::formIdBySlug('order_resep');
         abort_unless($form_id, 404);
         abort_unless(AksesEhr::can((int) $form_id, 'create'), 403);
 
@@ -107,7 +107,7 @@ class PeresepanObatController extends Controller
 
             DB::commit();
 
-            return redirect()->route('emr.dynamic.index', ['form_name' => 'peresepan_obat', 'registrasi_detail_id' => $registrasi_detail_id])
+            return redirect()->route('emr.dynamic.index', ['form_name' => 'order_resep', 'registrasi_detail_id' => $registrasi_detail_id])
                 ->with('success', 'Resep berhasil disimpan.');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -118,7 +118,7 @@ class PeresepanObatController extends Controller
 
     public function update(Request $request, $registrasi_detail_id, $emr_id)
     {
-        $form_id = EmrHelper::formIdBySlug('peresepan_obat');
+        $form_id = EmrHelper::formIdBySlug('order_resep');
         abort_unless($form_id, 404);
         abort_unless(AksesEhr::can((int) $form_id, 'update'), 403);
 
@@ -163,7 +163,7 @@ class PeresepanObatController extends Controller
 
             DB::commit();
 
-            return redirect()->route('emr.dynamic.index', ['form_name' => 'peresepan_obat', 'registrasi_detail_id' => $registrasi_detail_id])
+            return redirect()->route('emr.dynamic.index', ['form_name' => 'order_resep', 'registrasi_detail_id' => $registrasi_detail_id])
                 ->with('success', 'Resep berhasil diperbarui.');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -174,7 +174,7 @@ class PeresepanObatController extends Controller
 
     public function destroy($registrasi_detail_id, $emr_id)
     {
-        $form_id = EmrHelper::formIdBySlug('peresepan_obat');
+        $form_id = EmrHelper::formIdBySlug('order_resep');
         abort_unless($form_id, 404);
         abort_unless(AksesEhr::can((int) $form_id, 'delete'), 403);
 
@@ -207,7 +207,7 @@ class PeresepanObatController extends Controller
 
             DB::commit();
 
-            return redirect()->route('emr.dynamic.index', ['form_name' => 'peresepan_obat', 'registrasi_detail_id' => $registrasi_detail_id])
+            return redirect()->route('emr.dynamic.index', ['form_name' => 'order_resep', 'registrasi_detail_id' => $registrasi_detail_id])
                 ->with('success', 'Resep berhasil dibatalkan.');
         } catch (\Throwable $e) {
             DB::rollBack();

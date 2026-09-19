@@ -87,4 +87,30 @@ class GenerateHelper
         return Carbon::parse($tglKunjungan.' '.Carbon::parse($waktuMulai)->format('H:i'))
             ->addMinutes(($urutan - 1) * 60);
     }
+
+    /**
+     * Membuat nomor order penunjang baru (Laboratorium / Radiologi).
+     * Format: {PREFIX}-{Ymd}-{0001} — reset penomoran setiap hari.
+     *
+     * @param  string  $prefix  'LAB' | 'RAD'
+     * @param  string  $table  Nama tabel order
+     * @param  string  $column  Kolom nomor order
+     */
+    public static function generateNoOrder(string $prefix, string $table, string $column): string
+    {
+        $prefix = strtoupper($prefix).'-'.now()->format('Ymd');
+
+        $suffixes = DB::table($table)
+            ->where($column, 'like', $prefix.'-%')
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->pluck($column)
+            ->map(fn ($no) => (int) last(explode('-', $no)))
+            ->toArray();
+
+        $last = empty($suffixes) ? 0 : max($suffixes);
+
+        return $prefix.'-'.str_pad((string) ($last + 1), 4, '0', STR_PAD_LEFT);
+    }
 }

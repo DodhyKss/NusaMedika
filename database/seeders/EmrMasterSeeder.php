@@ -17,6 +17,7 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_id' => 1, 'nama_menu' => 'Catatan Medis'],
             ['dashboard_menu_id' => 2, 'nama_menu' => 'Pengkajian'],
             ['dashboard_menu_id' => 3, 'nama_menu' => 'Resep'],
+            ['dashboard_menu_id' => 4, 'nama_menu' => 'Order'],
         ];
 
         foreach ($menus as $menu) {
@@ -30,14 +31,28 @@ class EmrMasterSeeder extends Seeder
             );
         }
 
+        // Menu lama "Resep" (3) digantikan menu "Order" (4) — soft-delete agar
+        // tidak ada menu kosong yang tampil di dashboard pasien.
+        DB::table('dashboard_menu')
+            ->where('dashboard_menu_id', 3)
+            ->update([
+                'status_batal' => 1,
+                'mod_time' => $now,
+                'mod_user_id' => 1,
+            ]);
+
         $subMenus = [
             // Menu 1 "Catatan Medis"
             ['dashboard_menu_sub_id' => 1, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Soap'],
             // Menu 2 "Pengkajian"
             ['dashboard_menu_sub_id' => 2, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Pengkajian Keperawatan'],
-            // Menu 3 "Resep" — nama sub menu harus sama dengan slug form (peresepan_obat)
-            // agar link dashboard meneruskan form_name yang benar ke PeresepanObatController.
+            // Menu 3 "Resep" (lama, soft-delete) — sub 3 "Peresepan Obat" digantikan "Order Resep"
             ['dashboard_menu_sub_id' => 3, 'dashboard_menu_id' => 3, 'nama_sub_menu' => 'Peresepan Obat'],
+            // Menu 4 "Order" — nama sub menu harus sama dengan slug form agar
+            // dashboard meneruskan form_name yang benar (Str::slug nama sub di view).
+            ['dashboard_menu_sub_id' => 4, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Order Resep'],
+            ['dashboard_menu_sub_id' => 5, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Laboratorium'],
+            ['dashboard_menu_sub_id' => 6, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Radiologi'],
         ];
 
         foreach ($subMenus as $subMenu) {
@@ -50,6 +65,15 @@ class EmrMasterSeeder extends Seeder
                 ])
             );
         }
+
+        // Sub menu lama "Peresepan Obat" (3) ikut di-soft-delete bersama menu "Resep".
+        DB::table('dashboard_menu_sub')
+            ->where('dashboard_menu_sub_id', 3)
+            ->update([
+                'status_batal' => 1,
+                'mod_time' => $now,
+                'mod_user_id' => 1,
+            ]);
 
         $extras = [
             // Sub Menu 2 "Pengkajian Keperawatan"
@@ -76,7 +100,9 @@ class EmrMasterSeeder extends Seeder
             ['form_id' => 2, 'nama_form' => 'SOAP / CPPT', 'slug' => 'soap', 'id_dash_menu' => '1.1', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 3, 'nama_form' => 'Pengkajian Awal Keperawatan', 'slug' => 'pengkajian_awal_keperawatan', 'id_dash_menu' => '2.2.1', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 4, 'nama_form' => 'Pengkajian Harian Keperawatan', 'slug' => 'pengkajian_harian_keperawatan', 'id_dash_menu' => '2.2.2', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
-            ['form_id' => 5, 'nama_form' => 'Peresepan Obat', 'slug' => 'peresepan_obat', 'id_dash_menu' => '3.3', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            ['form_id' => 5, 'nama_form' => 'Order Resep', 'slug' => 'order_resep', 'id_dash_menu' => '4.4', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            ['form_id' => 6, 'nama_form' => 'Order Laboratorium', 'slug' => 'laboratorium', 'id_dash_menu' => '4.5', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            ['form_id' => 7, 'nama_form' => 'Order Radiologi', 'slug' => 'radiologi', 'id_dash_menu' => '4.6', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
         ];
 
         foreach ($forms as $form) {
@@ -108,6 +134,8 @@ class EmrMasterSeeder extends Seeder
             61 => 'Riwayat Operasi Kemo', 62 => 'Vaksin COVID', 63 => 'Alloanamnesa', 64 => 'Nama Alloanamnesa', 65 => 'Hubungan Alloanamnesa',
             66 => 'UP GO 1a', 67 => 'UP GO 1b', 68 => 'UP GO 2',
             69 => 'Obat', 70 => 'Jumlah', 71 => 'S 1', 72 => 'S 2', 73 => 'Aturan Pakai', 74 => 'Rute Pemberian',
+            75 => 'Tindakan', 76 => 'Prioritas', 77 => 'Keterangan', 78 => 'Hasil',
+            79 => 'Nilai Normal', 80 => 'Satuan Hasil', 81 => 'Flag Abnormal', 82 => 'Petugas Pelaksana',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -169,6 +197,14 @@ class EmrMasterSeeder extends Seeder
                 'barang_id' => 69, 'jumlah' => 70, 's_1' => 71, 's_2' => 72,
                 'aturan_pakai' => 73, 'rute_pemberian' => 74,
             ],
+            6 => [
+                'tindakan_id' => 75, 'prioritas' => 76, 'keterangan' => 77, 'hasil' => 78,
+                'nilai_normal' => 79, 'satuan_hasil' => 80, 'flag_abnormal' => 81, 'petugas_id' => 82,
+            ],
+            7 => [
+                'tindakan_id' => 75, 'prioritas' => 76, 'keterangan' => 77, 'hasil' => 78,
+                'flag_abnormal' => 81, 'petugas_id' => 82,
+            ],
         ];
 
         foreach ($mapping as $formId => $variabels) {
@@ -200,6 +236,8 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(3);
         EmrHelper::backfillObjekId(4);
         EmrHelper::backfillObjekId(5);
+        EmrHelper::backfillObjekId(6);
+        EmrHelper::backfillObjekId(7);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -210,6 +248,14 @@ class EmrMasterSeeder extends Seeder
             ['profesi_id' => 1, 'form_id' => 3, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 1, 'form_id' => 4, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 1, 'form_id' => 5, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Order Laboratorium (form 6): Dokter create/read/update/delete; Perawat read; Analis Laboratorium read.
+            ['profesi_id' => 1, 'form_id' => 6, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 6, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 13, 'form_id' => 6, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // Order Radiologi (form 7): Dokter create/read/update/delete; Perawat read; Radiografer read.
+            ['profesi_id' => 1, 'form_id' => 7, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 7, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 5, 'form_id' => 7, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
             // Perawat (profesi 2): form pengkajian saja
             ['profesi_id' => 2, 'form_id' => 3, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 4, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],

@@ -24,6 +24,7 @@ class UserSeeder extends Seeder
             ['user_id' => 10, 'user_name' => 'ahli_gizi', 'user_password' => 'ahli_gizi', 'pegawai_id' => 10],
             ['user_id' => 11, 'user_name' => 'security', 'user_password' => 'security', 'pegawai_id' => 11],
             ['user_id' => 12, 'user_name' => 'teknisi', 'user_password' => 'teknisi', 'pegawai_id' => 12],
+            ['user_id' => 13, 'user_name' => 'analis', 'user_password' => 'analis', 'pegawai_id' => 13],
         ];
 
         foreach ($users as $user) {
@@ -64,6 +65,7 @@ class UserSeeder extends Seeder
             10 => $validAktifSubMenuIds,
             11 => $validAktifSubMenuIds,
             12 => $validAktifSubMenuIds,
+            13 => $validAktifSubMenuIds,
         ];
 
         foreach ($akses as $userId => $subMenuIds) {

@@ -53,6 +53,7 @@ class MasterPegawaiSeeder extends Seeder
             ['profesi_id' => 10, 'nama_profesi' => 'Ahli Gizi'],
             ['profesi_id' => 11, 'nama_profesi' => 'Security'],
             ['profesi_id' => 12, 'nama_profesi' => 'Teknisi'],
+            ['profesi_id' => 13, 'nama_profesi' => 'Analis Laboratorium'],
         ];
 
         foreach ($profesis as $profesi) {
@@ -137,7 +138,7 @@ class MasterPegawaiSeeder extends Seeder
                 'pegawai_id' => 6,
                 'nama_pegawai' => 'Radiografer',
                 'nip' => 'RDG001',
-                'bagian_id' => 1,
+                'bagian_id' => 37,
                 'profesi_id' => 5,
                 'jabatan_id' => 13,
                 'status_kepegawaian_id' => 1,
@@ -193,6 +194,15 @@ class MasterPegawaiSeeder extends Seeder
                 'nip' => 'TKN001',
                 'bagian_id' => 1,
                 'profesi_id' => 12,
+                'jabatan_id' => 13,
+                'status_kepegawaian_id' => 1,
+            ],
+            [
+                'pegawai_id' => 13,
+                'nama_pegawai' => 'Analis Laboratorium',
+                'nip' => 'ANL001',
+                'bagian_id' => 36,
+                'profesi_id' => 13,
                 'jabatan_id' => 13,
                 'status_kepegawaian_id' => 1,
             ],

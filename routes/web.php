@@ -8,6 +8,8 @@ use App\Http\Controllers\EMR\Soap\SoapController;
 use App\Http\Controllers\Farmasi\Resep\ListPesananResep\ListPesananResepController;
 use App\Http\Controllers\Inventory\Pesanan\BuatPesanan\BuatPesananController;
 use App\Http\Controllers\Inventory\Pesanan\SetujuiPesanan\SetujuiPesananController;
+use App\Http\Controllers\PenunjangMedis\Laboratorium\DaftarPesananLaboratorium\DaftarPesananLaboratoriumController;
+use App\Http\Controllers\PenunjangMedis\Radiologi\DaftarPesananRadiologi\DaftarPesananRadiologiController;
 use Illuminate\Support\Facades\Route;
 
 // ================ DESKRIPSI ============== #
@@ -61,4 +63,24 @@ Route::middleware('auth')->group(function () {
     Route::get('/list_pesanan_resep/{peresepan_obat}/dispense', [ListPesananResepController::class, 'dispense'])->name('list_pesanan_resep.dispense');
     Route::post('/list_pesanan_resep/{peresepan_obat}/dispense', [ListPesananResepController::class, 'dispenseStore'])->name('list_pesanan_resep.dispense_store');
     Route::post('/list_pesanan_resep/{peresepan_obat}/batal', [ListPesananResepController::class, 'batal'])->name('list_pesanan_resep.batal');
+
+    // ============ ROUTE PENUNJANG MEDIS ============= #
+    // Aksi non-CRUD order laboratorium/radiologi (pilih bagian / terima / simpan hasil / selesai / batal / cetak)
+    // didaftarkan manual agar reusable & tidak terikat pola CRUD sub_menu.
+    // Laboratorium.
+    Route::post('/daftar_pesanan_laboratorium/pilih-bagian', [DaftarPesananLaboratoriumController::class, 'pilihBagian'])->name('daftar_pesanan_laboratorium.pilih_bagian');
+    Route::get('/daftar_pesanan_laboratorium/{order_laboratorium}', [DaftarPesananLaboratoriumController::class, 'detail'])->name('daftar_pesanan_laboratorium.detail');
+    Route::post('/order_laboratorium/{order_laboratorium}/terima', [DaftarPesananLaboratoriumController::class, 'terima'])->name('order_laboratorium.terima');
+    Route::post('/order_laboratorium/{order_laboratorium}/simpan-hasil', [DaftarPesananLaboratoriumController::class, 'simpanHasil'])->name('order_laboratorium.simpan_hasil');
+    Route::post('/order_laboratorium/{order_laboratorium}/selesai', [DaftarPesananLaboratoriumController::class, 'selesai'])->name('order_laboratorium.selesai');
+    Route::post('/order_laboratorium/{order_laboratorium}/batal', [DaftarPesananLaboratoriumController::class, 'batal'])->name('order_laboratorium.batal');
+    Route::get('/order_laboratorium/{order_laboratorium}/cetak', [DaftarPesananLaboratoriumController::class, 'cetak'])->name('order_laboratorium.cetak');
+    // Radiologi.
+    Route::post('/daftar_pesanan_radiologi/pilih-bagian', [DaftarPesananRadiologiController::class, 'pilihBagian'])->name('daftar_pesanan_radiologi.pilih_bagian');
+    Route::get('/daftar_pesanan_radiologi/{order_radiologi}', [DaftarPesananRadiologiController::class, 'detail'])->name('daftar_pesanan_radiologi.detail');
+    Route::post('/order_radiologi/{order_radiologi}/terima', [DaftarPesananRadiologiController::class, 'terima'])->name('order_radiologi.terima');
+    Route::post('/order_radiologi/{order_radiologi}/simpan-hasil', [DaftarPesananRadiologiController::class, 'simpanHasil'])->name('order_radiologi.simpan_hasil');
+    Route::post('/order_radiologi/{order_radiologi}/selesai', [DaftarPesananRadiologiController::class, 'selesai'])->name('order_radiologi.selesai');
+    Route::post('/order_radiologi/{order_radiologi}/batal', [DaftarPesananRadiologiController::class, 'batal'])->name('order_radiologi.batal');
+    Route::get('/order_radiologi/{order_radiologi}/cetak', [DaftarPesananRadiologiController::class, 'cetak'])->name('order_radiologi.cetak');
 });
