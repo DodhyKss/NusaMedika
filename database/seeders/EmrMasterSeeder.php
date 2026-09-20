@@ -18,6 +18,7 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_id' => 2, 'nama_menu' => 'Pengkajian'],
             ['dashboard_menu_id' => 3, 'nama_menu' => 'Resep'],
             ['dashboard_menu_id' => 4, 'nama_menu' => 'Order'],
+            ['dashboard_menu_id' => 5, 'nama_menu' => 'Formulir'],
         ];
 
         foreach ($menus as $menu) {
@@ -53,6 +54,8 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_id' => 4, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Order Resep'],
             ['dashboard_menu_sub_id' => 5, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Laboratorium'],
             ['dashboard_menu_sub_id' => 6, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Radiologi'],
+            // Menu 5 "Formulir" — tanpa extra; id_dash_menu form = "5.7".
+            ['dashboard_menu_sub_id' => 7, 'dashboard_menu_id' => 5, 'nama_sub_menu' => 'Konsultasi'],
         ];
 
         foreach ($subMenus as $subMenu) {
@@ -103,6 +106,8 @@ class EmrMasterSeeder extends Seeder
             ['form_id' => 5, 'nama_form' => 'Order Resep', 'slug' => 'order_resep', 'id_dash_menu' => '4.4', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 6, 'nama_form' => 'Order Laboratorium', 'slug' => 'laboratorium', 'id_dash_menu' => '4.5', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 7, 'nama_form' => 'Order Radiologi', 'slug' => 'radiologi', 'id_dash_menu' => '4.6', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            // Formulir Konsultasi (multi-guna: Rehabilitasi Medik / Konsul Layanan / Rencana Kontrol).
+            ['form_id' => 8, 'nama_form' => 'Konsultasi', 'slug' => 'konsultasi', 'id_dash_menu' => '5.7', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
         ];
 
         foreach ($forms as $form) {
@@ -136,6 +141,9 @@ class EmrMasterSeeder extends Seeder
             69 => 'Obat', 70 => 'Jumlah', 71 => 'S 1', 72 => 'S 2', 73 => 'Aturan Pakai', 74 => 'Rute Pemberian',
             75 => 'Tindakan', 76 => 'Prioritas', 77 => 'Keterangan', 78 => 'Hasil',
             79 => 'Nilai Normal', 80 => 'Satuan Hasil', 81 => 'Flag Abnormal', 82 => 'Petugas Pelaksana',
+            83 => 'Jenis Konsultasi', 84 => 'Bagian Tujuan Konsultasi',
+            85 => 'Dokter Tujuan Konsultasi', 86 => 'Tanggal Kontrol',
+            87 => 'Indikasi Konsultasi', 88 => 'Bagian Rehabilitasi Medik',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -205,6 +213,15 @@ class EmrMasterSeeder extends Seeder
                 'tindakan_id' => 75, 'prioritas' => 76, 'keterangan' => 77, 'hasil' => 78,
                 'flag_abnormal' => 81, 'petugas_id' => 82,
             ],
+            8 => [
+                'jenis_konsultasi' => 83,
+                'bagian_tujuan_id' => 84,    // Konsul Layanan (wajib) / Rencana Kontrol (wajib) → bagian Poli (referensi 1)
+                'dokter_tujuan_id' => 85,    // Konsul Layanan (WAJIB) / Rencana Kontrol (wajib) → pegawai dokter
+                'tanggal_kontrol' => 86,     // Rencana Kontrol (wajib)
+                'indikasi_konsultasi' => 87, // semua jenis
+                'bagian_rehab_id' => 88,     // Konsultasi Rehabilitasi Medik (wajib) → bagian penunjang rehab
+                'catatan' => 77,             // opsional, reuse objek 77 "Keterangan"
+            ],
         ];
 
         foreach ($mapping as $formId => $variabels) {
@@ -238,6 +255,7 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(5);
         EmrHelper::backfillObjekId(6);
         EmrHelper::backfillObjekId(7);
+        EmrHelper::backfillObjekId(8);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -256,6 +274,9 @@ class EmrMasterSeeder extends Seeder
             ['profesi_id' => 1, 'form_id' => 7, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 7, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
             ['profesi_id' => 5, 'form_id' => 7, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // Formulir Konsultasi (form 8): Dokter create/read/update/delete; Perawat read.
+            ['profesi_id' => 1, 'form_id' => 8, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 8, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
             // Perawat (profesi 2): form pengkajian saja
             ['profesi_id' => 2, 'form_id' => 3, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 4, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],

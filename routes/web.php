@@ -4,12 +4,14 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\EMR\DynamicFormController;
 use App\Http\Controllers\EMR\EmrDashboard\EmrDashboardController;
+use App\Http\Controllers\EMR\Konsultasi\KonsultasiController;
 use App\Http\Controllers\EMR\Soap\SoapController;
 use App\Http\Controllers\Farmasi\Resep\ListPesananResep\ListPesananResepController;
 use App\Http\Controllers\Inventory\Pesanan\BuatPesanan\BuatPesananController;
 use App\Http\Controllers\Inventory\Pesanan\SetujuiPesanan\SetujuiPesananController;
 use App\Http\Controllers\PenunjangMedis\Laboratorium\DaftarPesananLaboratorium\DaftarPesananLaboratoriumController;
 use App\Http\Controllers\PenunjangMedis\Radiologi\DaftarPesananRadiologi\DaftarPesananRadiologiController;
+use App\Http\Controllers\PenunjangMedis\RehabilitasiMedik\DaftarPasienRehabilitasiMedik\DaftarPasienRehabilitasiMedikController;
 use Illuminate\Support\Facades\Route;
 
 // ================ DESKRIPSI ============== #
@@ -48,6 +50,10 @@ Route::middleware('auth')->group(function () {
     // ============ ROUTE SOAP ================= #
     Route::get('/emr/soap/print/{emr_id}', [SoapController::class, 'print'])->name('emr.soap.print');
 
+    // ============ ROUTE KONSULTASI (EMR/Cetak) ============= #
+    // Aksi non-CRUD konsultasi (cetak slip/rencana kontrol) didaftarkan manual.
+    Route::get('/emr/konsultasi/print/{emr_id}', [KonsultasiController::class, 'print'])->name('emr.konsultasi.print');
+
     // ============ ROUTE INVENTORY ============= #
     // Aksi non-CRUD pemesanan (setujui/tolak/batal) didaftarkan manual agar reusable.
     Route::post('/pemesanan/{pemesanan}/setujui', [SetujuiPesananController::class, 'setujui'])->name('pemesanan.setujui');
@@ -83,4 +89,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/order_radiologi/{order_radiologi}/selesai', [DaftarPesananRadiologiController::class, 'selesai'])->name('order_radiologi.selesai');
     Route::post('/order_radiologi/{order_radiologi}/batal', [DaftarPesananRadiologiController::class, 'batal'])->name('order_radiologi.batal');
     Route::get('/order_radiologi/{order_radiologi}/cetak', [DaftarPesananRadiologiController::class, 'cetak'])->name('order_radiologi.cetak');
+
+    // Rehabilitasi Medik — pilih bagian rehab (session) & detail pasien (bukan CRUD, didaftarkan manual).
+    Route::post('/daftar_pasien_rehabilitasi_medik/pilih-bagian', [DaftarPasienRehabilitasiMedikController::class, 'pilihBagian'])->name('daftar_pasien_rehabilitasi_medik.pilih_bagian');
+    Route::get('/daftar_pasien_rehabilitasi_medik/detail/{registrasi_detail}', [DaftarPasienRehabilitasiMedikController::class, 'detail'])->name('daftar_pasien_rehabilitasi_medik.detail');
 });

@@ -72,6 +72,9 @@ class BagianSeeder extends Seeder
         $penunjangs = [
             'INSTALASI LABORATORIUM',
             'INSTALASI RADIOLOGI',
+            // Rehabilitasi Medik (Konsultasi, bukan Order) — penunjang medis.
+            // SELALU append di akhir agar id existing tidak bergeser.
+            'INSTALASI REHABILITASI MEDIK',
         ];
 
         $bagians = [];

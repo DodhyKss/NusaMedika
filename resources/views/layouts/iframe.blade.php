@@ -20,6 +20,17 @@
             <p class="text-sm text-red-700 font-medium">{{ session('error') }}</p>
         </div>
     @endif
+    @if($errors->any())
+        <div class="m-4 flex items-start gap-3 bg-red-50 border border-red-200 p-3.5 rounded-lg">
+            <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="flex flex-col gap-0.5">
+                <p class="text-sm font-semibold text-red-700">Data belum tersimpan. Periksa kembali isian berikut:</p>
+                @foreach($errors->all() as $error)
+                    <p class="text-sm text-red-600">- {{ $error }}</p>
+                @endforeach
+            </div>
+        </div>
+    @endif
     
     @yield('content')
 </body>

@@ -152,6 +152,11 @@ class SelectOption
                 ['value' => 'ICD-10', 'label' => 'ICD-10'],
                 ['value' => 'ICD-9', 'label' => 'ICD-9'],
             ],
+            'jenis_konsultasi' => [
+                ['value' => 'REHABILITASI_MEDIK', 'label' => 'Konsultasi Rehabilitasi Medik'],
+                ['value' => 'KONSUL_LAYANAN', 'label' => 'Konsul Layanan Klinik'],
+                ['value' => 'RENCANA_KONTROL', 'label' => 'Rencana Kontrol Rawat Jalan'],
+            ],
         ];
     }
 

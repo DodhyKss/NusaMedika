@@ -59,6 +59,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             // Modul Penunjang Medis (8)
             ['menu_id' => 14, 'modul_id' => 8, 'nama_menu' => 'Laboratorium', 'urutan_menu' => 1],
             ['menu_id' => 15, 'modul_id' => 8, 'nama_menu' => 'Radiologi', 'urutan_menu' => 2],
+            ['menu_id' => 16, 'modul_id' => 8, 'nama_menu' => 'Rehabilitasi Medik', 'urutan_menu' => 3],
         ];
 
         foreach ($menus as $menu) {
@@ -133,6 +134,8 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 44, 'menu_id' => 14, 'nama_sub_menu' => 'Daftar Pesanan Laboratorium', 'file_sub_menu' => 'PenunjangMedis/Laboratorium/DaftarPesananLaboratorium/daftar_pesanan_laboratorium', 'urutan_sub_menu' => 1],
             // Menu Radiologi (15) - Penunjang Medis
             ['sub_menu_id' => 45, 'menu_id' => 15, 'nama_sub_menu' => 'Daftar Pesanan Radiologi', 'file_sub_menu' => 'PenunjangMedis/Radiologi/DaftarPesananRadiologi/daftar_pesanan_radiologi', 'urutan_sub_menu' => 1],
+            // Menu Rehabilitasi Medik (16) - Penunjang Medis
+            ['sub_menu_id' => 47, 'menu_id' => 16, 'nama_sub_menu' => 'Daftar Pasien Rehabilitasi Medik', 'file_sub_menu' => 'PenunjangMedis/RehabilitasiMedik/DaftarPasienRehabilitasiMedik/daftar_pasien_rehabilitasi_medik', 'urutan_sub_menu' => 1],
         ];
 
         foreach ($subMenus as $subMenu) {
