@@ -47,6 +47,7 @@
                         <option value="{{ env('JENIS_RAWAT_IGD', 'IGD') }}" {{ request('jenis_layanan') == env('JENIS_RAWAT_IGD', 'IGD') ? 'selected' : '' }}>IGD</option>
                         <option value="{{ env('JENIS_RAWAT_RI', 'RI') }}" {{ request('jenis_layanan') == env('JENIS_RAWAT_RI', 'RI') ? 'selected' : '' }}>RAWAT INAP</option>
                         <option value="{{ env('JENIS_RAWAT_RJ', 'RJ') }}" {{ request('jenis_layanan') == env('JENIS_RAWAT_RJ', 'RJ') ? 'selected' : '' }}>RAWAT JALAN</option>
+                        <option value="{{ env('JENIS_RAWAT_MCU', 'MCU') }}" {{ request('jenis_layanan') == env('JENIS_RAWAT_MCU', 'MCU') ? 'selected' : '' }}>MEDICAL CHECKUP</option>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>

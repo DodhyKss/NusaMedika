@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Registrasi\Pendaftaran\DaftarRajal;
+namespace App\Http\Controllers\Registrasi\Pendaftaran\DaftarMedicalCheckup;
 
 use App\Helpers\GenerateHelper;
 use App\Http\Controllers\Controller;
@@ -14,16 +14,22 @@ use App\Models\PenanggungRawat;
 use App\Models\Registrasi;
 use App\Models\RegistrasiDetail;
 use App\Models\RegistrasiUrut;
+use App\Models\SuketMcu;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class DaftarRajalController extends Controller
+class DaftarMedicalCheckupController extends Controller
 {
     public function index()
     {
         $jadwals = JadwalDokter::aktif()
+            ->whereHas('bagian', function ($q) {
+                $q->aktif()
+                    ->where('referensi_bagian_id', env('REF_BAGIAN_RAJAL'))
+                    ->where('nama_bagian', 'like', '%MEDICAL CHECKUP%');
+            })
             ->with([
                 'pegawai' => fn ($q) => $q->where(function ($sq) {
                     $sq->whereNull('status_batal')->orWhere('status_batal', 0);
@@ -35,12 +41,6 @@ class DaftarRajalController extends Controller
             ->orderBy('hari')
             ->orderBy('waktu_mulai')
             ->get();
-
-        // Eksklusi poliklinik Medical Checkup: jadwal MCU hanya dilayani dari
-        // menu Daftar Medical Checkup (jenis_rawat=MCU), bukan rawat jalan.
-        $jadwals = $jadwals->filter(function ($j) {
-            return ! str_contains(mb_strtoupper($j->bagian->nama_bagian ?? ''), 'MEDICAL CHECKUP');
-        })->values();
 
         $polikliniks = $jadwals->map(fn ($jd) => $jd->bagian)
             ->filter()
@@ -70,7 +70,14 @@ class DaftarRajalController extends Controller
             $q->whereNull('status_batal')->orWhere('status_batal', 0);
         })->orderBy('nama_nasabah')->get();
 
-        return view('moduls.Registrasi.Pendaftaran.DaftarRajal.daftar_rajal', compact('polikliniks', 'nasabahs', 'jadwalsByPoli'));
+        $sukets = SuketMcu::aktif()->orderBy('nama_suket')->get();
+
+        return view('moduls.Registrasi.Pendaftaran.DaftarMedicalCheckup.daftar_medical_checkup', compact(
+            'polikliniks',
+            'nasabahs',
+            'jadwalsByPoli',
+            'sukets'
+        ));
     }
 
     public function store(Request $request)
@@ -84,8 +91,10 @@ class DaftarRajalController extends Controller
             'cara_masuk' => 'required',
             'icd_id' => 'required',
             'keluhan' => 'required',
+            'suket_mcu_id' => 'nullable|exists:suket_mcu,suket_mcu_id',
         ]);
 
+        // Aturan "1 pasien = 1 registrasi aktif per tgl" berlaku lintas jenis_rawat (RJ & MCU).
         $aktif = Registrasi::where('pasien_id', $request->pasien_id)->whereDate('tgl_masuk', $request->tgl_kunjungan)
             ->where(function ($q) {
                 $q->whereNull('status_batal')->orWhere('status_batal', 0);
@@ -98,10 +107,14 @@ class DaftarRajalController extends Controller
 
         $jadwal = JadwalDokter::aktif()->with('bagian')->find($request->jadwal_dokter_id);
 
-        if (! $jadwal || ! $jadwal->bagian
-            || str_contains(mb_strtoupper($jadwal->bagian->nama_bagian), 'MEDICAL CHECKUP')) {
-            return back()->withInput()->with('error', 'Poliklinik Medical Checkup hanya dapat didaftarkan melalui menu Daftar Medical Checkup.');
+        if (! $jadwal || ! $jadwal->bagian || $jadwal->bagian->referensi_bagian_id != env('REF_BAGIAN_RAJAL')
+            || mb_strpos(mb_strtoupper($jadwal->bagian->nama_bagian), 'MEDICAL CHECKUP') === false) {
+            return back()->withInput()->with('error', 'Jadwal dokter yang dipilih bukan jadwal Medical Checkup.');
         }
+
+        $suket = $request->filled('suket_mcu_id')
+            ? SuketMcu::aktif()->find($request->suket_mcu_id)
+            : null;
 
         try {
             DB::beginTransaction();
@@ -129,7 +142,7 @@ class DaftarRajalController extends Controller
             $registrasi = new Registrasi;
             $registrasi->pasien_id = $request->pasien_id;
             $registrasi->tgl_masuk = $request->tgl_kunjungan.' '.date('H:i:s');
-            $registrasi->jenis_rawat = env('JENIS_RAWAT_RJ');
+            $registrasi->jenis_rawat = env('JENIS_RAWAT_MCU', 'MCU');
             $registrasi->prioritas = $request->cara_masuk;
             $registrasi->pasien_nasabah_id = $pasienNasabah->pasien_nasabah_id;
             $registrasi->memo = $request->keluhan;
@@ -155,6 +168,8 @@ class DaftarRajalController extends Controller
             $registrasiDetail->hak_kelas_id = $hakKelasId;
             $registrasiDetail->terima_dari = 'DALAM';
             $registrasiDetail->tgl_daftar = now();
+            $registrasiDetail->suket_mcu_id = $suket ? $suket->suket_mcu_id : null;
+            $registrasiDetail->harga_suket = $suket ? $suket->harga : null;
             $registrasiDetail->status_batal = 0;
             $registrasiDetail->input_time = now();
             $registrasiDetail->input_user_id = auth()->id();
@@ -210,7 +225,7 @@ class DaftarRajalController extends Controller
 
             DB::commit();
 
-            return redirect()->route('list_pelayanan_pasien.index')->with('success', 'Pendaftaran rawat jalan berhasil.');
+            return redirect()->route('list_pasien_medical_checkup.index')->with('success', 'Pendaftaran Medical Checkup berhasil.');
         } catch (\Exception $e) {
             DB::rollBack();
 

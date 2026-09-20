@@ -16,11 +16,14 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['modul_id' => 1, 'nama_modul' => 'Registrasi', 'icon_modul' => 'fa-solid fa-clipboard-list', 'urutan_modul' => 1],
             ['modul_id' => 7, 'nama_modul' => 'Farmasi', 'icon_modul' => 'fa-solid fa-prescription-bottle-medical', 'urutan_modul' => 2],
             ['modul_id' => 2, 'nama_modul' => 'Rawat Jalan', 'icon_modul' => 'fa-solid fa-user-injured', 'urutan_modul' => 3],
-            ['modul_id' => 3, 'nama_modul' => 'Rawat Inap', 'icon_modul' => 'fa-solid fa-bed', 'urutan_modul' => 4],
-            ['modul_id' => 4, 'nama_modul' => 'Gawat Darurat', 'icon_modul' => 'fa-solid fa-truck-medical', 'urutan_modul' => 5],
-            ['modul_id' => 5, 'nama_modul' => 'Administrator', 'icon_modul' => 'fa-solid fa-gear', 'urutan_modul' => 6],
-            ['modul_id' => 6, 'nama_modul' => 'Inventory', 'icon_modul' => 'fa-solid fa-box-archive', 'urutan_modul' => 7],
-            ['modul_id' => 8, 'nama_modul' => 'Penunjang Medis', 'icon_modul' => 'fa-solid fa-microscope', 'urutan_modul' => 8],
+            // Modul Medical Checkup ditempatkan tepat SETELAH Rawat Jalan;
+            // modul di bawahnya bergeser satu (urutan lama dinaikkan 1).
+            ['modul_id' => 9, 'nama_modul' => 'Medical Checkup', 'icon_modul' => 'fa-solid fa-heart-pulse', 'urutan_modul' => 4],
+            ['modul_id' => 3, 'nama_modul' => 'Rawat Inap', 'icon_modul' => 'fa-solid fa-bed', 'urutan_modul' => 5],
+            ['modul_id' => 4, 'nama_modul' => 'Gawat Darurat', 'icon_modul' => 'fa-solid fa-truck-medical', 'urutan_modul' => 6],
+            ['modul_id' => 5, 'nama_modul' => 'Administrator', 'icon_modul' => 'fa-solid fa-gear', 'urutan_modul' => 7],
+            ['modul_id' => 6, 'nama_modul' => 'Inventory', 'icon_modul' => 'fa-solid fa-box-archive', 'urutan_modul' => 8],
+            ['modul_id' => 8, 'nama_modul' => 'Penunjang Medis', 'icon_modul' => 'fa-solid fa-microscope', 'urutan_modul' => 9],
         ];
 
         foreach ($moduls as $modul) {
@@ -60,6 +63,8 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['menu_id' => 14, 'modul_id' => 8, 'nama_menu' => 'Laboratorium', 'urutan_menu' => 1],
             ['menu_id' => 15, 'modul_id' => 8, 'nama_menu' => 'Radiologi', 'urutan_menu' => 2],
             ['menu_id' => 16, 'modul_id' => 8, 'nama_menu' => 'Rehabilitasi Medik', 'urutan_menu' => 3],
+            // Modul Medical Checkup (9)
+            ['menu_id' => 17, 'modul_id' => 9, 'nama_menu' => 'Pasien', 'urutan_menu' => 1],
         ];
 
         foreach ($menus as $menu) {
@@ -86,6 +91,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 5, 'menu_id' => 2, 'nama_sub_menu' => 'Daftar Rawat Inap', 'file_sub_menu' => 'Registrasi/Pendaftaran/DaftarRanap/daftar_ranap', 'urutan_sub_menu' => 3],
             ['sub_menu_id' => 6, 'menu_id' => 2, 'nama_sub_menu' => 'Registrasi IGD', 'file_sub_menu' => 'Registrasi/Pendaftaran/DaftarGawatDarurat/daftar_gawat_darurat', 'urutan_sub_menu' => 4],
             ['sub_menu_id' => 7, 'menu_id' => 2, 'nama_sub_menu' => 'Registrasi IGD Obgyn', 'file_sub_menu' => 'Registrasi/Pendaftaran/DaftarGawatDaruratObstetriGinekologi/daftar_gawat_darurat_obstetri_ginekologi', 'urutan_sub_menu' => 5],
+            ['sub_menu_id' => 48, 'menu_id' => 2, 'nama_sub_menu' => 'Daftar Medical Checkup', 'file_sub_menu' => 'Registrasi/Pendaftaran/DaftarMedicalCheckup/daftar_medical_checkup', 'urutan_sub_menu' => 6],
             // Menu Pasien (3) - Rawat Jalan
             ['sub_menu_id' => 12, 'menu_id' => 3, 'nama_sub_menu' => 'List Pasien Dokter', 'file_sub_menu' => 'RawatJalan/Pasien/ListPasienDokter/list_pasien_dokter', 'urutan_sub_menu' => 1],
             ['sub_menu_id' => 29, 'menu_id' => 3, 'nama_sub_menu' => 'List Pasien', 'file_sub_menu' => 'RawatJalan/Pasien/ListPasienRajal/list_pasien_rajal', 'urutan_sub_menu' => 2],
@@ -136,6 +142,10 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 45, 'menu_id' => 15, 'nama_sub_menu' => 'Daftar Pesanan Radiologi', 'file_sub_menu' => 'PenunjangMedis/Radiologi/DaftarPesananRadiologi/daftar_pesanan_radiologi', 'urutan_sub_menu' => 1],
             // Menu Rehabilitasi Medik (16) - Penunjang Medis
             ['sub_menu_id' => 47, 'menu_id' => 16, 'nama_sub_menu' => 'Daftar Pasien Rehabilitasi Medik', 'file_sub_menu' => 'PenunjangMedis/RehabilitasiMedik/DaftarPasienRehabilitasiMedik/daftar_pasien_rehabilitasi_medik', 'urutan_sub_menu' => 1],
+            // Menu Pasien (17) - Medical Checkup
+            ['sub_menu_id' => 49, 'menu_id' => 17, 'nama_sub_menu' => 'List Pasien Medical Checkup', 'file_sub_menu' => 'MedicalCheckup/Pasien/ListPasienMedicalCheckup/list_pasien_medical_checkup', 'urutan_sub_menu' => 1],
+            // Menu Manajemen Master (6) - Administrator (Surat Keterangan MCU)
+            ['sub_menu_id' => 50, 'menu_id' => 6, 'nama_sub_menu' => 'Surat Keterangan MCU', 'file_sub_menu' => 'Administrator/ManajemenMaster/SuketMedicalCheckup/suket_medical_checkup', 'urutan_sub_menu' => 18],
         ];
 
         foreach ($subMenus as $subMenu) {

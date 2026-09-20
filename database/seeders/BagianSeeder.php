@@ -77,6 +77,14 @@ class BagianSeeder extends Seeder
             'INSTALASI REHABILITASI MEDIK',
         ];
 
+        // Poliklinik Medical Checkup (referensi_bagian_id 1 / Rawat Jalan).
+        // SELALU APPEND di akhir list agar id existing (yang sudah direferensikan)
+        // tidak bergeser. Nama harus mengandung "MEDICAL CHECKUP" karena dipakai
+        // sebagai penanda poli MCU di DaftarRajalController & query list MCU.
+        $poliesMcu = [
+            'POLI MEDICAL CHECKUP',
+        ];
+
         $bagians = [];
         $id = 1;
         foreach ($polies as $nama) {
@@ -96,6 +104,9 @@ class BagianSeeder extends Seeder
         }
         foreach ($penunjangs as $nama) {
             $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 6];
+        }
+        foreach ($poliesMcu as $nama) {
+            $bagians[] = ['bagian_id' => $id++, 'nama_bagian' => $nama, 'referensi_bagian_id' => 1];
         }
 
         // Hapus permanen record lama (placeholder Rawat Jalan/Rawat Inap/IGD + data lama) lalu seed ulang
