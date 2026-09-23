@@ -147,6 +147,7 @@
             }
         });
     </script>
+    <x-confirm-alert />
     @stack('scripts')
 </body>
 </html>

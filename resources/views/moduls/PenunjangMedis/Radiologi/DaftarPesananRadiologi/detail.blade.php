@@ -27,7 +27,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H9v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                 Cetak LHR
             </a>
-            <form action="{{ route('order_radiologi.batal', $order->order_radiologi_id) }}" method="POST" onsubmit="return confirm('Yakin membatalkan order ini?');">
+            <form action="{{ route('order_radiologi.batal', $order->order_radiologi_id) }}" method="POST" data-confirm-message="Yakin membatalkan order ini?" data-confirm-danger="true" data-confirm-title="Batalkan">
                 @csrf
                 <button type="submit" class="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors flex items-center gap-2 shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -139,7 +139,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                     Simpan Hasil
                 </button>
-                <form action="{{ route('order_radiologi.selesai', $order->order_radiologi_id) }}" method="POST" onsubmit="return confirm('Finalisasi order ini? Hasil yang belum diisi akan ditandai kosong.');">
+                <form action="{{ route('order_radiologi.selesai', $order->order_radiologi_id) }}" method="POST" data-confirm-message="Finalisasi order ini? Hasil yang belum diisi akan ditandai kosong." data-confirm-danger="false">
                     @csrf
                     <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm shadow-emerald-600/20 transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>

@@ -31,14 +31,14 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <form action="{{ route('pemesanan.tolak', $p->pemesanan_id) }}" method="POST" onsubmit="return confirm('Yakin menolak pemesanan ini?');">
+                <form action="{{ route('pemesanan.tolak', $p->pemesanan_id) }}" method="POST" data-confirm-message="Yakin menolak pemesanan ini?" data-confirm-danger="true" data-confirm-title="Batalkan">
                     @csrf
                     <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-red-600 bg-white border border-red-200 hover:bg-red-50 rounded-lg transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
                         Tolak
                     </button>
                 </form>
-                <form action="{{ route('pemesanan.setujui', $p->pemesanan_id) }}" method="POST" onsubmit="return confirm('Setujui pemesanan ini?');">
+                <form action="{{ route('pemesanan.setujui', $p->pemesanan_id) }}" method="POST" data-confirm-message="Setujui pemesanan ini?" data-confirm-danger="false">
                     @csrf
                     <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm shadow-emerald-600/20 transition-all hover:-translate-y-0.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>

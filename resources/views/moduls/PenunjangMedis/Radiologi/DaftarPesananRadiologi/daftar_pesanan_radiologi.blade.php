@@ -144,7 +144,7 @@
                         <td class="px-5 py-3">
                             <div class="flex items-center justify-end gap-2">
                                 @if ((int) $o->status_order === 0)
-                                    <form action="{{ route('order_radiologi.batal', $o->order_radiologi_id) }}" method="POST" onsubmit="return confirm('Yakin membatalkan order ini?');">
+                                    <form action="{{ route('order_radiologi.batal', $o->order_radiologi_id) }}" method="POST" data-confirm-message="Yakin membatalkan order ini?" data-confirm-danger="true" data-confirm-title="Batalkan">
                                         @csrf
                                         <button type="submit" class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors">
                                             Batal

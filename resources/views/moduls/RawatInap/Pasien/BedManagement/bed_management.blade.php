@@ -79,15 +79,15 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
-                                <form action="{{ route('bed_management.pindah_tolak') }}" method="POST" onsubmit="return pilihAlasanTolak(this);">
+                                <form id="formTolak-{{ $pindah->pindah_ruangan_id }}" action="{{ route('bed_management.pindah_tolak') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="pindah_ruangan_id" value="{{ $pindah->pindah_ruangan_id }}">
                                     <input type="hidden" name="alasan_tolak">
-                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors whitespace-nowrap">
+                                    <button type="button" onclick="bukaModalTolak('{{ $pindah->pindah_ruangan_id }}', '{{ $pindah->nama_pasien }}', '{{ $pindah->nama_bed }}')" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors whitespace-nowrap">
                                         Tolak
                                     </button>
                                 </form>
-                                <form action="{{ route('bed_management.pindah_approve') }}" method="POST" onsubmit="return confirm('Setujui pemindahan pasien ' + '{{ $pindah->nama_pasien }}' + ' ke ' + '{{ $pindah->nama_bed }}' + '?');">
+                                <form action="{{ route('bed_management.pindah_approve') }}" method="POST" data-confirm-message="Setujui pemindahan pasien {{ $pindah->nama_pasien }} ke {{ $pindah->nama_bed }}?" data-confirm-title="Setujui Permintaan Pindah Ruangan" data-confirm-text="Ya, Setujui">
                                     @csrf
                                     <input type="hidden" name="pindah_ruangan_id" value="{{ $pindah->pindah_ruangan_id }}">
                                     <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors whitespace-nowrap">
@@ -166,7 +166,7 @@
                             @endif
                             @if ($terisi)
                                 @if ($pulang)
-                                    <form action="{{ route('bed_management.ready') }}" method="POST" onsubmit="return confirm('Batalkan rencana persiapan pulang pasien ini?');" class="col-span-2">
+                                    <form action="{{ route('bed_management.ready') }}" method="POST" data-confirm-message="Batalkan rencana persiapan pulang pasien ini?" data-confirm-title="Batalkan Persiapan" data-confirm-text="Ya, Batalkan" class="col-span-2">
                                         @csrf
                                         <input type="hidden" name="bed_id" value="{{ $bed->bed_id }}">
                                         <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors whitespace-nowrap">
@@ -499,13 +499,22 @@
         });
     }
 
-    function pilihAlasanTolak(form) {
-        var alasan = prompt('Alasan penolakan (opsional):');
-        if (alasan === null) {
-            return false;
-        }
-        form.querySelector('input[name="alasan_tolak"]').value = alasan;
-        return true;
+    function bukaModalTolak(id, nama, bed) {
+        window.nusaConfirm({
+            title: 'Tolak Permintaan Pindah Ruangan',
+            message: 'Tolak permintaan pindah ruangan pasien ' + nama + ' ke ' + bed + '?',
+            confirmText: 'Ya, Tolak',
+            danger: true,
+            input: {
+                label: 'Alasan penolakan',
+                placeholder: 'Tulis alasan (opsional)'
+            },
+            onConfirm: function (alasan) {
+                var form = document.getElementById('formTolak-' + id);
+                form.querySelector('input[name="alasan_tolak"]').value = alasan || '';
+                form.submit();
+            }
+        });
     }
 
     function tutupModalPulang() {

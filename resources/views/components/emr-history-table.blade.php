@@ -66,7 +66,7 @@
                                     </a>
                                     @endif
                                     @if($aksesCrud['delete'])
-                                    <form action="{{ route('emr.form.destroy', ['form_name' => $slug, 'registrasi_detail_id' => $registrasiDetailId, 'emr_id' => $item->emr_id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus riwayat ini?');" class="inline">
+                                    <form action="{{ route('emr.form.destroy', ['form_name' => $slug, 'registrasi_detail_id' => $registrasiDetailId, 'emr_id' => $item->emr_id]) }}" method="POST" data-confirm-message="Apakah Anda yakin ingin menghapus riwayat ini?" data-confirm-danger="true" data-confirm-title="Hapus Data" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors" title="Hapus">

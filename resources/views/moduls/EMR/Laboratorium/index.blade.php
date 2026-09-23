@@ -101,7 +101,7 @@
                             </a>
                         @endif
                         @if ($aksesCrud['delete'] && (int) $order->status_order === 0)
-                            <form action="{{ route('emr.form.destroy', ['form_name' => 'laboratorium', 'registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $order->order_laboratorium_id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan order ini?');" class="inline">
+                            <form action="{{ route('emr.form.destroy', ['form_name' => 'laboratorium', 'registrasi_detail_id' => $registrasi_detail->registrasi_detail_id, 'emr_id' => $order->order_laboratorium_id]) }}" method="POST" data-confirm-message="Apakah Anda yakin ingin membatalkan order ini?" data-confirm-danger="true" data-confirm-title="Batalkan" class="inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors" title="Batal">
