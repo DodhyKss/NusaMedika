@@ -1,4 +1,14 @@
 <nav class="sticky top-0 z-30 flex items-center justify-between w-full h-16 min-h-16 px-6 bg-white border-b border-slate-200 flex-shrink-0">
+    @php
+        // Calculate patient counts for navbar display
+        $occupiedBeds = \App\Models\Bed::terisi()->count();
+        $rjToday = DB::table('registrasi')
+            ->where('jenis_rawat', 'RJ')
+            ->whereDate('tgl_masuk', today())
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })->count();
+    @endphp
     <div class="flex items-center">
         <button id="sidebar-toggle" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg focus:outline-none transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -8,6 +18,21 @@
     </div>
 
     <div class="flex items-center gap-2">
+        <!-- Patient Counts -->
+        <div class="flex items-center gap-2">
+            <!-- Rawat Inap Count -->
+            <div class="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium">Rawat Inap
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <span>{{ $occupiedBeds }}</span>
+            </div>
+            
+            <!-- Rawat Jalan Count -->
+            <div class="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium">Rawat Jalan
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                <span>{{ $rjToday }}</span>
+            </div>
+        </div>
+        
         <!-- Notification Bell -->
         <button class="relative p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
             <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
@@ -48,6 +73,19 @@
             if ($profesiId) {
                 $profesiName = \Illuminate\Support\Facades\DB::table('profesi')->where('profesi_id', $profesiId)->value('nama_profesi') ?? '-';
             }
+
+            $userBagian = '-';
+            $pegawaiBagian = \Illuminate\Support\Facades\DB::table('pegawai')
+                ->where('pegawai_id', auth()->user()->pegawai_id ?? null)
+                ->value('bagian_id');
+            if ($pegawaiBagian) {
+                $userBagian = \Illuminate\Support\Facades\DB::table('bagian')
+                    ->where('bagian_id', $pegawaiBagian)
+                    ->where(function ($q) {
+                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                    })
+                    ->value('nama_bagian') ?? '-';
+            }
         @endphp
         <div class="flex items-center gap-3">
             <div class="hidden sm:block text-right">
@@ -55,6 +93,7 @@
                     {{ Auth::user()->nama_pegawai ?? Auth::user()->user_name }}
                 </p>
                 <p class="text-[11px] text-slate-400 font-medium">{{ $profesiName }}</p>
+                <p class="text-[11px] text-slate-400 font-medium">{{ $userBagian }}</p>
             </div>
             <div class="relative">
                 <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
