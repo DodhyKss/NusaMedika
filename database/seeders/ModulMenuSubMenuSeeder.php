@@ -16,8 +16,6 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['modul_id' => 1, 'nama_modul' => 'Registrasi', 'icon_modul' => 'fa-solid fa-clipboard-list', 'urutan_modul' => 1],
             ['modul_id' => 7, 'nama_modul' => 'Farmasi', 'icon_modul' => 'fa-solid fa-prescription-bottle-medical', 'urutan_modul' => 2],
             ['modul_id' => 2, 'nama_modul' => 'Rawat Jalan', 'icon_modul' => 'fa-solid fa-user-injured', 'urutan_modul' => 3],
-            // Modul Medical Checkup ditempatkan tepat SETELAH Rawat Jalan;
-            // modul di bawahnya bergeser satu (urutan lama dinaikkan 1).
             ['modul_id' => 9, 'nama_modul' => 'Medical Checkup', 'icon_modul' => 'fa-solid fa-heart-pulse', 'urutan_modul' => 4],
             ['modul_id' => 3, 'nama_modul' => 'Rawat Inap', 'icon_modul' => 'fa-solid fa-bed', 'urutan_modul' => 5],
             ['modul_id' => 4, 'nama_modul' => 'Gawat Darurat', 'icon_modul' => 'fa-solid fa-truck-medical', 'urutan_modul' => 6],
@@ -97,6 +95,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 29, 'menu_id' => 3, 'nama_sub_menu' => 'List Pasien', 'file_sub_menu' => 'RawatJalan/Pasien/ListPasienRajal/list_pasien_rajal', 'urutan_sub_menu' => 2],
             // Menu Pasien (4) - Rawat Inap
             ['sub_menu_id' => 13, 'menu_id' => 4, 'nama_sub_menu' => 'List Pasien Ranap', 'file_sub_menu' => 'RawatInap/Pasien/ListPasienRanap/list_pasien_ranap', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 52, 'menu_id' => 4, 'nama_sub_menu' => 'Bed Management', 'file_sub_menu' => 'RawatInap/Pasien/BedManagement/bed_management', 'urutan_sub_menu' => 2],
             // Menu Pasien (5) - Gawat Darurat
             ['sub_menu_id' => 14, 'menu_id' => 5, 'nama_sub_menu' => 'List Pasien IGD', 'file_sub_menu' => 'GawatDarurat/Pasien/ListPasienGawatDarurat/list_pasien_gawat_darurat', 'urutan_sub_menu' => 1],
             // Menu Manajemen Master (6) - Administrator
@@ -118,6 +117,8 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 36, 'menu_id' => 6, 'nama_sub_menu' => 'Jenis Barang', 'file_sub_menu' => 'Administrator/ManajemenMaster/JenisBarang/jenis_barang', 'urutan_sub_menu' => 15],
             ['sub_menu_id' => 37, 'menu_id' => 6, 'nama_sub_menu' => 'Supplier', 'file_sub_menu' => 'Administrator/ManajemenMaster/Supplier/supplier', 'urutan_sub_menu' => 16],
             ['sub_menu_id' => 38, 'menu_id' => 6, 'nama_sub_menu' => 'Distributor', 'file_sub_menu' => 'Administrator/ManajemenMaster/Distributor/distributor', 'urutan_sub_menu' => 17],
+            ['sub_menu_id' => 50, 'menu_id' => 6, 'nama_sub_menu' => 'Surat Keterangan MCU', 'file_sub_menu' => 'Administrator/ManajemenMaster/SuketMedicalCheckup/suket_medical_checkup', 'urutan_sub_menu' => 18],
+            ['sub_menu_id' => 51, 'menu_id' => 6, 'nama_sub_menu' => 'Master Bed', 'file_sub_menu' => 'Administrator/ManajemenMaster/Bed/bed', 'urutan_sub_menu' => 19],
             // Menu Manajemen User (7) - Administrator
             ['sub_menu_id' => 18, 'menu_id' => 7, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'Administrator/ManajemenUser/User/user', 'urutan_sub_menu' => 1],
             // Menu Manajemen EMR (8) - Administrator
@@ -144,8 +145,6 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 47, 'menu_id' => 16, 'nama_sub_menu' => 'Daftar Pasien Rehabilitasi Medik', 'file_sub_menu' => 'PenunjangMedis/RehabilitasiMedik/DaftarPasienRehabilitasiMedik/daftar_pasien_rehabilitasi_medik', 'urutan_sub_menu' => 1],
             // Menu Pasien (17) - Medical Checkup
             ['sub_menu_id' => 49, 'menu_id' => 17, 'nama_sub_menu' => 'List Pasien Medical Checkup', 'file_sub_menu' => 'MedicalCheckup/Pasien/ListPasienMedicalCheckup/list_pasien_medical_checkup', 'urutan_sub_menu' => 1],
-            // Menu Manajemen Master (6) - Administrator (Surat Keterangan MCU)
-            ['sub_menu_id' => 50, 'menu_id' => 6, 'nama_sub_menu' => 'Surat Keterangan MCU', 'file_sub_menu' => 'Administrator/ManajemenMaster/SuketMedicalCheckup/suket_medical_checkup', 'urutan_sub_menu' => 18],
         ];
 
         foreach ($subMenus as $subMenu) {

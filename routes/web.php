@@ -12,6 +12,7 @@ use App\Http\Controllers\Inventory\Pesanan\SetujuiPesanan\SetujuiPesananControll
 use App\Http\Controllers\PenunjangMedis\Laboratorium\DaftarPesananLaboratorium\DaftarPesananLaboratoriumController;
 use App\Http\Controllers\PenunjangMedis\Radiologi\DaftarPesananRadiologi\DaftarPesananRadiologiController;
 use App\Http\Controllers\PenunjangMedis\RehabilitasiMedik\DaftarPasienRehabilitasiMedik\DaftarPasienRehabilitasiMedikController;
+use App\Http\Controllers\RawatInap\Pasien\BedManagement\BedManagementController;
 use Illuminate\Support\Facades\Route;
 
 // ================ DESKRIPSI ============== #
@@ -93,4 +94,12 @@ Route::middleware('auth')->group(function () {
     // Rehabilitasi Medik — pilih bagian rehab (session) & detail pasien (bukan CRUD, didaftarkan manual).
     Route::post('/daftar_pasien_rehabilitasi_medik/pilih-bagian', [DaftarPasienRehabilitasiMedikController::class, 'pilihBagian'])->name('daftar_pasien_rehabilitasi_medik.pilih_bagian');
     Route::get('/daftar_pasien_rehabilitasi_medik/detail/{registrasi_detail}', [DaftarPasienRehabilitasiMedikController::class, 'detail'])->name('daftar_pasien_rehabilitasi_medik.detail');
+
+    // ============ ROUTE BED MANAGEMENT ============= #
+    // Aksi non-CRUD Rawat Inap (tempatkan / persiapan pulang / lepas bed) didaftarkan manual.
+    Route::post('/bed_management/assign', [BedManagementController::class, 'assign'])->name('bed_management.assign');
+    Route::post('/bed_management/ready', [BedManagementController::class, 'ready'])->name('bed_management.ready');
+    Route::post('/bed_management/release', [BedManagementController::class, 'release'])->name('bed_management.release');
+    Route::post('/bed_management/pulang', [BedManagementController::class, 'pulang'])->name('bed_management.pulang');
+    Route::post('/bed_management/move', [BedManagementController::class, 'move'])->name('bed_management.move');
 });

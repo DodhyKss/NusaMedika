@@ -148,9 +148,23 @@ class SelectOption
                 ['value' => 'Saudara Kandung', 'label' => 'Saudara Kandung'],
                 ['value' => 'Lainnya', 'label' => 'Lainnya'],
             ],
+            'alasan_pulang' => [
+                ['value' => 'Sembuh', 'label' => 'Sembuh'],
+                ['value' => 'Atas Permintaan Sendiri (APS)', 'label' => 'Pulang Atas Permintaan Sendiri (APS)'],
+                ['value' => 'Dirujuk', 'label' => 'Dirujuk ke Rumah Sakit Lain'],
+                ['value' => 'Meninggal', 'label' => 'Meninggal'],
+                ['value' => 'Lainnya', 'label' => 'Lainnya'],
+            ],
             'kategori_icd' => [
                 ['value' => 'ICD-10', 'label' => 'ICD-10'],
                 ['value' => 'ICD-9', 'label' => 'ICD-9'],
+            ],
+            'ruang_igd' => [
+                ['value' => 'Ruang Resusitasi', 'label' => 'Ruang Resusitasi'],
+                ['value' => 'Ruang Tindakan Non-Bedah', 'label' => 'Ruang Tindakan Non-Bedah'],
+                ['value' => 'Ruang Observasi', 'label' => 'Ruang Observasi'],
+                ['value' => 'Ruang Isolasi', 'label' => 'Ruang Isolasi'],
+                ['value' => 'IGD Anak', 'label' => 'IGD Anak'],
             ],
             'jenis_konsultasi' => [
                 ['value' => 'REHABILITASI_MEDIK', 'label' => 'Konsultasi Rehabilitasi Medik'],

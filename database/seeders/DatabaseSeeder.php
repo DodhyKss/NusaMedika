@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             WilayahSeeder::class,
             KelasRuangSeeder::class,
+            BedSeeder::class,
             SuketMcuSeeder::class,
             NasabahSeeder::class,
             IcdSeeder::class,

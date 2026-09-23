@@ -15,41 +15,48 @@
         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
         <h2 class="text-sm font-semibold text-slate-700">Filter Pencarian</h2>
     </div>
-    <form action="#" method="GET" id="filterForm">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+    <form action="{{ route('list_pasien_gawat_darurat.index') }}" method="GET" id="filterForm">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+            <!-- Filter Tanggal -->
+            <div>
+                <label for="tanggal_kunjungan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Tanggal Kunjungan</label>
+                <input type="date" id="tanggal_kunjungan" name="tanggal_kunjungan" value="{{ $tanggalKunjungan }}"
+                       class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
+            </div>
+
             <!-- Filter Ruangan / Zona IGD -->
             <div>
-                <label for="ruangan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Pilih Ruangan / Zona IGD</label>
-                <div class="relative">
-                    <select id="ruangan" name="ruangan" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">Semua Ruangan IGD</option>
-                        {!! \App\Helpers\SelectOption::render('ruang_igd') !!}
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
-                </div>
+                <label for="zona" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Zona / Ruangan IGD</label>
+                <select id="zona" name="zona"
+                        class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                    <option value="">Semua Zona</option>
+                    @foreach (\App\Helpers\SelectOption::all()['ruang_igd'] as $opt)
+                        <option value="{{ $opt['value'] }}" @selected($zona === $opt['value'])>{{ $opt['label'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Filter Triase -->
+            <div>
+                <label for="triase" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Triase</label>
+                <select id="triase" name="triase"
+                        class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                    <option value="">Semua Triase</option>
+                    <option value="Merah" @selected($triase === 'Merah')>Level 1 - Resusitasi (Merah)</option>
+                    <option value="Kuning" @selected($triase === 'Kuning')>Level 2 - Gawat Darurat (Kuning)</option>
+                    <option value="Hijau" @selected($triase === 'Hijau')>Level 3 - Darurat Tidak Gawat (Hijau)</option>
+                    <option value="Hitam" @selected($triase === 'Hitam')>Level 4 - Meninggal (Hitam)</option>
+                </select>
             </div>
 
             <!-- Filter Dokter Jaga -->
             <div>
-                <label for="dokter" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Pilih Dokter Jaga</label>
-                <div class="relative">
-                    <select id="dokter" name="dokter" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">Semua Dokter Jaga</option>
-                        {!! \App\Helpers\SelectOption::render('dokter_jaga_igd') !!}
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
-                </div>
+                <x-select_dokter name="dokter_id" id="dokter_id" :selected="$dokterPegawaiId ?? ''" label="Dokter / Petugas Jaga" placeholder="Semua Petugas" />
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex justify-end gap-2 mt-2 md:mt-0">
-                <a href="#" title="Reset Filter" class="inline-flex items-center justify-center bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 text-sm font-semibold py-2.5 px-4 rounded-lg shadow-sm transition-colors">
+            <div class="flex justify-end gap-2 mt-2 lg:mt-6">
+                <a href="{{ route('list_pasien_gawat_darurat.index') }}" title="Reset Filter" class="inline-flex items-center justify-center bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 text-sm font-semibold py-2.5 px-4 rounded-lg shadow-sm transition-colors">
                     Reset
                 </a>
                 <button type="submit" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-6 rounded-lg shadow-sm shadow-blue-600/20 transition-all hover:-translate-y-0.5">
@@ -72,135 +79,101 @@
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nama Pasien</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Triase</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ruangan / Zona</th>
-                    <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Dokter Jaga</th>
+                    <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Dokter / Petugas Jaga</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Penjamin</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Status</th>
                     <th class="px-3 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody class="text-[12px] divide-y divide-slate-100">
-                <!-- Baris 1 (Gawat Darurat / Triase Merah) -->
-                <tr class="hover:bg-blue-50/40 transition-colors bg-red-50/20">
-                    <td class="px-3 py-3 text-center text-slate-600 font-medium">19 Okt 2026<br><span class="text-[10px] text-slate-400">11:05 WIB</span></td>
-                    <td class="px-3 py-3 font-semibold text-blue-600">RM-001288</td>
-                    <td class="px-3 py-3 font-semibold text-slate-800">
-                        Johan Pratama
-                        <span class="block text-[10px] text-slate-400 font-normal mt-0.5">Laki-laki, 55 Tahun</span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        <span class="inline-flex items-center justify-center px-2 py-1 rounded bg-red-100 text-red-700 font-bold text-[10px] border border-red-200">
-                            Merah (P1)
-                        </span>
-                    </td>
-                    <td class="px-3 py-3 font-medium text-slate-700">Ruang Resusitasi</td>
-                    <td class="px-3 py-3 text-slate-600">dr. Eka Pratama</td>
-                    <td class="px-3 py-3">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">
-                            BPJS Kesehatan
-                        </span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-red-100 text-red-700 border border-red-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                            Tindakan Kritis
-                        </span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        <a href="#" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm transition-colors">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                            Penanganan
-                        </a>
-                    </td>
-                </tr>
+                @php
+                    $triaseClass = [
+                        'Merah' => 'bg-red-100 text-red-700 border-red-200',
+                        'Kuning' => 'bg-amber-100 text-amber-700 border-amber-200',
+                        'Hijau' => 'bg-green-100 text-green-700 border-green-200',
+                        'Hitam' => 'bg-slate-200 text-slate-800 border-slate-300',
+                    ];
+                    $triaseRow = [
+                        'Merah' => 'bg-red-50/30',
+                        'Kuning' => 'bg-amber-50/30',
+                        'Hijau' => 'bg-green-50/20',
+                        'Hitam' => 'opacity-70',
+                    ];
+                    $jkLabel = ['L' => 'Laki-laki', 'P' => 'Perempuan'];
+                @endphp
 
-                <!-- Baris 2 (Triase Kuning) -->
-                <tr class="hover:bg-blue-50/40 transition-colors">
-                    <td class="px-3 py-3 text-center text-slate-600 font-medium">19 Okt 2026<br><span class="text-[10px] text-slate-400">10:45 WIB</span></td>
-                    <td class="px-3 py-3 font-semibold text-blue-600">RM-001285</td>
-                    <td class="px-3 py-3 font-semibold text-slate-800">
-                        Anita Wulandari
-                        <span class="block text-[10px] text-slate-400 font-normal mt-0.5">Perempuan, 24 Tahun</span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        <span class="inline-flex items-center justify-center px-2 py-1 rounded bg-amber-100 text-amber-700 font-bold text-[10px] border border-amber-200">
-                            Kuning (P2)
-                        </span>
-                    </td>
-                    <td class="px-3 py-3 font-medium text-slate-700">Ruang Tindakan Non-Bedah</td>
-                    <td class="px-3 py-3 text-slate-600">dr. Eka Pratama</td>
-                    <td class="px-3 py-3">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold bg-blue-100 text-blue-700">
-                            Umum / Mandiri
-                        </span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                            Observasi
-                        </span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        <a href="#" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            Periksa
-                        </a>
-                    </td>
-                </tr>
-
-                <!-- Baris 3 (Triase Hijau) -->
-                <tr class="hover:bg-blue-50/40 transition-colors opacity-80">
-                    <td class="px-3 py-3 text-center text-slate-500 font-medium">19 Okt 2026<br><span class="text-[10px] text-slate-400">09:30 WIB</span></td>
-                    <td class="px-3 py-3 font-semibold text-slate-500">RM-001270</td>
-                    <td class="px-3 py-3 font-semibold text-slate-500">
-                        Kurniawan
-                        <span class="block text-[10px] text-slate-400 font-normal mt-0.5">Laki-laki, 30 Tahun</span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        <span class="inline-flex items-center justify-center px-2 py-1 rounded bg-green-100 text-green-700 font-bold text-[10px] border border-green-200">
-                            Hijau (P3)
-                        </span>
-                    </td>
-                    <td class="px-3 py-3 font-medium text-slate-500">Ruang Observasi</td>
-                    <td class="px-3 py-3 text-slate-400">dr. Eka Pratama</td>
-                    <td class="px-3 py-3">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-500">
-                            Asuransi Swasta
-                        </span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Selesai & Pulang
-                        </span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        <a href="#" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                            Rekam Medis
-                        </a>
-                    </td>
-                </tr>
+                @forelse ($listPasien as $row)
+                    @php
+                        $rowClass = $triaseRow[$row->triase] ?? '';
+                        $usia = $row->tgl_lahir ? \Carbon\Carbon::parse($row->tgl_lahir)->age : '-';
+                        $selesai = $row->check_out !== null || (int) $row->status_selesai === 1;
+                    @endphp
+                    <tr class="hover:bg-blue-50/40 transition-colors {{ $rowClass }}">
+                        <td class="px-3 py-3 text-center text-slate-600 font-medium whitespace-nowrap">
+                            {{ \Carbon\Carbon::parse($row->tgl_masuk)->translatedFormat('d M Y') }}<br>
+                            <span class="text-[10px] text-slate-400">{{ \Carbon\Carbon::parse($row->tgl_masuk)->format('H:i') }} WIB</span>
+                        </td>
+                        <td class="px-3 py-3 font-semibold text-blue-600 whitespace-nowrap">{{ $row->no_mr }}</td>
+                        <td class="px-3 py-3 font-semibold text-slate-800">
+                            {{ $row->nama_pasien }}
+                            <span class="block text-[10px] text-slate-400 font-normal mt-0.5">{{ $jkLabel[$row->jenis_kelamin] ?? $row->jenis_kelamin }}, {{ $usia }} Tahun</span>
+                        </td>
+                        <td class="px-3 py-3 text-center">
+                            <span class="inline-flex items-center justify-center px-2 py-1 rounded font-bold text-[10px] border {{ $triaseClass[$row->triase] ?? 'bg-slate-100 text-slate-600 border-slate-200' }}">
+                                {{ $row->triase ?? '-' }}
+                            </span>
+                        </td>
+                        <td class="px-3 py-3 font-medium text-slate-700">{{ $row->lokasi_rawat ?? '-' }}</td>
+                        <td class="px-3 py-3 text-slate-600">{{ $row->dokter_jaga ?? '-' }}</td>
+                        <td class="px-3 py-3">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold bg-blue-100 text-blue-700">
+                                {{ $row->nama_nasabah ?? '-' }}
+                            </span>
+                        </td>
+                        <td class="px-3 py-3 text-center">
+                            @if ($selesai)
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Selesai
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-red-100 text-red-700 border border-red-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                                    Masih Dirawat
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-3 py-3 text-center">
+                            <a href="{{ route('dashboard_pasien.index', $row->registrasi_detail_id) }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                Dashboard
+                            </a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="9" class="px-3 py-12 text-center">
+                            <div class="flex flex-col items-center gap-3 text-slate-400">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                <p class="text-sm font-medium">Tidak ada pasien IGD pada filter ini.</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
     <!-- Pagination -->
-    <div class="px-5 py-3.5 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <span class="text-sm text-slate-500 text-center sm:text-left">Menampilkan <span class="font-medium text-slate-700">1</span> sampai <span class="font-medium text-slate-700">3</span> dari <span class="font-medium text-slate-700">15</span> pasien IGD</span>
-        <div class="flex items-center justify-center sm:justify-end gap-1">
-            <button class="px-3 py-1.5 text-sm font-medium text-slate-400 bg-white border border-slate-200 rounded-md cursor-not-allowed">
-                Sebelumnya
-            </button>
-            <button class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">
-                1
-            </button>
-            <button class="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50">
-                2
-            </button>
-            <button class="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50">
-                Selanjutnya
-            </button>
+    @if ($listPasien->hasPages())
+        <div class="px-5 py-3.5 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <span class="text-sm text-slate-500 text-center sm:text-left">
+                Menampilkan <span class="font-medium text-slate-700">{{ $listPasien->firstItem() ?? 0 }}</span> sampai <span class="font-medium text-slate-700">{{ $listPasien->lastItem() ?? 0 }}</span> dari <span class="font-medium text-slate-700">{{ $listPasien->total() }}</span> pasien IGD
+            </span>
+            <div class="flex items-center justify-center sm:justify-end">
+                {{ $listPasien->links() }}
+            </div>
         </div>
-    </div>
+    @endif
 </div>
 @endsection

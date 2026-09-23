@@ -16,6 +16,9 @@ class RegistrasiDetail extends Model
         'registrasi_id',
         'bagian_id',
         'status_batal',
+        'triase',
+        'cara_masuk',
+        'lokasi_rawat',
     ];
 
     public function bagian()

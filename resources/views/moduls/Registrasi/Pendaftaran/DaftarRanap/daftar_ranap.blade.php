@@ -16,7 +16,7 @@
 </div>
 
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-    <form action="#" method="POST" id="formDaftarRanap">
+    <form action="{{ route('daftar_ranap.store') }}" method="POST" id="formDaftarRanap">
         @csrf
         
         <!-- Section 1: Data Pasien -->
@@ -45,8 +45,8 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
             </div>
             <div>
-                <h2 class="text-base font-semibold text-slate-800">2. Ruang Perawatan & DPJP</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Tentukan ruangan, kelas, bed, dan dokter penanggung jawab.</p>
+                <h2 class="text-base font-semibold text-slate-800">2. Ruang Perawatan</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Tentukan ruangan, kelas, dan dokter penanggung jawab. Bed ditempatkan kemudian lewat Bed Management.</p>
             </div>
         </div>
 
@@ -56,50 +56,38 @@
                 <div>
                     <label for="tgl_masuk" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Tanggal & Waktu Masuk <span class="text-red-500">*</span></label>
                     <input type="datetime-local" id="tgl_masuk" name="tgl_masuk" value="{{ date('Y-m-d\TH:i') }}"
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
+                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700" required>
+                    @error('tgl_masuk')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Dokter DPJP -->
                 <div>
-                    <label for="dokter_dpjp" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Dokter (DPJP) <span class="text-red-500">*</span></label>
-                    <select id="dokter_dpjp" name="dokter_dpjp" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Dokter --</option>
-                        {!! \App\Helpers\SelectOption::render('dokter_ranap') !!}
-                    </select>
+                    <x-select_dokter label="Dokter (DPJP)" name="dokter_id" id="dokter_id" placeholder="-- Pilih Dokter --" />
                 </div>
 
                 <!-- Ruangan / Bangsal -->
                 <div>
-                    <label for="ruangan_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Ruangan / Bangsal <span class="text-red-500">*</span></label>
-                    <select id="ruangan_id" name="ruangan_id" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Ruangan --</option>
-                        {!! \App\Helpers\SelectOption::render('ruang_rawat_inap') !!}
-                    </select>
+                    <x-select-ruang-perawatan name="bagian_id" id="bagian_id" :selected="old('bagian_id')" />
+                    @error('bagian_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Kelas Perawatan -->
                 <div>
-                    <label for="kelas_perawatan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kelas Perawatan <span class="text-red-500">*</span></label>
-                    <select id="kelas_perawatan" name="kelas_perawatan" 
+                    <label for="kelas_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kelas Perawatan</label>
+                    <select id="kelas_id" name="kelas_id"
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Kelas --</option>
-                        <option value="">-- Pilih Kelas --</option>
+                        <option value="">-- Ikuti Hak Kelas Nasabah --</option>
                         @foreach ($kelasList as $kelasItem)
-                            <option value="{{ $kelasItem->kelas_ruang_id }}">{{ $kelasItem->nama_kelas_ruang }}</option>
+                            <option value="{{ $kelasItem->kelas_ruang_id }}" @selected((string) old('kelas_id') === (string) $kelasItem->kelas_ruang_id)>{{ $kelasItem->nama_kelas_ruang }}</option>
                         @endforeach
                     </select>
-                </div>
-
-                <!-- Nomor Bed -->
-                <div>
-                    <label for="nomor_bed" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nomor Bed <span class="text-red-500">*</span></label>
-                    <select id="nomor_bed" name="nomor_bed" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Bed Tersedia --</option>
-                        {!! \App\Helpers\SelectOption::render('bed') !!}
-                    </select>
+                    @error('kelas_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
         </div>
@@ -117,55 +105,75 @@
 
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                <!-- Jenis Penjamin -->
+                <!-- Penjamin -->
                 <div>
-                    <label for="jenis_penjamin" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Jenis Penjamin <span class="text-red-500">*</span></label>
-                    <select id="jenis_penjamin" name="jenis_penjamin" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                    <label for="nasabah_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Penjamin / Nasabah <span class="text-red-500">*</span></label>
+                    <select id="nasabah_id" name="nasabah_id"
+                            class="select2 w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none" required>
                         <option value="">-- Pilih Penjamin --</option>
-                        {!! \App\Helpers\SelectOption::render('jaminan') !!}
+                        @foreach ($nasabahs as $nasabah)
+                            <option value="{{ $nasabah->nasabah_id }}" @selected((string) old('nasabah_id') === (string) $nasabah->nasabah_id)>{{ $nasabah->nama_nasabah }}</option>
+                        @endforeach
                     </select>
+                    @error('nasabah_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Asal Masuk (Rujukan/IGD) -->
                 <div>
-                    <label for="asal_masuk" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Asal Masuk <span class="text-red-500">*</span></label>
-                    <select id="asal_masuk" name="asal_masuk" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                    <label for="asal_pasien_ranap" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Asal Masuk <span class="text-red-500">*</span></label>
+                    <select id="asal_pasien_ranap" name="asal_pasien_ranap"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none" required>
                         <option value="">-- Pilih Asal --</option>
-                        {!! \App\Helpers\SelectOption::render('asal_pasien_ranap') !!}
+                        {!! \App\Helpers\SelectOption::render('asal_pasien_ranap', old('asal_pasien_ranap')) !!}
                     </select>
+                    @error('asal_pasien_ranap')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Nama Penanggung Jawab -->
                 <div>
-                    <label for="nama_pj" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nama Penanggung Jawab <span class="text-red-500">*</span></label>
-                    <input type="text" id="nama_pj" name="nama_pj" placeholder="Nama lengkap keluarga/kerabat" 
+                    <label for="nama_pj" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nama Penanggung Jawab</label>
+                    <input type="text" id="nama_pj" name="nama_pj" value="{{ old('nama_pj') }}" placeholder="Nama lengkap keluarga/kerabat" 
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
                 </div>
 
                 <!-- Hubungan dengan Pasien -->
                 <div>
-                    <label for="hubungan_pj" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Hubungan dengan Pasien <span class="text-red-500">*</span></label>
-                    <select id="hubungan_pj" name="hubungan_pj" 
+                    <label for="hubungan_pj" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Hubungan dengan Pasien</label>
+                    <select id="hubungan_pj" name="hubungan_pj"
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Hubungan --</option>
-                        {!! \App\Helpers\SelectOption::render('hubungan_keluarga_ranap') !!}
+                        {!! \App\Helpers\SelectOption::render('hubungan_keluarga_ranap', old('hubungan_pj')) !!}
                     </select>
                 </div>
 
                 <!-- No. HP Penanggung Jawab -->
                 <div>
-                    <label for="nohp_pj" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">No. HP Penanggung Jawab <span class="text-red-500">*</span></label>
-                    <input type="text" id="nohp_pj" name="nohp_pj" placeholder="08xxxxxxxxxx" 
+                    <label for="nohp_pj" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">No. HP Penanggung Jawab</label>
+                    <input type="text" id="nohp_pj" name="nohp_pj" value="{{ old('nohp_pj') }}" placeholder="08xxxxxxxxxx" 
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
+                </div>
+
+                <!-- Diagnosa Awal (ICD) -->
+                <div>
+                    <label for="icd_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Diagnosa Awal (ICD)</label>
+                    <select id="icd_id" name="icd_id" class="select2-icd w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700"
+                            data-url="{{ route('api.icd.search') }}">
+                        <option value=""></option>
+                    </select>
+                    @error('icd_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Diagnosa Awal / Alasan Masuk -->
                 <div class="md:col-span-2">
-                    <label for="diagnosa_awal" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Diagnosa Awal / Indikasi Rawat Inap <span class="text-red-500">*</span></label>
+                    <label for="diagnosa_awal" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Diagnosa Awal / Indikasi Rawat Inap</label>
                     <textarea id="diagnosa_awal" name="diagnosa_awal" rows="3" placeholder="Masukkan diagnosa awal atau alasan medis pasien dirawat inap..." 
-                              class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400 resize-none"></textarea>
+                              class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400 resize-none">{{ old('diagnosa_awal') }}</textarea>
                 </div>
             </div>
             

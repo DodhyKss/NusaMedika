@@ -16,9 +16,10 @@
 </div>
 
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-    <form action="#" method="POST" id="formRegistrasiIGD">
+    <form action="{{ route('daftar_gawat_darurat.store') }}" method="POST" id="formRegistrasiIGD">
         @csrf
-        
+        <input type="hidden" name="mode_pasien" id="mode_pasien" value="terdaftar">
+
         <!-- Section 1: Data Pasien -->
         <div class="px-6 py-4 border-b border-slate-200 bg-red-50 flex items-center gap-3">
             <div class="p-2 bg-red-100 text-red-600 rounded-lg">
@@ -30,7 +31,7 @@
                     <p class="text-xs text-red-600/80 mt-0.5">Cari pasien atau daftarkan sebagai pasien darurat (Tanpa Identitas).</p>
                 </div>
                 <!-- Tombol Pasien Baru (Cepat) -->
-                <button type="button" class="text-xs font-semibold bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded shadow-sm transition-colors flex items-center gap-1.5">
+                <button type="button" id="btnPasienDarurat" class="text-xs font-semibold bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded shadow-sm transition-colors flex items-center gap-1.5">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Pasien Darurat (Mr. X)
                 </button>
@@ -40,8 +41,11 @@
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                 <!-- Pilih Pasien -->
-                <div class="md:col-span-2">
-                    <x-select_pasien label="Cari Pasien Terdaftar" required />
+                <div class="md:col-span-2" id="wrapPasienTerdaftar">
+                    <x-select_pasien label="Cari Pasien Terdaftar" name="pasien_id" id="pasien_id_igd" />
+                    @error('pasien_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
         </div>
@@ -62,38 +66,70 @@
                 <!-- Tanggal & Waktu Kedatangan -->
                 <div>
                     <label for="waktu_kedatangan" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Waktu Kedatangan <span class="text-red-500">*</span></label>
-                    <input type="datetime-local" id="waktu_kedatangan" name="waktu_kedatangan" value="{{ date('Y-m-d\TH:i') }}"
-                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700">
+                    <input type="datetime-local" id="waktu_kedatangan" name="waktu_kedatangan" value="{{ old('waktu_kedatangan', date('Y-m-d\TH:i')) }}"
+                           class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700" required>
+                    @error('waktu_kedatangan')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Ruang IGD -->
+                <div>
+                    <label for="ruang_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Ruang IGD <span class="text-red-500">*</span></label>
+                    <select id="ruang_id" name="ruang_id"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none" required>
+                        <option value="">-- Pilih Ruang --</option>
+                        @foreach ($ruangIgd as $ruang)
+                            <option value="{{ $ruang->bagian_id }}" @selected((string) old('ruang_id') === (string) $ruang->bagian_id)>{{ $ruang->nama_bagian }}</option>
+                        @endforeach
+                    </select>
+                    @error('ruang_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Kategori Triase -->
                 <div>
                     <label for="triase" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Kategori Triase <span class="text-red-500">*</span></label>
-                    <select id="triase" name="triase" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none font-medium">
+                    <select id="triase" name="triase"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none font-medium" required>
                         <option value="">-- Pilih Triase --</option>
-                        {!! \App\Helpers\SelectOption::render('triase_igd') !!}
+                        {!! \App\Helpers\SelectOption::render('triase_igd', old('triase')) !!}
                     </select>
+                    @error('triase')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Dokter Jaga IGD -->
                 <div>
-                    <label for="dokter_igd" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Dokter Jaga IGD <span class="text-red-500">*</span></label>
-                    <select id="dokter_igd" name="dokter_igd" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        <option value="">-- Pilih Dokter Jaga --</option>
-                        {!! \App\Helpers\SelectOption::render('dokter_igd') !!}
-                    </select>
+                    <x-select_dokter label="Dokter Jaga IGD" name="dokter_id" id="dokter_igd" placeholder="-- Pilih Dokter Jaga --" />
                 </div>
 
                 <!-- Cara Masuk -->
                 <div>
                     <label for="cara_masuk" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Cara Kedatangan <span class="text-red-500">*</span></label>
-                    <select id="cara_masuk" name="cara_masuk" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                    <select id="cara_masuk" name="cara_masuk"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none" required>
                         <option value="">-- Pilih Kedatangan --</option>
-                        {!! \App\Helpers\SelectOption::render('cara_masuk_igd') !!}
+                        {!! \App\Helpers\SelectOption::render('cara_masuk', old('cara_masuk')) !!}
                     </select>
+                    @error('cara_masuk')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Zona / Lokasi Rawat -->
+                <div>
+                    <label for="zona" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Zona / Lokasi Rawat</label>
+                    <select id="zona" name="zona"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
+                        <option value="">-- Pilih Zona --</option>
+                        {!! \App\Helpers\SelectOption::render('ruang_igd', old('zona')) !!}
+                    </select>
+                    @error('zona')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
         </div>
@@ -111,47 +147,65 @@
 
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                <!-- Jenis Penjamin -->
+                <!-- Penjamin -->
                 <div>
-                    <label for="jenis_penjamin" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Jenis Penjamin <span class="text-red-500">*</span></label>
-                    <select id="jenis_penjamin" name="jenis_penjamin" 
-                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
-                        {!! \App\Helpers\SelectOption::render('jaminan', 'Umum') !!}
+                    <label for="nasabah_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Penjamin / Nasabah <span class="text-red-500">*</span></label>
+                    <select id="nasabah_id" name="nasabah_id"
+                            class="select2 w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none" required>
+                        <option value="">-- Pilih Penjamin --</option>
+                        @foreach ($nasabahs as $nasabah)
+                            <option value="{{ $nasabah->nasabah_id }}" @selected((string) old('nasabah_id') === (string) $nasabah->nasabah_id)>{{ $nasabah->nama_nasabah }}</option>
+                        @endforeach
                     </select>
+                    @error('nasabah_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Nama Pengantar -->
                 <div>
                     <label for="nama_pengantar" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Nama Pengantar</label>
-                    <input type="text" id="nama_pengantar" name="nama_pengantar" placeholder="Nama lengkap pengantar" 
+                    <input type="text" id="nama_pengantar" name="nama_pengantar" value="{{ old('nama_pengantar') }}" placeholder="Nama lengkap pengantar"
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
                 </div>
 
                 <!-- Hubungan Pengantar -->
                 <div>
                     <label for="hubungan_pengantar" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Hubungan Pengantar</label>
-                    <select id="hubungan_pengantar" name="hubungan_pengantar" 
+                    <select id="hubungan_pengantar" name="hubungan_pengantar"
                             class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 appearance-none">
                         <option value="">-- Pilih Hubungan --</option>
-                        {!! \App\Helpers\SelectOption::render('hubungan_penanggung') !!}
+                        {!! \App\Helpers\SelectOption::render('hubungan_penanggung', old('hubungan_pengantar')) !!}
                     </select>
                 </div>
 
                 <!-- No HP Pengantar -->
                 <div>
                     <label for="nohp_pengantar" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">No. HP Pengantar / Darurat</label>
-                    <input type="text" id="nohp_pengantar" name="nohp_pengantar" placeholder="08xxxxxxxxxx" 
+                    <input type="text" id="nohp_pengantar" name="nohp_pengantar" value="{{ old('nohp_pengantar') }}" placeholder="08xxxxxxxxxx"
                            class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400">
+                </div>
+
+                <!-- Diagnosa Awal (ICD) -->
+                <div>
+                    <label for="icd_id" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Diagnosa Awal (ICD)</label>
+                    <select id="icd_id" name="icd_id" class="select2-icd w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700"
+                            data-url="{{ route('api.icd.search') }}">
+                        <option value=""></option>
+                    </select>
+                    @error('icd_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Keluhan / Kondisi Saat Tiba -->
                 <div class="md:col-span-2">
-                    <label for="kondisi_tiba" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Keluhan / Kondisi Saat Tiba (Cito) <span class="text-red-500">*</span></label>
-                    <textarea id="kondisi_tiba" name="kondisi_tiba" rows="3" placeholder="Deskripsikan kondisi kegawatdaruratan, misal: Korban KLL, tidak sadar, pendarahan..." 
-                              class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400 resize-none"></textarea>
+                    <label for="kondisi_tiba" class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Keluhan / Kondisi Saat Tiba (Cito)</label>
+                    <textarea id="kondisi_tiba" name="kondisi_tiba" rows="3" placeholder="Deskripsikan kondisi kegawatdaruratan, misal: Korban KLL, tidak sadar, pendarahan..."
+                              class="w-full text-sm border border-slate-200 rounded-lg px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-700 placeholder-slate-400 resize-none">{{ old('kondisi_tiba') }}</textarea>
                 </div>
             </div>
-            
+
             <hr class="my-6 border-slate-200">
 
             <!-- Buttons -->
@@ -178,3 +232,31 @@
     }
 </style>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.getElementById('btnPasienDarurat');
+        const wrap = document.getElementById('wrapPasienTerdaftar');
+        const mode = document.getElementById('mode_pasien');
+        const pasienSelect = document.getElementById('pasien_id_igd');
+
+        btn.addEventListener('click', function () {
+            const darurat = mode.value === 'darurat';
+            mode.value = darurat ? 'terdaftar' : 'darurat';
+            wrap.classList.toggle('hidden', !darurat);
+            btn.classList.toggle('bg-slate-600', darurat);
+            btn.classList.toggle('hover:bg-slate-700', darurat);
+            btn.innerHTML = darurat
+                ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> Batalkan Mode Darurat'
+                : '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Pasien Darurat (Mr. X)';
+            if (darurat) {
+                pasienSelect.value = '';
+                if (window.jQuery && jQuery(pasienSelect).data('select2')) {
+                    jQuery(pasienSelect).val('').trigger('change');
+                }
+            }
+        });
+    });
+</script>
+@endpush
