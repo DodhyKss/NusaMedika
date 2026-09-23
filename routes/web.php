@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
     // ======================================== #
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/pasien/{jenis}', [DashboardController::class, 'pasien'])->name('dashboard.pasien');
 
     // ============ ROUTE SOAP ================= #
     Route::get('/emr/soap/print/{emr_id}', [SoapController::class, 'print'])->name('emr.soap.print');
