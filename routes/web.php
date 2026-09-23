@@ -102,4 +102,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/bed_management/release', [BedManagementController::class, 'release'])->name('bed_management.release');
     Route::post('/bed_management/pulang', [BedManagementController::class, 'pulang'])->name('bed_management.pulang');
     Route::post('/bed_management/move', [BedManagementController::class, 'move'])->name('bed_management.move');
+    Route::post('/bed_management/pindah_request', [BedManagementController::class, 'pindahRequest'])->name('bed_management.pindah_request');
+    Route::post('/bed_management/pindah_approve', [BedManagementController::class, 'pindahApprove'])->name('bed_management.pindah_approve');
+    Route::post('/bed_management/pindah_tolak', [BedManagementController::class, 'pindahTolak'])->name('bed_management.pindah_tolak');
 });

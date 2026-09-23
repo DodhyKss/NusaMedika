@@ -44,6 +44,7 @@ class BedManagementController extends Controller
                 ->whereIn('r.pasien_id', $terisiPasienIds->all())
                 ->where('r.jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
                 ->whereNull('r.tgl_keluar')
+                ->whereNull('rd.check_out')
                 ->where(function ($q) {
                     $q->whereNull('r.status_batal')->orWhere('r.status_batal', 0);
                 })
@@ -73,6 +74,7 @@ class BedManagementController extends Controller
             ->where(function ($q) {
                 $q->whereNull('r.status_batal')->orWhere('r.status_batal', 0);
             })
+            ->whereNull('rd.check_out')
             ->where('rd.bagian_id', $ruangId)
             ->where(function ($q) {
                 $q->whereNull('rd.status_batal')->orWhere('rd.status_batal', 0);
@@ -104,6 +106,45 @@ class BedManagementController extends Controller
             )->all()])
             ->all();
 
+        $permintaanPindah = DB::table('pindah_ruangan as pr')
+            ->join('pasien as p', 'p.pasien_id', '=', 'pr.pasien_id')
+            ->leftJoin('bed as b', 'b.bed_id', '=', 'pr.bed_tujuan_id')
+            ->leftJoin('bagian as ba', 'ba.bagian_id', '=', 'pr.bagian_asal_id')
+            ->where('pr.bagian_tujuan_id', $ruangId)
+            ->where('pr.status', 0)
+            ->where(function ($q) {
+                $q->whereNull('pr.status_batal')->orWhere('pr.status_batal', 0);
+            })
+            ->select(
+                'pr.pindah_ruangan_id',
+                'pr.pasien_id',
+                'pr.bed_tujuan_id',
+                'pr.bagian_asal_id',
+                'pr.input_time',
+                'p.no_mr',
+                'p.nama_pasien',
+                'b.nama_bed',
+                'b.no_kamar',
+                'ba.nama_bagian as nama_bagian_asal'
+            )
+            ->orderBy('pr.input_time')
+            ->get();
+
+        $pendingPindah = DB::table('pindah_ruangan as pr')
+            ->leftJoin('bagian as bg', 'bg.bagian_id', '=', 'pr.bagian_tujuan_id')
+            ->where('pr.status', 0)
+            ->where(function ($q) {
+                $q->whereNull('pr.status_batal')->orWhere('pr.status_batal', 0);
+            })
+            ->select(
+                'pr.pasien_id',
+                'pr.pindah_ruangan_id',
+                'pr.bed_tujuan_id',
+                'bg.nama_bagian as nama_bagian_tujuan'
+            )
+            ->get()
+            ->keyBy('pasien_id');
+
         return view('moduls.RawatInap.Pasien.BedManagement.bed_management', compact(
             'ruangs',
             'ruangId',
@@ -112,7 +153,9 @@ class BedManagementController extends Controller
             'registrasiMap',
             'waitlist',
             'kosongBeds',
-            'kosongBedsPerRuang'
+            'kosongBedsPerRuang',
+            'permintaanPindah',
+            'pendingPindah'
         ));
     }
 
@@ -293,9 +336,11 @@ class BedManagementController extends Controller
 
                 $detail = DB::table('registrasi_detail')
                     ->where('registrasi_id', $registrasi->registrasi_id)
+                    ->whereNull('check_out')
                     ->where(function ($q) {
                         $q->whereNull('status_batal')->orWhere('status_batal', 0);
                     })
+                    ->orderBy('registrasi_detail_id', 'desc')
                     ->first();
 
                 if ($detail) {
@@ -338,6 +383,10 @@ class BedManagementController extends Controller
             'ruang_id' => 'nullable|integer|exists:bagian,bagian_id',
         ]);
 
+        if ($request->filled('ruang_id')) {
+            return back()->with('error', 'Pindah lintas ruangan wajib melalui permintaan pindah ruangan.');
+        }
+
         DB::beginTransaction();
         try {
             $current = Bed::aktif()->where('bed_id', $request->bed_id)->whereNotNull('pasien_id_1')->firstOrFail();
@@ -348,19 +397,17 @@ class BedManagementController extends Controller
 
             $target = Bed::aktif()->where('bed_id', $request->target_bed_id)->whereNull('pasien_id_1')->firstOrFail();
 
-            if ($request->filled('ruang_id')) {
-                if ((int) $request->ruang_id === (int) $current->bagian_id) {
-                    return back()->with('error', 'Pilih ruangan yang berbeda dari ruangan saat ini.');
-                }
-
-                if ((int) $target->bagian_id !== (int) $request->ruang_id) {
-                    return back()->with('error', 'Bed tujuan tidak berada pada ruangan terpilih.');
-                }
-            } elseif ((int) $target->bagian_id !== (int) $current->bagian_id) {
+            if ((int) $target->bagian_id !== (int) $current->bagian_id) {
                 return back()->with('error', 'Pindah bed hanya untuk bed kosong pada ruangan yang sama. Gunakan Pindah Ruangan untuk lintas ruangan.');
             }
 
             $pasienId = $current->pasien_id_1;
+
+            if ($this->punyaPermintaanPindah($pasienId)) {
+                return back()->with('error', 'Pasien memiliki permintaan pindah ruangan yang belum diproses, tidak dapat dipindah.');
+            }
+
+            $tglPindah = now();
 
             // Isi bed tujuan dengan data pasien dari bed sebelumnya
             $target->pasien_id_1 = $pasienId;
@@ -371,7 +418,7 @@ class BedManagementController extends Controller
             $target->namakelas = $current->namakelas;
             $target->flag_persiapan_pulang = $current->flag_persiapan_pulang ?? 2;
             $target->tgl_pulang = $current->tgl_pulang;
-            $target->mod_time = now();
+            $target->mod_time = $tglPindah;
             $target->mod_user_id = Auth::id();
             $target->save();
 
@@ -382,42 +429,23 @@ class BedManagementController extends Controller
             $current->status_bed = 0;
             $current->flag_persiapan_pulang = 2;
             $current->tgl_pulang = null;
-            $current->mod_time = now();
+            $current->mod_time = $tglPindah;
             $current->mod_user_id = Auth::id();
             $current->save();
 
-            // Pindah ruangan: ikutkan ruang pasien di registrasi_detail & bill_temp
-            if ($request->filled('ruang_id')) {
-                $rd = RegistrasiDetail::where('registrasi_id', function ($q) use ($pasienId) {
-                    $q->select('registrasi_id')
-                        ->from('registrasi')
-                        ->where('pasien_id', $pasienId)
-                        ->where('jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
-                        ->whereNull('tgl_keluar')
-                        ->where(function ($sq) {
-                            $sq->whereNull('status_batal')->orWhere('status_batal', 0);
-                        })
-                        ->limit(1);
-                })
-                    ->where(function ($q) {
-                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                    })
-                    ->first();
-
-                if ($rd) {
-                    $rd->bagian_id = $request->ruang_id;
-                    $rd->mod_time = now();
-                    $rd->mod_user_id = Auth::id();
-                    $rd->save();
-
-                    DB::table('bill_temp')
-                        ->where('registrasi_detail_id', $rd->registrasi_detail_id)
-                        ->where(function ($q) {
-                            $q->whereNull('status_batal')->orWhere('status_batal', 0);
-                        })
-                        ->update(['bagian_id' => $request->ruang_id]);
-                }
-            }
+            // Catat pergerakan pasien di bed_log
+            DB::table('bed_log')->insert([
+                'pasien_id' => $pasienId,
+                'registrasi_detail_id' => $this->detailAktifId($pasienId),
+                'bed_asal_id' => $current->bed_id,
+                'bagian_asal_id' => $current->bagian_id,
+                'bed_id' => $target->bed_id,
+                'bagian_id' => $target->bagian_id,
+                'aksi' => 'PINDAH_BED',
+                'tgl_pindah' => $tglPindah,
+                'input_time' => $tglPindah,
+                'input_user_id' => Auth::id(),
+            ]);
 
             DB::commit();
 
@@ -427,6 +455,275 @@ class BedManagementController extends Controller
 
             return back()->with('error', 'Gagal memindahkan pasien: '.$e->getMessage());
         }
+    }
+
+    public function pindahRequest(Request $request)
+    {
+        $request->validate([
+            'bed_id' => 'required|integer|exists:bed,bed_id',
+            'target_bed_id' => 'required|integer|exists:bed,bed_id',
+            'ruang_id' => 'required|integer|exists:bagian,bagian_id',
+        ]);
+
+        $current = Bed::aktif()->where('bed_id', $request->bed_id)->whereNotNull('pasien_id_1')->firstOrFail();
+
+        if (($current->flag_persiapan_pulang ?? 0) === 1) {
+            return back()->with('error', 'Pasien sedang dalam persiapan pulang, tidak dapat dipindah.');
+        }
+
+        if ((int) $request->ruang_id === (int) $current->bagian_id) {
+            return back()->with('error', 'Pilih ruangan yang berbeda dari ruangan saat ini.');
+        }
+
+        $target = Bed::aktif()->where('bed_id', $request->target_bed_id)->whereNull('pasien_id_1')->firstOrFail();
+
+        if ((int) $target->bagian_id !== (int) $request->ruang_id) {
+            return back()->with('error', 'Bed tujuan tidak berada pada ruangan terpilih.');
+        }
+
+        $pasienId = $current->pasien_id_1;
+
+        if ($this->punyaPermintaanPindah($pasienId)) {
+            return back()->with('error', 'Pasien memiliki permintaan pindah ruangan yang belum diproses, tidak dapat dipindah.');
+        }
+
+        if ($this->punyaPermintaanPindah($pasienId)) {
+            return back()->with('error', 'Pasien sudah memiliki permintaan pindah ruangan yang belum disetujui.');
+        }
+
+        DB::table('pindah_ruangan')->insert([
+            'pasien_id' => $pasienId,
+            'registrasi_detail_id' => $this->detailAktifId($pasienId),
+            'bed_asal_id' => $current->bed_id,
+            'bagian_asal_id' => $current->bagian_id,
+            'bed_tujuan_id' => $target->bed_id,
+            'bagian_tujuan_id' => (int) $request->ruang_id,
+            'status' => 0,
+            'input_time' => now(),
+            'input_user_id' => Auth::id(),
+        ]);
+
+        return back()->with('success', 'Permintaan pindah ruangan diajukan, menunggu persetujuan ruang tujuan.');
+    }
+
+    public function pindahApprove(Request $request)
+    {
+        $request->validate([
+            'pindah_ruangan_id' => 'required|integer|exists:pindah_ruangan,pindah_ruangan_id',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $permintaan = DB::table('pindah_ruangan')
+                ->where('pindah_ruangan_id', $request->pindah_ruangan_id)
+                ->where('status', 0)
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
+                ->firstOrFail();
+
+            $current = Bed::aktif()->where('bed_id', $permintaan->bed_asal_id)->whereNotNull('pasien_id_1')->firstOrFail();
+
+            if ((int) $current->pasien_id_1 !== (int) $permintaan->pasien_id) {
+                throw new \Exception('Pasien sudah tidak berada di bed asal.');
+            }
+
+            if (($current->flag_persiapan_pulang ?? 0) === 1) {
+                throw new \Exception('Pasien sedang dalam persiapan pulang, tidak dapat dipindah.');
+            }
+
+            $target = Bed::aktif()->where('bed_id', $permintaan->bed_tujuan_id)->whereNull('pasien_id_1')->firstOrFail();
+
+            if ((int) $target->bagian_id !== (int) $permintaan->bagian_tujuan_id) {
+                throw new \Exception('Bed tujuan tidak lagi berada pada ruangan tujuan.');
+            }
+
+            $pasienId = (int) $current->pasien_id_1;
+            $tglPindah = now();
+
+            // Isi bed tujuan dengan data pasien
+            $target->pasien_id_1 = $pasienId;
+            $target->tgl_masuk = $current->tgl_masuk;
+            $target->status_bed = 1;
+            $target->kelas_id = $current->kelas_id;
+            $target->kodekelas = $current->kodekelas;
+            $target->namakelas = $current->namakelas;
+            $target->flag_persiapan_pulang = $current->flag_persiapan_pulang ?? 2;
+            $target->tgl_pulang = $current->tgl_pulang;
+            $target->mod_time = $tglPindah;
+            $target->mod_user_id = Auth::id();
+            $target->save();
+
+            // Kosongkan bed asal
+            $current->pasien_id_1 = null;
+            $current->pasien_id_2 = null;
+            $current->tgl_masuk = null;
+            $current->status_bed = 0;
+            $current->flag_persiapan_pulang = 2;
+            $current->tgl_pulang = null;
+            $current->mod_time = $tglPindah;
+            $current->mod_user_id = Auth::id();
+            $current->save();
+
+            // Tutup detail lama & buat detail baru di ruang tujuan
+            $detailAktif = DB::table('registrasi_detail')
+                ->where('registrasi_detail_id', $permintaan->registrasi_detail_id)
+                ->first();
+
+            if (! $detailAktif) {
+                throw new \Exception('Registrasi detail asal tidak ditemukan.');
+            }
+
+            DB::table('registrasi_detail')
+                ->where('registrasi_detail_id', $detailAktif->registrasi_detail_id)
+                ->update([
+                    'check_out' => $tglPindah,
+                    'mod_time' => $tglPindah,
+                    'mod_user_id' => Auth::id(),
+                ]);
+
+            $registrasiDetailId = DB::table('registrasi_detail')->insertGetId([
+                'registrasi_id' => $detailAktif->registrasi_id,
+                'tgl_daftar' => $tglPindah,
+                'check_in' => $tglPindah,
+                'bagian_id' => $target->bagian_id,
+                'bagian_asal_id' => $detailAktif->bagian_id,
+                'kelas_id' => $detailAktif->kelas_id,
+                'hak_kelas_id' => $detailAktif->hak_kelas_id,
+                'input_time' => $tglPindah,
+                'input_user_id' => Auth::id(),
+            ]);
+
+            // Tutup bill detail lama & buat bill baru untuk detail baru
+            $billLama = DB::table('bill_temp')
+                ->where('registrasi_detail_id', $detailAktif->registrasi_detail_id)
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
+                ->orderBy('bill_temp_id', 'desc')
+                ->first();
+
+            if ($billLama) {
+                DB::table('bill_temp')
+                    ->where('bill_temp_id', $billLama->bill_temp_id)
+                    ->update([
+                        'status_selesai' => 1,
+                        'mod_time' => $tglPindah,
+                        'mod_user_id' => Auth::id(),
+                    ]);
+
+                DB::table('bill_temp')->insert([
+                    'registrasi_detail_id' => $registrasiDetailId,
+                    'pasien_id' => $pasienId,
+                    'bagian_id' => $target->bagian_id,
+                    'nasabah_id' => $billLama->nasabah_id,
+                    'kelas_ruang_id' => $billLama->kelas_ruang_id,
+                    'hak_kelas_ruang_id' => $billLama->hak_kelas_ruang_id,
+                    'tgl_bill' => $tglPindah,
+                    'status_selesai' => 0,
+                    'input_time' => $tglPindah,
+                    'input_user_id' => Auth::id(),
+                ]);
+            }
+
+            // Catat pergerakan pasien di bed_log
+            DB::table('bed_log')->insert([
+                'pasien_id' => $pasienId,
+                'registrasi_detail_id' => $registrasiDetailId,
+                'bed_asal_id' => $current->bed_id,
+                'bagian_asal_id' => $current->bagian_id,
+                'bed_id' => $target->bed_id,
+                'bagian_id' => $target->bagian_id,
+                'aksi' => 'PINDAH_RUANGAN',
+                'tgl_pindah' => $tglPindah,
+                'input_time' => $tglPindah,
+                'input_user_id' => Auth::id(),
+            ]);
+
+            // Tandai permintaan disetujui
+            DB::table('pindah_ruangan')
+                ->where('pindah_ruangan_id', $permintaan->pindah_ruangan_id)
+                ->update([
+                    'status' => 1,
+                    'registrasi_detail_id' => $registrasiDetailId,
+                    'disetujui_user_id' => Auth::id(),
+                    'disetujui_time' => $tglPindah,
+                    'mod_time' => $tglPindah,
+                    'mod_user_id' => Auth::id(),
+                ]);
+
+            DB::commit();
+
+            return back()->with('success', 'Permintaan pindah ruangan disetujui, pasien dipindahkan ke ruang tujuan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->with('error', 'Gagal menyetujui pindah ruangan: '.$e->getMessage());
+        }
+    }
+
+    public function pindahTolak(Request $request)
+    {
+        $request->validate([
+            'pindah_ruangan_id' => 'required|integer|exists:pindah_ruangan,pindah_ruangan_id',
+            'alasan_tolak' => 'nullable|string|max:255',
+        ]);
+
+        $updated = DB::table('pindah_ruangan')
+            ->where('pindah_ruangan_id', $request->pindah_ruangan_id)
+            ->where('status', 0)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->update([
+                'status' => 2,
+                'keterangan' => $request->input('alasan_tolak'),
+                'mod_time' => now(),
+                'mod_user_id' => Auth::id(),
+            ]);
+
+        if (! $updated) {
+            return back()->with('error', 'Permintaan sudah diproses.');
+        }
+
+        return back()->with('success', 'Permintaan pindah ruangan ditolak.');
+    }
+
+    private function punyaPermintaanPindah(int $pasienId): bool
+    {
+        return DB::table('pindah_ruangan')
+            ->where('pasien_id', $pasienId)
+            ->where('status', 0)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->exists();
+    }
+
+    private function detailAktifId(int $pasienId): ?int
+    {
+        $registrasi = DB::table('registrasi')
+            ->where('pasien_id', $pasienId)
+            ->where('jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
+            ->whereNull('tgl_keluar')
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->orderBy('registrasi_id', 'desc')
+            ->first();
+
+        if (! $registrasi) {
+            return null;
+        }
+
+        return DB::table('registrasi_detail')
+            ->where('registrasi_id', $registrasi->registrasi_id)
+            ->whereNull('check_out')
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->orderBy('registrasi_detail_id', 'desc')
+            ->value('registrasi_detail_id');
     }
 
     private function ruangPerawatan()

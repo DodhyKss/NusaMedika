@@ -44,6 +44,64 @@
             <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> Persiapan Pulang</span>
         </div>
 
+        <!-- Permintaan Pindah Ruangan Masuk -->
+        @if ($permintaanPindah->isNotEmpty())
+            <div class="bg-white rounded-xl border border-amber-200 shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-amber-200 bg-amber-50 flex items-center gap-3">
+                    <div class="p-2 bg-amber-100 text-amber-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-semibold text-slate-800">Permintaan Pindah Ruangan Masuk</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Pasien meminta pindah masuk ke ruang ini, menunggu persetujuan Anda.</p>
+                    </div>
+                    <span class="ml-auto inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-600 text-white">{{ $permintaanPindah->count() }} Permintaan</span>
+                </div>
+                <div class="divide-y divide-slate-100">
+                    @foreach ($permintaanPindah as $pindah)
+                        <div class="px-5 py-3.5 flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-5">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-800">{{ $pindah->nama_pasien }}</p>
+                                <p class="text-xs text-slate-500 mt-0.5">NORM {{ $pindah->no_mr }}</p>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-1 text-xs text-slate-600">
+                                <div>
+                                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Dari Ruangan</p>
+                                    <p class="font-medium mt-0.5">{{ $pindah->nama_bagian_asal ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Bed Tujuan</p>
+                                    <p class="font-medium mt-0.5">{{ $pindah->nama_bed ?? '-' }} (Kamar {{ $pindah->no_kamar ?? '-' }})</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Diajukan</p>
+                                    <p class="font-medium mt-0.5">{{ date('d-m-Y H:i', strtotime($pindah->input_time)) }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <form action="{{ route('bed_management.pindah_tolak') }}" method="POST" onsubmit="return pilihAlasanTolak(this);">
+                                    @csrf
+                                    <input type="hidden" name="pindah_ruangan_id" value="{{ $pindah->pindah_ruangan_id }}">
+                                    <input type="hidden" name="alasan_tolak">
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors whitespace-nowrap">
+                                        Tolak
+                                    </button>
+                                </form>
+                                <form action="{{ route('bed_management.pindah_approve') }}" method="POST" onsubmit="return confirm('Setujui pemindahan pasien ' + '{{ $pindah->nama_pasien }}' + ' ke ' + '{{ $pindah->nama_bed }}' + '?');">
+                                    @csrf
+                                    <input type="hidden" name="pindah_ruangan_id" value="{{ $pindah->pindah_ruangan_id }}">
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors whitespace-nowrap">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        Setujui
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         <!-- Daftar Bed -->
         <div class="space-y-3">
             @forelse ($beds as $bed)
@@ -126,6 +184,12 @@
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                         Persiapan Pulang
                                     </button>
+@if (isset($pendingPindah[$bed->pasien_id_1]))
+                                        <div class="col-span-2 w-full inline-flex items-center justify-center gap-1.5 px-2 py-2 text-center text-xs font-semibold leading-snug text-amber-600 bg-amber-50 border border-amber-200 rounded-lg">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            Menunggu Persetujuan Pindah ke {{ $pendingPindah[$bed->pasien_id_1]->nama_bagian_tujuan ?? 'Ruang Tujuan' }}
+                                        </div>
+                                    @else
                                     <button type="button" onclick="bukaModalPindahBed({{ $bed->bed_id }})"
                                             class="inline-flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors whitespace-nowrap">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"></path></svg>
@@ -136,6 +200,7 @@
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4a1 1 0 011-1h4a1 1 0 011 1v4"></path></svg>
                                         Pindah Ruangan
                                     </button>
+                                    @endif
                                 @endif
                             @endif
                         </div>
@@ -280,13 +345,13 @@
             </div>
             <div class="flex-1">
                 <h3 class="text-base font-semibold text-slate-800">Pindah Ruangan</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Pindahkan pasien ke bed kosong di ruangan lain.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Ajukan permintaan pindah ke bed kosong di ruangan lain. Pasien tetap di bed saat ini hingga disetujui ruang tujuan.</p>
             </div>
             <button type="button" onclick="tutupModalPindahRuang()" class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
-        <form action="{{ route('bed_management.move') }}" method="POST" id="formPindahRuang">
+        <form action="{{ route('bed_management.pindah_request') }}" method="POST" id="formPindahRuang">
             @csrf
             <input type="hidden" name="bed_id" id="modal_pindah_ruang_bed_id">
             <div class="p-5 space-y-4">
@@ -307,7 +372,7 @@
                         <option value="">-- Pilih Bed Terlebih Dahulu --</option>
                     </select>
                 </div>
-                <p class="text-xs text-slate-400">Ruangan & bed pasien di pendaftaran (registrasi_detail / bill) ikut diperbarui.</p>
+                <p class="text-xs text-slate-400">Ruang & bed pasien akan dipindahkan setelah permintaan disetujui oleh ruang tujuan.</p>
             </div>
             <div class="px-5 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-end gap-2.5">
                 <button type="button" onclick="tutupModalPindahRuang()" class="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
@@ -315,7 +380,7 @@
                 </button>
                 <button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-slate-800 hover:bg-slate-900 rounded-lg shadow-sm shadow-slate-800/20 transition-all flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4a1 1 0 011-1h4a1 1 0 011 1v4"></path></svg>
-                    Pindahkan
+                    Ajukan Permintaan
                 </button>
             </div>
         </form>
@@ -432,6 +497,15 @@
             opt.textContent = beds[bedId];
             select.appendChild(opt);
         });
+    }
+
+    function pilihAlasanTolak(form) {
+        var alasan = prompt('Alasan penolakan (opsional):');
+        if (alasan === null) {
+            return false;
+        }
+        form.querySelector('input[name="alasan_tolak"]').value = alasan;
+        return true;
     }
 
     function tutupModalPulang() {
