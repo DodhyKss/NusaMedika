@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\EMR\DynamicFormController;
 use App\Http\Controllers\EMR\EmrDashboard\EmrDashboardController;
@@ -48,6 +49,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/pasien/{jenis}', [DashboardController::class, 'pasien'])->name('dashboard.pasien');
+
+    // ============ ROUTE PROFILE (modal di navbar) ========== #
+    // Aksi non-CRUD: user hanya boleh mengubah profile & akun miliknya sendiri.
+    Route::put('/profile/pegawai', [ProfileController::class, 'updatePegawai'])->name('profile.pegawai');
+    Route::put('/profile/akun', [ProfileController::class, 'updateAkun'])->name('profile.akun');
 
     // ============ ROUTE SOAP ================= #
     Route::get('/emr/soap/print/{emr_id}', [SoapController::class, 'print'])->name('emr.soap.print');

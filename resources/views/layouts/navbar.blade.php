@@ -88,20 +88,23 @@
             }
         @endphp
         <div class="flex items-center gap-3">
-            <div class="hidden sm:block text-right">
-                <p class="text-sm font-semibold text-slate-800 leading-tight">
-                    {{ Auth::user()->nama_pegawai ?? Auth::user()->user_name }}
-                </p>
-                <p class="text-[11px] text-slate-400 font-medium">{{ $profesiName }}</p>
-                <p class="text-[11px] text-slate-400 font-medium">{{ $userBagian }}</p>
-            </div>
-            <div class="relative">
-                <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
-                    {{ strtoupper(substr(Auth::user()->nama_pegawai ?? Auth::user()->user_name, 0, 1)) }}
+            <button type="button" id="profile-trigger" title="Kelola Profile"
+                    class="flex items-center gap-3 pr-1 pl-2 py-1 rounded-lg hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-colors">
+                <div class="hidden sm:block text-right">
+                    <p class="text-sm font-semibold text-slate-800 leading-tight">
+                        {{ Auth::user()->nama_pegawai ?? Auth::user()->user_name }}
+                    </p>
+                    <p class="text-[11px] text-slate-400 font-medium">{{ $profesiName }}</p>
+                    <p class="text-[11px] text-slate-400 font-medium">{{ $userBagian }}</p>
                 </div>
-                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
-            </div>
-            
+                <div class="relative">
+                    <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                        {{ strtoupper(substr(Auth::user()->nama_pegawai ?? Auth::user()->user_name, 0, 1)) }}
+                    </div>
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
+                </div>
+            </button>
+
             <!-- Logout -->
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -112,6 +115,9 @@
         </div>
     </div>
 </nav>
+
+{{-- Modal update profile (pegawai & akun login), dipicu dari blok profile di navbar --}}
+<x-profile_modal />
 
 <script>
     (function () {
