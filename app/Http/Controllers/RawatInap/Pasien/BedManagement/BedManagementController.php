@@ -34,6 +34,9 @@ class BedManagementController extends Controller
 
         $terisiPasienIds = $beds->pluck('pasien_id_1')->filter()->unique();
 
+        $bagianPerPasien = $beds->filter(fn ($b) => $b->pasien_id_1)
+            ->mapWithKeys(fn ($b) => [$b->pasien_id_1 => (int) $b->bagian_id]);
+
         $registrasiMap = [];
         if ($terisiPasienIds->isNotEmpty()) {
             $registrasiMap = DB::table('registrasi as r')
@@ -51,24 +54,26 @@ class BedManagementController extends Controller
                 ->where(function ($q) {
                     $q->whereNull('rd.status_batal')->orWhere('rd.status_batal', 0);
                 })
-                ->select('r.pasien_id', 'rd.registrasi_detail_id', 'pg.nama_pegawai as dpjp')
+                ->select('r.pasien_id', 'rd.registrasi_detail_id', 'rd.bagian_id', 'pg.nama_pegawai as dpjp')
+                ->orderByDesc('rd.registrasi_detail_id')
                 ->get()
-                ->keyBy('pasien_id')
+                ->groupBy('pasien_id')
+                ->mapWithKeys(function ($rows) use ($bagianPerPasien) {
+                    $rows = $rows->sortByDesc('registrasi_detail_id')->values();
+                    $bagianId = $bagianPerPasien[$rows->first()->pasien_id] ?? null;
+                    $row = ($bagianId ? $rows->firstWhere('bagian_id', $bagianId) : null) ?? $rows->first();
+
+                    return [$row->pasien_id => $row];
+                })
                 ->all();
         }
 
+        // Waitlist = pasien rawat inap dengan detail aktif di ruang ini yang belum menempati bed aktif mana pun
         $waitlist = DB::table('registrasi as r')
             ->join('registrasi_detail as rd', 'rd.registrasi_id', '=', 'r.registrasi_id')
             ->join('pasien as p', 'p.pasien_id', '=', 'r.pasien_id')
             ->leftJoin('pasien_nasabah as pn', 'pn.pasien_nasabah_id', '=', 'r.pasien_nasabah_id')
             ->leftJoin('nasabah as n', 'n.nasabah_id', '=', 'pn.nasabah_id')
-            ->leftJoin('bed as b', function ($q) use ($ruangId) {
-                $q->on('b.pasien_id_1', '=', 'r.pasien_id')
-                    ->where('b.bagian_id', '=', $ruangId)
-                    ->where(function ($sb) {
-                        $sb->whereNull('b.status_batal')->orWhere('b.status_batal', 0);
-                    });
-            })
             ->where('r.jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
             ->whereNull('r.tgl_keluar')
             ->where(function ($q) {
@@ -79,7 +84,14 @@ class BedManagementController extends Controller
             ->where(function ($q) {
                 $q->whereNull('rd.status_batal')->orWhere('rd.status_batal', 0);
             })
-            ->whereNull('b.bed_id')
+            ->whereNotExists(function ($q) {
+                $q->select(DB::raw(1))
+                    ->from('bed as bx')
+                    ->whereColumn('bx.pasien_id_1', 'r.pasien_id')
+                    ->where(function ($q) {
+                        $q->whereNull('bx.status_batal')->orWhere('bx.status_batal', 0);
+                    });
+            })
             ->select(
                 'r.registrasi_id',
                 'rd.registrasi_detail_id',
@@ -90,7 +102,11 @@ class BedManagementController extends Controller
                 'n.nama_nasabah'
             )
             ->orderBy('r.tgl_masuk')
-            ->get();
+            ->orderBy('rd.registrasi_detail_id')
+            ->get()
+            ->groupBy('pasien_id')
+            ->map(fn ($rows) => $rows->first())
+            ->values();
 
         $kosongBeds = $beds->whereNull('pasien_id_1')->pluck('nama_bed', 'bed_id');
 
@@ -189,11 +205,10 @@ class BedManagementController extends Controller
 
             $sudahPunyaBed = Bed::aktif()
                 ->where('pasien_id_1', $registrasi->pasien_id)
-                ->where('bagian_id', $detail->bagian_id)
                 ->exists();
 
             if ($sudahPunyaBed) {
-                return back()->with('error', 'Pasien sudah memiliki bed aktif pada ruang ini.');
+                return back()->with('error', 'Pasien sudah memiliki bed aktif pada ruang perawatan, tidak dapat ditempatkan lagi.');
             }
 
             $kelas = $detail->hak_kelas_id
@@ -267,15 +282,7 @@ class BedManagementController extends Controller
         try {
             $bed = Bed::aktif()->where('bed_id', $request->bed_id)->whereNotNull('pasien_id_1')->firstOrFail();
 
-            $bed->pasien_id_1 = null;
-            $bed->pasien_id_2 = null;
-            $bed->tgl_masuk = null;
-            $bed->status_bed = 0;
-            $bed->flag_persiapan_pulang = 2;
-            $bed->tgl_pulang = null;
-            $bed->mod_time = now();
-            $bed->mod_user_id = Auth::id();
-            $bed->save();
+            $this->kosongkanBed($bed);
 
             DB::commit();
 
@@ -303,15 +310,7 @@ class BedManagementController extends Controller
             $pasienId = $bed->pasien_id_1;
 
             // Kosongkan bed
-            $bed->pasien_id_1 = null;
-            $bed->pasien_id_2 = null;
-            $bed->tgl_masuk = null;
-            $bed->status_bed = 0;
-            $bed->flag_persiapan_pulang = 2;
-            $bed->tgl_pulang = null;
-            $bed->mod_time = now();
-            $bed->mod_user_id = Auth::id();
-            $bed->save();
+            $this->kosongkanBed($bed);
 
             // Selesaikan registrasi rawat inap aktif pasien
             $registrasi = DB::table('registrasi')
@@ -334,18 +333,18 @@ class BedManagementController extends Controller
                         'mod_user_id' => Auth::id(),
                     ]);
 
-                $detail = DB::table('registrasi_detail')
+                $detailIds = DB::table('registrasi_detail')
                     ->where('registrasi_id', $registrasi->registrasi_id)
                     ->whereNull('check_out')
                     ->where(function ($q) {
                         $q->whereNull('status_batal')->orWhere('status_batal', 0);
                     })
-                    ->orderBy('registrasi_detail_id', 'desc')
-                    ->first();
+                    ->pluck('registrasi_detail_id')
+                    ->all();
 
-                if ($detail) {
+                if ($detailIds) {
                     DB::table('registrasi_detail')
-                        ->where('registrasi_detail_id', $detail->registrasi_detail_id)
+                        ->whereIn('registrasi_detail_id', $detailIds)
                         ->update([
                             'check_out' => $tglKeluar,
                             'mod_time' => now(),
@@ -353,7 +352,7 @@ class BedManagementController extends Controller
                         ]);
 
                     DB::table('bill_temp')
-                        ->where('registrasi_detail_id', $detail->registrasi_detail_id)
+                        ->whereIn('registrasi_detail_id', $detailIds)
                         ->where(function ($q) {
                             $q->whereNull('status_batal')->orWhere('status_batal', 0);
                         })
@@ -423,20 +422,12 @@ class BedManagementController extends Controller
             $target->save();
 
             // Kosongkan bed sebelumnya
-            $current->pasien_id_1 = null;
-            $current->pasien_id_2 = null;
-            $current->tgl_masuk = null;
-            $current->status_bed = 0;
-            $current->flag_persiapan_pulang = 2;
-            $current->tgl_pulang = null;
-            $current->mod_time = $tglPindah;
-            $current->mod_user_id = Auth::id();
-            $current->save();
+            $this->kosongkanBed($current, $tglPindah);
 
             // Catat pergerakan pasien di bed_log
             DB::table('bed_log')->insert([
                 'pasien_id' => $pasienId,
-                'registrasi_detail_id' => $this->detailAktifId($pasienId),
+                'registrasi_detail_id' => $this->detailIdUntukBed($pasienId, (int) $current->bagian_id),
                 'bed_asal_id' => $current->bed_id,
                 'bagian_asal_id' => $current->bagian_id,
                 'bed_id' => $target->bed_id,
@@ -481,19 +472,15 @@ class BedManagementController extends Controller
             return back()->with('error', 'Bed tujuan tidak berada pada ruangan terpilih.');
         }
 
-        $pasienId = $current->pasien_id_1;
+        $pasienId = (int) $current->pasien_id_1;
 
         if ($this->punyaPermintaanPindah($pasienId)) {
-            return back()->with('error', 'Pasien memiliki permintaan pindah ruangan yang belum diproses, tidak dapat dipindah.');
-        }
-
-        if ($this->punyaPermintaanPindah($pasienId)) {
-            return back()->with('error', 'Pasien sudah memiliki permintaan pindah ruangan yang belum disetujui.');
+            return back()->with('error', 'Pasien sudah memiliki permintaan pindah ruangan yang belum diproses.');
         }
 
         DB::table('pindah_ruangan')->insert([
             'pasien_id' => $pasienId,
-            'registrasi_detail_id' => $this->detailAktifId($pasienId),
+            'registrasi_detail_id' => $this->detailIdUntukBed($pasienId, (int) $current->bagian_id),
             'bed_asal_id' => $current->bed_id,
             'bagian_asal_id' => $current->bagian_id,
             'bed_tujuan_id' => $target->bed_id,
@@ -541,6 +528,26 @@ class BedManagementController extends Controller
             $pasienId = (int) $current->pasien_id_1;
             $tglPindah = now();
 
+            // Detail asal: utamakan detail yang sesuai ruangan bed asal
+            $detailAktif = $this->detailAktifUntukBed($pasienId, (int) $current->bagian_id)
+                ?? DB::table('registrasi_detail')
+                    ->where('registrasi_detail_id', $permintaan->registrasi_detail_id)
+                    ->first();
+
+            if (! $detailAktif) {
+                throw new \Exception('Registrasi detail asal tidak ditemukan.');
+            }
+
+            // Pastikan pasien hanya menempati satu bed (rapikan bed ganda dari data lama)
+            $bedGanda = Bed::aktif()
+                ->where('pasien_id_1', $pasienId)
+                ->where('bed_id', '!=', $current->bed_id)
+                ->get();
+
+            foreach ($bedGanda as $bed) {
+                $this->kosongkanBed($bed, $tglPindah);
+            }
+
             // Isi bed tujuan dengan data pasien
             $target->pasien_id_1 = $pasienId;
             $target->tgl_masuk = $current->tgl_masuk;
@@ -555,39 +562,34 @@ class BedManagementController extends Controller
             $target->save();
 
             // Kosongkan bed asal
-            $current->pasien_id_1 = null;
-            $current->pasien_id_2 = null;
-            $current->tgl_masuk = null;
-            $current->status_bed = 0;
-            $current->flag_persiapan_pulang = 2;
-            $current->tgl_pulang = null;
-            $current->mod_time = $tglPindah;
-            $current->mod_user_id = Auth::id();
-            $current->save();
+            $this->kosongkanBed($current, $tglPindah);
 
-            // Tutup detail lama & buat detail baru di ruang tujuan
-            $detailAktif = DB::table('registrasi_detail')
-                ->where('registrasi_detail_id', $permintaan->registrasi_detail_id)
-                ->first();
+            // Tutup seluruh detail aktif pasien di semua ruang agar tidak muncul di waitlist ruang asal
+            $detailIds = DB::table('registrasi_detail')
+                ->where('registrasi_id', $detailAktif->registrasi_id)
+                ->whereNull('check_out')
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
+                ->pluck('registrasi_detail_id')
+                ->all();
 
-            if (! $detailAktif) {
-                throw new \Exception('Registrasi detail asal tidak ditemukan.');
+            if ($detailIds) {
+                DB::table('registrasi_detail')
+                    ->whereIn('registrasi_detail_id', $detailIds)
+                    ->update([
+                        'check_out' => $tglPindah,
+                        'mod_time' => $tglPindah,
+                        'mod_user_id' => Auth::id(),
+                    ]);
             }
-
-            DB::table('registrasi_detail')
-                ->where('registrasi_detail_id', $detailAktif->registrasi_detail_id)
-                ->update([
-                    'check_out' => $tglPindah,
-                    'mod_time' => $tglPindah,
-                    'mod_user_id' => Auth::id(),
-                ]);
 
             $registrasiDetailId = DB::table('registrasi_detail')->insertGetId([
                 'registrasi_id' => $detailAktif->registrasi_id,
                 'tgl_daftar' => $tglPindah,
                 'check_in' => $tglPindah,
                 'bagian_id' => $target->bagian_id,
-                'bagian_asal_id' => $detailAktif->bagian_id,
+                'bagian_asal_id' => $current->bagian_id,
                 'kelas_id' => $detailAktif->kelas_id,
                 'hak_kelas_id' => $detailAktif->hak_kelas_id,
                 'input_time' => $tglPindah,
@@ -596,7 +598,7 @@ class BedManagementController extends Controller
 
             // Tutup bill detail lama & buat bill baru untuk detail baru
             $billLama = DB::table('bill_temp')
-                ->where('registrasi_detail_id', $detailAktif->registrasi_detail_id)
+                ->whereIn('registrasi_detail_id', $detailIds ?: [0])
                 ->where(function ($q) {
                     $q->whereNull('status_batal')->orWhere('status_batal', 0);
                 })
@@ -605,7 +607,10 @@ class BedManagementController extends Controller
 
             if ($billLama) {
                 DB::table('bill_temp')
-                    ->where('bill_temp_id', $billLama->bill_temp_id)
+                    ->whereIn('registrasi_detail_id', $detailIds)
+                    ->where(function ($q) {
+                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                    })
                     ->update([
                         'status_selesai' => 1,
                         'mod_time' => $tglPindah,
@@ -700,6 +705,45 @@ class BedManagementController extends Controller
             ->exists();
     }
 
+    private function kosongkanBed(Bed $bed, $waktu = null): void
+    {
+        $bed->pasien_id_1 = null;
+        $bed->pasien_id_2 = null;
+        $bed->tgl_masuk = null;
+        $bed->status_bed = 0;
+        $bed->flag_persiapan_pulang = 2;
+        $bed->tgl_pulang = null;
+        $bed->mod_time = $waktu ?? now();
+        $bed->mod_user_id = Auth::id();
+        $bed->save();
+    }
+
+    private function detailAktifUntukBed(int $pasienId, int $bagianId)
+    {
+        return DB::table('registrasi_detail as rd')
+            ->join('registrasi as r', 'r.registrasi_id', '=', 'rd.registrasi_id')
+            ->where('r.pasien_id', $pasienId)
+            ->where('r.jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
+            ->whereNull('r.tgl_keluar')
+            ->where('rd.bagian_id', $bagianId)
+            ->whereNull('rd.check_out')
+            ->where(function ($q) {
+                $q->whereNull('r.status_batal')->orWhere('r.status_batal', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('rd.status_batal')->orWhere('rd.status_batal', 0);
+            })
+            ->orderByDesc('rd.registrasi_detail_id')
+            ->select('rd.*')
+            ->first();
+    }
+
+    private function detailIdUntukBed(int $pasienId, int $bagianId): ?int
+    {
+        return $this->detailAktifUntukBed($pasienId, $bagianId)?->registrasi_detail_id
+            ?? $this->detailAktifId($pasienId);
+    }
+
     private function detailAktifId(int $pasienId): ?int
     {
         $registrasi = DB::table('registrasi')
@@ -709,7 +753,7 @@ class BedManagementController extends Controller
             ->where(function ($q) {
                 $q->whereNull('status_batal')->orWhere('status_batal', 0);
             })
-            ->orderBy('registrasi_id', 'desc')
+            ->orderByDesc('registrasi_id')
             ->first();
 
         if (! $registrasi) {
@@ -722,7 +766,7 @@ class BedManagementController extends Controller
             ->where(function ($q) {
                 $q->whereNull('status_batal')->orWhere('status_batal', 0);
             })
-            ->orderBy('registrasi_detail_id', 'desc')
+            ->orderByDesc('registrasi_detail_id')
             ->value('registrasi_detail_id');
     }
 

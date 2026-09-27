@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\RawatInap\Pasien\ListPasienRanap;
 
+use App\Helpers\AksesEhr;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,9 @@ class ListPasienRanapController extends Controller
         $listPasien = collect([]);
 
         if ($filter) {
+            // Dokter hanya melihat pasiennya sendiri (DPJP + konsul), profesi lain melihat semua pasien ranap
+            $hanyaPasienSaya = AksesEhr::profesiId() === (int) env('PROFESI_ID_DOKTER', 1);
+
             $subQueryDpjp = DB::table('penanggung_rawat as pr')
                 ->select(
                     'r.registrasi_id',
@@ -47,7 +51,7 @@ class ListPasienRanapController extends Controller
                     $q->whereNull('pr.status_batal')->orWhere('pr.status_batal', 0);
                 })
                 ->where('r.jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
-                ->where('b.referensi_bagian_id', env('REF_BAGIAN_RANAP', 31))
+                ->where('b.referensi_bagian_id', env('REF_BAGIAN_RANAP', 2))
                 ->whereNull('r.tgl_keluar')
                 ->where(function ($q) {
                     $q->whereNull('r.status_batal')->orWhere('r.status_batal', 0);
@@ -125,7 +129,7 @@ class ListPasienRanapController extends Controller
                     $q->whereNull('e.status_batal')->orWhere('e.status_batal', 0);
                 })
                 ->where('r.jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
-                ->where('b.referensi_bagian_id', env('REF_BAGIAN_RANAP', 31))
+                ->where('b.referensi_bagian_id', env('REF_BAGIAN_RANAP', 2))
                 ->whereNull('r.tgl_keluar')
                 ->where(function ($q) {
                     $q->whereNull('r.status_batal')->orWhere('r.status_batal', 0);
@@ -183,7 +187,9 @@ class ListPasienRanapController extends Controller
                     'ed_jk.value'
                 );
 
-            $subQuery = $subQueryDpjp->unionAll($subQueryKonsul);
+            $subQuery = $hanyaPasienSaya
+                ? $subQueryDpjp->unionAll($subQueryKonsul)
+                : $this->subQuerySemuaRanap($ruanganId);
 
             $listPasien = DB::query()
                 ->fromSub($subQuery, 'x')
@@ -198,5 +204,82 @@ class ListPasienRanapController extends Controller
         }
 
         return view('moduls.RawatInap.Pasien.ListPasienRanap.list_pasien_ranap', compact('ruanganId', 'listPasien'));
+    }
+
+    /**
+     * Semua pasien rawat inap aktif yang sedang menempati bed (dipakai user selain dokter).
+     * Label status: DPJP bila punya penanggung/rawat aktif, Konsul bila ada EMR konsultasi, selain itu Perawatan.
+     */
+    private function subQuerySemuaRanap($ruanganId = null)
+    {
+        $statusPerawatan = 'case'
+            ." when exists (select 1 from penanggung_rawat pr where pr.registrasi_id = r.registrasi_id and (pr.status_batal is null or pr.status_batal = 0)) then 'DPJP'"
+            .' when exists (select 1 from emr e where e.registrasi_id = r.registrasi_id and e.form_id = '.env('FORM_ID_KONSULTASI', 26).' and (e.status_batal is null or e.status_batal = 0)) then \'Konsul\''
+            ." else 'Perawatan' end";
+
+        return DB::table('registrasi as r')
+            ->join('bed as bd', 'r.pasien_id', '=', 'bd.pasien_id_1')
+            ->join('bagian as b', 'bd.bagian_id', '=', 'b.bagian_id')
+            ->join('pasien as p', 'r.pasien_id', '=', 'p.pasien_id')
+            ->leftJoin('pasien_nasabah as pn', 'r.pasien_nasabah_id', '=', 'pn.pasien_nasabah_id')
+            ->leftJoin('nasabah as n', 'pn.nasabah_id', '=', 'n.nasabah_id')
+            ->where('r.jenis_rawat', env('JENIS_RAWAT_RI', 'RI'))
+            ->where('b.referensi_bagian_id', env('REF_BAGIAN_RANAP', 2))
+            ->whereNull('r.tgl_keluar')
+            ->where(function ($q) {
+                $q->whereNull('r.status_batal')->orWhere('r.status_batal', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('bd.status_batal')->orWhere('bd.status_batal', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('b.status_batal')->orWhere('b.status_batal', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('p.status_batal')->orWhere('p.status_batal', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('pn.status_batal')->orWhere('pn.status_batal', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('n.status_batal')->orWhere('n.status_batal', 0);
+            })
+            ->when(! empty($ruanganId), function ($query) use ($ruanganId) {
+                $query->where('bd.bagian_id', $ruanganId);
+            })
+            ->select(
+                'r.registrasi_id',
+                'r.pasien_id',
+                'r.tgl_masuk',
+                DB::raw("CONCAT(bd.no_kamar, ' - ', bd.nama_bed) as no_bed"),
+                'bd.no_kamar',
+                'bd.nama_bed',
+                'bd.namakelas',
+                'b.nama_bagian',
+                'bd.bagian_id',
+                'p.no_mr',
+                'p.nama_pasien',
+                'p.jenis_kelamin',
+                'p.tgl_lahir',
+                'n.nama_nasabah',
+                DB::raw("CONCAT(FLOOR(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()) / 86400), ' days ', LPAD(FLOOR(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400) / 3600), 2, '0'), ':', LPAD(FLOOR(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600) / 60), 2, '0'), ':', LPAD(MOD(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600), 60), 2, '0')) as los"),
+                DB::raw("case when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 3 then 'LOS <=3' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 5 then 'LOS >3 & <=5' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 7 then 'LOS >5 & <=7' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 10 then 'LOS >7 & <=10' else 'LOS >10' end as kapasitas"),
+                DB::raw($statusPerawatan.' as status_perawatan')
+            )
+            ->groupBy(
+                'r.registrasi_id',
+                'r.pasien_id',
+                'r.tgl_masuk',
+                'bd.no_kamar',
+                'bd.nama_bed',
+                'bd.namakelas',
+                'bd.bagian_id',
+                'b.nama_bagian',
+                'p.no_mr',
+                'p.nama_pasien',
+                'p.jenis_kelamin',
+                'p.tgl_lahir',
+                'n.nama_nasabah'
+            );
     }
 }
