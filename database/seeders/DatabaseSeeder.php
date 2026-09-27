@@ -50,6 +50,9 @@ class DatabaseSeeder extends Seeder
             'tindakan', 'tindakan_harga',
             'order_laboratorium', 'order_laboratorium_detail',
             'order_radiologi', 'order_radiologi_detail',
+            'notifikasi', 'notifikasi_penerima',
+            'percakapan', 'pesan', 'status_sosial',
+            'forum_topik', 'forum_balasan',
         ];
 
         foreach ($tables as $table) {

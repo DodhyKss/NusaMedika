@@ -22,6 +22,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['modul_id' => 5, 'nama_modul' => 'Administrator', 'icon_modul' => 'fa-solid fa-gear', 'urutan_modul' => 7],
             ['modul_id' => 6, 'nama_modul' => 'Inventory', 'icon_modul' => 'fa-solid fa-box-archive', 'urutan_modul' => 8],
             ['modul_id' => 8, 'nama_modul' => 'Penunjang Medis', 'icon_modul' => 'fa-solid fa-microscope', 'urutan_modul' => 9],
+            ['modul_id' => 10, 'nama_modul' => 'Social', 'icon_modul' => 'fa-solid fa-users', 'urutan_modul' => 10],
         ];
 
         foreach ($moduls as $modul) {
@@ -50,6 +51,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['menu_id' => 6, 'modul_id' => 5, 'nama_menu' => 'Manajemen Master', 'urutan_menu' => 1],
             ['menu_id' => 7, 'modul_id' => 5, 'nama_menu' => 'Manajemen User', 'urutan_menu' => 2],
             ['menu_id' => 8, 'modul_id' => 5, 'nama_menu' => 'Manajemen EMR', 'urutan_menu' => 3],
+            ['menu_id' => 18, 'modul_id' => 5, 'nama_menu' => 'Manajemen Admin', 'urutan_menu' => 4],
             // Modul Inventory (6)
             ['menu_id' => 9, 'modul_id' => 6, 'nama_menu' => 'Pesanan', 'urutan_menu' => 1],
             ['menu_id' => 10, 'modul_id' => 6, 'nama_menu' => 'Penerimaan', 'urutan_menu' => 2],
@@ -63,6 +65,8 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['menu_id' => 16, 'modul_id' => 8, 'nama_menu' => 'Rehabilitasi Medik', 'urutan_menu' => 3],
             // Modul Medical Checkup (9)
             ['menu_id' => 17, 'modul_id' => 9, 'nama_menu' => 'Pasien', 'urutan_menu' => 1],
+            // Modul Social (10)
+            ['menu_id' => 19, 'modul_id' => 10, 'nama_menu' => 'Interaksi', 'urutan_menu' => 1],
         ];
 
         foreach ($menus as $menu) {
@@ -145,6 +149,14 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 47, 'menu_id' => 16, 'nama_sub_menu' => 'Daftar Pasien Rehabilitasi Medik', 'file_sub_menu' => 'PenunjangMedis/RehabilitasiMedik/DaftarPasienRehabilitasiMedik/daftar_pasien_rehabilitasi_medik', 'urutan_sub_menu' => 1],
             // Menu Pasien (17) - Medical Checkup
             ['sub_menu_id' => 49, 'menu_id' => 17, 'nama_sub_menu' => 'List Pasien Medical Checkup', 'file_sub_menu' => 'MedicalCheckup/Pasien/ListPasienMedicalCheckup/list_pasien_medical_checkup', 'urutan_sub_menu' => 1],
+            // Menu Manajemen Admin (18) - Administrator
+            ['sub_menu_id' => 53, 'menu_id' => 18, 'nama_sub_menu' => 'Notifikasi', 'file_sub_menu' => 'Administrator/ManajemenAdmin/Notifikasi/notifikasi', 'urutan_sub_menu' => 1],
+            // Menu Interaksi (19) - Social
+            ['sub_menu_id' => 54, 'menu_id' => 19, 'nama_sub_menu' => 'Status', 'file_sub_menu' => 'Social/Status/status', 'urutan_sub_menu' => 1],
+            ['sub_menu_id' => 55, 'menu_id' => 19, 'nama_sub_menu' => 'Pesan', 'file_sub_menu' => 'Social/Pesan/pesan', 'urutan_sub_menu' => 2],
+            ['sub_menu_id' => 56, 'menu_id' => 19, 'nama_sub_menu' => 'Status User', 'file_sub_menu' => 'Social/StatusUser/status_user', 'urutan_sub_menu' => 3],
+            ['sub_menu_id' => 57, 'menu_id' => 19, 'nama_sub_menu' => 'Forum', 'file_sub_menu' => 'Social/Forum/forum', 'urutan_sub_menu' => 4],
+            ['sub_menu_id' => 58, 'menu_id' => 19, 'nama_sub_menu' => 'Buat Topik', 'file_sub_menu' => 'Social/BuatTopik/buat_topik', 'urutan_sub_menu' => 5],
         ];
 
         foreach ($subMenus as $subMenu) {

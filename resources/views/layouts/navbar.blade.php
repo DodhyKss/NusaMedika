@@ -33,11 +33,74 @@
             </div>
         </div>
         
-        <!-- Notification Bell -->
-        <button class="relative p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-        </button>
+        <!-- Notifikasi (lonceng) -->
+        @php
+            $notifikasiBelum = \App\Helpers\NotifikasiHelper::belumDibaca((int) auth()->id());
+            $jumlahNotifikasi = $notifikasiBelum->count();
+        @endphp
+        <div class="relative" id="notifikasi-wrap">
+            <button type="button" id="notifikasi-btn" title="Notifikasi" class="relative p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                <span id="notifikasi-dot" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white {{ $jumlahNotifikasi ? '' : 'hidden' }}"></span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                @if ($jumlahNotifikasi)
+                    <span id="notifikasi-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white">
+                        {{ $jumlahNotifikasi > 99 ? '99+' : $jumlahNotifikasi }}
+                    </span>
+                @else
+                    <span id="notifikasi-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white"></span>
+                @endif
+            </button>
+
+            <div id="notifikasi-popover" class="hidden absolute right-0 top-full mt-2 w-96 bg-white rounded-xl border border-slate-200 shadow-lg z-50 overflow-hidden">
+                <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between gap-2">
+                    <p class="text-xs font-bold text-slate-700 uppercase tracking-wider">Notifikasi</p>
+                    @if ($jumlahNotifikasi)
+                        <form method="POST" action="{{ route('notifikasi.tutup_semua') }}" id="formTutupSemua">
+                            @csrf
+                            <button type="submit" class="text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                                Tandai semua dibaca
+                            </button>
+                        </form>
+                    @endif
+                </div>
+
+                <div id="notifikasi-list" class="max-h-96 overflow-y-auto divide-y divide-slate-100">
+                    @forelse ($notifikasiBelum as $penerima)
+                        <div class="px-4 py-3 flex items-start gap-3 hover:bg-slate-50 transition-colors" data-notifikasi-item="{{ $penerima->notifikasi_id }}">
+                            <span class="mt-1 w-2 h-2 rounded-full flex-shrink-0
+                                @php
+                                    $dotClass = match ($penerima->notifikasi->prioritas) {
+                                        'URGENT' => 'bg-red-500',
+                                        'PENTING' => 'bg-amber-500',
+                                        default => 'bg-blue-500',
+                                    };
+                                @endphp
+                                {{ $dotClass }}"></span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[13px] font-semibold text-slate-800 leading-snug">{{ $penerima->notifikasi->judul }}</p>
+                                <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">{{ $penerima->notifikasi->pesan }}</p>
+                                <p class="text-[11px] text-slate-400 mt-1">
+                                    {{ $penerima->notifikasi->input_time ? \Illuminate\Support\Carbon::parse($penerima->notifikasi->input_time)->diffForHumans() : '' }}
+                                </p>
+                            </div>
+                            <form method="POST" action="{{ route('notifikasi.tutup', $penerima->notifikasi_id) }}" class="flex-shrink-0">
+                                @csrf
+                                <button type="submit" title="Tutup notifikasi"
+                                        class="p-1 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </form>
+                        </div>
+                    @empty
+                        <div id="notifikasi-kosong" class="px-4 py-10 text-center">
+                            <svg class="w-9 h-9 mx-auto text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                            <p class="text-sm text-slate-400 mt-2 font-medium">Tidak ada notifikasi baru.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
 
         <!-- Cek Kecepatan Internet -->
         <div class="relative" id="speedtest-wrap">
@@ -121,6 +184,36 @@
 
 <script>
     (function () {
+        // ================ Lonceng Notifikasi ================ //
+        const notifWrap = document.getElementById('notifikasi-wrap');
+        const notifBtn = document.getElementById('notifikasi-btn');
+        const notifPopover = document.getElementById('notifikasi-popover');
+        if (notifWrap && notifBtn && notifPopover) {
+            notifBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                notifPopover.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!notifWrap.contains(e.target)) {
+                    notifPopover.classList.add('hidden');
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    notifPopover.classList.add('hidden');
+                }
+            });
+
+            // Notifikasi yang belum ditutup otomatis dibuka saat halaman dimuat,
+            // sehingga pengguna langsung tahu ada pesan baru.
+            if (notifPopover.querySelector('[data-notifikasi-item]')) {
+                notifPopover.classList.remove('hidden');
+            }
+        }
+
+        // ================ Cek Kecepatan Internet ================ //
         const wrap = document.getElementById('speedtest-wrap');
         const btn = document.getElementById('speedtest-btn');
         const popover = document.getElementById('speedtest-popover');

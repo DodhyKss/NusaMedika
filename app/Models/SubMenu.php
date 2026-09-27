@@ -29,4 +29,18 @@ class SubMenu extends Model
     {
         return $this->hasMany(UserAkses::class, 'sub_menu_id', 'sub_menu_id');
     }
+
+    /**
+     * Cari sub_menu_id berdasarkan file_sub_menu (path view lengkap).
+     * Dipakai saat Blade perlu memeriksa hak akses sebuah sub_menu tanpa
+     * menuliskan id-nya secara hardcoded.
+     */
+    public static function idByPath(string $fileSubMenu): ?int
+    {
+        return static::where('file_sub_menu', trim($fileSubMenu, '/'))
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->value('sub_menu_id');
+    }
 }

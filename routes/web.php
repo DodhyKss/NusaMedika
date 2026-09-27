@@ -10,10 +10,13 @@ use App\Http\Controllers\EMR\Soap\SoapController;
 use App\Http\Controllers\Farmasi\Resep\ListPesananResep\ListPesananResepController;
 use App\Http\Controllers\Inventory\Pesanan\BuatPesanan\BuatPesananController;
 use App\Http\Controllers\Inventory\Pesanan\SetujuiPesanan\SetujuiPesananController;
+use App\Http\Controllers\Notifikasi\NotifikasiPenerimaController;
 use App\Http\Controllers\PenunjangMedis\Laboratorium\DaftarPesananLaboratorium\DaftarPesananLaboratoriumController;
 use App\Http\Controllers\PenunjangMedis\Radiologi\DaftarPesananRadiologi\DaftarPesananRadiologiController;
 use App\Http\Controllers\PenunjangMedis\RehabilitasiMedik\DaftarPasienRehabilitasiMedik\DaftarPasienRehabilitasiMedikController;
 use App\Http\Controllers\RawatInap\Pasien\BedManagement\BedManagementController;
+use App\Http\Controllers\Social\Forum\ForumController;
+use App\Http\Controllers\Social\Pesan\PesanController;
 use Illuminate\Support\Facades\Route;
 
 // ================ DESKRIPSI ============== #
@@ -101,6 +104,21 @@ Route::middleware('auth')->group(function () {
     // Rehabilitasi Medik — pilih bagian rehab (session) & detail pasien (bukan CRUD, didaftarkan manual).
     Route::post('/daftar_pasien_rehabilitasi_medik/pilih-bagian', [DaftarPasienRehabilitasiMedikController::class, 'pilihBagian'])->name('daftar_pasien_rehabilitasi_medik.pilih_bagian');
     Route::get('/daftar_pasien_rehabilitasi_medik/detail/{registrasi_detail}', [DaftarPasienRehabilitasiMedikController::class, 'detail'])->name('daftar_pasien_rehabilitasi_medik.detail');
+
+    // ============ ROUTE SOCIAL (pesan, status, forum) ========== #
+    // Non-CRUD: membuka obrolan, mengirim pesan, dan membalas topik tidak mengikuti pola CRUD sub_menu.
+    // whereNumber WAJIB: route manual ini didaftarkan sebelum route auto, sehingga
+    // tanpa constraint ia akan.capture 'pesan/create' atau 'forum/create' dan
+    // meneruskannya ke show() sebagai id yang tidak ada (404).
+    Route::get('/pesan/{percakapan}', [PesanController::class, 'show'])->whereNumber('percakapan')->name('pesan.show');
+    Route::post('/pesan/{percakapan}/kirim', [PesanController::class, 'kirim'])->whereNumber('percakapan')->name('pesan.kirim');
+    Route::get('/forum/{topik}', [ForumController::class, 'show'])->whereNumber('topik')->name('forum.show');
+    Route::post('/forum/{topik}/balas', [ForumController::class, 'balas'])->whereNumber('topik')->name('forum.balas');
+
+    // ============ ROUTE NOTIFIKASI (aksi lonceng navbar) ========== #
+    // Non-CRUD & milik user sendiri: menutup notifikasi yang masuk.
+    Route::post('/notifikasi/{notifikasi}/tutup', [NotifikasiPenerimaController::class, 'tutup'])->name('notifikasi.tutup');
+    Route::post('/notifikasi/tutup-semua', [NotifikasiPenerimaController::class, 'tutupSemua'])->name('notifikasi.tutup_semua');
 
     // ============ ROUTE BED MANAGEMENT ============= #
     // Aksi non-CRUD Rawat Inap (tempatkan / persiapan pulang / lepas bed) didaftarkan manual.
