@@ -32,7 +32,7 @@ class ImplementasiKeperawatanController extends Controller
 
         $aksesCrud = AksesEhr::flags((int) $form_id);
 
-        $riwayat = EmrHelper::emrList((int) $form_id, (int) $registrasi_detail->registrasi_id, 10);
+        $riwayat = EmrHelper::emrList((int) $form_id, (int) $registrasi_detail->registrasi_id);
 
         // Tidak boleh membuat data baru -> tampilkan riwayat terakhir.
         if (empty($emr_id) && ! ($aksesCrud['create'] ?? false) && $riwayat->isNotEmpty()) {
@@ -44,23 +44,12 @@ class ImplementasiKeperawatanController extends Controller
             ]);
         }
 
-        // Ksnapshot diambil di sini agar form edit tetap bisa menampilkan nama
-        // walaupun master sudah di-soft-delete.
+        // Master Implementasi untuk dropdown.
         $implementasiList = Implementasi::aktif()->orderBy('kode_implementasi')->get();
 
-        $historyGrouped = [];
-        foreach ($riwayat as $emr) {
-            $detail = EmrHelper::emrDetailByVariabel((int) $emr->emr_id);
-            $tanggal = (string) ($detail['tanggal_implementasi'] ?? '');
-            $waktu = (string) ($detail['waktu_implementasi'] ?? '');
-
-            if ($tanggal === '') {
-                $tanggal = date('Y-m-d', strtotime($emr->tgl_jam));
-            }
-
-            $label = trim(($detail['nama_implementasi'] ?? 'Implementasi').' - '.($waktu !== '' ? $waktu : date('H:i', strtotime($emr->tgl_jam))));
-            $historyGrouped[$tanggal][$label] = $emr->emr_id;
-        }
+        // Riwayat KUNJUNGAN untuk dropdown "History" di panel kiri.
+        // Riwayat emr sendiri sudah diambil komponen x-emr-history-table.
+        $historyGrouped = EmrHelper::historyKunjunganGrouped($registrasi_detail);
 
         if (empty($emr_id)) {
             $emr_data = EmrHelper::wrapData([

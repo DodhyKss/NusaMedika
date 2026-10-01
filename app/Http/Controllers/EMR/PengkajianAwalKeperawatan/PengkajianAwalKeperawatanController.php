@@ -11,7 +11,6 @@ use App\Models\Pasien;
 use App\Models\RegistrasiDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class PengkajianAwalKeperawatanController extends Controller
 {
@@ -37,35 +36,7 @@ class PengkajianAwalKeperawatanController extends Controller
             ]);
         }
 
-        $history_kunjungan = DB::table('registrasi_detail')
-            ->join('registrasi', 'registrasi_detail.registrasi_id', '=', 'registrasi.registrasi_id')
-            ->leftJoin('bagian', function ($join) {
-                $join->on('registrasi_detail.bagian_id', '=', 'bagian.bagian_id')
-                    ->where(function ($q) {
-                        $q->whereNull('bagian.status_batal')->orWhere('bagian.status_batal', 0);
-                    });
-            })
-            ->where('registrasi.pasien_id', $registrasi_detail->registrasi->pasien_id)
-            ->where(function ($q) {
-                $q->whereNull('registrasi.status_batal')->orWhere('registrasi.status_batal', 0);
-            })
-            ->where(function ($q) {
-                $q->whereNull('registrasi_detail.status_batal')->orWhere('registrasi_detail.status_batal', 0);
-            })
-            ->select('registrasi.tgl_masuk', 'bagian.nama_bagian', 'registrasi_detail.registrasi_detail_id')
-            ->orderBy('registrasi.tgl_masuk', 'desc')
-            ->get();
-
-        $historyGrouped = [];
-        foreach ($history_kunjungan as $hk) {
-            $date = date('Y-m-d', strtotime($hk->tgl_masuk));
-            if (! isset($historyGrouped[$date])) {
-                $historyGrouped[$date] = [];
-            }
-            if ($hk->nama_bagian) {
-                $historyGrouped[$date][$hk->nama_bagian] = $hk->registrasi_detail_id;
-            }
-        }
+        $historyGrouped = EmrHelper::historyKunjunganGrouped($registrasi_detail);
 
         $emr_data = [];
 

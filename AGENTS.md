@@ -343,6 +343,7 @@ $details = EmrHelper::emrDetailByVariabel($emr_id); // keyed by variabel
 $details['subjective']
 ```
 
+- **`$historyGrouped` = riwayat KUNJUNGAN, bukan riwayat emr.** Komponen `x-emr-split-layout` memakai bentuk `[ 'Y-m-d' => [ 'Nama Bagian' => registrasi_detail_id ] ]` untuk dropdown "History" (judul = `Carbon::parse($date)`, tautan = `$getLink($registrasi_detail_id)`). Sumbernya `registrasi_detail` seluruh kunjungan pasien — **jangan** menyusunnya dari baris `emr`. Riwayat emr per form sudah otomatis diambil sendiri oleh `x-emr-history-table` (memakai `EmrHelper::getHistoryForForm()`). Pencarian duplikat sudah dipusatkan di `EmrHelper::historyKunjunganGrouped($registrasi_detail)` — pakai helper itu, jangan tulis query sendiri.
 - **Partial blade EMR** (`moduls/EMR/PartialForm/*.blade.php`): pola `$emr_data[env('OBJEK_ID_X')]['variabel']` diganti ke `$emr_data['variabel']` (flat keyed by variabel). Refactor via regex — **WAJIB** karena partial yang masih `{{ $emr_data ?? '' }}` membuat semua field bernilai sama & tidak ada checkbox/radio yang tercentang (lihat section *Pengkajian Risiko Jatuh*).
 
 - **SOAP / Pengkajian Awal / Pengkajian Harian**: ketiganya punya controller & view sendiri (`PengkajianAwalKeperawatanController` → `moduls.EMR.PengkajianAwalKeperawatan.index`, `PengkajianHarianKeperawatanController` → `...PengkajianHarianKeperawatan.index`, dideteksi otomatis oleh `DynamicFormController` lewat nama folder) dan memakai `EmrHelper`; gate akses via `AksesEhr::can($formId, 'read|create|update|delete')`.

@@ -333,6 +333,65 @@ class EmrHelper
         ];
     }
 
+    /**
+     * Riwayat KUNJUNGAN (bukan riwayat emr) untuk dropdown "History" di panel
+     * kiri form EMR.
+     *
+     * Kontrak bentuk data WAJIB sesuai komponen `x-emr-split-layout`:
+     *   [ 'Y-m-d' => [ 'Nama Bagian' => registrasi_detail_id, ... ], ... ]
+     * lalu `x-emr-split-layout` merender `Carbon::parse($date)` sebagai judul
+     * dan `$getLink($registrasi_detail_id)` untuk tautan ke kunjungan tersebut.
+     *
+     *toh: sumbernya adalah `registrasi_detail` milik seluruh kunjungan pasien,
+     * BUKUM baris `emr` — riwayat emr per form sudah ditangani sendiri oleh
+     * komponen `x-emr-history-table` (memakai `getHistoryForForm()`).
+     *
+     * @param  object  $registrasiDetail  model RegistrasiDetail (sudah eager-load registrasi)
+     * @return array<string, array<string, int>>
+     */
+    public static function historyKunjunganGrouped($registrasiDetail): array
+    {
+        if (! $registrasiDetail || ! $registrasiDetail->registrasi) {
+            return [];
+        }
+
+        $kunjungan = DB::table('registrasi_detail')
+            ->join('registrasi', 'registrasi_detail.registrasi_id', '=', 'registrasi.registrasi_id')
+            ->leftJoin('bagian', function ($join) {
+                $join->on('registrasi_detail.bagian_id', '=', 'bagian.bagian_id')
+                    ->where(function ($q) {
+                        $q->whereNull('bagian.status_batal')->orWhere('bagian.status_batal', 0);
+                    });
+            })
+            ->where('registrasi.pasien_id', $registrasiDetail->registrasi->pasien_id)
+            ->where(function ($q) {
+                $q->whereNull('registrasi.status_batal')->orWhere('registrasi.status_batal', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('registrasi_detail.status_batal')->orWhere('registrasi_detail.status_batal', 0);
+            })
+            ->select('registrasi.tgl_masuk', 'bagian.nama_bagian', 'registrasi_detail.registrasi_detail_id')
+            ->orderBy('registrasi.tgl_masuk', 'desc')
+            ->get();
+
+        $grouped = [];
+        foreach ($kunjungan as $row) {
+            if (! $row->nama_bagian) {
+                continue;
+            }
+
+            $date = date('Y-m-d', strtotime($row->tgl_masuk));
+
+            if (! isset($grouped[$date])) {
+                $grouped[$date] = [];
+            }
+
+            $grouped[$date][$row->nama_bagian] = $row->registrasi_detail_id;
+        }
+
+        return $grouped;
+    }
+
     public static function delete(int $emrId): void
     {
         $emr = static::emrById($emrId);

@@ -9,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Models\RegistrasiDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Pengkajian Harian Keperawatan (form slug `pengkajian_harian_keperawatan`).
@@ -75,27 +74,9 @@ class PengkajianHarianKeperawatanController extends Controller
             $isView = request('action') === 'view';
         }
 
-        // Shift pengkajian yang sudah terisi (ringkasan per tanggal) untuk sidebar.
-        $riwayatTanggal = DB::table('emr')
-            ->where('form_id', $form_id)
-            ->where('registrasi_id', $registrasi_detail->registrasi_id)
-            ->where(function ($q) {
-                $q->whereNull('status_batal')->orWhere('status_batal', 0);
-            })
-            ->orderBy('tgl_jam', 'desc')
-            ->get(['emr_id', 'tgl_jam', 'pegawai_id']);
-
-        $petugas = DB::table('pegawai')
-            ->whereIn('pegawai_id', $riwayatTanggal->pluck('pegawai_id')->filter()->unique())
-            ->pluck('nama_pegawai', 'pegawai_id');
-
-        $historyGrouped = [];
-        foreach ($riwayatTanggal as $row) {
-            $tanggal = date('Y-m-d', strtotime($row->tgl_jam));
-            $jam = date('H:i', strtotime($row->tgl_jam));
-            $nama = $petugas[$row->pegawai_id] ?? 'Perawat';
-            $historyGrouped[$tanggal][$nama.' - '.$jam] = $row->emr_id;
-        }
+        // Riwayat KUNJUNGAN untuk dropdown "History" di panel kiri.
+        // Riwayat emr sendiri sudah diambil komponen x-emr-history-table.
+        $historyGrouped = EmrHelper::historyKunjunganGrouped($registrasi_detail);
 
         return view('moduls.EMR.PengkajianHarianKeperawatan.index', compact(
             'registrasi_detail',

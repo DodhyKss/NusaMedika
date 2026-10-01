@@ -102,7 +102,7 @@ Baris `akses_ehr` untuk form 9: **Dokter (profesi 1)** dan **Perawat (profesi 2)
 
 `EMR\ImplementasiKeperawatan\ImplementasiKeperawatanController` — terdeteksi otomatis `DynamicFormController` karena `Str::studly('implementasi_keperawatan')` = `ImplementasiKeperawatan`.
 
-- `index` — `abort_unless(AksesEhr::can(..., 'read'), 403)`; mengirim `$implementasiList` (master aktif) untuk dropdown; riwayat dikelompokkan per tanggal + jam.
+- `index` — `abort_unless(AksesEhr::can(..., 'read'), 403)`; mengirim `$implementasiList` (master aktif) untuk dropdown; `$historyGrouped` diambil dari `EmrHelper::historyKunjunganGrouped($registrasi_detail)` — **riwayat kunjungan**, bukan riwayat emr (lihat §6).
 - `store`/`update` — memanggil `validated()` (wajib, tanggal/jam), lalu `filteredData()` yang menyaring field terpetakan dan mengisi snapshot nama.
 - `destroy` — `EmrHelper::delete()` (soft delete `emr` + `emr_detail`).
 
@@ -138,3 +138,32 @@ View `moduls/EMR/ImplementasiKeperawatan/index.blade.php` memakai `x-emr-split-l
 - **Satu implementasi per pengisian form.** Lima intervensi dalam satu shift berarti lima entri EMR terpisah (masing-masing punya `emr_id` sendiri dan tampil terpisah di riwayat). Bila implementasi dikumpulkan dalam satu baris per waktu (pivot `implementasi` → `emr`), atau field JSON — perlu redesign.
 - Belum ada rekap total per hari / grafik tren.
 - Tidak ada integrasi ke `bill_temp` (implementasi tidak dikenakan biaya).
+---
+
+## 6. Riwayat: kunjungan, bukan EMR
+
+Dropdown "History" di panel kiri setiap form EMR **bukan** daftar entri EMR. Kontrak
+bentuk datanya (dipakai `x-emr-split-layout`):
+
+```php
+[ 'Y-m-d' => [ 'Nama Bagian' => registrasi_detail_id, ... ], ... ]
+```
+
+Judul dropdown = `Carbon::parse($date)`, dan tiap chip unit menghasilkan tautan
+`$getLink($registrasi_detail_id)` ke kunjungan tersebut. Sumbernya adalah
+`registrasi_detail` milik seluruh kunjungan pasien yang masih aktif — bukan
+`emr`.
+
+Riwayat entri EMR per form sudah diambil sendiri oleh komponen
+`x-emr-history-table` (memakai `EmrHelper::getHistoryForForm($slug, $registrasiDetailId)`),
+sehingga controller **tidak perlu** menyusunnya.
+
+Query yang sama sebelumnya ditulis inline di 3 controller; sekarang dipusatkan
+menjadi `EmrHelper::historyKunjunganGrouped($registrasi_detail)`
+(`app/Helpers/EmrHelper.php`), dipakai oleh Pengkajian Awal, Pengkajian Harian,
+dan Implementasi Keperawatan.
+
+> Versi pertama controller Implementasi justru menyusun `$historyGrouped` dari
+> baris `emr` (label "nama implementasi - jam" -> `emr_id`), sehingga chip unit
+> berisi nama implementasi, tautannya mengarah ke `emr_id`, dan daftar kunjungan
+> hilang. Gejalanya: dropdown History tidak bisa berpindah antar kunjungan.
