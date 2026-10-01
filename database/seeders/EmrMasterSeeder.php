@@ -15,7 +15,7 @@ class EmrMasterSeeder extends Seeder
         // ======== Dashboard Pasien (dashboard_menu -> dashboard_menu_sub -> dashboard_menu_sub_extra) ========
         $menus = [
             ['dashboard_menu_id' => 1, 'nama_menu' => 'Catatan Medis'],
-            ['dashboard_menu_id' => 2, 'nama_menu' => 'Pengkajian'],
+            ['dashboard_menu_id' => 2, 'nama_menu' => 'Catatan Keperawatan'],
             ['dashboard_menu_id' => 3, 'nama_menu' => 'Resep'],
             ['dashboard_menu_id' => 4, 'nama_menu' => 'Order'],
             ['dashboard_menu_id' => 5, 'nama_menu' => 'Formulir'],
@@ -45,7 +45,7 @@ class EmrMasterSeeder extends Seeder
         $subMenus = [
             // Menu 1 "Catatan Medis"
             ['dashboard_menu_sub_id' => 1, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Soap'],
-            // Menu 2 "Pengkajian"
+            // Menu 2 "Catatan Keperawatan"
             ['dashboard_menu_sub_id' => 2, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Pengkajian Keperawatan'],
             // Menu 3 "Resep" (lama, soft-delete) — sub 3 "Peresepan Obat" digantikan "Order Resep"
             ['dashboard_menu_sub_id' => 3, 'dashboard_menu_id' => 3, 'nama_sub_menu' => 'Peresepan Obat'],

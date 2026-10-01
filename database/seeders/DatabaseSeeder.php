@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             TindakanSeeder::class,
             GroupTindakanSeeder::class,
             MasterTarifSeeder::class,
+            PasienDummySeeder::class,
             EmrMasterSeeder::class,
         ]);
         // Seeder di atas mengisi ID eksplisit (updateOrInsert), sehingga sequence
