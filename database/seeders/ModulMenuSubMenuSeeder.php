@@ -126,6 +126,7 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 59, 'menu_id' => 6, 'nama_sub_menu' => 'Master Kategori Tindakan', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterKategoriTindakan/master_kategori_tindakan', 'urutan_sub_menu' => 20],
             ['sub_menu_id' => 60, 'menu_id' => 6, 'nama_sub_menu' => 'Master Group Tindakan', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterGroupTindakan/master_group_tindakan', 'urutan_sub_menu' => 21],
             ['sub_menu_id' => 61, 'menu_id' => 6, 'nama_sub_menu' => 'Master Tarif', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterTarif/master_tarif', 'urutan_sub_menu' => 22],
+            ['sub_menu_id' => 62, 'menu_id' => 6, 'nama_sub_menu' => 'Master Implementasi', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterImplementasi/master_implementasi', 'urutan_sub_menu' => 23],
             // Menu Manajemen User (7) - Administrator
             ['sub_menu_id' => 18, 'menu_id' => 7, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'Administrator/ManajemenUser/User/user', 'urutan_sub_menu' => 1],
             // Menu Manajemen EMR (8) - Administrator

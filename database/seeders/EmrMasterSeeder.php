@@ -46,6 +46,11 @@ class EmrMasterSeeder extends Seeder
             // Menu 1 "Catatan Medis"
             ['dashboard_menu_sub_id' => 1, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Soap'],
             // Menu 2 "Catatan Keperawatan"
+            // Sub menu TANPA extra: header_ehr memakai CONCAT_WS sehingga id_dash_menu
+            // = "2.8", dan EmrDashboard merender sub ini sebagai link langsung dengan
+            // Str::slug(nama_sub_menu) — WAJIB sama dengan slug form.
+            ['dashboard_menu_sub_id' => 8, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Implementasi Keperawatan'],
+            // Menu 2 "Catatan Keperawatan"
             ['dashboard_menu_sub_id' => 2, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Pengkajian Keperawatan'],
             // Menu 3 "Resep" (lama, soft-delete) — sub 3 "Peresepan Obat" digantikan "Order Resep"
             ['dashboard_menu_sub_id' => 3, 'dashboard_menu_id' => 3, 'nama_sub_menu' => 'Peresepan Obat'],
@@ -108,6 +113,9 @@ class EmrMasterSeeder extends Seeder
             ['form_id' => 7, 'nama_form' => 'Order Radiologi', 'slug' => 'radiologi', 'id_dash_menu' => '4.6', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             // Formulir Konsultasi (multi-guna: Rehabilitasi Medik / Konsul Layanan / Rencana Kontrol).
             ['form_id' => 8, 'nama_form' => 'Konsultasi', 'slug' => 'konsultasi', 'id_dash_menu' => '5.7', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            // Implementasi Keperawatan: satu baris per pengisian — Implementasi (dari
+            // Master Implementasi) + tanggal + jam + keterangan + respon (free text).
+            ['form_id' => 9, 'nama_form' => 'Implementasi Keperawatan', 'slug' => 'implementasi_keperawatan', 'id_dash_menu' => '2.8', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
         ];
 
         foreach ($forms as $form) {
@@ -169,6 +177,13 @@ class EmrMasterSeeder extends Seeder
             114 => 'Keluhan Utama Harian', 115 => 'Catatan Keperawatan',
             116 => 'Eliminasi (Bj)', 117 => 'Intake Cairan (ml)',
             118 => 'Intake Makanan (persen)', 119 => 'Tidur (jam)', 120 => 'Catatan Tambahan',
+
+            // Implementasi Keperawatan (form 9). `nama_implementasi` disimpan sebagai
+            // snapshot supaya riwayat tetap terbaca bila master di-rename atau
+            // di-soft-delete (pola sama dengan order_laboratorium_detail.nama_tindakan).
+            121 => 'Implementasi', 122 => 'Nama Implementasi',
+            123 => 'Tanggal Implementasi', 124 => 'Waktu Implementasi',
+            125 => 'Keterangan Implementasi', 126 => 'Respon Implementasi',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -282,6 +297,15 @@ class EmrMasterSeeder extends Seeder
                 'bagian_rehab_id' => 88,     // Konsultasi Rehabilitasi Medik (wajib) → bagian penunjang rehab
                 'catatan' => 77,             // opsional, reuse objek 77 "Keterangan"
             ],
+            // Implementasi Keperawatan: satu baris per pengisian form.
+            9 => [
+                'implementasi_id' => 121,     // wajib, dari Master Implementasi
+                'nama_implementasi' => 122,   // snapshot, diisi server
+                'tanggal_implementasi' => 123, // wajib (date)
+                'waktu_implementasi' => 124,  // wajib (jam, H:i)
+                'keterangan_implementasi' => 125, // opsional
+                'respon_implementasi' => 126,     // opsional, free text
+            ],
         ];
 
         foreach ($mapping as $formId => $variabels) {
@@ -328,6 +352,7 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(6);
         EmrHelper::backfillObjekId(7);
         EmrHelper::backfillObjekId(8);
+        EmrHelper::backfillObjekId(9);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -352,6 +377,11 @@ class EmrMasterSeeder extends Seeder
             // Perawat (profesi 2): form pengkajian saja
             ['profesi_id' => 2, 'form_id' => 3, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 4, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Implementasi Keperawatan (form 9): Dokter & Perawat create/read/update/delete.
+            // WAJIB di-seed: EmrDashboardController INNER JOIN akses_ehr, jadi tanpa
+            // baris ini form tidak muncul di dashboard dan selalu 403.
+            ['profesi_id' => 1, 'form_id' => 9, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 9, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
         ];
 
         foreach ($akses as $row) {
