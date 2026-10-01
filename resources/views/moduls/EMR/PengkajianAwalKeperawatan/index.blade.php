@@ -40,14 +40,16 @@
             />
         </x-slot>
 
-        <!-- Form Partials (A-F) -->
+        {{-- Form Partials (A-F).
+             F = Pengkajian Risiko Jatuh berbasis usia (HDS/MFS/TUG/Sydney);
+             partial pengkajian_up_go lama sudah diganti. --}}
         <fieldset class="space-y-3" {{ $isView ? 'disabled' : '' }}>
             @include('moduls.EMR.PartialForm.informasi_pasien')
             @include('moduls.EMR.PartialForm.riwayat_penyakit')
             @include('moduls.EMR.PartialForm.pemeriksaan_fisik')
             @include('moduls.EMR.PartialForm.pengkajian_nyeri')
             @include('moduls.EMR.PartialForm.riwayat_alergi')
-            @include('moduls.EMR.PartialForm.pengkajian_up_go')
+            @include('moduls.EMR.PartialForm.pengkajian_risiko_jatuh')
         </fieldset>
         
     </x-emr-split-layout>

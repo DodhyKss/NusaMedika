@@ -4,6 +4,7 @@ namespace App\Http\Controllers\EMR\PengkajianAwalKeperawatan;
 
 use App\Helpers\AksesEhr;
 use App\Helpers\EmrHelper;
+use App\Helpers\RisikoJatuhHelper;
 use App\Http\Controllers\Controller;
 use App\Models\DiagnosaRawat;
 use App\Models\Pasien;
@@ -68,6 +69,11 @@ class PengkajianAwalKeperawatanController extends Controller
 
         $emr_data = [];
 
+        // Usia pasien menentukan instrumen pengkajian risiko jatuh (HDS/MFS/TUG).
+        $usia = RisikoJatuhHelper::hitungUsia(
+            $registrasi_detail->registrasi->pasien->tgl_lahir
+        );
+
         // Jika emr_id null artinya user input data baru
         if (empty($emr_id)) {
             // Data Pasien
@@ -128,9 +134,13 @@ class PengkajianAwalKeperawatanController extends Controller
                 'pemberian_o2' => '', 'cara_pemberian_o2' => '', 'ett' => '', 'saturasi' => '', 'ews' => '',
                 'allo_anamnesa' => '', 'nama_allo' => '', 'hubungan_allo' => '', 'bmi' => '',
 
-                // Pengkajian Nyeri / Alergi / UP GO
+                // Pengkajian Nyeri / Alergi
                 'nyeri' => 'tidak', 'alergi' => 'tidak',
-                'up_go_1_a' => '', 'up_go_1_b' => '', 'up_go_2' => '',
+
+                // Pengkajian Risiko Jatuh (instrumen dipilih dari usia)
+                'risiko_jatuh_instrumen' => RisikoJatuhHelper::instrumenUntukUsia($usia),
+                'risiko_jatuh_skor' => '', 'risiko_jatuh_label' => '',
+                'risiko_jatuh_intervensi' => '', 'risiko_jatuh_ringkasan' => '',
             ]);
 
             $formAction = route('emr.form.store', ['form_name' => 'pengkajian_awal_keperawatan', 'registrasi_detail_id' => $registrasi_detail_id]);
@@ -160,7 +170,8 @@ class PengkajianAwalKeperawatanController extends Controller
             'isView',
             'printUrl',
             'emr_id',
-            'aksesCrud'
+            'aksesCrud',
+            'usia'
         ));
     }
 
@@ -170,7 +181,8 @@ class PengkajianAwalKeperawatanController extends Controller
         abort_unless($form_id, 404);
         abort_unless(AksesEhr::can((int) $form_id, 'create'), 403);
 
-        $registrasi_detail = RegistrasiDetail::findOrFail($registrasi_detail_id);
+        $registrasi_detail = RegistrasiDetail::with('registrasi.pasien')->findOrFail($registrasi_detail_id);
+        $usia = RisikoJatuhHelper::hitungUsia($registrasi_detail->registrasi->pasien->tgl_lahir ?? null);
 
         $user = Auth::user();
         if ($user == null || $user->pegawai_id == null || $user->user_id == null) {
@@ -178,7 +190,7 @@ class PengkajianAwalKeperawatanController extends Controller
         }
 
         try {
-            EmrHelper::insert((int) $form_id, $this->filteredData($request, (int) $form_id), (int) $registrasi_detail_id);
+            EmrHelper::insert((int) $form_id, $this->filteredData($request, (int) $form_id, $usia), (int) $registrasi_detail_id);
 
             return redirect()->back()->with('success', 'Data Pengkajian Awal Keperawatan berhasil disimpan');
         } catch (\Exception $e) {
@@ -193,7 +205,10 @@ class PengkajianAwalKeperawatanController extends Controller
         abort_unless(AksesEhr::can((int) $form_id, 'update'), 403);
 
         try {
-            EmrHelper::update((int) $emr_id, (int) $form_id, $this->filteredData($request, (int) $form_id));
+            $registrasi_detail = RegistrasiDetail::with('registrasi.pasien')->findOrFail($registrasi_detail_id);
+            $usia = RisikoJatuhHelper::hitungUsia($registrasi_detail->registrasi->pasien->tgl_lahir ?? null);
+
+            EmrHelper::update((int) $emr_id, (int) $form_id, $this->filteredData($request, (int) $form_id, $usia));
 
             return redirect()->back()->with('success', 'Data Pengkajian Awal Keperawatan berhasil diperbarui');
         } catch (\Exception $e) {
@@ -217,13 +232,30 @@ class PengkajianAwalKeperawatanController extends Controller
     }
 
     /**
-     * Ambil hanya field yang terdaftar di mapping form (objekVariabels),
+     * Ambil hanya field yang terdaftar di mapping form (objekVariabel),
      * sisanya (radio bantu, _token, dll.) tidak ikut disimpan.
+     *
+     * Skor risiko jatuh dihitung ULANG di server dari jawaban mentah, bukan
+     * memakai nilai yang dikirim hidden input — supaya angka tersimpan tidak
+     * bisa dimanipulasi dari sisi browser dan selalu sama dengan hasil hitung.
      */
-    private function filteredData(Request $request, int $formId): array
+    private function filteredData(Request $request, int $formId, ?int $usia = null): array
     {
         $mapped = array_flip(EmrHelper::objekVariabels($formId));
+        $data = array_intersect_key($request->all(), $mapped);
 
-        return array_intersect_key($request->all(), $mapped);
+        $kode = RisikoJatuhHelper::normalisasiKode($request->input('risiko_jatuh_instrumen'))
+            ?: RisikoJatuhHelper::deteksiInstrumen($data);
+
+        $hasil = RisikoJatuhHelper::hitung($kode, $data, $usia);
+
+        // Belum ada item yang terisi -> simpan kosong, bukan "Belum Dinilai".
+        $data['risiko_jatuh_instrumen'] = $kode;
+        $data['risiko_jatuh_skor'] = $hasil['skor'];
+        $data['risiko_jatuh_label'] = $hasil['lengkap'] ? $hasil['label'] : '';
+        $data['risiko_jatuh_intervensi'] = $hasil['intervensi'];
+        $data['risiko_jatuh_ringkasan'] = RisikoJatuhHelper::ringkasan($hasil);
+
+        return $data;
     }
 }

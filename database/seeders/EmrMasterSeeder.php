@@ -144,6 +144,31 @@ class EmrMasterSeeder extends Seeder
             83 => 'Jenis Konsultasi', 84 => 'Bagian Tujuan Konsultasi',
             85 => 'Dokter Tujuan Konsultasi', 86 => 'Tanggal Kontrol',
             87 => 'Indikasi Konsultasi', 88 => 'Bagian Rehabilitasi Medik',
+
+            // Pengkajian risiko jatuh (lihat App\Helpers\RisikoJatuhHelper).
+            // Instrumen dipilih otomatis dari usia: HDS anak, MFS dewasa, TUG untuk pasien lanjut usia.
+            89 => 'Risiko Jatuh - Instrumen', 90 => 'Risiko Jatuh - Skor',
+            91 => 'Risiko Jatuh - Tingkat Risiko', 92 => 'Risiko Jatuh - Intervensi',
+            93 => 'Risiko Jatuh - Ringkasan',
+            // HDS (Humpty Dumpty) item 1-7
+            94 => 'HDS 1 - Sangat Hiperaktif', 95 => 'HDS 2 - Sering Jatuh',
+            96 => 'HDS 3 - Menggunakan Alat Bantu', 97 => 'HDS 4 - Hambatan Komunikasi',
+            98 => 'HDS 5 - Pusing Saat Berpindah', 99 => 'HDS 6 - Riwayat Fraktur',
+            100 => 'HDS 7 - Pernah di-Restraint',
+            // MFS (Morse Fall Scale) item 1-6
+            101 => 'MFS 1 - Riwayat Jatuh', 102 => 'MFS 2 - Diagnosa Sekunder',
+            103 => 'MFS 3 - Alat Bantu Ambulasi', 104 => 'MFS 4 - Terpasang Infus',
+            105 => 'MFS 5 - Gait dan Transfer', 106 => 'MFS 6 - Status Mental',
+            // Sydney Scoring: Transfer Score + Mobility Score
+            107 => 'Sydney TS - Tempat Tidur', 108 => 'Sydney TS - Kursi Roda',
+            109 => 'Sydney TS - Bantuan Orang', 110 => 'Sydney MS - Bantuan Orang',
+            111 => 'Sydney MS - Kursi Roda', 112 => 'Sydney MS - Imobil',
+            // Timed Up and Go
+            113 => 'Durasi Timed Up and Go',
+            // Pengkajian harian keperawatan
+            114 => 'Keluhan Utama Harian', 115 => 'Catatan Keperawatan',
+            116 => 'Eliminasi (Bj)', 117 => 'Intake Cairan (ml)',
+            118 => 'Intake Makanan (persen)', 119 => 'Tidur (jam)', 120 => 'Catatan Tambahan',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -193,13 +218,48 @@ class EmrMasterSeeder extends Seeder
                 'berat_badan' => 8, 'tinggi_badan' => 9, 'pemberian_o2' => 18,
                 'cara_pemberian_o2' => 19, 'ett' => 20, 'saturasi' => 15, 'ews' => 16,
                 'allo_anamnesa' => 63, 'nama_allo' => 64, 'hubungan_allo' => 65, 'bmi' => 58,
-                'nyeri' => 14, 'alergi' => 17, 'up_go_1_a' => 66, 'up_go_1_b' => 67, 'up_go_2' => 68,
+                'nyeri' => 14, 'alergi' => 17,
+
+                // Pengkajian risiko jatuh (instrumen dipilih dari usia, lihat
+                // App\Helpers\RisikoJatuhHelper). Objek 66-68 (UP GO lama) tidak
+                // lagi dipakai form ini; mapping lamanya dibersihkan di bawah.
+                'risiko_jatuh_instrumen' => 89, 'risiko_jatuh_skor' => 90,
+                'risiko_jatuh_label' => 91, 'risiko_jatuh_intervensi' => 92,
+                'risiko_jatuh_ringkasan' => 93,
+                // HDS (anak)
+                'hds_1' => 94, 'hds_2' => 95, 'hds_3' => 96, 'hds_4' => 97,
+                'hds_5' => 98, 'hds_6' => 99, 'hds_7' => 100,
+                // Morse Fall Scale (dewasa)
+                'mfs_1' => 101, 'mfs_2' => 102, 'mfs_3' => 103,
+                'mfs_4' => 104, 'mfs_5' => 105, 'mfs_6' => 106,
+                // Sydney Scoring (alternatif)
+                'syd_ts_bed' => 107, 'syd_ts_bangku' => 108, 'syd_ts_bantuan' => 109,
+                'syd_ms_bantuan' => 110, 'syd_ms_kursi_roda' => 111, 'syd_ms_imobil' => 112,
+                // Timed Up and Go (lansia)
+                'tug_detik' => 113,
             ],
+            // Pengkajian harian keperawatan: vital + keluhan +yeri + risiko jatuh
+            // (dinilai ulang tiap hari) + balance cairan/eliminasi.
             4 => [
-                'keluhan' => 13, 'kesadaran' => 51, 'td' => 6, 'nadi' => 10, 'suhu' => 11,
-                'pernapasan' => 12, 'saturasi' => 15, 'berat_badan' => 8, 'tinggi_badan' => 9,
-                'ews' => 16, 'gcs_jumlah' => 57, 'pemberian_o2' => 18,
-                'cara_pemberian_o2' => 19, 'ett' => 20,
+                'keluhan' => 114, 'catatan_keperawatan' => 115,
+                'kesadaran' => 51, 'dpo' => 59,
+                'gcs_e' => 54, 'gcs_m' => 55, 'gcs_v' => 56, 'gcs_jumlah' => 57,
+                'td' => 6, 'nadi' => 10, 'suhu' => 11, 'pernapasan' => 12,
+                'berat_badan' => 8, 'tinggi_badan' => 9, 'saturasi' => 15, 'ews' => 16,
+                'pemberian_o2' => 18, 'cara_pemberian_o2' => 19, 'ett' => 20,
+                'nyeri' => 14, 'alergi' => 17,
+                'eliminasi' => 116, 'intake_cairan' => 117,
+                'intake_makanan' => 118, 'tidur' => 119, 'catatan_tambahan' => 120,
+                'risiko_jatuh_instrumen' => 89, 'risiko_jatuh_skor' => 90,
+                'risiko_jatuh_label' => 91, 'risiko_jatuh_intervensi' => 92,
+                'risiko_jatuh_ringkasan' => 93,
+                'hds_1' => 94, 'hds_2' => 95, 'hds_3' => 96, 'hds_4' => 97,
+                'hds_5' => 98, 'hds_6' => 99, 'hds_7' => 100,
+                'mfs_1' => 101, 'mfs_2' => 102, 'mfs_3' => 103,
+                'mfs_4' => 104, 'mfs_5' => 105, 'mfs_6' => 106,
+                'syd_ts_bed' => 107, 'syd_ts_bangku' => 108, 'syd_ts_bantuan' => 109,
+                'syd_ms_bantuan' => 110, 'syd_ms_kursi_roda' => 111, 'syd_ms_imobil' => 112,
+                'tug_detik' => 113,
             ],
             5 => [
                 'barang_id' => 69, 'jumlah' => 70, 's_1' => 71, 's_2' => 72,
@@ -244,6 +304,18 @@ class EmrMasterSeeder extends Seeder
                     'status_batal' => 0,
                 ]);
             }
+        }
+
+        // Mapping variabel UP GO lama (objek 66-68) tidak lagi dipakai form 3:
+        // bagian F diganti Pengkajian Risiko Jatuh berbasis usia. Soft-delete agar
+        // tidak ikut ter-simpan kalau masih ada data lama.
+        foreach (['up_go_1_a', 'up_go_1_b', 'up_go_2'] as $variabelLama) {
+            DB::table('objek_form_control')
+                ->where('variabel', $variabelLama)
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
+                ->update(['status_batal' => 1, 'mod_time' => $now]);
         }
 
         // Isi objek_id data legacy yang tadinya NULL (dulu env('OBJEK_ID_*') kosong),

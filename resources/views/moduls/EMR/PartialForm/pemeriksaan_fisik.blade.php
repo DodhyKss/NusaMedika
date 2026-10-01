@@ -2,7 +2,7 @@
     <div class="text-sm space-y-6">
         <div class="flex items-center gap-2">
             <label class="font-bold text-slate-800">Kesadaran :</label> 
-            <input type="text" name="kesadaran" value="{{ $emr_data ?? '' }}" class="form-input border border-slate-300 rounded w-64 h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Compos Mentis (Alert)">
+            <input type="text" name="kesadaran" value="{{ $emr_data['kesadaran'] ?? '' }}" class="form-input border border-slate-300 rounded w-64 h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Compos Mentis (Alert)">
         </div>
 
         <!-- GCS Table -->
@@ -15,67 +15,67 @@
                     <!-- EYE -->
                     <tr>
                         <td rowspan="4" class="border border-slate-300 p-2 text-center font-bold w-24">EYE<br>(E)</td>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_e" class="text-slate-800 focus:ring-slate-800" value="4" {{ ($emr_data ?? '') == '4' ? 'checked' : '' }}> Buka Mata Spontan</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_e" class="text-slate-800 focus:ring-slate-800" value="4" {{ ($emr_data['gcs_e'] ?? '') == '4' ? 'checked' : '' }}> Buka Mata Spontan</label></td>
                         <td class="border border-slate-300 p-2 text-center w-12 font-medium">4</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_e" class="text-slate-800 focus:ring-slate-800" value="3" {{ ($emr_data ?? '') == '3' ? 'checked' : '' }}> Buka Mata Bila Dirangsang Suara</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_e" class="text-slate-800 focus:ring-slate-800" value="3" {{ ($emr_data['gcs_e'] ?? '') == '3' ? 'checked' : '' }}> Buka Mata Bila Dirangsang Suara</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">3</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_e" class="text-slate-800 focus:ring-slate-800" value="2" {{ ($emr_data ?? '') == '2' ? 'checked' : '' }}> Buka Mata Bila Dirangsang Nyeri</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_e" class="text-slate-800 focus:ring-slate-800" value="2" {{ ($emr_data['gcs_e'] ?? '') == '2' ? 'checked' : '' }}> Buka Mata Bila Dirangsang Nyeri</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">2</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_e" class="text-slate-800 focus:ring-slate-800" value="1" {{ ($emr_data ?? '') == '1' ? 'checked' : '' }}> Tidak Bisa Buka Mata Dengan Dirangsang Apapun</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_e" class="text-slate-800 focus:ring-slate-800" value="1" {{ ($emr_data['gcs_e'] ?? '') == '1' ? 'checked' : '' }}> Tidak Bisa Buka Mata Dengan Dirangsang Apapun</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">1</td>
                     </tr>
                     <!-- MOTORIK -->
                     <tr>
                         <td rowspan="6" class="border border-slate-300 p-2 text-center font-bold w-24">MOTORIK<br>(M)</td>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="6" {{ ($emr_data ?? '') == '6' ? 'checked' : '' }}> Mengikuti Perintah</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="6" {{ ($emr_data['gcs_m'] ?? '') == '6' ? 'checked' : '' }}> Mengikuti Perintah</label></td>
                         <td class="border border-slate-300 p-2 text-center w-12 font-medium">6</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="5" {{ ($emr_data ?? '') == '5' ? 'checked' : '' }}> Mengetahui Tempat Rangsang Nyeri</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="5" {{ ($emr_data['gcs_m'] ?? '') == '5' ? 'checked' : '' }}> Mengetahui Tempat Rangsang Nyeri</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">5</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="4" {{ ($emr_data ?? '') == '4' ? 'checked' : '' }}> Hanya Menarik Bagian Tubuh Bila Dirangsang</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="4" {{ ($emr_data['gcs_m'] ?? '') == '4' ? 'checked' : '' }}> Hanya Menarik Bagian Tubuh Bila Dirangsang</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">4</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="3" {{ ($emr_data ?? '') == '3' ? 'checked' : '' }}> Timbul Fleksi Abnormal Bila Diberi Rangsang Nyeri</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="3" {{ ($emr_data['gcs_m'] ?? '') == '3' ? 'checked' : '' }}> Timbul Fleksi Abnormal Bila Diberi Rangsang Nyeri</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">3</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="2" {{ ($emr_data ?? '') == '2' ? 'checked' : '' }}> Timbul Ekstensi Abnormal Bila Diberi Rangsang Nyeri</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="2" {{ ($emr_data['gcs_m'] ?? '') == '2' ? 'checked' : '' }}> Timbul Ekstensi Abnormal Bila Diberi Rangsang Nyeri</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">2</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="1" {{ ($emr_data ?? '') == '1' ? 'checked' : '' }}> Tidak Ada Gerakan Dengan Rangsang Apapun</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_m" class="text-slate-800 focus:ring-slate-800" value="1" {{ ($emr_data['gcs_m'] ?? '') == '1' ? 'checked' : '' }}> Tidak Ada Gerakan Dengan Rangsang Apapun</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">1</td>
                     </tr>
                     <!-- VERBAL -->
                     <tr>
                         <td rowspan="5" class="border border-slate-300 p-2 text-center font-bold w-24">VERBAL<br>(V)</td>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_v" class="text-slate-800 focus:ring-slate-800" value="5" {{ ($emr_data ?? '') == '5' ? 'checked' : '' }}> Komunikasi Verbal Baik, Jawaban Baik</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_v" class="text-slate-800 focus:ring-slate-800" value="5" {{ ($emr_data['gcs_v'] ?? '') == '5' ? 'checked' : '' }}> Komunikasi Verbal Baik, Jawaban Baik</label></td>
                         <td class="border border-slate-300 p-2 text-center w-12 font-medium">5</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_v" class="text-slate-800 focus:ring-slate-800" value="4" {{ ($emr_data ?? '') == '4' ? 'checked' : '' }}> Bingung, Disorientasi Waktu, Orang, Dan Tempat</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_v" class="text-slate-800 focus:ring-slate-800" value="4" {{ ($emr_data['gcs_v'] ?? '') == '4' ? 'checked' : '' }}> Bingung, Disorientasi Waktu, Orang, Dan Tempat</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">4</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_v" class="text-slate-800 focus:ring-slate-800" value="3" {{ ($emr_data ?? '') == '3' ? 'checked' : '' }}> Dengan Rangsangan Hanya Ada Kata-kata</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_v" class="text-slate-800 focus:ring-slate-800" value="3" {{ ($emr_data['gcs_v'] ?? '') == '3' ? 'checked' : '' }}> Dengan Rangsangan Hanya Ada Kata-kata</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">3</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_v" class="text-slate-800 focus:ring-slate-800" value="2" {{ ($emr_data ?? '') == '2' ? 'checked' : '' }}> Dengan Rangsangan Hanya Keluar Suara</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_v" class="text-slate-800 focus:ring-slate-800" value="2" {{ ($emr_data['gcs_v'] ?? '') == '2' ? 'checked' : '' }}> Dengan Rangsangan Hanya Keluar Suara</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">2</td>
                     </tr>
                     <tr>
-                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_v" class="text-slate-800 focus:ring-slate-800" value="1" {{ ($emr_data ?? '') == '1' ? 'checked' : '' }}> Timbul Ekstensi Abnormal Bila Diberi Rangsang Nyeri</label></td>
+                        <td class="border border-slate-300 p-2"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gcs_v" class="text-slate-800 focus:ring-slate-800" value="1" {{ ($emr_data['gcs_v'] ?? '') == '1' ? 'checked' : '' }}> Timbul Ekstensi Abnormal Bila Diberi Rangsang Nyeri</label></td>
                         <td class="border border-slate-300 p-2 text-center font-medium">1</td>
                     </tr>
                 </tbody>
@@ -84,13 +84,13 @@
 
         <div class="mt-4">
             <label class="font-bold flex items-center gap-2 text-sm text-slate-800 cursor-pointer w-max">
-                Dalam Pengaruh Obat (DPO) : <input type="checkbox" name="dpo" value="1" class="rounded text-slate-800 focus:ring-slate-800 w-4 h-4" {{ ($emr_data ?? '') == '1' ? 'checked' : '' }}> <span class="font-normal text-slate-600">DPO</span>
+                Dalam Pengaruh Obat (DPO) : <input type="checkbox" name="dpo" value="1" class="rounded text-slate-800 focus:ring-slate-800 w-4 h-4" {{ ($emr_data['dpo'] ?? '') == '1' ? 'checked' : '' }}> <span class="font-normal text-slate-600">DPO</span>
             </label>
         </div>
 
         <div class="flex flex-col items-center border-t border-slate-200 pt-6 my-4 border-b pb-6">
             <span class="text-xs tracking-widest font-semibold mb-2 text-slate-600">JUMLAH</span>
-            <input type="text" name="gcs_jumlah" value="{{ $emr_data ?? '' }}" readonly value="" placeholder="0" class="bg-[#d0e3f2] border-none text-3xl font-bold py-4 px-4 rounded-sm text-center text-[#1e466b] shadow-inner w-32 focus:ring-0">
+            <input type="text" name="gcs_jumlah" id="gcs_jumlah" value="{{ $emr_data['gcs_jumlah'] ?? '' }}" readonly placeholder="0" class="gcs-jumlah bg-[#d0e3f2] border-none text-3xl font-bold py-4 px-4 rounded-sm text-center text-[#1e466b] shadow-inner w-32 focus:ring-0">
         </div>
 
         <!-- Vitals Grid -->
@@ -99,21 +99,21 @@
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">Tekanan Darah Ini</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="td" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
+                    <input type="text" name="td" value="{{ $emr_data['td'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
                     <span class="text-slate-600 text-xs mb-1">/ mmHg</span>
                 </div>
             </div>
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">Nadi</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="nadi" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
+                    <input type="text" name="nadi" value="{{ $emr_data['nadi'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
                     <span class="text-slate-600 text-xs mb-1">x/Menit</span>
                 </div>
             </div>
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">Suhu</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="suhu" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
+                    <input type="text" name="suhu" value="{{ $emr_data['suhu'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
                     <span class="text-slate-600 text-xs mb-1">°C</span>
                 </div>
             </div>
@@ -122,21 +122,21 @@
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">Pernapasan</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="pernapasan" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
+                    <input type="text" name="pernapasan" value="{{ $emr_data['pernapasan'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
                     <span class="text-slate-600 text-xs mb-1">x/Menit</span>
                 </div>
             </div>
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">Berat Badan</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="berat_badan" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
+                    <input type="text" name="berat_badan" value="{{ $emr_data['berat_badan'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
                     <span class="text-slate-600 text-xs mb-1">Kg</span>
                 </div>
             </div>
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">Tinggi Badan</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="tinggi_badan" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent">
+                    <input type="text" name="tinggi_badan" value="{{ $emr_data['tinggi_badan'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent">
                     <span class="text-slate-600 text-xs mb-1">Cm</span>
                 </div>
             </div>
@@ -145,20 +145,20 @@
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">Pemberian O2</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="pemberian_o2" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent">
+                    <input type="text" name="pemberian_o2" value="{{ $emr_data['pemberian_o2'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent">
                     <span class="text-slate-600 text-xs mb-1">L/Mnt</span>
                 </div>
             </div>
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">Cara Pemberian</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="cara_pemberian_o2" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
+                    <input type="text" name="cara_pemberian_o2" value="{{ $emr_data['cara_pemberian_o2'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
                 </div>
             </div>
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">ETT</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="ett" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
+                    <input type="text" name="ett" value="{{ $emr_data['ett'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
                     <span class="text-slate-600 text-xs mb-1">%</span>
                 </div>
             </div>
@@ -167,26 +167,26 @@
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">Saturasi</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="saturasi" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
+                    <input type="text" name="saturasi" value="{{ $emr_data['saturasi'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
                     <span class="text-slate-600 text-xs mb-1">%</span>
                 </div>
             </div>
             <div>
                 <label class="block font-bold text-slate-800 text-xs mb-1">EWS</label>
                 <div class="flex items-end gap-2 mt-2">
-                    <input type="text" name="ews" value="{{ $emr_data ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
+                    <input type="text" name="ews" value="{{ $emr_data['ews'] ?? '' }}" class="form-input w-20 border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-1 text-sm bg-transparent" placeholder="">
                 </div>
             </div>
             <div>
                 <div class="flex items-center gap-2 mt-4 mb-2">
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" name="allo_anamnesa" class="rounded text-slate-800 focus:ring-slate-800 w-3 h-3" {{ ($emr_data ?? '') == 'on' ? 'checked' : '' }}> 
+                        <input type="checkbox" name="allo_anamnesa" class="rounded text-slate-800 focus:ring-slate-800 w-3 h-3" {{ ($emr_data['allo_anamnesa'] ?? '') == 'on' ? 'checked' : '' }}> 
                         <span class="font-bold text-slate-800 text-xs">Allo Anamnesa</span>
                     </label>
                 </div>
                 <div class="flex items-center gap-2 text-slate-600 text-xs">
-                    <span>Nama:</span> <input type="text" name="nama_allo" value="{{ $emr_data ?? '' }}" class="form-input border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-0 h-5 w-20 bg-transparent">, 
-                    <span>Hubungan:</span> <input type="text" name="hubungan_allo" value="{{ $emr_data ?? '' }}" class="form-input border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-0 h-5 w-20 bg-transparent">
+                    <span>Nama:</span> <input type="text" name="nama_allo" value="{{ $emr_data['nama_allo'] ?? '' }}" class="form-input border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-0 h-5 w-20 bg-transparent">, 
+                    <span>Hubungan:</span> <input type="text" name="hubungan_allo" value="{{ $emr_data['hubungan_allo'] ?? '' }}" class="form-input border-b-2 border-t-0 border-l-0 border-r-0 border-slate-300 rounded-none shadow-none focus:ring-0 focus:border-blue-500 px-1 py-0 h-5 w-20 bg-transparent">
                 </div>
             </div>
         </div>
@@ -195,8 +195,57 @@
             <h4 class="font-bold text-slate-800 text-xs mb-0">Skrining Status Nutrisi</h4>
             <div class="flex gap-2 items-center">
                 <span class="text-slate-600 text-xs">BMI</span>
-                <input type="text" name="bmi" value="{{ $emr_data ?? '' }}" class="form-input w-16 h-7 text-sm font-bold border border-slate-300 rounded focus:border-blue-500 focus:ring-blue-500" placeholder="0"> 
+                <input type="text" name="bmi" value="{{ $emr_data['bmi'] ?? '' }}" class="form-input w-16 h-7 text-sm font-bold border border-slate-300 rounded focus:border-blue-500 focus:ring-blue-500" placeholder="0"> 
             </div>
         </div>
     </div>
 </x-emr-accordion>
+
+<script>
+/**
+ * Total GCS = GCS Eye + GCS Verbal + GCS Motorik.
+ *
+ * Field `gcs_jumlah` bersifat readonly sehingga harus dihitung otomatis.
+ * Radio group dibaca dari radio yang sedang checked (bukan radio pertama:
+ * memilih opsi kedua akan membuat radio pertama ter-uncheck).
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    var target = document.querySelector('.gcs-jumlah');
+    if (!target || target.dataset.gcsReady === '1') return;
+    target.dataset.gcsReady = '1';
+
+    function nilaiGcs(nama) {
+        var inputs = document.getElementsByName(nama);
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].type === 'radio' && inputs[i].checked) {
+                return parseInt(inputs[i].value, 10);
+            }
+        }
+        return null;
+    }
+
+    function hitungGcs() {
+        var e = nilaiGcs('gcs_e');
+        var v = nilaiGcs('gcs_v');
+        var m = nilaiGcs('gcs_m');
+
+        if (e === null && v === null && m === null) {
+            target.value = '';
+            return;
+        }
+
+        // Komponen yang belum dinilai dianggap 0, agar total tetap tampil untuk data yang tersimpan sebagian.
+        target.value = (e || 0) + (v || 0) + (m || 0);
+    }
+
+    // Dengarkan perubahan pada ketiga grup radio GCS.
+    ['gcs_e', 'gcs_v', 'gcs_m'].forEach(function (nama) {
+        var inputs = document.getElementsByName(nama);
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].addEventListener('change', hitungGcs);
+        }
+    });
+
+    hitungGcs();
+});
+</script>

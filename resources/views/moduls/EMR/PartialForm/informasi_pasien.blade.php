@@ -7,43 +7,43 @@
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Agama <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="agama" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data ?? '' }}" placeholder="Agama">
+                        <span>:</span> <input type="text" name="agama" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data['agama'] ?? '' }}" placeholder="Agama">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Nilai-nilai budaya / kepercayaan <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="kegiatan_ibadah" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" value="{{ $emr_data ?? '' }}" placeholder="Nilai-nilai budaya / kepercayaan">
+                        <span>:</span> <input type="text" name="kegiatan_ibadah" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" value="{{ $emr_data['kegiatan_ibadah'] ?? '' }}" placeholder="Nilai-nilai budaya / kepercayaan">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Tingkat Pendidikan <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="tingkat_pendidikan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data ?? '' }}" placeholder="Tingkat Pendidikan">
+                        <span>:</span> <input type="text" name="tingkat_pendidikan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data['tingkat_pendidikan'] ?? '' }}" placeholder="Tingkat Pendidikan">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Pekerjaan <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="pekerjaan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data ?? '' }}" placeholder="Pekerjaan">
+                        <span>:</span> <input type="text" name="pekerjaan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data['pekerjaan'] ?? '' }}" placeholder="Pekerjaan">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Suku Bangsa <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="suku_bangsa" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data ?? '' }}" placeholder="Suku Bangsa">
+                        <span>:</span> <input type="text" name="suku_bangsa" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data['suku_bangsa'] ?? '' }}" placeholder="Suku Bangsa">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Kebangsaan <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="kebangsaan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data ?? '' }}" placeholder="Kebangsaan">
+                        <span>:</span> <input type="text" name="kebangsaan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100" readonly value="{{ $emr_data['kebangsaan'] ?? '' }}" placeholder="Kebangsaan">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">No. Hp / Tlp. Pasien <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="handphone" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" value="{{ $emr_data ?? '' }}" placeholder="No. Hp / Tlp. Pasien">
+                        <span>:</span> <input type="text" name="handphone" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" value="{{ $emr_data['handphone'] ?? '' }}" placeholder="No. Hp / Tlp. Pasien">
                     </div>
                 </div>
             </div>
@@ -53,55 +53,55 @@
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Nama Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="nama_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Nama Suami / Istri" value="{{ $emr_data ?? '' }}">
+                        <span>:</span> <input type="text" name="nama_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Nama Suami / Istri" value="{{ $emr_data['nama_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Usia Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="usia_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Usia Suami / Istri" value="{{ $emr_data ?? '' }}">
+                        <span>:</span> <input type="text" name="usia_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Usia Suami / Istri" value="{{ $emr_data['usia_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Pendidikan Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="pendidikan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Pendidikan Suami / Istri" value="{{ $emr_data ?? '' }}">
+                        <span>:</span> <input type="text" name="pendidikan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Pendidikan Suami / Istri" value="{{ $emr_data['pendidikan_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Pekerjaan Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="pekerjaan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Pekerjaan Suami / Istri" value="{{ $emr_data ?? '' }}">
+                        <span>:</span> <input type="text" name="pekerjaan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Pekerjaan Suami / Istri" value="{{ $emr_data['pekerjaan_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Suku Bangsa Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="suku_bangsa_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Suku Bangsa Suami / Istri" value="{{ $emr_data ?? '' }}">
+                        <span>:</span> <input type="text" name="suku_bangsa_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Suku Bangsa Suami / Istri" value="{{ $emr_data['suku_bangsa_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Kebangsaan Suami / Istri <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="kebangsaan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Kebangsaan Suami / Istri" value="{{ $emr_data ?? '' }}">
+                        <span>:</span> <input type="text" name="kebangsaan_pasangan" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Kebangsaan Suami / Istri" value="{{ $emr_data['kebangsaan_pasangan'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Tinggal Bersama <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="tinggal_bersama" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Tinggal Bersama" value="{{ $emr_data ?? '' }}">
+                        <span>:</span> <input type="text" name="tinggal_bersama" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Tinggal Bersama" value="{{ $emr_data['tinggal_bersama'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Penanggung Jawab Pasien <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="penanggung_jawab_pasien" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Penanggung Jawab Pasien" value="{{ $emr_data ?? '' }}">
+                        <span>:</span> <input type="text" name="penanggung_jawab_pasien" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Penanggung Jawab Pasien" value="{{ $emr_data['penanggung_jawab_pasien'] ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 items-center mb-2">
                     <label class="col-span-1 text-slate-600">Hubungan <span class="text-red-500">*</span></label>
                     <div class="col-span-2 flex items-center gap-2">
-                        <span>:</span> <input type="text" name="hubungan_pasien" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Hubungan" value="{{ $emr_data ?? '' }}">
+                        <span>:</span> <input type="text" name="hubungan_pasien" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Hubungan" value="{{ $emr_data['hubungan_pasien'] ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -117,15 +117,15 @@
                 </div>
                 <div class="w-full sm:w-1/2 flex flex-col gap-2">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="aktifitas_sebelum_makan_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (!isset($emr_data) || $emr_data == 'off') ? 'checked' : '' }}>
+                        <input type="radio" name="aktifitas_sebelum_makan_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (($emr_data['aktifitas_sebelum_makan'] ?? '') === '' || ($emr_data['aktifitas_sebelum_makan'] ?? '') === 'off') ? 'checked' : '' }}>
                         <span class="ml-2 text-slate-600">Tidak</span>
                     </label>
                     <div class="flex items-center gap-2">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="aktifitas_sebelum_makan_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (isset($emr_data) && $emr_data != 'off') ? 'checked' : '' }}>
+                            <input type="radio" name="aktifitas_sebelum_makan_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (($emr_data['aktifitas_sebelum_makan'] ?? '') !== '' && ($emr_data['aktifitas_sebelum_makan'] ?? '') !== 'off') ? 'checked' : '' }}>
                             <span class="ml-2 mr-2 text-slate-600">Ya</span>
                         </label>
-                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="aktifitas_sebelum_makan" placeholder="Sebutkan Aktifitas" value="{{ (isset($emr_data) && $emr_data != 'off') ? $emr_data : '' }}">
+                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="aktifitas_sebelum_makan" placeholder="Sebutkan Aktifitas" value="{{ $emr_data['aktifitas_sebelum_makan'] ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -136,15 +136,15 @@
                 </div>
                 <div class="w-full sm:w-1/2 flex flex-col gap-2">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="pantangan_pulang_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (!isset($emr_data) || $emr_data == 'off') ? 'checked' : '' }}>
+                        <input type="radio" name="pantangan_pulang_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (($emr_data['pantangan_pulang'] ?? '') === '' || ($emr_data['pantangan_pulang'] ?? '') === 'off') ? 'checked' : '' }}>
                         <span class="ml-2 text-slate-600">Tidak</span>
                     </label>
                     <div class="flex items-center gap-2">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="pantangan_pulang_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (isset($emr_data) && $emr_data != 'off') ? 'checked' : '' }}>
+                            <input type="radio" name="pantangan_pulang_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (($emr_data['pantangan_pulang'] ?? '') !== '' && ($emr_data['pantangan_pulang'] ?? '') !== 'off') ? 'checked' : '' }}>
                             <span class="ml-2 mr-2 text-slate-600">Ya</span>
                         </label>
-                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_pulang" placeholder="Sebutkan Pantangan" value="{{ (isset($emr_data) && $emr_data != 'off') ? $emr_data : '' }}">
+                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_pulang" placeholder="Sebutkan Pantangan" value="{{ $emr_data['pantangan_pulang'] ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -155,15 +155,15 @@
                 </div>
                 <div class="w-full sm:w-1/2 flex flex-col gap-2">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="pantangan_transfusi_darah_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (!isset($emr_data) || $emr_data == 'off') ? 'checked' : '' }}>
+                        <input type="radio" name="pantangan_transfusi_darah_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (($emr_data['pantangan_transfusi_darah'] ?? '') === '' || ($emr_data['pantangan_transfusi_darah'] ?? '') === 'off') ? 'checked' : '' }}>
                         <span class="ml-2 text-slate-600">Tidak</span>
                     </label>
                     <div class="flex items-center gap-2">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="pantangan_transfusi_darah_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (isset($emr_data) && $emr_data != 'off') ? 'checked' : '' }}>
+                            <input type="radio" name="pantangan_transfusi_darah_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (($emr_data['pantangan_transfusi_darah'] ?? '') !== '' && ($emr_data['pantangan_transfusi_darah'] ?? '') !== 'off') ? 'checked' : '' }}>
                             <span class="ml-2 mr-2 text-slate-600">Ya</span>
                         </label>
-                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_transfusi_darah" placeholder="Sebutkan Pantangan" value="{{ (isset($emr_data) && $emr_data != 'off') ? $emr_data : '' }}">
+                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_transfusi_darah" placeholder="Sebutkan Pantangan" value="{{ $emr_data['pantangan_transfusi_darah'] ?? '' }}">
                     </div>
                 </div>
             </div>
@@ -174,15 +174,15 @@
                 </div>
                 <div class="w-full sm:w-1/2 flex flex-col gap-2">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="pantangan_makan_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (!isset($emr_data) || $emr_data == 'off') ? 'checked' : '' }}>
+                        <input type="radio" name="pantangan_makan_radio" value="off" class="text-blue-500 focus:ring-blue-500" {{ (($emr_data['pantangan_makan'] ?? '') === '' || ($emr_data['pantangan_makan'] ?? '') === 'off') ? 'checked' : '' }}>
                         <span class="ml-2 text-slate-600">Tidak</span>
                     </label>
                     <div class="flex items-center gap-2">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="pantangan_makan_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (isset($emr_data) && $emr_data != 'off') ? 'checked' : '' }}>
+                            <input type="radio" name="pantangan_makan_radio" value="on" class="text-blue-500 focus:ring-blue-500" {{ (($emr_data['pantangan_makan'] ?? '') !== '' && ($emr_data['pantangan_makan'] ?? '') !== 'off') ? 'checked' : '' }}>
                             <span class="ml-2 mr-2 text-slate-600">Ya</span>
                         </label>
-                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_makan" placeholder="Sebutkan Pantangan" value="{{ (isset($emr_data) && $emr_data != 'off') ? $emr_data : '' }}">
+                        <input type="text" class="form-input border border-slate-300 rounded w-full h-8 px-2 focus:border-blue-500 focus:ring-blue-500" name="pantangan_makan" placeholder="Sebutkan Pantangan" value="{{ $emr_data['pantangan_makan'] ?? '' }}">
                     </div>
                 </div>
             </div>

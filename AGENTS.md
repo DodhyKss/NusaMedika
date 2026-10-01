@@ -298,6 +298,19 @@ Menu 8 "Manajemen EMR" (modul 5 Administrator) berisi dua master CRUD; keduanya 
 
 - **Reset sequence**: `DatabaseSeeder` memanggil `GenerateHelper::resetSequence()` untuk tabel `objek` & `objek_form_control` agar auto-increment tidak bentrok.
 
+## Pengkajian Risiko Jatuh (EMR, berbasis usia)
+
+Rancangan lengkap + referensi ilmiah: `docs/PENGKAJIAN_RISIKO_JATUH.md`. Pusat logika: `app/Helpers/RisikoJatuhHelper.php`.
+
+- **Instrumen dipilih otomatis dari usia pasien** (`instrumenUntukUsia()`): anak `< 14` → **Humpty Dumpty** (`HDS`), dewasa `14–59` → **Morse Fall Scale** (`MFS`), lanjut usia `>= 60` → **Timed "Up and Go"** (`TUG`). **Sydney Scoring** (`SYDNEY`, STRATIFY modifikasi) tersedia sebagai alternatif semua usia dan bisa dipilih manual lewat dropdown.
+- **Skor & tingkat risiko dihitung di server** (`RisikoJatuhHelper::hitung()`) — input tersembunyi dari frontend **diabaikan** lalu dihitung ulang dari jawaban mentah, jadi angka tersimpan tidak bisa dimanipulasi dari browser. `deteksiInstrumen()` jadi fallback bila field `risiko_jatuh_instrumen` tidak ikut terkirim (form dirender ulang / integrasi lama).
+- **Variabel yang disimpan** (form 3 & 4, objek 89–113): `risiko_jatuh_instrumen`, `risiko_jatuh_skor`, `risiko_jatuh_label`, `risiko_jatuh_intervensi`, `risiko_jatuh_ringkasan`, plus jawaban tiap item (`hds_1..7`, `mfs_1..6`, `syd_*`, `tug_detik`).
+- **BUG — skor tidak berubah saat radio diganti**: jangan menyimpan hanya radio **pertama** sebuah grup (`querySelectorAll(...)[0]`) lalu membacanya lewat `.checked` — memilih opsi kedua membuat radio pertama ter-uncheck sehingga jawaban terbaca kosong dan skor tidak bergerak (hanya opsi pertama yang terbaca). Simpan **seluruh grup** (`item.els = Array.prototype.slice.call(panel.querySelectorAll('[name="X"]'))`) lalu cari elemen yang `checked` (`nilaiItem()`). `gcs_jumlah` (readonly) dihitung otomatis `gcs_e + gcs_v + gcs_m` — jangan menulis atribut `value` dua kali pada satu input.
+- **Gotcha TUG**: kategori TUG dibandingkan dengan batas atas 95% CI norma usia (**nilai mentah**, mis. 10,2 dtk untuk 70–79 — bukan hasil `ceil()` 11, yang akan salah classifying 11 dtk). Normalisasi hanya untuk tampilan. `>= 30` detik = risiko tinggi. Norma: Bohannon 2006 meta-analisis.
+- **Partial**: `pengkajian_risiko_jatuh` (panel utama + JS hitung live) & `_risiko_jatuh_instrumen` (tabel item per instrumen). Partial `pengkajian_up_go` lama **dihapus** (3 parameter, tidak membedakan usia, tanpa skor). `layouts.iframe` **tidak** merender `@stack('scripts')` → JS partial harus `<script>` inline.
+- **BUG PENTING — `$emr_data` harus dibaca per-variabel**: `EmrDataWrapper` hanya mengimplementasikan `ArrayAccess` dan `__toString()` mengembalikan string kosong. Semua partial lama menulis `value="{{ $emr_data ?? '' }}"` (scalar) sehingga **setiap field menampilkan nilai yang sama dan tidak ada radio/checkbox yang tercentang**. Pola benar: `{{ $emr_data['agama'] ?? '' }}` dan `{{ ($emr_data['nyeri'] ?? '') === 'ya' ? 'checked' : '' }}`. Sudah diperbaiki di 6 partial. Radio `_radio` (`*_radio`) adalah kontrol bantu di luar mapping `emr_detail` — statusnya diturunkan dari field teksnya, **jangan** simpan.
+- **`pasien.tgl_lahir` sekarang `date`** (bukan `timestamp(6)`) — migration `2026_10_01_000006`. Column `TIMESTAMP` di MySQL hanya menerima 1970–2038, sehingga pasien lahir sebelum 1970 (justru kelompok usia TUG) gagal disimpan dengan `ERROR 1292 Incorrect datetime value`.
+
 ## EmrHelper (pusat operasi EMR)
 
 `App\Helpers\EmrHelper` menggantikan **semua** pemakaian `env('FORM_ID_*')` dan `env('OBJEK_ID_*')` di controller & blade. Semua method statis:
@@ -320,9 +333,10 @@ $details = EmrHelper::emrDetailByVariabel($emr_id); // keyed by variabel
 $details['subjective']
 ```
 
-- **Partial blade EMR** (`moduls/EMR/PartialForm/*.blade.php`): pola `$emr_data[env('OBJEK_ID_X')]['variabel']` diganti ke `$emr_data['variabel']` (flat keyed by variabel). Refactor otomatis via regex.
+- **Partial blade EMR** (`moduls/EMR/PartialForm/*.blade.php`): pola `$emr_data[env('OBJEK_ID_X')]['variabel']` diganti ke `$emr_data['variabel']` (flat keyed by variabel). Refactor via regex — **WAJIB** karena partial yang masih `{{ $emr_data ?? '' }}` membuat semua field bernilai sama & tidak ada checkbox/radio yang tercentang (lihat section *Pengkajian Risiko Jatuh*).
 
-- **SOAP / Pengkajian Awal**: controller (`SoapController`, `PengkajianAwalKeperawatanController`) sudah memakai `EmrHelper`; gate akses via `AksesEhr::can($formId, 'read|create|update|delete')`.
+- **SOAP / Pengkajian Awal / Pengkajian Harian**: ketiganya punya controller & view sendiri (`PengkajianAwalKeperawatanController` → `moduls.EMR.PengkajianAwalKeperawatan.index`, `PengkajianHarianKeperawatanController` → `...PengkajianHarianKeperawatan.index`, dideteksi otomatis oleh `DynamicFormController` lewat nama folder) dan memakai `EmrHelper`; gate akses via `AksesEhr::can($formId, 'read|create|update|delete')`.
+- **Pengkajian Harian Keperawatan** (form 4) = keluhan & catatan (`harian_keluhan`), tanda vital & GCS (`pemeriksaan_fisik`), nyeri (`pengkajian_nyeri`), alergi (`riwayat_alergi`), balance cairan/eliminasi (`harian_balance`, ada notifikasi balance otomatis), dan risiko jatuh (`pengkajian_risiko_jatuh`, dinilai ulang tiap hari).
 
 ## Generic EMR routes (DynamicFormController)
 
