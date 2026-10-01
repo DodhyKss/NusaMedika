@@ -25,9 +25,12 @@
             $subtitleForm = 'Detail order radiologi pasien.';
         }
 
+        // Unit tujuan sebuah tindakan berasal dari Master Group Tindakan (peta
+        // tindakan_id => bagian_id), bukan lagi dari kolom tindakan.bagian_id.
         $tindakanOptions = '<option value=""></option>';
         foreach ($tindakans as $tk) {
-            $tindakanOptions .= '<option value="'.$tk->tindakan_id.'" data-bagian="'.$tk->bagian_id.'">'.e($tk->nama_tindakan).' ('.$tk->kode_tindakan.')</option>';
+            $bagianTd = $tindakanBagianMap[$tk->tindakan_id] ?? '';
+            $tindakanOptions .= '<option value="'.$tk->tindakan_id.'" data-bagian="'.e((string) $bagianTd).'">'.e($tk->nama_tindakan).' ('.$tk->kode_tindakan.')</option>';
         }
     @endphp
 
@@ -237,12 +240,9 @@
                 $sel.find('option').each(function () {
                     if (!this.value) return;
                     var bagian = $(this).attr('data-bagian') || '';
+                    // Tindakan tanpa group tidak punya unit tujuan -> tidak selectable.
                     this.disabled = bagianId && bagian !== bagianId;
                 });
-            }
-
-            function renderMeta($tr, item) {
-                // Radiologi: tidak ada satuan/nilai normal per item.
             }
 
             function addRow(item) {
@@ -253,7 +253,7 @@
                 tr.dataset.item = counter;
                 tr.innerHTML = [
                     '<td class="px-3 py-2 align-top">',
-                    '   <select name="tindakan_id[]" class="tindakan-select text-sm w-full" style="min-width:240px;"' + (isView ? ' disabled' : '') + '></select>',
+                    '   <select name="tindakan_id[' + counter + ']" class="tindakan-select text-sm w-full" style="min-width:240px;"' + (isView ? ' disabled' : '') + '></select>',
                     '</td>',
                     '<td class="px-3 py-2 align-top text-center">',
                     (isView ? '' : '   <button type="button" class="btn-hapus-item p-1.5 text-red-500 hover:bg-red-50 rounded-md transition-colors" title="Hapus Item"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>'),

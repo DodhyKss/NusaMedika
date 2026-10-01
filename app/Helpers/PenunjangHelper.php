@@ -28,10 +28,57 @@ class PenunjangHelper
     }
 
     /**
+     * Peta tindakan_id => bagian_id unit penunjang pemilik group.
+     *
+     * Tindakan tidak lagi punya kolom bagian_id, sehingga sumber kebenaran unit
+     * tujuan sebuah tindakan adalah Master Group Tindakan. Bila satu tindakan punya
+     * group di lebih dari satu unit, ambil group dengan `group_tindakan_id` terkecil
+     * supaya tidak dobel di dropdown order.
+     *
+     * @return array<int, int> tindakan_id => bagian_id
+     */
+    public static function tindakanBagianMap(): array
+    {
+        $rows = DB::table('group_tindakan_tindakan as gtt')
+            ->join('group_tindakan as gt', 'gt.group_tindakan_id', '=', 'gtt.group_tindakan_id')
+            ->where(function ($q) {
+                $q->where('gtt.status_batal', '!=', 1)->orWhereNull('gtt.status_batal');
+            })
+            ->where(function ($q) {
+                $q->where('gt.status_batal', '!=', 1)->orWhereNull('gt.status_batal');
+            })
+            ->groupBy('gtt.tindakan_id')
+            ->orderBy('gtt.tindakan_id')
+            ->select('gtt.tindakan_id')
+            ->selectRaw('MIN(gtt.group_tindakan_id) as group_tindakan_id')
+            ->get();
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
+
+        $groupIds = $rows->pluck('group_tindakan_id')->all();
+
+        $bagianPerGroup = DB::table('group_tindakan')
+            ->whereIn('group_tindakan_id', $groupIds)
+            ->pluck('bagian_id', 'group_tindakan_id');
+
+        $map = [];
+        foreach ($rows as $row) {
+            $bagianId = $bagianPerGroup[$row->group_tindakan_id] ?? null;
+            if ($bagianId !== null) {
+                $map[(int) $row->tindakan_id] = (int) $bagianId;
+            }
+        }
+
+        return $map;
+    }
+
+    /**
      * Resolusi tarif sebuah tindakan untuk sebuah kelas perawatan
      * (kelas_ruang_id), fallback ke tarif default (kelas_ruang_id NULL).
      *
-     * @return array{kelas_ruang_id: ?int, tarif: float, tarif_bpjs: ?float}
+     * @return array{kelas_ruang_id: ?int, tarif: float}
      */
     public static function tarif(int $tindakanId, ?int $kelasRuangId): array
     {
@@ -60,7 +107,6 @@ class PenunjangHelper
         return [
             'kelas_ruang_id' => $harga && $harga->kelas_ruang_id !== null ? (int) $harga->kelas_ruang_id : null,
             'tarif' => (float) ($harga->tarif ?? 0),
-            'tarif_bpjs' => $harga && $harga->tarif_bpjs !== null ? (float) $harga->tarif_bpjs : null,
         ];
     }
 
@@ -223,8 +269,9 @@ class PenunjangHelper
             ];
 
             if ($jenis === 'lab') {
-                $detail['satuan_hasil'] = $tindakan->satuan_hasil ?? null;
-                $detail['nilai_normal'] = $tindakan->nilai_normal ?? null;
+                // Satuan & nilai normal diinput manual per baris di form order.
+                $detail['satuan_hasil'] = $item['satuan_hasil'] ?? null;
+                $detail['nilai_normal'] = $item['nilai_normal'] ?? null;
             }
 
             DB::table($detailTable)->insert($detail);

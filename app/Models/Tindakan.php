@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Tindakan extends Model
@@ -18,20 +19,7 @@ class Tindakan extends Model
     protected $fillable = [
         'kode_tindakan',
         'nama_tindakan',
-        'bagian_id',
-        'kategori',
-        'satuan_hasil',
-        'nilai_normal',
-        'kode_bpjs',
-        'kode_inacbg',
-        'kode_loinc',
-        'keterangan',
-    ];
-
-    public const KATEGORI = [
-        'LAB' => 'Laboratorium',
-        'RAD' => 'Radiologi',
-        'LAIN' => 'Lainnya',
+        'kategori_tindakan_id',
     ];
 
     public function scopeAktif(Builder $query): Builder
@@ -41,18 +29,25 @@ class Tindakan extends Model
         });
     }
 
-    public function bagian(): BelongsTo
+    public function kategori(): BelongsTo
     {
-        return $this->belongsTo(Bagian::class, 'bagian_id', 'bagian_id');
+        return $this->belongsTo(KategoriTindakan::class, 'kategori_tindakan_id', 'kategori_tindakan_id');
+    }
+
+    /**
+     * Group (panel pemeriksaan) yang memuat tindakan ini per unit penunjang.
+     */
+    public function groups(): BelongsToMany
+    {
+        return $this->belongsToMany(GroupTindakan::class, 'group_tindakan_tindakan', 'tindakan_id', 'group_tindakan_id')
+            ->wherePivot('status_batal', '!=', 1)
+            ->where(
+                fn ($q) => $q->where('group_tindakan.status_batal', '!=', 1)->orWhereNull('group_tindakan.status_batal')
+            );
     }
 
     public function harga(): HasMany
     {
         return $this->hasMany(TindakanHarga::class, 'tindakan_id', 'tindakan_id')->aktif();
-    }
-
-    public function getKategoriLabelAttribute(): string
-    {
-        return self::KATEGORI[$this->kategori ?? 'LAIN'] ?? $this->kategori;
     }
 }

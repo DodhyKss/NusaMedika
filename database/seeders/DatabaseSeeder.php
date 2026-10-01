@@ -29,7 +29,10 @@ class DatabaseSeeder extends Seeder
             NasabahSeeder::class,
             IcdSeeder::class,
             JadwalDokterSeeder::class,
+            KategoriTindakanSeeder::class,
             TindakanSeeder::class,
+            GroupTindakanSeeder::class,
+            MasterTarifSeeder::class,
             EmrMasterSeeder::class,
         ]);
         // Seeder di atas mengisi ID eksplisit (updateOrInsert), sehingga sequence
@@ -47,7 +50,8 @@ class DatabaseSeeder extends Seeder
             'jadwal_dokter', 'suket_mcu',
             'dashboard_menu', 'dashboard_menu_sub', 'dashboard_menu_sub_extra', 'form', 'akses_ehr',
             'objek', 'objek_form_control',
-            'tindakan', 'tindakan_harga',
+            'kategori_tindakan', 'tindakan', 'tindakan_harga',
+            'group_tindakan', 'group_tindakan_tindakan',
             'order_laboratorium', 'order_laboratorium_detail',
             'order_radiologi', 'order_radiologi_detail',
             'notifikasi', 'notifikasi_penerima',

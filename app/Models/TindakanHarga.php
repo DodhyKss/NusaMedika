@@ -18,7 +18,6 @@ class TindakanHarga extends Model
         'tindakan_id',
         'kelas_ruang_id',
         'tarif',
-        'tarif_bpjs',
     ];
 
     public function scopeAktif(Builder $query): Builder

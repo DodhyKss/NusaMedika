@@ -35,7 +35,8 @@ class LaboratoriumController extends Controller
             ->orderBy('nama_bagian')
             ->get();
 
-        $tindakans = Tindakan::aktif()->with('bagian')->orderBy('nama_tindakan')->get();
+        $tindakans = Tindakan::aktif()->orderBy('nama_tindakan')->get();
+        $tindakanBagianMap = PenunjangHelper::tindakanBagianMap();
 
         $orders = PenunjangHelper::riwayatOrderPasien('lab', (int) $registrasi_detail->registrasi_id);
 
@@ -63,6 +64,7 @@ class LaboratoriumController extends Controller
             'aksesCrud',
             'bagianList',
             'tindakans',
+            'tindakanBagianMap',
             'orders',
             'edit',
             'editDetails',
@@ -180,6 +182,12 @@ class LaboratoriumController extends Controller
     private function validatedItems(Request $request, int $bagianTujuanId): array
     {
         $tindakanIds = (array) $request->input('tindakan_id', []);
+        // Input satuan & nilai normal memakai indeks baris (data-item) supaya tetap
+        // sinkron walau ada baris yang dihapus di form.
+        $satuanInputs = (array) $request->input('satuan_hasil', []);
+        $normalInputs = (array) $request->input('nilai_normal', []);
+
+        $bagianMap = PenunjangHelper::tindakanBagianMap();
 
         $items = [];
         foreach ($tindakanIds as $i => $tindakanId) {
@@ -192,12 +200,28 @@ class LaboratoriumController extends Controller
                 throw new \RuntimeException('Tindakan tidak valid pada baris #'.($i + 1).'.');
             }
 
-            if ((int) $tindakan->bagian_id !== $bagianTujuanId) {
-                throw new \RuntimeException('"'.$tindakan->nama_tindakan.'" tidak tersedia pada bagian tujuan terpilih.');
+            $baris = (string) $i;
+            if (($bagianMap[(int) $tindakanId] ?? null) !== $bagianTujuanId) {
+                throw new \RuntimeException(
+                    '"'.$tindakan->nama_tindakan.'" tidak termasuk dalam Group Tindakan bagian tujuan terpilih.'
+                );
+            }
+
+            $satuan = trim((string) ($satuanInputs[$baris] ?? ''));
+            $normal = trim((string) ($normalInputs[$baris] ?? ''));
+
+            if (mb_strlen($satuan) > 20) {
+                throw new \RuntimeException('Satuan hasil pada baris #'.($i + 1).' maksimal 20 karakter.');
+            }
+
+            if (mb_strlen($normal) > 100) {
+                throw new \RuntimeException('Nilai normal pada baris #'.($i + 1).' maksimal 100 karakter.');
             }
 
             $items[] = [
                 'tindakan_id' => (int) $tindakanId,
+                'satuan_hasil' => $satuan !== '' ? $satuan : null,
+                'nilai_normal' => $normal !== '' ? $normal : null,
             ];
         }
 

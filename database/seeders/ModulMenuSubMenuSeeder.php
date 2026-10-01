@@ -123,6 +123,9 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 38, 'menu_id' => 6, 'nama_sub_menu' => 'Distributor', 'file_sub_menu' => 'Administrator/ManajemenMaster/Distributor/distributor', 'urutan_sub_menu' => 17],
             ['sub_menu_id' => 50, 'menu_id' => 6, 'nama_sub_menu' => 'Surat Keterangan MCU', 'file_sub_menu' => 'Administrator/ManajemenMaster/SuketMedicalCheckup/suket_medical_checkup', 'urutan_sub_menu' => 18],
             ['sub_menu_id' => 51, 'menu_id' => 6, 'nama_sub_menu' => 'Master Bed', 'file_sub_menu' => 'Administrator/ManajemenMaster/Bed/bed', 'urutan_sub_menu' => 19],
+            ['sub_menu_id' => 59, 'menu_id' => 6, 'nama_sub_menu' => 'Master Kategori Tindakan', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterKategoriTindakan/master_kategori_tindakan', 'urutan_sub_menu' => 20],
+            ['sub_menu_id' => 60, 'menu_id' => 6, 'nama_sub_menu' => 'Master Group Tindakan', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterGroupTindakan/master_group_tindakan', 'urutan_sub_menu' => 21],
+            ['sub_menu_id' => 61, 'menu_id' => 6, 'nama_sub_menu' => 'Master Tarif', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterTarif/master_tarif', 'urutan_sub_menu' => 22],
             // Menu Manajemen User (7) - Administrator
             ['sub_menu_id' => 18, 'menu_id' => 7, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'Administrator/ManajemenUser/User/user', 'urutan_sub_menu' => 1],
             // Menu Manajemen EMR (8) - Administrator

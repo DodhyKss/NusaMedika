@@ -25,9 +25,12 @@
             $subtitleForm = 'Detail order laboratorium pasien.';
         }
 
+        // Unit tujuan sebuah tindakan berasal dari Master Group Tindakan (peta
+        // tindakan_id => bagian_id), bukan lagi dari kolom tindakan.bagian_id.
         $tindakanOptions = '<option value=""></option>';
         foreach ($tindakans as $tk) {
-            $tindakanOptions .= '<option value="'.$tk->tindakan_id.'" data-bagian="'.$tk->bagian_id.'" data-satuan="'.e($tk->satuan_hasil ?? '').'" data-nilai-normal="'.e($tk->nilai_normal ?? '').'">'.e($tk->nama_tindakan).' ('.$tk->kode_tindakan.')</option>';
+            $bagianTd = $tindakanBagianMap[$tk->tindakan_id] ?? '';
+            $tindakanOptions .= '<option value="'.$tk->tindakan_id.'" data-bagian="'.e((string) $bagianTd).'">'.e($tk->nama_tindakan).' ('.$tk->kode_tindakan.')</option>';
         }
     @endphp
 
@@ -155,8 +158,8 @@
                             <thead>
                                 <tr class="bg-slate-50 border-b border-slate-200">
                                     <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Pemeriksaan</th>
-                                    <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Satuan</th>
-                                    <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nilai Normal</th>
+                                    <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider" style="width:150px;">Satuan Hasil</th>
+                                    <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider" style="width:210px;">Nilai Normal</th>
                                     <th class="px-3 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center" style="width:44px;">#</th>
                                 </tr>
                             </thead>
@@ -225,6 +228,8 @@
     @php
         $existingItemsJson = $editDetails->map(fn ($d) => [
             'tindakan_id' => $d->tindakan_id ? (string) $d->tindakan_id : '',
+            'satuan_hasil' => (string) ($d->satuan_hasil ?? ''),
+            'nilai_normal' => (string) ($d->nilai_normal ?? ''),
         ])->values();
     @endphp
     <script>
@@ -235,6 +240,14 @@
             var isView = {{ $isView ? 'true' : 'false' }};
             var existingItems = @json($existingItemsJson);
             var optionsHtml = @json($tindakanOptions);
+
+            function escapeHtml(value) {
+                return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+            }
             var bagianSelect = document.getElementById('bagian_tujuan_id');
 
             function filterOptions($sel) {
@@ -243,13 +256,9 @@
                 $sel.find('option').each(function () {
                     if (!this.value) return;
                     var bagian = $(this).attr('data-bagian') || '';
+                    // Tindakan tanpa group tidak punya unit tujuan -> tidak selectable.
                     this.disabled = bagianId && bagian !== bagianId;
                 });
-            }
-
-            function renderMeta($tr, item) {
-                $tr.find('.meta-satuan').text(item.satuan || '-');
-                $tr.find('.meta-normal').text(item.nilai_normal || '-');
             }
 
             function addRow(item) {
@@ -258,12 +267,14 @@
 
                 var tr = document.createElement('tr');
                 tr.dataset.item = counter;
+                // Semua input memakai indeks baris (counter) supaya satuan & nilai
+                // normal tetap menempel ke barisnya walau baris lain dihapus.
                 tr.innerHTML = [
                     '<td class="px-3 py-2 align-top">',
-                    '   <select name="tindakan_id[]" class="tindakan-select text-sm w-full" style="min-width:240px;"' + (isView ? ' disabled' : '') + '></select>',
+                    '   <select name="tindakan_id[' + counter + ']" class="tindakan-select text-sm w-full" style="min-width:240px;"' + (isView ? ' disabled' : '') + '></select>',
                     '</td>',
-                    '<td class="px-3 py-2 align-top"><span class="meta-satuan text-sm text-slate-500">-</span></td>',
-                    '<td class="px-3 py-2 align-top"><span class="meta-normal text-sm text-slate-500">-</span></td>',
+                    '<td class="px-3 py-2 align-top"><input type="text" name="satuan_hasil[' + counter + ']" maxlength="20" value="' + escapeHtml(item.satuan_hasil || '') + '" placeholder="mg/dL, %" class="input-hasil text-sm w-full px-2 py-1.5 border border-slate-200 rounded-md bg-slate-50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-slate-700 placeholder-slate-400" style="min-width:120px;"></td>',
+                    '<td class="px-3 py-2 align-top"><input type="text" name="nilai_normal[' + counter + ']" maxlength="100" value="' + escapeHtml(item.nilai_normal || '') + '" placeholder="L 13-17 / P 12-16" class="input-normal text-sm w-full px-2 py-1.5 border border-slate-200 rounded-md bg-slate-50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-slate-700 placeholder-slate-400" style="min-width:180px;"></td>',
                     '<td class="px-3 py-2 align-top text-center">',
                     (isView ? '' : '   <button type="button" class="btn-hapus-item p-1.5 text-red-500 hover:bg-red-50 rounded-md transition-colors" title="Hapus Item"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>'),
                     '</td>'
@@ -283,8 +294,6 @@
                 }
 
                 $sel.on('change', function () {
-                    var opt = $sel.find('option:selected');
-                    renderMeta($tr, item = { satuan: opt.attr('data-satuan') || '', nilai_normal: opt.attr('data-nilai-normal') || '' });
                     if ($sel.val()) {
                         placeholder.style.display = 'none';
                     }

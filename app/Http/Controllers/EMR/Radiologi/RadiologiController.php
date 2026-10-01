@@ -35,7 +35,8 @@ class RadiologiController extends Controller
             ->orderBy('nama_bagian')
             ->get();
 
-        $tindakans = Tindakan::aktif()->with('bagian')->orderBy('nama_tindakan')->get();
+        $tindakans = Tindakan::aktif()->orderBy('nama_tindakan')->get();
+        $tindakanBagianMap = PenunjangHelper::tindakanBagianMap();
 
         $orders = PenunjangHelper::riwayatOrderPasien('rad', (int) $registrasi_detail->registrasi_id);
 
@@ -63,6 +64,7 @@ class RadiologiController extends Controller
             'aksesCrud',
             'bagianList',
             'tindakans',
+            'tindakanBagianMap',
             'orders',
             'edit',
             'editDetails',
@@ -181,6 +183,8 @@ class RadiologiController extends Controller
     {
         $tindakanIds = (array) $request->input('tindakan_id', []);
 
+        $bagianMap = PenunjangHelper::tindakanBagianMap();
+
         $items = [];
         foreach ($tindakanIds as $i => $tindakanId) {
             if ($tindakanId === null || $tindakanId === '') {
@@ -192,8 +196,10 @@ class RadiologiController extends Controller
                 throw new \RuntimeException('Tindakan tidak valid pada baris #'.($i + 1).'.');
             }
 
-            if ((int) $tindakan->bagian_id !== $bagianTujuanId) {
-                throw new \RuntimeException('"'.$tindakan->nama_tindakan.'" tidak tersedia pada bagian tujuan terpilih.');
+            if (($bagianMap[(int) $tindakanId] ?? null) !== $bagianTujuanId) {
+                throw new \RuntimeException(
+                    '"'.$tindakan->nama_tindakan.'" tidak termasuk dalam Group Tindakan bagian tujuan terpilih.'
+                );
             }
 
             $items[] = [

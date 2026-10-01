@@ -4,11 +4,11 @@
 <!-- Page Header -->
 <div class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
     <div>
-        <h1 class="text-[22px] font-bold text-slate-900 tracking-tight">Tambah Tindakan</h1>
-        <p class="text-sm text-slate-500 mt-1">Tambahkan katalog tindakan penunjang.</p>
+        <h1 class="text-[22px] font-bold text-slate-900 tracking-tight">Atur Tarif</h1>
+        <p class="text-sm text-slate-500 mt-1">Tentukan tarif default dan tarif per kelas untuk sebuah tindakan.</p>
     </div>
     <div class="flex gap-2">
-        <a href="{{ route('admin.master_tindakan.index') }}" class="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm">
+        <a href="{{ route('admin.master_tarif.index') }}" class="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Kembali
         </a>
@@ -21,15 +21,17 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </div>
         <div>
-            <h2 class="text-base font-semibold text-slate-800">Informasi Tindakan</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Kode, nama, dan kategori tindakan.</p>
+            <h2 class="text-base font-semibold text-slate-800">Informasi Tarif</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Tarif default wajib diisi; tarif per kelas bersifat opsional.</p>
         </div>
     </div>
 
     <div class="p-6">
-        @include('moduls.Administrator.ManajemenMaster.MasterTindakan._form', [
-            'actionUrl' => route('admin.master_tindakan.store'),
+        @include('moduls.Administrator.ManajemenMaster.MasterTarif._form', [
+            'actionUrl' => route('admin.master_tarif.store'),
             'isEdit' => false,
+            'belumAdaTarif' => $belumAdaTarif,
+            'kelasList' => $kelasList,
         ])
     </div>
 </div>
