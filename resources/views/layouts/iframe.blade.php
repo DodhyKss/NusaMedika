@@ -33,5 +33,8 @@
     @endif
     
     @yield('content')
+
+    {{-- Dialog konfirmasi/ peringatan global (window.nusaConfirm). --}}
+    <x-confirm-alert />
 </body>
 </html>

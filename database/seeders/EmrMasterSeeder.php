@@ -50,6 +50,9 @@ class EmrMasterSeeder extends Seeder
             // = "2.8", dan EmrDashboard merender sub ini sebagai link langsung dengan
             // Str::slug(nama_sub_menu) — WAJIB sama dengan slug form.
             ['dashboard_menu_sub_id' => 8, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Implementasi Keperawatan'],
+            // Menu 1 "Catatan Medis" — Tindakan Medis (tanpa extra, link langsung).
+            // Str::slug('Tindakan Medis','_') WAJIB sama dengan form.slug = tindakan_medis.
+            ['dashboard_menu_sub_id' => 9, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Tindakan Medis'],
             // Menu 2 "Catatan Keperawatan"
             ['dashboard_menu_sub_id' => 2, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Pengkajian Keperawatan'],
             // Menu 3 "Resep" (lama, soft-delete) — sub 3 "Peresepan Obat" digantikan "Order Resep"
@@ -116,6 +119,9 @@ class EmrMasterSeeder extends Seeder
             // Implementasi Keperawatan: satu baris per pengisian — Implementasi (dari
             // Master Implementasi) + tanggal + jam + keterangan + respon (free text).
             ['form_id' => 9, 'nama_form' => 'Implementasi Keperawatan', 'slug' => 'implementasi_keperawatan', 'id_dash_menu' => '2.8', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            // Tindakan Medis: permintaan tindakan atas persetujuan dokter + hasil/kondisi
+            // pasca tindakan + pemakaian obat/BMHP. id_dash_menu "1.9".
+            ['form_id' => 10, 'nama_form' => 'Tindakan Medis', 'slug' => 'tindakan_medis', 'id_dash_menu' => '1.9', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
         ];
 
         foreach ($forms as $form) {
@@ -184,6 +190,12 @@ class EmrMasterSeeder extends Seeder
             121 => 'Implementasi', 122 => 'Nama Implementasi',
             123 => 'Tanggal Implementasi', 124 => 'Waktu Implementasi',
             125 => 'Keterangan Implementasi', 126 => 'Respon Implementasi',
+
+            // Tindakan Medis (form 10)
+            127 => 'Dokter Penyetuju', 128 => 'Jenis Permintaan',
+            129 => 'Tanggal Tindakan', 130 => 'Waktu Tindakan',
+            131 => 'Hasil/Kondisi Pasca Tindakan', 132 => 'Pemakaian Obat/BMHP',
+            133 => 'Jenis Barang', 134 => 'Nomor Batch',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -306,7 +318,37 @@ class EmrMasterSeeder extends Seeder
                 'keterangan_implementasi' => 125, // opsional
                 'respon_implementasi' => 126,     // opsional, free text
             ],
+            // Tindakan Medis. Baris obat/BMHP memakai variabel BERSUFFIX
+            // (obat_1, jumlah_1, obat_2, ...) — lihat $mappingBarisObat di bawah.
+            10 => [
+                'dokter_persetujuan_id' => 127,  // wajib, dari pegawai (dokter)
+                'tindakan_id' => 75,             // wajib, reuse objek "Tindakan"
+                'jenis_permintaan' => 128,       // wajib, CITO / BIASA
+                'tanggal_tindakan' => 129,       // wajib (date)
+                'waktu_tindakan' => 130,         // wajib (jam, H:i)
+                'hasil_kondisi' => 131,           // opsional, free text
+                'keterangan' => 77,              // opsional, reuse objek "Keterangan"
+                'pemakaian_obat_bmhp' => 132,    // wajib, Ya / Tidak
+            ],
         ];
+
+        // Baris obat/BMHP (maks 20 baris per tindakan): variabel obat_1..obat_20
+        // memakai objek 69 (Barang) dan jumlah_1..jumlah_20 memakai objek 70 (Jumlah).
+        //
+        // Kenapa bersuffix, bukan N baris dengan variabel sama? Karena
+        // EmrHelper::emrDetailByVariabel() melakukan pluck('value','variabel'),
+        // sehingga N baris untuk variabel yang sama akan tertimpa oleh baris
+        // terakhir — item kedua dan seterusnya HILANG saat form dibuka lagi.
+        // Dengan suffix, semua key unik sehingga seluruh baris terbaca utuh,
+        // dan array_intersect_key() di controller tetap menyisakannya.
+        $mappingBarisObat = [];
+        for ($baris = 1; $baris <= 20; $baris++) {
+            $mappingBarisObat['jenis_barang_'.$baris] = 133; // Obat / BMHP
+            $mappingBarisObat['obat_'.$baris] = 69;
+            $mappingBarisObat['batch_'.$baris] = 134;
+            $mappingBarisObat['jumlah_'.$baris] = 70;
+        }
+        $mapping[10] = array_merge($mapping[10], $mappingBarisObat);
 
         foreach ($mapping as $formId => $variabels) {
             foreach ($variabels as $variabel => $objekId) {
@@ -353,6 +395,7 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(7);
         EmrHelper::backfillObjekId(8);
         EmrHelper::backfillObjekId(9);
+        EmrHelper::backfillObjekId(10);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -382,6 +425,9 @@ class EmrMasterSeeder extends Seeder
             // baris ini form tidak muncul di dashboard dan selalu 403.
             ['profesi_id' => 1, 'form_id' => 9, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 9, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Tindakan Medis (form 10): Dokter & Perawat create/read/update/delete.
+            ['profesi_id' => 1, 'form_id' => 10, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 10, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
         ];
 
         foreach ($akses as $row) {

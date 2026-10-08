@@ -2,7 +2,9 @@
     'slug',
     'registrasiDetailId',
     'currentEmrId' => null,
-    'headers' => [] // Array assoc: ['variabel_name' => 'Column Title']
+    'headers' => [], // Array assoc: ['variabel_name' => 'Column Title']
+    // Badge per nilai: ['variabel_name' => ['NILAI' => ['label' => 'Label', 'class' => '...']]]
+    'badges' => []
 ])
 
 @php
@@ -49,8 +51,16 @@
                                 {{ $item->nama_pegawai ?? '-' }}
                             </td>
                             @foreach($headers as $varKey => $headerLabel)
+                                @php
+                                    $nilai = trim((string) ($itemDetails[$varKey] ?? ''));
+                                    $badge = $badges[$varKey][$nilai] ?? null;
+                                @endphp
                                 <td class="px-3 py-3 text-slate-600">
-                                    {{ Str::limit($itemDetails[$varKey] ?? '-', 40) }}
+                                    @if ($badge)
+                                        <span class="inline-block border rounded px-2 py-0.5 text-[11px] font-semibold {{ $badge['class'] ?? '' }}">{{ $badge['label'] ?? $nilai }}</span>
+                                    @else
+                                        {{ Str::limit($nilai !== '' ? $nilai : '-', 40) }}
+                                    @endif
                                 </td>
                             @endforeach
                             <td class="px-3 py-3 text-center whitespace-nowrap">

@@ -33,13 +33,25 @@ class KartuStock extends Model
         'keterangan',
     ];
 
+    public const JENIS_SALDO_AWAL = 0;
+
+    public const JENIS_PENERIMAAN = 1;
+
+    public const JENIS_MUTASI_MASUK = 2;
+
+    public const JENIS_MUTASI_KELUAR = 3;
+
+    public const JENIS_PEMAKAIAN = 4;
+
+    public const JENIS_DISPENSE_OBAT = 5;
+
     public const JENIS_LABEL = [
-        0 => 'Saldo Awal',
-        1 => 'Penerimaan',
-        2 => 'Mutasi Masuk',
-        3 => 'Mutasi Keluar',
-        4 => 'Pemakaian',
-        5 => 'Dispense Obat',
+        self::JENIS_SALDO_AWAL => 'Saldo Awal',
+        self::JENIS_PENERIMAAN => 'Penerimaan',
+        self::JENIS_MUTASI_MASUK => 'Mutasi Masuk',
+        self::JENIS_MUTASI_KELUAR => 'Mutasi Keluar',
+        self::JENIS_PEMAKAIAN => 'Pemakaian',
+        self::JENIS_DISPENSE_OBAT => 'Dispense Obat',
     ];
 
     public function scopeAktif(Builder $query): Builder

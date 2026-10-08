@@ -206,6 +206,44 @@ class MasterPegawaiSeeder extends Seeder
                 'jabatan_id' => 13,
                 'status_kepegawaian_id' => 1,
             ],
+            // Dokter tambahan agar dropdown "Atas Persetujuan Dokter" pada EMR
+            // Tindakan Medis (form 10) terisi lebih dari satu pilihan.
+            [
+                'pegawai_id' => 14,
+                'nama_pegawai' => 'Dokter Spesialis Interna',
+                'nip' => 'DKT002',
+                'bagian_id' => 1,
+                'profesi_id' => 1,
+                'jabatan_id' => 13,
+                'status_kepegawaian_id' => 1,
+            ],
+            [
+                'pegawai_id' => 15,
+                'nama_pegawai' => 'Dokter Spesialis Bedah',
+                'nip' => 'DKT003',
+                'bagian_id' => 1,
+                'profesi_id' => 1,
+                'jabatan_id' => 13,
+                'status_kepegawaian_id' => 1,
+            ],
+            [
+                'pegawai_id' => 16,
+                'nama_pegawai' => 'Dokter Spesialis Anak',
+                'nip' => 'DKT004',
+                'bagian_id' => 1,
+                'profesi_id' => 1,
+                'jabatan_id' => 13,
+                'status_kepegawaian_id' => 1,
+            ],
+            [
+                'pegawai_id' => 17,
+                'nama_pegawai' => 'Kepala Bagian Medis',
+                'nip' => 'DKT005',
+                'bagian_id' => 1,
+                'profesi_id' => 1,
+                'jabatan_id' => 9,
+                'status_kepegawaian_id' => 1,
+            ],
         ];
 
         foreach ($pegawais as $pegawai) {

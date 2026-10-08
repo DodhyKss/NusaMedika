@@ -81,4 +81,149 @@ class StockHelper
         $kartu->status_batal = 0;
         $kartu->save();
     }
+
+    /**
+     * Daftar batch yang tersedia pada satu bagian/lokasi.
+     *
+     * Dipakai form EMR Tindakan Medis untuk mengisi dropdown nomor batch, badge
+     * sisa stok, dan tabel batch di modal "Tambah Obat/BMHP". Sumbernya tabel
+     * `stock` (running balance), bukan penjumlahan ulang dari penerimaan/mutasi.
+     *
+     * Bentuk balik:
+     *   [barang_id => [
+     *       'BATCH-001' => ['jumlah' => 50.0, 'tgl_expired' => '2027-10-01', 'kedaluwarsa' => false],
+     *   ], ...]
+     *
+     * Hanya batch dengan saldo > 0 yang disertakan, dan diurutkan **FEFO**
+     * (tgl_expired terdekat lebih dulu) supaya batch yang hampir habis dipakai
+     * lebih dahulu. Batch tanpa `tgl_expired` diletakkan di akhir.
+     */
+    public static function sisaPerBatch(int $bagianId): array
+    {
+        $rows = Stock::aktif()
+            ->where('bagian_id', $bagianId)
+            ->where('jumlah', '>', 0)
+            ->get(['barang_id', 'no_batch', 'jumlah', 'tgl_expired']);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $noBatch = (string) $row->no_batch;
+
+            if (! isset($result[$row->barang_id][$noBatch])) {
+                $expired = $row->tgl_expired
+                    ? substr((string) $row->tgl_expired, 0, 10)
+                    : null;
+
+                $result[$row->barang_id][$noBatch] = [
+                    'jumlah' => 0.0,
+                    'tgl_expired' => $expired,
+                    'kedaluwarsa' => $expired !== null && $expired < now()->format('Y-m-d'),
+                ];
+            }
+
+            $result[$row->barang_id][$noBatch]['jumlah'] += (float) $row->jumlah;
+
+            // Bila satu batch punya beberapa baris stok dengan tanggal berbeda,
+            // pakai yang paling awal agar tidak pernah dipakai lewat tanggal.
+            $expired = $row->tgl_expired ? substr((string) $row->tgl_expired, 0, 10) : null;
+            if ($expired !== null && ($result[$row->barang_id][$noBatch]['tgl_expired'] === null || $expired < $result[$row->barang_id][$noBatch]['tgl_expired'])) {
+                $result[$row->barang_id][$noBatch]['tgl_expired'] = $expired;
+                $result[$row->barang_id][$noBatch]['kedaluwarsa'] = $expired < now()->format('Y-m-d');
+            }
+        }
+
+        // Urutan FEFO: tanggal kedaluwarsa terdekat lebih dulu.
+        foreach ($result as $barangId => $batches) {
+            unset($batches);
+
+            uasort($result[$barangId], function ($a, $b) {
+                if ($a['tgl_expired'] === $b['tgl_expired']) {
+                    return 0;
+                }
+
+                // Batch tanpa tanggal expired dibiarkan di akhir.
+                if ($a['tgl_expired'] === null) {
+                    return 1;
+                }
+
+                if ($b['tgl_expired'] === null) {
+                    return -1;
+                }
+
+                return $a['tgl_expired'] <=> $b['tgl_expired'];
+            });
+        }
+
+        return $result;
+    }
+
+    /**
+     * Apakah nomor batch suatu barang sudah lewat tanggal kedaluwarsa.
+     *
+     * Mengembalikan true bila batch tidak ada, atau tanggal expired paling awal
+     * di antara baris stoknya sudah lewat.
+     */
+    public static function batchKedaluwarsa(int $bagianId, int $barangId, ?string $noBatch): bool
+    {
+        if ($noBatch === null || $noBatch === '') {
+            return true;
+        }
+
+        $expired = Stock::aktif()
+            ->where('bagian_id', $bagianId)
+            ->where('barang_id', $barangId)
+            ->where('no_batch', $noBatch)
+            ->whereNotNull('tgl_expired')
+            ->min('tgl_expired');
+
+        if ($expired === null) {
+            return false;
+        }
+
+        return substr((string) $expired, 0, 10) < now()->format('Y-m-d');
+    }
+
+    /**
+     * Sisa stok satu nomor batch. Mengembalikan 0.0 bila batch tidak ada.
+     */
+    public static function sisaBatch(int $bagianId, int $barangId, ?string $noBatch): float
+    {
+        if ($noBatch === null || $noBatch === '') {
+            return 0.0;
+        }
+
+        return (float) Stock::aktif()
+            ->where('bagian_id', $bagianId)
+            ->where('barang_id', $barangId)
+            ->where('no_batch', $noBatch)
+            ->sum('jumlah');
+    }
+
+    /**
+     * Catat pemakaian obat/BMHP dari form EMR Tindakan Medis.
+     *
+     * Memakai `jenis_mutasi` 4 (Pemakaian) pada kartu_stock, sehingga stok
+     * pada bagian tempat pasien dirawat berkurang.
+     */
+    public static function catatPemakaian(int $bagianId, int $barangId, string $noBatch, float $qty, array $opts = []): void
+    {
+        self::tambahKeluar($bagianId, $barangId, $noBatch, $qty, array_merge([
+            'jenis_mutasi' => KartuStock::JENIS_PEMAKAIAN,
+            'keterangan' => 'Pemakaian - Tindakan Medis',
+        ], $opts));
+    }
+
+    /**
+     * Kembalikan stok pemakaian (untuk pembatalan/pengubahan data EMR).
+     *
+     * Dipakai saat data Tindakan Medis diubah atau dihapus: stok batch lama
+     * dikembalikan dulu, lalu stok batch baru dicatat keluar.
+     */
+    public static function kembalikanPemakaian(int $bagianId, int $barangId, string $noBatch, float $qty, array $opts = []): void
+    {
+        self::tambahMasuk($bagianId, $barangId, $noBatch, $qty, array_merge([
+            'jenis_mutasi' => KartuStock::JENIS_PEMAKAIAN,
+            'keterangan' => 'Koreksi - Tindakan Medis',
+        ], $opts));
+    }
 }
