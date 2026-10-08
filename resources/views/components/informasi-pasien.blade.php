@@ -22,7 +22,7 @@
                 <h2 class="text-lg font-bold text-white group-hover:text-blue-100 transition-colors">{{ $pasien->nama_pasien ?? 'Tn. Supriyanto' }}</h2>
                 <div class="flex items-center gap-2 mt-0.5">
                     <span class="inline-flex items-center px-2 py-0.5 rounded bg-white/10 text-white text-xs font-bold border border-white/20">
-                        RM: {{ $pasien->no_mr ?? '00-12-34-56' }}
+                        RM: {{ $pasien->no_mr ?? '-' }}
                     </span>
                     <span class="text-slate-400 text-xs">|</span>
                     <span class="text-slate-200 text-xs font-medium">{{ $pasien->jenis_kelamin ?? 'Laki-laki' }}, {{ $umur }}</span>

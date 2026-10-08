@@ -53,6 +53,10 @@ class EmrMasterSeeder extends Seeder
             // Menu 1 "Catatan Medis" — Tindakan Medis (tanpa extra, link langsung).
             // Str::slug('Tindakan Medis','_') WAJIB sama dengan form.slug = tindakan_medis.
             ['dashboard_menu_sub_id' => 9, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Tindakan Medis'],
+            // Menu 1 "Catatan Medis" — Assesmen Awal Medis Rawat Jalan (tanpa
+            // extra, link langsung). Str::slug(nama,'_') WAJIB sama dengan
+            // form.slug = assesmen_awal_medis_rawat_jalan.
+            ['dashboard_menu_sub_id' => 10, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Assesmen Awal Medis Rawat Jalan'],
             // Menu 2 "Catatan Keperawatan"
             ['dashboard_menu_sub_id' => 2, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Pengkajian Keperawatan'],
             // Menu 3 "Resep" (lama, soft-delete) — sub 3 "Peresepan Obat" digantikan "Order Resep"
@@ -122,6 +126,10 @@ class EmrMasterSeeder extends Seeder
             // Tindakan Medis: permintaan tindakan atas persetujuan dokter + hasil/kondisi
             // pasca tindakan + pemakaian obat/BMHP. id_dash_menu "1.9".
             ['form_id' => 10, 'nama_form' => 'Tindakan Medis', 'slug' => 'tindakan_medis', 'id_dash_menu' => '1.9', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            // Assesmen Awal Medis Rawat Jalan: keluhan utama + tanda vital +
+            // diagnosa kerja. KHUSUS rawat jalan (rj=1, ri/igd/mcu=0).
+            // id_dash_menu "1.10" (menu 1 "Catatan Medis", sub 10 tanpa extra).
+            ['form_id' => 11, 'nama_form' => 'Assesmen Awal Medis Rawat Jalan', 'slug' => 'assesmen_awal_medis_rawat_jalan', 'id_dash_menu' => '1.10', 'ri' => 0, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
         ];
 
         foreach ($forms as $form) {
@@ -196,6 +204,18 @@ class EmrMasterSeeder extends Seeder
             129 => 'Tanggal Tindakan', 130 => 'Waktu Tindakan',
             131 => 'Hasil/Kondisi Pasca Tindakan', 132 => 'Pemakaian Obat/BMHP',
             133 => 'Jenis Barang', 134 => 'Nomor Batch',
+
+            // Assesmen Awal Medis Rawat Jalan (form 11). Sisanya (keluhan
+            // utama, seluruh tanda vital, kesadaran, nyeri, BMI, keterangan)
+            // REUSE objek yang sudah ada.
+            135 => 'Diagnosa Kerja', 136 => 'Tujuan Kunjungan',
+            137 => 'Tanggal Assesmen', 138 => 'Waktu Assesmen',
+            139 => 'Dokter Pemeriksa', 140 => 'Skor Nyeri',
+
+            // Assesmen Awal Medis Rawat Jalan (form 11) — pelengkap.
+            141 => 'Anamnesis', 142 => 'Total Skor EWS',
+            143 => 'Kategori Risiko EWS',
+            144 => 'Parameter EWS Tidak Diukur',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -330,6 +350,36 @@ class EmrMasterSeeder extends Seeder
                 'keterangan' => 77,              // opsional, reuse objek "Keterangan"
                 'pemakaian_obat_bmhp' => 132,    // wajib, Ya / Tidak
             ],
+            // Assesmen Awal Medis Rawat Jalan: keluhan utama + tanda vital +
+            // asesmen. Field turunan `bmi` dihitung server dari berat/tinggi
+            // (filteredData), jadi wajib ada di mapping.
+            11 => [
+                'keluhan_utama' => 13,           // wajib, reuse objek "Keluhan Utama"
+                'tanggal_assesmen' => 137,       // wajib (date)
+                'waktu_assesmen' => 138,         // wajib (jam, H:i)
+                'dokter_pemeriksa_id' => 139,    // wajib, dari pegawai (dokter)
+                'td_sistolik' => 6,              // reuse objek "Tekanan Darah Sistolik"
+                'td_diastolik' => 7,             // reuse objek "Tekanan Darah Diastolik"
+                'nadi' => 10,                    // reuse
+                'suhu' => 11,                    // reuse
+                'pernapasan' => 12,              // reuse
+                'saturasi' => 15,                // reuse
+                'berat_badan' => 8,              // reuse
+                'tinggi_badan' => 9,             // reuse
+                'bmi' => 58,                     // reuse, TURUNAN (dihitung server)
+                'kesadaran' => 51,                // reuse
+                'nyeri' => 14,                   // Ya / Tidak
+                'skor_nyeri' => 140,             // 0-10, tampil bila nyeri = Ya
+                'diagnosa_kerja' => 135,         // wajib
+                'tujuan_kunjungan' => 136,        // wajib
+                'catatan_tambahan' => 77,        // opsional, reuse objek "Keterangan"
+                'anamnesis' => 141,              // opsional, hasil anamnesis bebas
+                'riwayat_penyakit_dahulu' => 41, // opsional, reuse objek 41 "Riwayat Penyakit Sebelumnya"
+                'oksigen' => 18,                 // parameter EWS: Air / Oksigen (reuse objek 18)
+                'total_ews' => 142,              // TURUNAN (App\Helpers\EwsHelper)
+                'kategori_ews' => 143,           // TURUNAN (App\Helpers\EwsHelper)
+                'ews_tidak_diukur' => 144,       // daftar parameter yang ditandai tidak diukur
+            ],
         ];
 
         // Baris obat/BMHP (maks 20 baris per tindakan): variabel obat_1..obat_20
@@ -396,6 +446,7 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(8);
         EmrHelper::backfillObjekId(9);
         EmrHelper::backfillObjekId(10);
+        EmrHelper::backfillObjekId(11);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -428,6 +479,9 @@ class EmrMasterSeeder extends Seeder
             // Tindakan Medis (form 10): Dokter & Perawat create/read/update/delete.
             ['profesi_id' => 1, 'form_id' => 10, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 10, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Assesmen Awal Medis Rawat Jalan (form 11): Dokter & Perawat create/read/update/delete.
+            ['profesi_id' => 1, 'form_id' => 11, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 11, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
         ];
 
         foreach ($akses as $row) {

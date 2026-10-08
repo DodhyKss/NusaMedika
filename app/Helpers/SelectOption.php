@@ -171,6 +171,24 @@ class SelectOption
                 ['value' => 'KONSUL_LAYANAN', 'label' => 'Konsul Layanan Klinik'],
                 ['value' => 'RENCANA_KONTROL', 'label' => 'Rencana Kontrol Rawat Jalan'],
             ],
+            'kesadaran' => [
+                ['value' => 'Compos Mentis', 'label' => 'Compos Mentis (Alert)'],
+                ['value' => 'Confusion', 'label' => 'Confusion (Bingung)'],
+                ['value' => 'Restlessness', 'label' => 'Restlessness (Gelisah)'],
+                ['value' => 'Lethargy', 'label' => 'Lethargy (Lesu)'],
+                ['value' => 'Stupor', 'label' => 'Stupor'],
+                ['value' => 'Coma', 'label' => 'Coma'],
+            ],
+            'tujuan_kunjungan' => [
+                ['value' => 'Rawat Jalan', 'label' => 'Rawat Jalan (Konsultasi / Pengobatan)'],
+                ['value' => 'Kontrol', 'label' => 'Kontrol Berkala'],
+                ['value' => 'Rujukan', 'label' => 'Rujukan / Konsul ke Poli Lain'],
+                ['value' => 'Rawat Inap', 'label' => 'Rawat Inap'],
+            ],
+            'oksigen' => [
+                ['value' => 'Air', 'label' => 'Air (Tanpa Oksigen)'],
+                ['value' => 'Oksigen', 'label' => 'Oksigen'],
+            ],
         ];
     }
 

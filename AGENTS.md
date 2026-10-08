@@ -329,6 +329,27 @@ Menu 8 "Manajemen EMR" (modul 5 Administrator) berisi dua master CRUD; keduanya 
 - Formatting: `vendor/bin/pint` dengan `pint.json` (preset `laravel`). No PHPStan/Psalm, no CI. `composer lint` / `composer format`.
 - `composer dev` runs `artisan serve` + queue + pail + vite via concurrently — only useful inside the app container.
 
+## Form Assesmen Awal Medis Rawat Jalan (EMR, form 11)
+
+Form 11, `slug = assesmen_awal_medis_rawat_jalan`, sub-menu EMR `dashboard_menu_sub_id = 10` di bawah menu 1 "Catatan Medis" tanpa extra → `id_dash_menu = '1.10'`. **Khusus rawat jalan** (`rj=1`, `ri/igd/mcu=0`). Controller `EMR\AssesmenAwalMedisRawatJalan\AssesmenAwalMedisRawatJalanController` (slug → `Str::studly` → nama folder WAJIB sama), view `moduls/EMR/AssesmenAwalMedisRawatJalan/index.blade.php`. Objek baru 135–144, `akses_ehr` Dokter + Perawat full CRUD. `SelectOption` key `kesadaran`, `tujuan_kunjungan`, `oksigen`.
+
+Panel: Keluhan Utama (+ tanggal/jam/dokter pemeriksa), Anamnesis & Riwayat Penyakit, Tanda Vital (+ BMI), **EVM/EWS**, Assesmen (kesadaran, tujuan kunjungan, nyeri+skor, diagnosa kerja, catatan tambahan).
+
+**Gotcha `id_dash_menu` dengan angka 2 digit**: `AksesEhrController` sebelumnya memakai `$forms->firstWhere('id_dash_menu', '1.10')`, dan `Collection::firstWhere()` memakai `==` — `"1.1" == "1.10"` bernilai **true** di PHP (keduanya numeric string), sehingga sub menu 10 ("Assesmen Awal Medis Rawat Jalan") leaf-nya jadi form SOAP. Sudah diganti closure `===` strict. Dashboard EMR aman karena JOIN-nya di SQL varchar.
+
+### EVM / Early Warning Score (`app/Helpers/EwsHelper.php`)
+
+Pola mengikuti `RisikoJatuhHelper`. Parametrik RCPCH 7 parameter: pernapasan, SpO2, oksigen (Air/Oksigen), td_sistolik, nadi, kesadaran, suhu — skor 0-3, total 0-3 rendah / 4-6 sedang / >= 7 tinggi.
+
+- **Ambil dari tanda vital yang sudah ada di form**, bukan input terpisah: `hitung()` membaca key yang sama dengan `name` input (`pernapasan`, `saturasi`, `oksigen`, `td_sistolik`, `nadi`, `kesadaran`, `suhu`). JS `skorEws()` mencerminkan `EwsHelper::skor()` persis (wajib sama; diuji disetel ulang).
+- **SEMUA 7 input EWS harus berada di panel "Tanda Vital"**, jangan disebar. `kesadaran` & `oksigen` sengaja dipindah ke sana (mula-mula `kesadaran` di panel Assesmen, `oksigen` di panel EVM) karena petsugas sulit mencari input yang jadi parameter skor. Panel EVM jadi **ringkasan read-only** tanpa input angka, tiap baris punya tombol `Isi` (`data-ews-lompat`) yang `scrollIntoView` + sorot elemen inputnya (`lompatKeInput()`). Mode Lihat menyembunyikan kolom `Isi` & `Tidak Diukur`.
+- **Pastikan `id` input unik di seluruh halaman** — `document.getElementById()` dipakai untuk lompat & hitung, jadi input ganda bikin semuanya memakai elemen pertama.
+- **Total SELALU tampil** sebagai running total. Jangan pernah pakai `lengkap ? total : '-'` — itu membuat angka tidak pernah muncul untuk pengguna yang baru mengisi sebagian (bug yang pernah terjadi).
+- **Kategori risiko hanya disimpan bila semua parameter TERISI atau ditandai "Tidak Diukur"** (`$ews['lengkap']`), karena skor parsial bisa terlalu rendah dan menyesatkan.
+- **"Tidak Diukur"** untuk parameter yang tidak bisa diukur (mis. tidak ada pulse oximeter): checkbox `ews_na[]`, key ini **sengaja tidak ada** di `objek_form_control`. **Gotcha**: `ews_na` HARUS dibaca di `filteredData()` **sebelum** `array_intersect_key()`, kalau tidak checkbox hilang sebelum sempat dipakai. Salinannya disimpan ke `ews_tidak_diukur` (objek 144, comma separated). Memberi kontribusi 0 tapi dihitung "selesai".
+- `skor()` mengembalikan **null** untuk nilai kosong / di luar rentang wajar — bukan 0, karena 0 berarti "normal" sedangkan tidak diketahui bukan berarti normal. Null tidak ikut dihitung ke total.
+- Warna badge (JS & blade) diambil dari `EwsHelper::SKOR_WARNA` / `KATEGORI_WARNA` via `@json` supaya browser dan server tidak pernah berbeda.
+
 ## Form EMR (Administrator → Manajemen EMR → Form)
 
 - Sub-menu 32 "Form" (`file_sub_menu='Administrator/ManajemenEMR/Form/form'`, route `admin.form.*`) mengelola **tiga entitas** dalam satu halaman multi-tab:

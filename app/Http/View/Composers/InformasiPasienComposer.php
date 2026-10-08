@@ -27,6 +27,7 @@ class InformasiPasienComposer
                     p.tempat_lahir, 
                     p.tgl_lahir, 
                     p.ktp, 
+                    p.no_mr,
                     p.jenis_kelamin, 
                     p.no_hp, 
                     p.alamat,

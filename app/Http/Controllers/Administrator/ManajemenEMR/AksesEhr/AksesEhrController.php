@@ -197,14 +197,26 @@ class AksesEhrController extends Controller
 
                 $subExtras = $extras->where('dashboard_menu_sub_id', $sub->dashboard_menu_sub_id);
 
+                // PENTING: pencocokan id_dash_menu WAJIB strict (===), bukan longgar.
+                //
+                // `Collection::firstWhere()` membandingkan dengan `==`, dan
+                // "1.1" == "1.10" bernilai TRUE di PHP karena keduanya numeric
+                // string (1.1 == 1.1). Akibatnya sub menu 10 (id "1.10") cocok
+                // ke form SOAP (id "1.1") — form pertama di DB — sehingga leaf
+                // yang tampil di Akses EHR adalah SOAP, bukan Assesmen Awal
+                // Medis Rawat Jalan. Bandingkan sebagai string strict.
+                $cariForm = function (string $idDashMenu) use ($forms) {
+                    return $forms->first(fn ($f) => (string) $f->id_dash_menu === $idDashMenu);
+                };
+
                 if ($subExtras->isEmpty()) {
-                    $form = $forms->firstWhere('id_dash_menu', $menu->dashboard_menu_id.'.'.$sub->dashboard_menu_sub_id);
+                    $form = $cariForm($menu->dashboard_menu_id.'.'.$sub->dashboard_menu_sub_id);
                     if ($form) {
                         $subNode['leaf'] = $this->leaf($form, $flagMap[$form->form_id] ?? $defaultFlags);
                     }
                 } else {
                     foreach ($subExtras as $extra) {
-                        $form = $forms->firstWhere('id_dash_menu', $menu->dashboard_menu_id.'.'.$sub->dashboard_menu_sub_id.'.'.$extra->dashboard_menu_sub_extra_id);
+                        $form = $cariForm($menu->dashboard_menu_id.'.'.$sub->dashboard_menu_sub_id.'.'.$extra->dashboard_menu_sub_extra_id);
                         if ($form) {
                             $subNode['extras'][] = $this->leaf($form, $flagMap[$form->form_id] ?? $defaultFlags, $extra->nama_sub_menu_extra);
                         }
