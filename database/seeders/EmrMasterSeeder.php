@@ -57,6 +57,11 @@ class EmrMasterSeeder extends Seeder
             // extra, link langsung). Str::slug(nama,'_') WAJIB sama dengan
             // form.slug = assesmen_awal_medis_rawat_jalan.
             ['dashboard_menu_sub_id' => 10, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Assesmen Awal Medis Rawat Jalan'],
+            // Menu 1 "Catatan Medis" — SBAR (tanpa extra, link langsung).
+            // Str::slug('SBAR','_') = "sbar" WAJIB sama dengan form.slug = sbar
+            // (Str::studly('sbar') = "Sbar", bukan "SBAR" — jadi nama folder
+            // controller/view tetap Sbar).
+            ['dashboard_menu_sub_id' => 11, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'SBAR'],
             // Menu 2 "Catatan Keperawatan"
             ['dashboard_menu_sub_id' => 2, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Pengkajian Keperawatan'],
             // Menu 3 "Resep" (lama, soft-delete) — sub 3 "Peresepan Obat" digantikan "Order Resep"
@@ -130,6 +135,10 @@ class EmrMasterSeeder extends Seeder
             // diagnosa kerja. KHUSUS rawat jalan (rj=1, ri/igd/mcu=0).
             // id_dash_menu "1.10" (menu 1 "Catatan Medis", sub 10 tanpa extra).
             ['form_id' => 11, 'nama_form' => 'Assesmen Awal Medis Rawat Jalan', 'slug' => 'assesmen_awal_medis_rawat_jalan', 'id_dash_menu' => '1.10', 'ri' => 0, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
+            // SBAR (Situation-Background-Assessment-Recommendation): format
+            // komunikasi terstruktur untuk serah terima antar shift / permintaan
+            // konsultasi. Tersedia di semua jenis rawat. id_dash_menu "1.11".
+            ['form_id' => 12, 'nama_form' => 'SBAR', 'slug' => 'sbar', 'id_dash_menu' => '1.11', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
         ];
 
         foreach ($forms as $form) {
@@ -216,6 +225,13 @@ class EmrMasterSeeder extends Seeder
             141 => 'Anamnesis', 142 => 'Total Skor EWS',
             143 => 'Kategori Risiko EWS',
             144 => 'Parameter EWS Tidak Diukur',
+
+            // SBAR (form 12). `alergi` & `keterangan` reuse objek 17 & 77.
+            145 => 'Tanggal SBAR', 146 => 'Waktu SBAR',
+            147 => 'Shift', 148 => 'Urgensi SBAR',
+            149 => 'Cara Komunikasi', 150 => 'Penerima Informasi',
+            151 => 'S - Situation', 152 => 'B - Background',
+            153 => 'A - Assessment', 154 => 'R - Recommendation',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -380,6 +396,24 @@ class EmrMasterSeeder extends Seeder
                 'kategori_ews' => 143,           // TURUNAN (App\Helpers\EwsHelper)
                 'ews_tidak_diukur' => 144,       // daftar parameter yang ditandai tidak diukur
             ],
+
+            // SBAR (form 12): 4 unsur wajib + metadata komunikasi. Teks S & B
+            // di-prefill otomatis dari EMR form lain (lihat SbarController),
+            // tetap bisa diedit petugas sebelum disimpan.
+            12 => [
+                'tanggal_sbar' => 145,        // wajib (date)
+                'waktu_sbar' => 146,          // wajib (jam, H:i)
+                'shift' => 147,               // wajib: Pagi / Siang / Sore / Malam
+                'urgensi' => 148,             // wajib: Biasa / Segera / Mendesak
+                'cara_komunikasi' => 149,     // wajib: Tatap Muka / Telepon / dst.
+                'penerima_id' => 150,         // wajib, dari pegawai (penerima informasi)
+                's_situation' => 151,         // wajib, prefill dari data klinis
+                'b_background' => 152,        // wajib, prefill dari data klinis
+                'a_assessment' => 153,        // wajib
+                'r_recommendation' => 154,    // wajib
+                'alergi' => 17,               // opsional, reuse objek 17 "Alergi"
+                'catatan_tambahan' => 77,     // opsional, reuse objek 77 "Keterangan"
+            ],
         ];
 
         // Baris obat/BMHP (maks 20 baris per tindakan): variabel obat_1..obat_20
@@ -447,6 +481,7 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(9);
         EmrHelper::backfillObjekId(10);
         EmrHelper::backfillObjekId(11);
+        EmrHelper::backfillObjekId(12);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -482,6 +517,10 @@ class EmrMasterSeeder extends Seeder
             // Assesmen Awal Medis Rawat Jalan (form 11): Dokter & Perawat create/read/update/delete.
             ['profesi_id' => 1, 'form_id' => 11, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 11, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // SBAR (form 12): Dokter & Perawat create/read/update/delete, semua
+            // jenis rawat — format komunikasi antar petugas.
+            ['profesi_id' => 1, 'form_id' => 12, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 12, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
         ];
 
         foreach ($akses as $row) {

@@ -21,4 +21,10 @@
 
         </select>
     </div>
+
+    {{-- Tanpa blok ini, kegagalan validasi (mis. dokter_pemeriksa_id tidak
+         ada) ditolak diam-diam tanpa pesan di layar. --}}
+    @error($name ?? 'dokter_id')
+        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+    @enderror
 </div>

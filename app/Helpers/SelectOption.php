@@ -189,6 +189,23 @@ class SelectOption
                 ['value' => 'Air', 'label' => 'Air (Tanpa Oksigen)'],
                 ['value' => 'Oksigen', 'label' => 'Oksigen'],
             ],
+            'shift' => [
+                ['value' => 'Pagi', 'label' => 'Pagi (07.00 - 14.00)'],
+                ['value' => 'Siang', 'label' => 'Siang (14.00 - 21.00)'],
+                ['value' => 'Sore', 'label' => 'Sore (21.00 - 07.00)'],
+                ['value' => 'Malam', 'label' => 'Malam'],
+            ],
+            'urgensi_sbar' => [
+                ['value' => 'Biasa', 'label' => 'Biasa'],
+                ['value' => 'Segera', 'label' => 'Segera'],
+                ['value' => 'Mendesak', 'label' => 'Mendesak'],
+            ],
+            'cara_komunikasi' => [
+                ['value' => 'Tatap Muka', 'label' => 'Tatap Muka'],
+                ['value' => 'Telepon', 'label' => 'Telepon'],
+                ['value' => 'WhatsApp', 'label' => 'WhatsApp'],
+                ['value' => 'Surat', 'label' => 'Surat Rujukan'],
+            ],
         ];
     }
 

@@ -350,6 +350,23 @@ Pola mengikuti `RisikoJatuhHelper`. Parametrik RCPCH 7 parameter: pernapasan, Sp
 - `skor()` mengembalikan **null** untuk nilai kosong / di luar rentang wajar — bukan 0, karena 0 berarti "normal" sedangkan tidak diketahui bukan berarti normal. Null tidak ikut dihitung ke total.
 - Warna badge (JS & blade) diambil dari `EwsHelper::SKOR_WARNA` / `KATEGORI_WARNA` via `@json` supaya browser dan server tidak pernah berbeda.
 
+## Form SBAR (EMR, form 12) — komunikasi antar petugas
+
+Form 12, `slug = sbar`, sub-menu EMR `dashboard_menu_sub_id = 11` di bawah menu 1 "Catatan Medis" tanpa extra → `id_dash_menu = '1.11'`. **Tersedia di semua jenis rawat** (`ri/rj/igd/mcu = 1`). `akses_ehr` Dokter + Perawat full CRUD. Objek baru 145–154. `SelectOption` key `shift`, `urgensi_sbar`, `cara_komunikasi`.
+
+SBAR = Situation / Background / Assessment / Recommendation: format komunikasi terstruktur untuk **serah terima antar shift, permintaan konsultasi, atau transfer antar unit** — bukan catatan untuk klinisi sendiri (beda dengan SOAP).
+
+**Penamaan**: `nama_sub_menu = 'SBAR'` → `Str::slug('SBAR','_')` = `sbar` (WAJIB sama dengan `form.slug`), dan `Str::studly('sbar')` = `Sbar` → folder controller/view `Sbar` (BUKAN `SBAR`).
+
+Isi form: Identitas SBAR (tanggal + jam wajib manual, shift, urgensi, cara komunikasi, penerima informasi) → Ringkasan Klinis (read-only) → 4 textarea S/B/A/R (semua wajib) → alergi + catatan. Kolom **Pelapor** sengaja tidak jadi field: `emr.pegawai_id` sudah merekam penulis dan kolom "Pencatat" sudah tampil di riwayat.
+
+**Auto-fill S & B** (`SbarController::konteksKlinis()`) —_read EMR TERBARU per form pada `registrasi_detail` yang sama_ lewat `EmrHelper::latestEmr()` + `latestValuesByVariabel()`, lalu dirangkai jadi teks prefill pada textarea S & B (`$ringkasan['prefill_s']` / `['prefill_b']`), urutan prioritas `SUMBER`: assesen_awal_medis_rj → pengkajian_awal → pengkajian_harian → soap → implementasi. Prefill HANYA teks (tidak disimpan terpisah), jadi petugas bebas mengubahnya; saat edit, nilai tersimpan yang dipakai (`$emr_data` > prefill, `old()` selalu menang).
+
+### Komponen `x-select_pegawai`
+`app/View/Components/SelectPegawai.php` + `resources/views/components/select_pegawai.blade.php`, props `selected/name/id/label/placeholder/required/profesiId` (filter profesi opsional). Dipakai SBAR untuk "Penerima Informasi" — TIDAK memakai `x-select_dokter` karena serah terima antar shift juga antar perawat.
+
+**BUG yang sudah diperbaiki**: `x-select_dokter` & `x-select_pegawai` tadinya tidak punya blok `@error($name)`, sehingga kegagalan validasi (mis. `dokter_pemeriksa_id` / `penerima_id` tidak ada di `pegawai`) ditolak **tanpa pesan apa pun** di layar. Kalau menambah select baru, selalu sertakan blok `@error`.
+
 ## Form EMR (Administrator → Manajemen EMR → Form)
 
 - Sub-menu 32 "Form" (`file_sub_menu='Administrator/ManajemenEMR/Form/form'`, route `admin.form.*`) mengelola **tiga entitas** dalam satu halaman multi-tab:
