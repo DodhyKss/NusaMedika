@@ -105,6 +105,7 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_extra_id' => 2, 'dashboard_menu_sub_id' => 2, 'nama_sub_menu_extra' => 'Pengkajian Harian Keperawatan'],
             ['dashboard_menu_sub_extra_id' => 3, 'dashboard_menu_sub_id' => 12, 'nama_sub_menu_extra' => 'Tanda Vital'],
             ['dashboard_menu_sub_extra_id' => 4, 'dashboard_menu_sub_id' => 12, 'nama_sub_menu_extra' => 'Bundle VAP'],
+            ['dashboard_menu_sub_extra_id' => 5, 'dashboard_menu_sub_id' => 12, 'nama_sub_menu_extra' => 'Alat Invasif'],
         ];
 
         foreach ($extras as $extra) {
@@ -147,6 +148,7 @@ class EmrMasterSeeder extends Seeder
             ['form_id' => 12, 'nama_form' => 'SBAR',                                 'slug' => 'sbar',                               'id_dash_menu' => '1.11',  'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 13, 'nama_form' => 'Tanda Vital',                          'slug' => 'tanda_vital',                        'id_dash_menu' => '2.12.3', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 14, 'nama_form' => 'Bundle VAP',                           'slug' => 'bundle_vap',                         'id_dash_menu' => '2.12.4', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            ['form_id' => 15, 'nama_form' => 'Alat Invasif',                         'slug' => 'alat_invasif',                       'id_dash_menu' => '2.12.5', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
         ];
 
         foreach ($forms as $form) {
@@ -262,6 +264,14 @@ class EmrMasterSeeder extends Seeder
             168 => 'Skor Kepatuhan Bundle VAP',
             169 => 'Persen Kepatuhan Bundle VAP',
             170 => 'Kategori Kepatuhan Bundle VAP',
+
+            // Alat Invasif (form 15). Sengaja objek BARU semua — bukan reuse
+            // objek 155/156 ("Tanggal/Waktu Observasi") yang maknanya berbeda
+            // dan akan membingungkan saat laporan antar form.
+            171 => 'Tanggal Pemasangan Alat Invasif', 172 => 'Jam Pemasangan Alat Invasif',
+            173 => 'Alat Invasif', 174 => 'Lokasi Pemasangan Alat Invasif',
+            175 => 'Tanggal Lepas Alat Invasif', 176 => 'Jam Lepas Alat Invasif',
+            177 => 'Lama Pemasangan Alat Invasif (Hari)',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -500,6 +510,18 @@ class EmrMasterSeeder extends Seeder
                 'vap_kategori' => 170,         // TURUNAN, kategori kepatuhan
                 'catatan' => 77,               // reuse objek 77 "Keterangan"
             ],
+
+            // Alat Invasif (form 15). Bentuknya SATU baris per EMR (satu alat),
+            // jadi tidak perlu variabel bersuffix seperti butir bundle VAP.
+            15 => [
+                'tanggal_pasang' => 171,      // opsional (alat bisa sudah terpasang sebelum masuk)
+                'jam_pasang' => 172,          // opsional
+                'alat_invasif' => 173,        // wajib, opsi dari SelectOption::alat_invasif
+                'lokasi_pemasangan' => 174,   // wajib, opsi dari SelectOption::lokasi_alat_invasif
+                'tanggal_lepas' => 175,       // opsional, kosong = masih terpasang
+                'jam_lepas' => 176,           // opsional
+                'lama_pemasangan' => 177,     // TURUNAN, jumlah hari pasang -> lepas
+            ],
         ];
 
         // Baris obat/BMHP (maks 20 baris per tindakan): variabel obat_1..obat_20
@@ -580,6 +602,7 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(12);
         EmrHelper::backfillObjekId(13);
         EmrHelper::backfillObjekId(14);
+        EmrHelper::backfillObjekId(15);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -627,6 +650,10 @@ class EmrMasterSeeder extends Seeder
             // semua jenis rawat.
             ['profesi_id' => 1, 'form_id' => 14, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 14, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Alat Invasif (form 15): Dokter & Perawat create/read/update/delete,
+            // semua jenis rawat.
+            ['profesi_id' => 1, 'form_id' => 15, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 15, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
         ];
 
         foreach ($akses as $row) {
