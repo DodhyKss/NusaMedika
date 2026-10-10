@@ -239,6 +239,119 @@ class SelectOption
                 ['value' => 'Kaki', 'label' => 'Kaki / Perifer'],
                 ['value' => 'Lainnya', 'label' => 'Lainnya'],
             ],
+
+            // ===== Fase P1 — Catatan Medis LanjutAN =====
+            // Form 16 Resume Medis — tujuan rujukan saat kondisi pulang "Dirujuk".
+            'tujuan_rujukan' => [
+                ['value' => 'Puskesmas', 'label' => 'Puskesmas'],
+                ['value' => 'Faskes', 'label' => 'Faskes'],
+                ['value' => 'Rumah Sakit', 'label' => 'Rumah Sakit'],
+            ],
+            // Form 16 Resume Medis — klasifikasi kematian saat pulang "Meninggal".
+            'penyebab_kematian' => [
+                ['value' => 'DOA', 'label' => 'DOA (Dead On Arrival)'],
+                ['value' => 'Meninggal Di IGD', 'label' => 'Meninggal Di IGD'],
+                ['value' => '< 48 Jam', 'label' => 'Meninggal < 48 Jam'],
+                ['value' => '> 48 Jam', 'label' => 'Meninggal > 48 Jam'],
+                ['value' => 'Lahir Meninggal', 'label' => 'Lahir Meninggal'],
+            ],
+            // Form 20 Care Plan — tempat pertemuan evaluasi dijalankan.
+            'tempat_pertemuan' => [
+                ['value' => 'Ruang Perawatan', 'label' => 'Ruang Perawatan'],
+                ['value' => 'Poli / Poliklinik', 'label' => 'Poli / Poliklinik'],
+                ['value' => 'Instalasi Gawat Darurat', 'label' => 'Instalasi Gawat Darurat'],
+                ['value' => 'Ruang Periksa', 'label' => 'Ruang Periksa'],
+                ['value' => 'Teleedema', 'label' => 'Teleedema / Telemedisin'],
+            ],
+            // Form 21 DAR — jenis kejadian yang dilaporkan.
+            'jenis_dar' => [
+                ['value' => 'Kecelakaan Lalu Lintas', 'label' => 'Kecelakaan Lalu Lintas'],
+                ['value' => 'Kecelakaan Kerja', 'label' => 'Kecelakaan Kerja'],
+                ['value' => 'Kekerasan', 'label' => 'Kekerasan'],
+                ['value' => 'Lainnya', 'label' => 'Lainnya'],
+            ],
+            // ===== Form 19 Triage IGD =====
+            // Keadaan umum pasien saat triase (legacy `ku`).
+            'keadaan_umum_igd' => [
+                ['value' => 'Baik', 'label' => 'Baik', 'class' => 'text-emerald-600'],
+                ['value' => 'Sedang', 'label' => 'Sedang', 'class' => 'text-amber-500'],
+                ['value' => 'Lemas', 'label' => 'Lemas', 'class' => 'text-red-600'],
+            ],
+            // Patent jalan napas. Objek 226 dipakai dua variabel
+            // (jalan_nafas, tipe_nafas) karena legacy punya dua kontrol
+            // terpisah.
+            'jalan_nafas' => [
+                ['value' => 'N/A', 'label' => 'N/A (tidak dapat dinilai)'],
+                ['value' => 'PATEN', 'label' => 'PATEN'],
+                ['value' => 'GURGLING', 'label' => 'GURGLING'],
+                ['value' => 'SNORRING', 'label' => 'SNORRING'],
+                ['value' => 'STRIDOR', 'label' => 'STRIDOR'],
+            ],
+            'sirkulasi' => [
+                ['value' => 'Nadi Teraba', 'label' => 'Nadi Teraba'],
+                ['value' => 'Nadi Tidak Teraba', 'label' => 'Nadi Tidak Teraba'],
+            ],
+            'pupil' => [
+                ['value' => 'Baik', 'label' => 'Baik'],
+                ['value' => 'Tidak Baik', 'label' => 'Tidak Baik'],
+                ['value' => 'Lambat', 'label' => 'Lambat'],
+            ],
+            'jenis_anamnesis' => [
+                ['value' => 'Auto Anamnesis', 'label' => 'Auto Anamnesis'],
+                ['value' => 'Allo Anamnesis', 'label' => 'Allo Anamnesis'],
+            ],
+            'alasan_kunjungan_igd' => [
+                ['value' => 'Lemas', 'label' => 'Lemas'],
+                ['value' => 'Demam', 'label' => 'Demam'],
+                ['value' => 'Pusing', 'label' => 'Pusing'],
+                ['value' => 'Sakit Kepala', 'label' => 'Sakit Kepala'],
+                ['value' => 'Batuk', 'label' => 'Batuk'],
+                ['value' => 'Pilek', 'label' => 'Pilek'],
+                ['value' => 'Sesak Napas', 'label' => 'Sesak Napas'],
+                ['value' => 'Kontrol', 'label' => 'Kontrol'],
+                ['value' => 'Obat Habis', 'label' => 'Obat Habis'],
+                ['value' => 'Lainnya', 'label' => 'Lainnya'],
+            ],
+            'riwayat_penyakit_igd' => [
+                ['value' => 'Hipertensi', 'label' => 'Hipertensi'],
+                ['value' => 'DM', 'label' => 'Diabetes Melitus'],
+                ['value' => 'Typhoid', 'label' => 'Typhoid'],
+                ['value' => 'DHF', 'label' => 'Demam Berdarah (DHF)'],
+                ['value' => 'TB', 'label' => 'Tuberkulosis'],
+                ['value' => 'Stroke', 'label' => 'Stroke'],
+                ['value' => 'Asma', 'label' => 'Asma'],
+                ['value' => 'Lainnya', 'label' => 'Lainnya'],
+            ],
+            'frekuensi_nyeri' => [
+                ['value' => 'Sering', 'label' => 'Sering'],
+                ['value' => 'Kadang', 'label' => 'Kadang'],
+                ['value' => 'Jarang', 'label' => 'Jarang'],
+            ],
+            'karakteristik_nyeri' => [
+                ['value' => 'Terbakar', 'label' => 'Terbakar'],
+                ['value' => 'Tertusuk', 'label' => 'Tertusuk'],
+                ['value' => 'Tertindih', 'label' => 'Tertindih'],
+                ['value' => 'Menyebar', 'label' => 'Menyebar'],
+                ['value' => 'Berdenyut', 'label' => 'Berdenyut'],
+            ],
+            // 6 nilai legacy (1-5 + HITAM). Sengaja BERBEDA dari key
+            // `triase_igd` (Merah/Kuning/Hijau/Hitam) yang dipakai kolom
+            // `registrasi_detail.prioritas` - jangan memaksa satu key untuk
+            // dua keperluan.
+            'prioritas_triase_igd' => [
+                ['value' => '1', 'label' => 'Prioritas 1 - Resuscitation', 'class' => 'text-red-600'],
+                ['value' => '2', 'label' => 'Prioritas 2 - Emergency', 'class' => 'text-red-600'],
+                ['value' => '3', 'label' => 'Prioritas 3 - Urgent', 'class' => 'text-amber-500'],
+                ['value' => '4', 'label' => 'Prioritas 4 - Semi Urgent', 'class' => 'text-amber-500'],
+                ['value' => '5', 'label' => 'Prioritas 5 - Non Urgent', 'class' => 'text-emerald-500'],
+                ['value' => 'HITAM', 'label' => 'HITAM - DOA', 'class' => 'text-slate-800'],
+            ],
+            // Form 57 Catatan Medis Visum.
+            'jenis_visum' => [
+                ['value' => 'LAKA / KLL', 'label' => 'LAKA / KLL'],
+                ['value' => 'KDRT', 'label' => 'KDRT (Kekerasan Dalam Rumah Tangga)'],
+                ['value' => 'LAIN-LAIN', 'label' => 'Lain-lain'],
+            ],
         ];
     }
 

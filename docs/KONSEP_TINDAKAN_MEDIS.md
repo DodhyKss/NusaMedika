@@ -145,9 +145,10 @@ Server juga menjadi penjaga akhir (klien bisa saja mengirim POST langsung):
 | Kasus | Hasil |
 |---|---|
 | `(barang_id, no_batch)` sama muncul 2× dalam satu payload | **ditolak** — "sudah ditambahkan pada baris #N" |
-| nomor batch sama dipakai untuk **barang berbeda** | **ditolak** — nomor batch unik per fisik barang | Kolom jumlah di tabel terkunci: hanya baris yang
-batch-nya sedang dipilih yang boleh diisi, dan input jumlah utama baru aktif setelah
-satu batch dipilih.
+| nomor batch sama dipakai untuk **barang berbeda** | **ditolak** — nomor batch unik per fisik barang |
+
+Kolom jumlah di tabel terkunci: hanya baris yang batch-nya sedang dipilih yang
+boleh diisi, dan input jumlah utama baru aktif setelah satu batch dipilih.
 
 Peringatan memakai komponen **`confirm-alert`** (`window.nusaConfirm`), bukan
 `alert()` bawaan browser:

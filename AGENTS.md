@@ -308,6 +308,41 @@ sub_menu 57 `Social/Forum/forum`. Tabel `forum_topik` (judul, isi, `tipe`=`PUBLI
 - Tombol "Buat Topik" di halaman forum dibungkus `@if (auth()->user()->hasSubMenuAccess(\App\Models\SubMenu::idByPath('Social/BuatTopik/buat_topik') ?? 0))`; `SubMenu::idByPath()` ada supaya id tidak di-hardcode di blade. Akses awal hanya `user_id 1`; tambah user lain dari **Administrator → Manajemen User**.
  Topik bercakupan restricted tidak bisa dihapus pembuatnya sendiri bila ia tidak lagi berhak melihatnya — itu perilaku yang benar.
 
+## Status Implementasi Form EMR (WAJIB dibaca sebelum menambah form)
+
+- **Tracker = `docs/TASK_FORM.md`.** Satu baris per form (`EMR-0NN`, `NN` = `form_id`). Status manual: `⬜` belum · `🔄` sedang dikerjakan · `✅` selesai · `⛔` tertunda (butuh keputusan klinis) · `⚠️` terceceng. **Isi kolom `Owner` saat mengklaim** — beberapa agent bisa jalan bersamaan. **Selalu baca ulang filenya tepat sebelum mengklaim** supaya tidak mengambil baris yang sudah `🔄`.
+- **Alur tambah form EMR baru:** (1) baca tracker, pilih baris `⬜`; (2) baca `docs/ALOKASI_ID_GLOBAL.md` — **semua `form_id`, `objek_id`, `dashboard_menu_sub_id`, `dashboard_menu_sub_extra_id`, `profesi_id`, `slug`, dan flag `ri/rj/igd/mcu` terkunci di sana dan itu yang mengikat**; (3) baca `docs/PANDUAN_IMPLEMENTASI_FORM_EMR.md` (checklist 11 langkah); (4) baca `docs/KONSEP_<domain>.md` §form itu untuk struktur field, `$mapping`, dan `akses_ehr`; (5) klaim (ubah ke `🔄` + Owner); (6) kerjakan seeder → controller → blade; (7) `pint`; (8) tutup (ubah ke `✅`) **dan** tambahkan entri di file ini.
+- **Jangan menomori ulang sendiri.** Kalau menemukan bentrok ID atau desain form yang salah, perbarui `ALOKASI_ID_GLOBAL.md` lebih dulu — jangan diam-diam mengubah angka di seeder.
+- **114 form** (id 16–129) sudah punya konsep di `docs/` tapi belum diimplementasikan, dibagi 6 fase + 12 task prasyarat (`PRE-01`…`PRE-12`: seed profesi 14–18, tabel `order_patologi`/`order_mikrobiologi`/`order_poct`, `master_diet`, tabel `form_blanko*`, `EmrHelper::flag_abnormal`, ~16 helper baru). Prasyarat diselesaikan dulu bila form yang diklaim bergantung padanya.
+- Form 13–15 (`tanda_vital`, `bundle_vap`, `alat_invasif`) sudah ada di kode tapi **belum** punya entri di file ini — lihat `docs/TASK_FORM.md` §6.
+- **Form 1 "Catatan Awal Medis" itu stub mati** — ter-seed dengan `id_dash_menu = NULL`, tanpa controller & view, tidak pernah muncul di dashboard. Selesaikan atau soft-delete (tercantum di `docs/TASK_FORM.md` §6).
+
+## Fase P1 EMR — form 16–21 & 57 (SUDAH diimplementasikan)
+
+Rancangan: `docs/KONSEP_CATATAN_MEDIS_LANJUTAN.md` + `docs/KONSEP_DISCHARGE_PLANNING.md` + `docs/KONSEP_TRIASE_IGD.md`. Semua **terverifikasi E2E**: store -> mapping -> index -> update -> delete + gate akses per profesi (196 variabel).
+
+| form | slug | `id_dash_menu` | Folder | Objek baru |
+|---|---|---|---|---|
+| 16 | `resume_medis` | `1.13` | `EMR/ResumeMedis/` | 178-188 |
+| 20 | `care_plan` | `1.14` | `EMR/CarePlan/` | 189-195 |
+| 21 | `dar` | `1.15.6` | `EMR/Dar/` | 196 |
+| 57 | `catatan_medis_visum` | `1.15` | `EMR/CatatanMedisVisum/` | 197-199 |
+| 17 | `discharge_planning` | `6.33` | `EMR/DischargePlanning/` | 200-214 |
+| 18 | `pemulangan_pasien` | `6.34` | `EMR/PemulanganPasien/` | 215-224 |
+| 19 | `triage_igd` | `7.53` | `EMR/TriageIgd/` | 225-235 |
+
+Menu baru: `dashboard_menu` **6 "Resume & Discharge"** (sub 33, 34) dan **7 "Gawat Darurat"** (sub 53 Triage IGD, 54 Triage IGD OBGYN reserved). `dashboard_menu_sub_extra` **6 "DAR"** (induk sub 15).
+
+- **Sub 15 punya dua leaf** — `catatan_medis_visum` tanpa extra (`"1.15"`) dan `dar` lewat extra 6 (`"1.15.6"`). `nama_sub_menu_extra` WAJIB persis `DAR` (bukan `DAR (D-Rekognisi)`) agar `Str::slug` = `dar`.
+- **`akses_ehr` berbeda per form.** Visum (57) **hanya Dokter** (dokumen bermeterai; tanpa baris akses perawat -> form tak muncul di dashboard perawat dan URL 403). DAR (21) Dokter full CRUD + Perawat **read saja**. Sisanya Dokter + Perawat full CRUD.
+- **Field computed form 16 & 18**: `total_ews`, `kategori_ews` (objek 142/143) dan `gcs_jumlah` (objek 57) selalu dihitung ulang di `filteredData()`; nilai browser dibuang. Parameter EWS yang tidak ada di form ditandai "tidak diukur" — `EwsHelper::hitung($vital, ['saturasi', 'oksigen', 'kesadaran'])` — dan skor **hanya disimpan bila `$ews['lengkap']`** supaya skor parsial tidak menyesatkan.
+- **Aturan kondisional dibuang di `filteredData()`**, bukan sekadar tidak divalidasi. Contoh: `kondisi_saat_pulang != 'Dirujuk'` -> `dirujuk_ke` null; `!= 'Meninggal'` -> `meninggal` + `catatan_kematian` null.
+- **Objek 186 "Dirujuk Ke" satu-satunya objek > 177 lintas dokumen** (dideklarasi form 16, di-reuse form 18).
+- **Form 18 `diagnosis_medis` = picker ICD** (`integer|exists:icd,icd_id`), bukan free text. Enumerasi lokal (`diet_jenis`, `eliminasi_bab`/`bak`, `kondisi_luka`, `tingkat_kemandirian`) masih di `private const OPSI` controller — belum dipindah ke `SelectOption`.
+- **Form 19 Triage IGD** punya `metaTriase()` (zona/waktu/warna per prioritas) yang **harus diteruskan ke view** lewat `compact()` — dipakai badge riwayat, tabel zona, dan warna baris JS.
+- **`Rule::requiredIf()` menerima closure TANPA argumen.** `RequiredIf::__construct` bertipe `(\Closure(): bool)|bool` dan `__toString()` memanggilnya dengan 0 argumen. Tulis `fn () => $request->input('x') === 'y'`, **bukan** `fn ($r) => $r->x === 'y'` — yang kedua fatal "Too few arguments" dan merusak setiap penyimpanan Triage IGD.
+- **Pint sudah dijalankan.** `tests/Feature/ExampleTest` gagal **sejak commit awal** (`/` mengembalikan 302 ke login, tesnya ekspektasi 200) — bukan regresi.
+
 ## EMR dynamic forms
 
 - Route `/emr/form/{form_name}/{registrasi_detail_id}/{emr_id?}` (`emr.dynamic.index`): `DynamicFormController` first tries `App\Http\Controllers\EMR\{Studly}\{Studly}Controller`, else the view `moduls.emr.{slug}.index`.

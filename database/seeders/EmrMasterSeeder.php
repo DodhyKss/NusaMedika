@@ -19,6 +19,9 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_id' => 3, 'nama_menu' => 'Resep'],
             ['dashboard_menu_id' => 4, 'nama_menu' => 'Order'],
             ['dashboard_menu_id' => 5, 'nama_menu' => 'Formulir'],
+            // Menu BARU Fase P1.
+            ['dashboard_menu_id' => 6, 'nama_menu' => 'Resume & Discharge'],
+            ['dashboard_menu_id' => 7, 'nama_menu' => 'Gawat Darurat'],
         ];
 
         foreach ($menus as $menu) {
@@ -77,6 +80,29 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_id' => 6, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Radiologi'],
             // Menu 5 "Formulir" — tanpa extra; id_dash_menu form = "5.7".
             ['dashboard_menu_sub_id' => 7, 'dashboard_menu_id' => 5, 'nama_sub_menu' => 'Konsultasi'],
+
+            // ===== Fase P1 — Catatan Medis LanjutAN =====
+            // Menu 1 "Catatan Medis". Sub TANPA extra (link langsung), jadi
+            // id_dash_menu = "1.{sub}" dan Str::slug(nama_sub_menu,'_') WAJIB
+            // sama dengan form.slug.
+            ['dashboard_menu_sub_id' => 13, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Resume Medis'],
+            ['dashboard_menu_sub_id' => 14, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Care Plan'],
+            // Sub 15 "Catatan Medis Visum" punya dua leaf: form 57 tanpa extra
+            // (id_dash_menu "1.15") dan form 21 lewat extra 6 "DAR" ("1.15.6").
+            // PERHATIKAN: Str::slug('Catatan Medis Visum','_') =
+            // 'catatan_medis_visum' = form 57.slug, BUKAN form 21.
+            ['dashboard_menu_sub_id' => 15, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Catatan Medis Visum'],
+
+            // Menu 6 "Resume & Discharge" — sub TANPA extra (link langsung).
+            // dashboard_menu_sub_id bersifat GLOBAL, jadi bukan 1/2 melainkan 33/34
+            // (lihat docs/ALOKASI_ID_GLOBAL.md §3).
+            ['dashboard_menu_sub_id' => 33, 'dashboard_menu_id' => 6, 'nama_sub_menu' => 'Discharge Planning'],
+            ['dashboard_menu_sub_id' => 34, 'dashboard_menu_id' => 6, 'nama_sub_menu' => 'Pemulangan Pasien'],
+
+            // Menu 7 "Gawat Darurat" — sub 53 dipakai form 19 Triage IGD.
+            // Sub 54 dicadangkan untuk Triage IGD OBGYN (form berikutnya).
+            ['dashboard_menu_sub_id' => 53, 'dashboard_menu_id' => 7, 'nama_sub_menu' => 'Triage IGD'],
+            ['dashboard_menu_sub_id' => 54, 'dashboard_menu_id' => 7, 'nama_sub_menu' => 'Triage IGD OBGYN'],
         ];
 
         foreach ($subMenus as $subMenu) {
@@ -106,6 +132,12 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_extra_id' => 3, 'dashboard_menu_sub_id' => 12, 'nama_sub_menu_extra' => 'Tanda Vital'],
             ['dashboard_menu_sub_extra_id' => 4, 'dashboard_menu_sub_id' => 12, 'nama_sub_menu_extra' => 'Bundle VAP'],
             ['dashboard_menu_sub_extra_id' => 5, 'dashboard_menu_sub_id' => 12, 'nama_sub_menu_extra' => 'Alat Invasif'],
+            // Sub Menu 15 "Catatan Medis Visum" — extra untuk form 21 DAR.
+            // `nama_sub_menu_extra` WAJIB persis 'DAR' (TANPA keterangan dalam
+            // kurung): Str::slug('DAR','_') = 'dar' harus sama dengan form.slug
+            // form 21. Kalau ditulis 'DAR (D-Rekognisi)' slug-nya jadi
+            // 'dar_d_rekognisi' dan form 21 jadi yatim dari dashboard.
+            ['dashboard_menu_sub_extra_id' => 6, 'dashboard_menu_sub_id' => 15, 'nama_sub_menu_extra' => 'DAR'],
         ];
 
         foreach ($extras as $extra) {
@@ -149,6 +181,27 @@ class EmrMasterSeeder extends Seeder
             ['form_id' => 13, 'nama_form' => 'Tanda Vital',                          'slug' => 'tanda_vital',                        'id_dash_menu' => '2.12.3', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 14, 'nama_form' => 'Bundle VAP',                           'slug' => 'bundle_vap',                         'id_dash_menu' => '2.12.4', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 15, 'nama_form' => 'Alat Invasif',                         'slug' => 'alat_invasif',                       'id_dash_menu' => '2.12.5', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+
+            // ===== Fase P1 — Catatan Medis Lanjutan =====
+            // Resume Medis: ringkasan episode rawat inap. Tersedia di RI/RJ/IGD.
+            // id_dash_menu "1.13" (menu 1 "Catatan Medis", sub 13 tanpa extra).
+            ['form_id' => 16, 'nama_form' => 'Resume Medis', 'slug' => 'resume_medis', 'id_dash_menu' => '1.13', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            // Care Plan: rencana asuhan medis + kriteria Discharge Planning.
+            // id_dash_menu "1.14".
+            ['form_id' => 20, 'nama_form' => 'Care Plan', 'slug' => 'care_plan', 'id_dash_menu' => '1.14', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            // DAR: catatan kejadian forensik. 3 tingkat: sub 15 + extra 6.
+            // id_dash_menu "1.15.6".
+            ['form_id' => 21, 'nama_form' => 'DAR', 'slug' => 'dar', 'id_dash_menu' => '1.15.6', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            // Catatan Medis Visum: KHUSUS IGD (dokter IGD yang membuat, dokumen
+            // bermeterai). id_dash_menu "1.15" (sub 15 tanpa extra).
+            ['form_id' => 57, 'nama_form' => 'Catatan Medis Visum', 'slug' => 'catatan_medis_visum', 'id_dash_menu' => '1.15', 'ri' => 0, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            // Discharge Planning: perencanaan pulang. id_dash_menu "6.33".
+            ['form_id' => 17, 'nama_form' => 'Discharge Planning', 'slug' => 'discharge_planning', 'id_dash_menu' => '6.33', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            // Pemulangan Pasien: ringkasan & instruksi saat dipulangkan.
+            // id_dash_menu "6.34".
+            ['form_id' => 18, 'nama_form' => 'Pemulangan Pasien', 'slug' => 'pemulangan_pasien', 'id_dash_menu' => '6.34', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            // Triage IGD: KHUSUS IGD. id_dash_menu "7.53".
+            ['form_id' => 19, 'nama_form' => 'Triage IGD', 'slug' => 'triage_igd', 'id_dash_menu' => '7.53', 'ri' => 0, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
         ];
 
         foreach ($forms as $form) {
@@ -272,6 +325,49 @@ class EmrMasterSeeder extends Seeder
             173 => 'Alat Invasif', 174 => 'Lokasi Pemasangan Alat Invasif',
             175 => 'Tanggal Lepas Alat Invasif', 176 => 'Jam Lepas Alat Invasif',
             177 => 'Lama Pemasangan Alat Invasif (Hari)',
+
+            // ===== Objek 178-199: Fase P1 (Resume Medis, Care Plan, DAR, Visum) =====
+            // ID dikunci di docs/ALOKASI_ID_GLOBAL.md §1 — jangan diubah/digeser.
+            // --- Form 16 Resume Medis ---
+            178 => 'Tanggal Resume Medis', 179 => 'Waktu Resume Medis',
+            180 => 'Indikasi Rawat Inap', 181 => 'Diagnosa Primer Resume',
+            182 => 'Diagnosa Sekunder Resume', 183 => 'Prosedur yang Dilakukan',
+            184 => 'Komplikasi Penyakit', 185 => 'Kondisi Saat Pulang',
+            186 => 'Dirujuk Ke', 187 => 'Meninggal',
+            188 => 'Pemeriksaan Fisik', // 12 organ -> 12 variabel bersuffix pf_*
+            // --- Form 20 Care Plan ---
+            189 => 'Tempat Pertemuan', 190 => 'Intervensi Non Farmakologis',
+            191 => 'Intervensi Farmakologis', 192 => 'Perkiraan Lama Rawat (Hari)',
+            193 => 'Target Perawatan', 194 => 'Kriteria Pemulangan Pasien',
+            195 => 'Tanggal Evaluasi Care Plan',
+            // --- Form 21 DAR ---
+            196 => 'Tanggal DAR',
+            // --- Form 57 Catatan Medis Visum ---
+            197 => 'Jenis Visum', 198 => 'Nomor Visum Et Repertum',
+            199 => 'Permintaan Visum',
+
+            // ===== Objek 200-224: Fase P1 Discharge Planning & Pemulangan =====
+            200 => 'Tanggal Masuk RS', 201 => 'Estimasi / Rencana Hari Rawat',
+            202 => 'Rencana Tanggal Pemulangan', 203 => 'Pengaruh Perubahan Kondisi',
+            204 => 'Antisipasi Masalah', 205 => 'Kebutuhan Bantuan Sehari-hari',
+            206 => 'Tinggal & Bantuan Pelayan', 207 => 'Menggunakan Alat Medis di Rumah',
+            208 => 'Perlu Alat Bantu', 209 => 'Perlu Perawatan Khusus',
+            210 => 'Masalah Kebutuhan Pribadi', 211 => 'Nyeri Kronis',
+            212 => 'Perlu Edukasi', 213 => 'Keterampilan Khusus',
+            214 => 'Kebutuhan Edukasi',
+            215 => 'Kondisi Saat Pulang', 216 => 'Meninggal',
+            217 => 'Diet / Nutrisi', 218 => 'Eliminasi BAB & BAK',
+            219 => 'Luka / Operasi', 220 => 'Transfer & Mobilisasi',
+            221 => 'Edukasi / Penyuluhan yang Sudah Diberikan', 222 => 'Manajemen Nyeri',
+            223 => 'Barang & Hasil yang Disyerahkan',
+            224 => 'Masalah Keperawatan / Kebidanan Selama Dirawat',
+
+            // ===== Objek 225-235: Fase P1 Triage IGD =====
+            225 => 'Keadaan Umum', 226 => 'Jalan Nafas', 227 => 'Sirkulasi',
+            228 => 'Akral', 229 => 'Pupil', 230 => 'Refleks Cahaya',
+            231 => 'Jenis Anamnesis', 232 => 'Lokasi Nyeri',
+            233 => 'Frekuensi Nyeri', 234 => 'Karakteristik Nyeri',
+            235 => 'Prioritas Triase IGD',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -522,6 +618,247 @@ class EmrMasterSeeder extends Seeder
                 'jam_lepas' => 176,           // opsional
                 'lama_pemasangan' => 177,     // TURUNAN, jumlah hari pasang -> lepas
             ],
+
+            // ===== Fase P1 — Catatan Medis Lanjutan =====
+
+            // Resume Medis (form 16). Pemeriksaan fisik 12 organ memakai SATU
+            // objek (188) dengan 12 variabel bersuffix — sama seperti pola
+            // butir bundle VAP: emrDetailByVariabel() melakukan
+            // pluck('value','variabel') sehingga satu variabel untuk 12 organ
+            // akan tertimpa. Laporan antar-form WAJIB query per variabel,
+            // bukan per objek_id.
+            16 => [
+                'tanggal_resume' => 178,
+                'waktu_resume' => 179,
+                'keluhan_utama' => 13,   // reuse "Keluhan Utama"
+                'indikasi_rawat_inap' => 180,
+                'riwayat_kesehatan_saat_ini' => 42,   // reuse "Riwayat Penyakit Sekarang"
+                'riwayat_penyakit_dahulu' => 41,   // reuse "Riwayat Penyakit Sebelumnya"
+
+                // Tanda vital & skor — seluruhnya reuse objek yang sudah ada.
+                'td_sistolik' => 6,
+                'td_diastolik' => 7,
+                'nadi' => 10,
+                'pernapasan' => 12,
+                'suhu' => 11,
+                'skor_nyeri' => 140,  // reuse
+                'total_ews' => 142,  // TURUNAN (EwsHelper)
+                'kategori_ews' => 143,  // TURUNAN (EwsHelper)
+                'gcs_e' => 54,
+                'gcs_m' => 55,
+                'gcs_v' => 56,
+                'gcs_jumlah' => 57,   // TURUNAN
+
+                // Pemeriksaan fisik: 12 organ -> satu objek 188.
+                'pf_kepala' => 188,
+                'pf_mata' => 188,
+                'pf_tht' => 188,
+                'pf_gigidanmulut' => 188,
+                'pf_leher' => 188,
+                'pf_toraks' => 188,
+                'pf_jantung' => 188,
+                'pf_paru' => 188,
+                'pf_abdomen' => 188,
+                'pf_kelenjar' => 188,
+                'pf_genitalia' => 188,
+                'pf_ekstremitas' => 188,
+
+                // Diagnosa resume.
+                'diagnosa_primer' => 181,
+                'diagnosa_sekunder' => 182,
+                'prosedur' => 183,
+                'komplikasi' => 184,
+
+                // Kondisi pulang / rujukan / kematian.
+                'kondisi_saat_pulang' => 185,
+                'catatan_alasan_pulang' => 77,   // reuse "Keterangan"
+                'dirujuk_ke' => 186,
+                'meninggal' => 187,
+                'catatan_kematian' => 77,   // reuse "Keterangan"
+            ],
+
+            // Care Plan (form 20).
+            20 => [
+                'tanggal_care_plan' => 195,
+                'perkiraan_lama_rawat' => 192,
+                'tempat_pertemuan' => 189,
+                'intervensi_non_farmakologis' => 190,
+                'intervensi_farmakologis' => 191,
+                'target_perawatan' => 193,
+                'kriteria_pemulangan' => 194,
+                'catatan' => 77,   // reuse "Keterangan"
+            ],
+
+            // DAR (form 21) — catatan kejadian forensik.
+            21 => [
+                'tanggal_dar' => 196,
+                'dasar_laporan' => 13,   // reuse "Keluhan Utama"
+                'kronologi_kejadian' => 1,    // reuse "Subjective (S)"
+                'temuan_pemeriksaan' => 2,    // reuse "Objective (O)"
+                'kesimpulan_dar' => 3,    // reuse "Assessment (A)"
+                'tindakan_dar' => 5,    // reuse "Instruksi (I)"
+                'meninggal' => 187,  // reuse objek form 16
+            ],
+
+            // Catatan Medis Visum (form 57).
+            57 => [
+                'tanggal_visum' => 155,  // reuse "Tanggal Observasi"
+                'waktu_visum' => 156,  // reuse "Waktu Observasi"
+                'jenis_visum' => 197,
+                'nomor_visum' => 198,
+                'dokter_visum' => 139,  // reuse "Dokter Pemeriksa"
+                'permintaan_visum' => 199,
+                'benda_bukti_identifisir' => 77,   // reuse "Keterangan"
+                'hasil_visum' => 2,    // reuse "Objective (O)"
+                'kesimpulan_visum' => 3,    // reuse "Assessment (A)"
+                'kelainan_sebab' => 1,    // reuse "Subjective (S)"
+                'kelainan_akibat' => 4,    // reuse "Planning (P)"
+            ],
+
+            // Discharge Planning (form 17).
+            17 => [
+                'tanggal_masuk_rs' => 200,
+                'waktu_masuk_rs' => 156, // reuse "Waktu Observasi"
+                'diagnosis_medis' => 40, // reuse "Diagnosa Medis"
+                'estimasi_hari_rawat' => 201,
+                'tanggal_ren_pulang' => 202,
+                'waktu_ren_pulang' => 156,
+                'pengaruh_pasien_kel' => 203,
+                'pengaruh_kerja' => 203,
+                'pengaruh_keuangan' => 203,
+                'antisipati_masalah' => 204,
+                'tinggal_sendiri' => 206,
+                'membantu_pasien' => 206,
+                'gunakan_alat_medis' => 207,
+                'perlu_alat_bantu' => 208,
+                'perlu_perawatan_khusus' => 209,
+                'masalah_kebutuhan_pribadi' => 210,
+                'nyeri_kronis' => 211,
+                'perlu_edukasi' => 212,
+                'keterampilan_khusus' => 213,
+                'adl_menyiapkan_makanan' => 205,
+                'adl_makan' => 205,
+                'adl_diet' => 205,
+                'adl_menyiapkan_obat' => 205,
+                'adl_minum_obat' => 205,
+                'adl_mandi' => 205,
+                'adl_berpakaian' => 205,
+                'adl_transportasi' => 205,
+                'adl_edukasi_kesehatan' => 205,
+                'adl_edukasi_lain' => 205,
+                'edukasi_obat_obat' => 214,
+                'edukasi_nutrisi' => 214,
+                'edukasi_perawatan_luka' => 214,
+                'edukasi_mobilisasi' => 214,
+                'edukasi_manajemen_nyeri' => 214,
+                'edukasi_insulin_sc' => 214,
+                'edukasi_lain_1' => 214,
+                'edukasi_lain_2' => 214,
+                'catatan' => 77, // reuse "Keterangan"
+            ],
+
+            // Pemulangan Pasien (form 18).
+            18 => [
+                'tanggal_pulang' => 155, // reuse "Tanggal Observasi"
+                'waktu_pulang' => 156,
+                'kondisi_pulang' => 215,
+                'catatan_alasan_pulang' => 77,
+                // Objek 186 "Dirujuk Ke" dideklarasikan di form 16 dan hanya
+                // di-reuse di sini — satu-satunya objek > 177 lintas dokumen.
+                'dirujuk_ke' => 186,
+                'rujuk_di_area_sama' => 186,
+                'meninggal' => 216,
+                'catatan_meninggal' => 77,
+                'td_sistolik' => 6,
+                'td_diastolik' => 7,
+                'nadi' => 10,
+                'pernapasan' => 12,
+                'suhu' => 11,
+                'skor_nyeri' => 140,
+                'total_ews' => 142, // TURUNAN
+                'kategori_ews' => 143, // TURUNAN
+                'gcs_e' => 54,
+                'gcs_m' => 55,
+                'gcs_v' => 56,
+                'gcs_jumlah' => 57, // TURUNAN
+                'diet_jenis' => 217,
+                'diet_keterangan' => 217,
+                'bab' => 218,
+                'bak' => 218,
+                'bak_keterangan' => 218,
+                'luka' => 219,
+                'luka_keterangan' => 219,
+                'transfer' => 220,
+                'edukasi_1' => 221,
+                'edukasi_2' => 221,
+                'edukasi_3' => 221,
+                'edukasi_4' => 221,
+                'edukasi_5' => 221,
+                'edukasi_6' => 221,
+                'edukasi_7' => 221,
+                'edukasi_keterangan' => 221,
+                'nyeri_terapi' => 222,
+                'nyeri_efek_samping' => 222,
+                'nyeri_kapan_ke_rs' => 222,
+                'masalah_keperawatan' => 224,
+                'anjuran_pulang' => 5, // reuse "Instruksi (I)"
+                'keterangan' => 77,
+                'serah_lab' => 223,
+                'serah_rontgen' => 223,
+                'serah_ct_scan' => 223,
+                'serah_mri' => 223,
+                'serah_usg' => 223,
+                'serah_surat_sakit' => 223,
+                'serah_surat_asuransi' => 223,
+                'serah_resume' => 223,
+                'serah_buku_bayi' => 223,
+                'serah_gol_darah' => 223,
+                'serah_skl_bayi' => 223,
+                'serah_penyerah_bayi' => 223,
+                'serah_lainnya' => 223,
+            ],
+
+            // Triage IGD (form 19). Hampir semua field me-reuse objek lama.
+            19 => [
+                'tanggal_triase' => 155,
+                'waktu_triase' => 156,
+                'keadaan_umum' => 225,
+                'berat_badan' => 8,
+                'tinggi_badan' => 9,
+                'suhu' => 11,
+                'jalan_nafas' => 226,
+                'tipe_nafas' => 226,
+                'frekuensi_nafas' => 12,
+                'saturasi' => 15,
+                'sirkulasi' => 227,
+                'akral' => 228,
+                'nadi' => 10,
+                'td_sistolik' => 6,
+                'td_diastolik' => 7,
+                'kesadaran' => 51,
+                'pupil' => 229,
+                'refleks_cahaya' => 230,
+                'jenis_anamnesis' => 231,
+                'alasan_kunjungan' => 13, // reuse "Keluhan Utama"
+                'alasan_kunjungan_lain' => 13,
+                'nyeri' => 14,
+                'skor_nyeri' => 140,
+                'lokasi_nyeri' => 232,
+                'frekuensi_nyeri' => 233,
+                'karakteristik_nyeri' => 234,
+                'riwayat_penyakit_1' => 42,
+                'riwayat_penyakit_2' => 42,
+                'riwayat_penyakit_3' => 42,
+                'riwayat_penyakit_4' => 42,
+                'riwayat_penyakit_5' => 42,
+                'riwayat_penyakit_6' => 42,
+                'riwayat_penyakit_7' => 42,
+                'riwayat_penyakit_8' => 42,
+                'riwayat_penyakit_lain' => 42,
+                'risiko_jatuh' => 91, // reuse "Risiko Jatuh - Tingkat Risiko"
+                'prioritas_triase' => 235,
+                'catatan' => 77,
+            ],
         ];
 
         // Baris obat/BMHP (maks 20 baris per tindakan): variabel obat_1..obat_20
@@ -603,6 +940,13 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(13);
         EmrHelper::backfillObjekId(14);
         EmrHelper::backfillObjekId(15);
+        EmrHelper::backfillObjekId(16);
+        EmrHelper::backfillObjekId(20);
+        EmrHelper::backfillObjekId(21);
+        EmrHelper::backfillObjekId(57);
+        EmrHelper::backfillObjekId(17);
+        EmrHelper::backfillObjekId(18);
+        EmrHelper::backfillObjekId(19);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -654,6 +998,32 @@ class EmrMasterSeeder extends Seeder
             // semua jenis rawat.
             ['profesi_id' => 1, 'form_id' => 15, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 15, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+
+            // ===== Fase P1 — Catatan Medis Lanjutan =====
+            // Resume Medis (form 16): Dokter & Perawat full CRUD.
+            ['profesi_id' => 1, 'form_id' => 16, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 16, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Care Plan (form 20): Dokter & Perawat full CRUD.
+            ['profesi_id' => 1, 'form_id' => 20, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 20, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // DAR (form 21): Dokter full CRUD; Perawat READ SAJA (dokumen
+            // forensik hanya boleh dibuat dokter).
+            ['profesi_id' => 1, 'form_id' => 21, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 21, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // Catatan Medis Visum (form 57): HANYA Dokter (1). Sengaja TIDAK ada
+            // baris untuk Perawat — dokumen bermeterai & bertanda tangan. Tanpa
+            // baris akses, form tidak muncul di dashboard perawat & URL 403.
+            ['profesi_id' => 1, 'form_id' => 57, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+
+            // Discharge Planning (form 17): Dokter & Perawat full CRUD.
+            ['profesi_id' => 1, 'form_id' => 17, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 17, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Pemulangan Pasien (form 18): Dokter & Perawat full CRUD.
+            ['profesi_id' => 1, 'form_id' => 18, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 18, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Triage IGD (form 19): Dokter & Perawat full CRUD.
+            ['profesi_id' => 1, 'form_id' => 19, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 19, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
         ];
 
         foreach ($akses as $row) {
