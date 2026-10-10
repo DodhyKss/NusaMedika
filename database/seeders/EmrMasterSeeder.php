@@ -104,6 +104,7 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_extra_id' => 1, 'dashboard_menu_sub_id' => 2, 'nama_sub_menu_extra' => 'Pengkajian Awal Keperawatan'],
             ['dashboard_menu_sub_extra_id' => 2, 'dashboard_menu_sub_id' => 2, 'nama_sub_menu_extra' => 'Pengkajian Harian Keperawatan'],
             ['dashboard_menu_sub_extra_id' => 3, 'dashboard_menu_sub_id' => 12, 'nama_sub_menu_extra' => 'Tanda Vital'],
+            ['dashboard_menu_sub_extra_id' => 4, 'dashboard_menu_sub_id' => 12, 'nama_sub_menu_extra' => 'Bundle VAP'],
         ];
 
         foreach ($extras as $extra) {
@@ -145,6 +146,7 @@ class EmrMasterSeeder extends Seeder
             // konsultasi. Tersedia di semua jenis rawat. id_dash_menu "1.11".
             ['form_id' => 12, 'nama_form' => 'SBAR',                                 'slug' => 'sbar',                               'id_dash_menu' => '1.11',  'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 13, 'nama_form' => 'Tanda Vital',                          'slug' => 'tanda_vital',                        'id_dash_menu' => '2.12.3', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            ['form_id' => 14, 'nama_form' => 'Bundle VAP',                           'slug' => 'bundle_vap',                         'id_dash_menu' => '2.12.4', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
         ];
 
         foreach ($forms as $form) {
@@ -244,6 +246,22 @@ class EmrMasterSeeder extends Seeder
             // sudah ada.
             155 => 'Tanggal Observasi', 156 => 'Waktu Observasi',
             157 => 'Flow Rate Oksigen',
+
+            // Bundle Pencegahan VAP (form 14): 10 butir bundle (vap_1..vap_10)
+            // + 3 field ringkasan kepatuhan.
+            158 => 'Bundle VAP 1 - Elevasi Kepala 30-45 Derajat',
+            159 => 'Bundle VAP 2 - Sedasi Minimal / SAT-SBT',
+            160 => 'Bundle VAP 3 - Oral Care Chlorhexidine',
+            161 => 'Bundle VAP 4 - Profilaksis Tukak Lambung',
+            162 => 'Bundle VAP 5 - Profilaksis DVT',
+            163 => 'Bundle VAP 6 - Suction Subglottik',
+            164 => 'Bundle VAP 7 - Hand Hygiene',
+            165 => 'Bundle VAP 8 - Tekanan Cuff',
+            166 => 'Bundle VAP 9 - Ganti Circuit Ventilator',
+            167 => 'Bundle VAP 10 - Evaluasi Weaning',
+            168 => 'Skor Kepatuhan Bundle VAP',
+            169 => 'Persen Kepatuhan Bundle VAP',
+            170 => 'Kategori Kepatuhan Bundle VAP',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -466,6 +484,22 @@ class EmrMasterSeeder extends Seeder
 
                 'keterangan' => 77,            // reuse objek 77 "Keterangan"
             ],
+
+            // Bundle Pencegahan VAP (form 14).
+            //
+            // 10 butir bundle memakai variabel BERSUFFIX vap_1..vap_10, bukan
+            // satu variabel `vap` dengan 10 baris, karena
+            // EmrHelper::emrDetailByVariabel() melakukan pluck('value','variabel')
+            // — 10 baris untuk variabel sama akan tertimpa oleh baris terakhir
+            // sehingga butir kedua dst. HILANG saat form dibuka lagi.
+            14 => [
+                'tanggal_bundle' => 155,       // wajib (date), reuse objek 155
+                'waktu_bundle' => 156,         // wajib (jam, H:i), reuse objek 156
+                'vap_skor' => 168,             // TURUNAN, jumlah butir "Ya"
+                'vap_persen' => 169,           // TURUNAN, persen kepatuhan
+                'vap_kategori' => 170,         // TURUNAN, kategori kepatuhan
+                'catatan' => 77,               // reuse objek 77 "Keterangan"
+            ],
         ];
 
         // Baris obat/BMHP (maks 20 baris per tindakan): variabel obat_1..obat_20
@@ -485,6 +519,16 @@ class EmrMasterSeeder extends Seeder
             $mappingBarisObat['jumlah_'.$baris] = 70;
         }
         $mapping[10] = array_merge($mapping[10], $mappingBarisObat);
+
+        // Butir bundle VAP (form 14): 10 variabel, satu per butir, dipetakan ke
+        // objek 158-167. Suffiks dipakai dengan alasan yang sama seperti baris
+        // obat/BMHP di atas — key HARUS unik agar seluruh butir ikut terbaca
+        // saat form dibuka lagi.
+        $mappingButirVap = [];
+        for ($butir = 1; $butir <= 10; $butir++) {
+            $mappingButirVap['vap_'.$butir] = 157 + $butir;
+        }
+        $mapping[14] = array_merge($mapping[14], $mappingButirVap);
 
         foreach ($mapping as $formId => $variabels) {
             foreach ($variabels as $variabel => $objekId) {
@@ -535,6 +579,7 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(11);
         EmrHelper::backfillObjekId(12);
         EmrHelper::backfillObjekId(13);
+        EmrHelper::backfillObjekId(14);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -578,6 +623,10 @@ class EmrMasterSeeder extends Seeder
             // create/read/update/delete, semua jenis rawat.
             ['profesi_id' => 1, 'form_id' => 13, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 13, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Bundle VAP (form 14): Dokter & Perawat create/read/update/delete,
+            // semua jenis rawat.
+            ['profesi_id' => 1, 'form_id' => 14, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 14, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
         ];
 
         foreach ($akses as $row) {
