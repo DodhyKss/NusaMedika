@@ -62,6 +62,10 @@ class EmrMasterSeeder extends Seeder
             // (Str::studly('sbar') = "Sbar", bukan "SBAR" — jadi nama folder
             // controller/view tetap Sbar).
             ['dashboard_menu_sub_id' => 11, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'SBAR'],
+            // Menu 2 "Catatan Keperawatan" — Observasi Harian. Sub menu DENGAN
+            // extra, jadi id_dash_menu = "2.12.3" dan form_name di dashboard
+            // diambil dari Str::slug(nama_sub_menu_extra) = "tanda_vital".
+            ['dashboard_menu_sub_id' => 12, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Observasi Harian'],
             // Menu 2 "Catatan Keperawatan"
             ['dashboard_menu_sub_id' => 2, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Pengkajian Keperawatan'],
             // Menu 3 "Resep" (lama, soft-delete) — sub 3 "Peresepan Obat" digantikan "Order Resep"
@@ -99,6 +103,7 @@ class EmrMasterSeeder extends Seeder
             // Sub Menu 2 "Pengkajian Keperawatan"
             ['dashboard_menu_sub_extra_id' => 1, 'dashboard_menu_sub_id' => 2, 'nama_sub_menu_extra' => 'Pengkajian Awal Keperawatan'],
             ['dashboard_menu_sub_extra_id' => 2, 'dashboard_menu_sub_id' => 2, 'nama_sub_menu_extra' => 'Pengkajian Harian Keperawatan'],
+            ['dashboard_menu_sub_extra_id' => 3, 'dashboard_menu_sub_id' => 12, 'nama_sub_menu_extra' => 'Tanda Vital'],
         ];
 
         foreach ($extras as $extra) {
@@ -138,7 +143,8 @@ class EmrMasterSeeder extends Seeder
             // SBAR (Situation-Background-Assessment-Recommendation): format
             // komunikasi terstruktur untuk serah terima antar shift / permintaan
             // konsultasi. Tersedia di semua jenis rawat. id_dash_menu "1.11".
-            ['form_id' => 12, 'nama_form' => 'SBAR', 'slug' => 'sbar', 'id_dash_menu' => '1.11', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            ['form_id' => 12, 'nama_form' => 'SBAR',                                 'slug' => 'sbar',                               'id_dash_menu' => '1.11',  'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
+            ['form_id' => 13, 'nama_form' => 'Tanda Vital',                          'slug' => 'tanda_vital',                        'id_dash_menu' => '2.12.3', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
         ];
 
         foreach ($forms as $form) {
@@ -232,6 +238,12 @@ class EmrMasterSeeder extends Seeder
             149 => 'Cara Komunikasi', 150 => 'Penerima Informasi',
             151 => 'S - Situation', 152 => 'B - Background',
             153 => 'A - Assessment', 154 => 'R - Recommendation',
+
+            // Tanda Vital / Observasi Harian (form 13). Sisanya (seluruh tanda
+            // vital, GCS, kesadaran, oksigen, EWS, nyeri) REUSE objek yang
+            // sudah ada.
+            155 => 'Tanggal Observasi', 156 => 'Waktu Observasi',
+            157 => 'Flow Rate Oksigen',
         ];
 
         foreach ($objeks as $objekId => $namaObjek) {
@@ -414,6 +426,46 @@ class EmrMasterSeeder extends Seeder
                 'alergi' => 17,               // opsional, reuse objek 17 "Alergi"
                 'catatan_tambahan' => 77,     // opsional, reuse objek 77 "Keterangan"
             ],
+
+            // Tanda Vital / Observasi Harian (form 13).
+            //
+            // Sengaja HANYA 3 objek baru (tanggal, waktu observasi, dan flow
+            // rate oksigen); seluruh tanda vital, BMI, kesadaran, oksigen, EWS,
+            // dan nyeri memakai objek yang sudah ada supaya laporan antar form
+            // konsisten.
+            13 => [
+                'tanggal_observasi' => 155,    // wajib (date)
+                'waktu_observasi' => 156,      // wajib (jam, H:i)
+
+                // Tanda vital
+                'td_sistolik' => 6,            // wajib, parameter EWS
+                'td_diastolik' => 7,           // wajib
+                'nadi' => 10,                  // wajib, parameter EWS
+                'pernapasan' => 12,            // wajib, parameter EWS
+                'suhu' => 11,                  // wajib, parameter EWS
+                'saturasi' => 15,              // wajib, parameter EWS
+                'berat_badan' => 8,            // opsional
+                'tinggi_badan' => 9,           // opsional
+                'bmi' => 58,                   // TURUNAN, dihitung ulang di server
+
+                // Kesadaran & pemberian oksigen
+                'kesadaran' => 51,             // wajib, parameter EWS
+                'oksigen' => 18,               // wajib, parameter EWS (Air/Oksigen)
+                'cara_oksigen' => 19,          // wajib bila oksigen = Oksigen
+                'flow_rate' => 157,            // L/menit, opsional
+                'ett' => 20,                   // radio Ya/Tidak
+
+                // Penilaian nyeri
+                'nyeri' => 14,
+                'skor_nyeri' => 140,           // opsional, relevan bila nyeri = Ya
+
+                // EVM (lihat App\Helpers\EwsHelper)
+                'total_ews' => 142,            // TURUNAN
+                'kategori_ews' => 143,         // TURUNAN
+                'ews_tidak_diukur' => 144,     // daftar parameter "tidak diukur"
+
+                'keterangan' => 77,            // reuse objek 77 "Keterangan"
+            ],
         ];
 
         // Baris obat/BMHP (maks 20 baris per tindakan): variabel obat_1..obat_20
@@ -482,6 +534,7 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(10);
         EmrHelper::backfillObjekId(11);
         EmrHelper::backfillObjekId(12);
+        EmrHelper::backfillObjekId(13);
 
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -521,6 +574,10 @@ class EmrMasterSeeder extends Seeder
             // jenis rawat — format komunikasi antar petugas.
             ['profesi_id' => 1, 'form_id' => 12, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 12, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Tanda Vital / Observasi Harian (form 13): Dokter & Perawat
+            // create/read/update/delete, semua jenis rawat.
+            ['profesi_id' => 1, 'form_id' => 13, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 13, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
         ];
 
         foreach ($akses as $row) {
