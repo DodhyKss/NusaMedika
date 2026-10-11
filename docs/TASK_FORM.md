@@ -1,7 +1,7 @@
 # TASK FORM EMR — NusaMedika
 
 **Status dokumen:** sumber kebenaran progress implementasi form EMR.
-**Terakhir diperbarui:** 2026-10-10
+**Terakhir diperbarui:** 2026-10-11
 **Acuan:** `docs/ALOKASI_ID_GLOBAL.md` (ID), `docs/PANDUAN_IMPLEMENTASI_FORM_EMR.md` (cara), `docs/KONSEP_*.md` (spesifikasi per form).
 
 > **WAJIB baca file ini sebelum menambah form EMR baru.** Satu form = satu baris task.
@@ -79,12 +79,12 @@ Sebuah task berstatus ✅ bila **SEMUA** butir berikut terpenuhi:
 | Fase | Lingkup | Total | ⬜ | 🔄 | ✅ | ⛔ | Progres |
 |---|---|---|---|---|---|---|---|
 | **P1** | Catatan Medis Lanjutan | 7 | 0 | 0 | 7 | 0 | **100%** |
-| **P2** | Asuhan Keperawatan | 23 | 23 | 0 | 0 | 0 | 0% |
+| **P2** | Asuhan Keperawatan | 23 | 0 | 0 | 23 | 0 | **100%** |
 | **P3** | Gizi, Farmasi & Penunjang | 13 | 12 | 0 | 0 | 1 | 0% |
 | **P4** | Kebidanan & MCU | 26 | 25 | 0 | 0 | 1 | 0% |
 | **P5** | Bedah, Anestesi & ICU | 23 | 20 | 0 | 0 | 3 | 0% |
 | **P6** | Onkologi, Psikososial & Formulir | 22 | 22 | 0 | 0 | 0 | 0% |
-| **Total** | 6 fase | **114** | **109** | 0 | 0 | **5** | **0%** |
+| **Total** | 6 fase | **114** | **84** | 0 | **30** | **5** | **26%** |
 
 
 
@@ -151,29 +151,29 @@ Sebuah task berstatus ✅ bila **SEMUA** butir berikut terpenuhi:
 
 | Task | Nama Form | `slug` | `id_dash_menu` | ri/rj/igd/mcu | Status | Owner | Dokumen Konsep | Folder Controller/View | Catatan / Prasyarat |
 |---|---|---|---|---|---|---|---|---|---|
-| `EMR-022` | Rencana Asuhan Keperawatan | `rencana_asuhan_keperawatan` | `2.73.26` | 1/0/0/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/RencanaAsuhanKeperawatan/` · `moduls/EMR/RencanaAsuhanKeperawatan/` | — |
-| `EMR-023` | Issues Keperawatan | `issues_keperawatan` | `2.73.27` | 1/0/0/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/IssuesKeperawatan/` · `moduls/EMR/IssuesKeperawatan/` | — |
-| `EMR-024` | Intake | `intake` | `2.93.46` | 1/0/0/0 | ⬜ |  | KONSEP_CAIRAN_BALANCE.md | `EMR/Intake/` · `moduls/EMR/Intake/` | — |
-| `EMR-025` | Output | `output` | `2.93.47` | 1/0/0/0 | ⬜ |  | KONSEP_CAIRAN_BALANCE.md | `EMR/Output/` · `moduls/EMR/Output/` | — |
-| `EMR-026` | Monitoring Cairan | `monitoring_cairan` | `9.94` | 1/0/0/0 | ⬜ |  | KONSEP_CAIRAN_BALANCE.md | `EMR/MonitoringCairan/` · `moduls/EMR/MonitoringCairan/` | — |
-| `EMR-027` | Penilaian Nyeri | `penilaian_nyeri` | `9.113.66` | 1/1/1/0 | ⬜ |  | KONSEP_NYERI.md | `EMR/PenilaianNyeri/` · `moduls/EMR/PenilaianNyeri/` | — |
-| `EMR-028` | Kesadaran & Pemberian O2 | `kesadaran_oksigen` | `9.95` | 1/0/0/0 | ⬜ |  | KONSEP_CAIRAN_BALANCE.md | `EMR/KesadaranOksigen/` · `moduls/EMR/KesadaranOksigen/` | — |
-| `EMR-029` | Handover / Serah Terima | `handover` | `2.74.28` | 1/0/0/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/Handover/` · `moduls/EMR/Handover/` | — |
-| `EMR-030` | Monitoring & Evaluasi Risiko Jatuh | `monitoring_risiko_jatuh` | `8.133.86` | 1/0/0/0 | ⬜ |  | KONSEP_RISIKO_JATUH_LANJUTAN.md | `EMR/MonitoringRisikoJatuh/` · `moduls/EMR/MonitoringRisikoJatuh/` | — |
-| `EMR-031` | Asesmen Kebutuhan Edukasi | `asesmen_kebutuhan_edukasi` | `2.75.29` | 1/1/0/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/AsesmenKebutuhanEdukasi/` · `moduls/EMR/AsesmenKebutuhanEdukasi/` | — |
-| `EMR-032` | Penilaian Risiko Dekubitus (Norton) | `penilaian_risiko_dekubitus` | `8.134.87` | 1/0/0/0 | ⬜ |  | KONSEP_RISIKO_JATUH_LANJUTAN.md | `EMR/PenilaianRisikoDekubitus/` · `moduls/EMR/PenilaianRisikoDekubitus/` | — |
-| `EMR-033` | Barthel Index | `barthel_index` | `8.134.88` | 1/0/0/0 | ⬜ |  | KONSEP_RISIKO_JATUH_LANJUTAN.md | `EMR/BarthelIndex/` · `moduls/EMR/BarthelIndex/` | — |
-| `EMR-034` | Asesmen Status Fungsional | `asesmen_status_fungsional` | `8.76.31` | 1/1/0/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/AsesmenStatusFungsional/` · `moduls/EMR/AsesmenStatusFungsional/` | — |
-| `EMR-035` | Pengkajian Keperawatan Kritis | `pengkajian_keperawatan_kritis` | `2.75.30` | 1/0/1/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/PengkajianKeperawatanKritis/` · `moduls/EMR/PengkajianKeperawatanKritis/` | — |
-| `EMR-036` | Metode Nyeri | `metode_nyeri` | `9.113.67` | 1/1/1/0 | ⬜ |  | KONSEP_NYERI.md | `EMR/MetodeNyeri/` · `moduls/EMR/MetodeNyeri/` | — |
-| `EMR-037` | Body Map Nyeri | `body_map_nyeri` | `9.114` | 1/1/1/0 | ⬜ |  | KONSEP_NYERI.md | `EMR/BodyMapNyeri/` · `moduls/EMR/BodyMapNyeri/` | — |
-| `EMR-038` | Skrining Nyeri Perina | `skrining_nyeri_perina` | `9.113.68` | 1/0/0/0 | ⬜ |  | KONSEP_NYERI.md | `EMR/SkriningNyeriPerina/` · `moduls/EMR/SkriningNyeriPerina/` | — |
-| `EMR-054` | Catatan Keperawatan Rawat Jalan | `catatan_keperawatan_rajal` | `8.77.37` | 0/1/0/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/CatatanKeperawatanRajal/` · `moduls/EMR/CatatanKeperawatanRajal/` | — |
-| `EMR-055` | Riwayat Penyakit | `riwayat_penyakit` | `8.77.35` | 1/1/1/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/RiwayatPenyakit/` · `moduls/EMR/RiwayatPenyakit/` | — |
-| `EMR-056` | Riwayat Keluarga | `riwayat_keluarga` | `8.77.36` | 1/1/1/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/RiwayatKeluarga/` · `moduls/EMR/RiwayatKeluarga/` | — |
-| `EMR-123` | Asesmen Akhir Kehidupan | `asesmen_akhir_kehidupan` | `8.76.33` | 1/0/1/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/AsesmenAkhirKehidupan/` · `moduls/EMR/AsesmenAkhirKehidupan/` | — |
-| `EMR-124` | Uji Fungsi & Asesment | `uji_fungsi_asesment` | `8.76.34` | 0/1/0/1 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/UjiFungsiAsesment/` · `moduls/EMR/UjiFungsiAsesment/` | — |
-| `EMR-125` | Respon Emosi & Status Mental | `respon_emosi` | `8.76.32` | 1/1/1/0 | ⬜ |  | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/ResponEmosi/` · `moduls/EMR/ResponEmosi/` | — |
+| `EMR-022` | Rencana Asuhan Keperawatan | `rencana_asuhan_keperawatan` | `2.73.26` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/RencanaAsuhanKeperawatan/` · `moduls/EMR/RencanaAsuhanKeperawatan/` | — |
+| `EMR-023` | Issues Keperawatan | `issues_keperawatan` | `2.73.27` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/IssuesKeperawatan/` · `moduls/EMR/IssuesKeperawatan/` | — |
+| `EMR-024` | Intake | `intake` | `2.93.46` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_CAIRAN_BALANCE.md | `EMR/Intake/` · `moduls/EMR/Intake/` | — |
+| `EMR-025` | Output | `output` | `2.93.47` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_CAIRAN_BALANCE.md | `EMR/Output/` · `moduls/EMR/Output/` | — |
+| `EMR-026` | Monitoring Cairan | `monitoring_cairan` | `9.94` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_CAIRAN_BALANCE.md | `EMR/MonitoringCairan/` · `moduls/EMR/MonitoringCairan/` | — |
+| `EMR-027` | Penilaian Nyeri | `penilaian_nyeri` | `9.113.66` | 1/1/1/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_NYERI.md | `EMR/PenilaianNyeri/` · `moduls/EMR/PenilaianNyeri/` | — |
+| `EMR-028` | Kesadaran & Pemberian O2 | `kesadaran_oksigen` | `9.95` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_CAIRAN_BALANCE.md | `EMR/KesadaranOksigen/` · `moduls/EMR/KesadaranOksigen/` | — |
+| `EMR-029` | Handover / Serah Terima | `handover` | `2.74.28` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/Handover/` · `moduls/EMR/Handover/` | — |
+| `EMR-030` | Monitoring & Evaluasi Risiko Jatuh | `monitoring_risiko_jatuh` | `8.133.86` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_RISIKO_JATUH_LANJUTAN.md | `EMR/MonitoringRisikoJatuh/` · `moduls/EMR/MonitoringRisikoJatuh/` | — |
+| `EMR-031` | Asesmen Kebutuhan Edukasi | `asesmen_kebutuhan_edukasi` | `2.75.29` | 1/1/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/AsesmenKebutuhanEdukasi/` · `moduls/EMR/AsesmenKebutuhanEdukasi/` | — |
+| `EMR-032` | Penilaian Risiko Dekubitus (Norton) | `penilaian_risiko_dekubitus` | `8.134.87` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_RISIKO_JATUH_LANJUTAN.md | `EMR/PenilaianRisikoDekubitus/` · `moduls/EMR/PenilaianRisikoDekubitus/` | — |
+| `EMR-033` | Barthel Index | `barthel_index` | `8.134.88` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_RISIKO_JATUH_LANJUTAN.md | `EMR/BarthelIndex/` · `moduls/EMR/BarthelIndex/` | — |
+| `EMR-034` | Asesmen Status Fungsional | `asesmen_status_fungsional` | `8.76.31` | 1/1/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/AsesmenStatusFungsional/` · `moduls/EMR/AsesmenStatusFungsional/` | — |
+| `EMR-035` | Pengkajian Keperawatan Kritis | `pengkajian_keperawatan_kritis` | `2.75.30` | 1/0/1/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/PengkajianKeperawatanKritis/` · `moduls/EMR/PengkajianKeperawatanKritis/` | — |
+| `EMR-036` | Metode Nyeri | `metode_nyeri` | `9.113.67` | 1/1/1/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_NYERI.md | `EMR/MetodeNyeri/` · `moduls/EMR/MetodeNyeri/` | — |
+| `EMR-037` | Body Map Nyeri | `body_map_nyeri` | `9.114` | 1/1/1/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_NYERI.md | `EMR/BodyMapNyeri/` · `moduls/EMR/BodyMapNyeri/` | — |
+| `EMR-038` | Skrining Nyeri Perina | `skrining_nyeri_perina` | `9.113.68` | 1/0/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_NYERI.md | `EMR/SkriningNyeriPerina/` · `moduls/EMR/SkriningNyeriPerina/` | — |
+| `EMR-054` | Catatan Keperawatan Rawat Jalan | `catatan_keperawatan_rajal` | `8.77.37` | 0/1/0/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/CatatanKeperawatanRajal/` · `moduls/EMR/CatatanKeperawatanRajal/` | — |
+| `EMR-055` | Riwayat Penyakit | `riwayat_penyakit` | `8.77.35` | 1/1/1/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/RiwayatPenyakit/` · `moduls/EMR/RiwayatPenyakit/` | — |
+| `EMR-056` | Riwayat Keluarga | `riwayat_keluarga` | `8.77.36` | 1/1/1/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/RiwayatKeluarga/` · `moduls/EMR/RiwayatKeluarga/` | — |
+| `EMR-123` | Asesmen Akhir Kehidupan | `asesmen_akhir_kehidupan` | `8.76.33` | 1/0/1/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/AsesmenAkhirKehidupan/` · `moduls/EMR/AsesmenAkhirKehidupan/` | — |
+| `EMR-124` | Uji Fungsi & Asesment | `uji_fungsi_asesment` | `8.76.34` | 0/1/0/1 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/UjiFungsiAsesment/` · `moduls/EMR/UjiFungsiAsesment/` | — |
+| `EMR-125` | Respon Emosi & Status Mental | `respon_emosi` | `8.76.32` | 1/1/1/0 | ✅ | P2 · selesai 2026-10-11 | KONSEP_ASUHAN_KEPERAWATAN_LANJUTAN.md | `EMR/ResponEmosi/` · `moduls/EMR/ResponEmosi/` | — |
 
 ## 9. Fase P3 — Gizi, Farmasi & Penunjang
 
@@ -311,11 +311,15 @@ Task berikut **tidak bisa diselesaikan** tanpa keputusan manusia. Jangan dikerja
 | `docs/ANALISIS_KEKURANGAN_FORM.md` | Analisis gap vs SIMRS Tenriawaru |
 | `docs/KONSEP_*.md` (19 file) | Spesifikasi tiap domain: field, mapping, akses, validasi, cetak |
 | `AGENTS.md` | Aturan proyek; section *Status Implementasi Form EMR* menunjuk ke file ini |
+| `tools/e2e.php` + `tools/lib_pay.php` | Harness verifikasi E2E (payload builder introspektif) |
 
 ## 15. Riwayat
 
 | Tanggal | Perubahan |
 |---|---|
 | 2026-10-10 | File dibuat. 114 form (16–129) + 12 prasyarat + 15 form eksisting tercatat. 5 task `⛔`. |
+| 2026-10-11 | **Fase P2 selesai**: 23 form (22–38, 54–56, 123–125) → ✅. Tambah objek 236–361, menu 8 "Penilaian Klinis" & 9 "Monitoring", sub 73–77/93–95/113–114/133–134, extra 26–37/46–47/66–68/86–88. 6 helper baru. Semua terverifikasi E2E (363 variabel).
+| 2026-10-11 | Tambah harness E2E permanen `tools/e2e.php` + `tools/lib_pay.php` (payload builder introspektif dari aturan `validated()`).
+| 2026-10-11 | **Verifikasi akhir P1+P2**: 30 form (16-38, 54-57, 123-125) lulus E2E penuh - **559 variabel**, `ALL OK`. Harness diperkuat: `min`/`max` hanya untuk kolom numerik, `phpListValues()` (pecah literal PHP hormati kutip/kurung), `Rule::exists()` objek + rantai `->where()`, blok rules `$var = [...]` yang di-*validate* via variabel, deteksi `array` tanpa kutip. Harness kini auto-bersihkan data uji di akhir run (sebelumnya meninggalkan 35 baris `emr` + 442 nilai "Data Uji"). `pint --test` bersih, 0 CJK/garbled. Integritas: objek 361, form 45, mapping 923, akses 98, menu 9, sub 31, extra 26, 0 data uji tersisa. |
 | 2026-10-10 | **Fase P1 selesai**: form 16, 17, 18, 19, 20, 21, 57 → ✅. Seeder (objek 178–235, menu 6–7, sub 33/34/53/54) + controller + blade. Semua terverifikasi E2E: store/mapping/index/update/delete + gate akses. 2 bug nyata ditemukan & diperbaiki (`Rule::requiredIf` wrong-arity di TriageIgd; `$metaTriase` undefined). |
 

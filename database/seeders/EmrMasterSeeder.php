@@ -11,7 +11,6 @@ class EmrMasterSeeder extends Seeder
     public function run(): void
     {
         $now = now();
-
         // ======== Dashboard Pasien (dashboard_menu -> dashboard_menu_sub -> dashboard_menu_sub_extra) ========
         $menus = [
             ['dashboard_menu_id' => 1, 'nama_menu' => 'Catatan Medis'],
@@ -22,8 +21,10 @@ class EmrMasterSeeder extends Seeder
             // Menu BARU Fase P1.
             ['dashboard_menu_id' => 6, 'nama_menu' => 'Resume & Discharge'],
             ['dashboard_menu_id' => 7, 'nama_menu' => 'Gawat Darurat'],
+            // ===== Fase P2 — Asuhan Keperawatan, Cairan, Nyeri, Skala =====
+            ['dashboard_menu_id' => 8, 'nama_menu' => 'Penilaian Klinis'],
+            ['dashboard_menu_id' => 9, 'nama_menu' => 'Monitoring'],
         ];
-
         foreach ($menus as $menu) {
             DB::table('dashboard_menu')->updateOrInsert(
                 ['dashboard_menu_id' => $menu['dashboard_menu_id']],
@@ -34,7 +35,6 @@ class EmrMasterSeeder extends Seeder
                 ])
             );
         }
-
         // Menu lama "Resep" (3) digantikan menu "Order" (4) — soft-delete agar
         // tidak ada menu kosong yang tampil di dashboard pasien.
         DB::table('dashboard_menu')
@@ -44,7 +44,6 @@ class EmrMasterSeeder extends Seeder
                 'mod_time' => $now,
                 'mod_user_id' => 1,
             ]);
-
         $subMenus = [
             // Menu 1 "Catatan Medis"
             ['dashboard_menu_sub_id' => 1, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Soap'],
@@ -80,7 +79,6 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_id' => 6, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Radiologi'],
             // Menu 5 "Formulir" — tanpa extra; id_dash_menu form = "5.7".
             ['dashboard_menu_sub_id' => 7, 'dashboard_menu_id' => 5, 'nama_sub_menu' => 'Konsultasi'],
-
             // ===== Fase P1 — Catatan Medis LanjutAN =====
             // Menu 1 "Catatan Medis". Sub TANPA extra (link langsung), jadi
             // id_dash_menu = "1.{sub}" dan Str::slug(nama_sub_menu,'_') WAJIB
@@ -92,19 +90,31 @@ class EmrMasterSeeder extends Seeder
             // PERHATIKAN: Str::slug('Catatan Medis Visum','_') =
             // 'catatan_medis_visum' = form 57.slug, BUKAN form 21.
             ['dashboard_menu_sub_id' => 15, 'dashboard_menu_id' => 1, 'nama_sub_menu' => 'Catatan Medis Visum'],
-
             // Menu 6 "Resume & Discharge" — sub TANPA extra (link langsung).
             // dashboard_menu_sub_id bersifat GLOBAL, jadi bukan 1/2 melainkan 33/34
             // (lihat docs/ALOKASI_ID_GLOBAL.md §3).
             ['dashboard_menu_sub_id' => 33, 'dashboard_menu_id' => 6, 'nama_sub_menu' => 'Discharge Planning'],
             ['dashboard_menu_sub_id' => 34, 'dashboard_menu_id' => 6, 'nama_sub_menu' => 'Pemulangan Pasien'],
-
             // Menu 7 "Gawat Darurat" — sub 53 dipakai form 19 Triage IGD.
             // Sub 54 dicadangkan untuk Triage IGD OBGYN (form berikutnya).
             ['dashboard_menu_sub_id' => 53, 'dashboard_menu_id' => 7, 'nama_sub_menu' => 'Triage IGD'],
             ['dashboard_menu_sub_id' => 54, 'dashboard_menu_id' => 7, 'nama_sub_menu' => 'Triage IGD OBGYN'],
+            // ===== Sub-menu Fase P2 =====
+            // dashboard_menu_sub_id bersifat GLOBAL (lihat docs/ALOKASI_ID_GLOBAL.md §0).
+            // Str::slug(nama_sub_menu,'_') WAJIB sama dengan form.slug untuk sub TANPA extra.
+            ['dashboard_menu_sub_id' => 73, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Asuhan Keperawatan'],
+            ['dashboard_menu_sub_id' => 74, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Serah Terima'],
+            ['dashboard_menu_sub_id' => 75, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Asesmen Klinis Keperawatan'],
+            ['dashboard_menu_sub_id' => 76, 'dashboard_menu_id' => 8, 'nama_sub_menu' => 'Asesmen Pasien'],
+            ['dashboard_menu_sub_id' => 77, 'dashboard_menu_id' => 8, 'nama_sub_menu' => 'Anamnesis'],
+            ['dashboard_menu_sub_id' => 93, 'dashboard_menu_id' => 2, 'nama_sub_menu' => 'Balance Cairan'],
+            ['dashboard_menu_sub_id' => 94, 'dashboard_menu_id' => 9, 'nama_sub_menu' => 'Monitoring Cairan'],
+            ['dashboard_menu_sub_id' => 95, 'dashboard_menu_id' => 9, 'nama_sub_menu' => 'Kesadaran Oksigen'],
+            ['dashboard_menu_sub_id' => 113, 'dashboard_menu_id' => 9, 'nama_sub_menu' => 'Nyeri'],
+            ['dashboard_menu_sub_id' => 114, 'dashboard_menu_id' => 9, 'nama_sub_menu' => 'Body Map Nyeri'],
+            ['dashboard_menu_sub_id' => 133, 'dashboard_menu_id' => 8, 'nama_sub_menu' => 'Risiko Jatuh'],
+            ['dashboard_menu_sub_id' => 134, 'dashboard_menu_id' => 8, 'nama_sub_menu' => 'Penilaian Dekubitus'],
         ];
-
         foreach ($subMenus as $subMenu) {
             DB::table('dashboard_menu_sub')->updateOrInsert(
                 ['dashboard_menu_sub_id' => $subMenu['dashboard_menu_sub_id']],
@@ -115,7 +125,6 @@ class EmrMasterSeeder extends Seeder
                 ])
             );
         }
-
         // Sub menu lama "Peresepan Obat" (3) ikut di-soft-delete bersama menu "Resep".
         DB::table('dashboard_menu_sub')
             ->where('dashboard_menu_sub_id', 3)
@@ -124,7 +133,6 @@ class EmrMasterSeeder extends Seeder
                 'mod_time' => $now,
                 'mod_user_id' => 1,
             ]);
-
         $extras = [
             // Sub Menu 2 "Pengkajian Keperawatan"
             ['dashboard_menu_sub_extra_id' => 1, 'dashboard_menu_sub_id' => 2, 'nama_sub_menu_extra' => 'Pengkajian Awal Keperawatan'],
@@ -138,8 +146,28 @@ class EmrMasterSeeder extends Seeder
             // form 21. Kalau ditulis 'DAR (D-Rekognisi)' slug-nya jadi
             // 'dar_d_rekognisi' dan form 21 jadi yatim dari dashboard.
             ['dashboard_menu_sub_extra_id' => 6, 'dashboard_menu_sub_id' => 15, 'nama_sub_menu_extra' => 'DAR'],
+            // ===== Sub-extra Fase P2 (slug form diambil dari NAMA EXTRA) =====
+            ['dashboard_menu_sub_extra_id' => 26, 'dashboard_menu_sub_id' => 73, 'nama_sub_menu_extra' => 'Rencana Asuhan Keperawatan'],
+            ['dashboard_menu_sub_extra_id' => 27, 'dashboard_menu_sub_id' => 73, 'nama_sub_menu_extra' => 'Issues Keperawatan'],
+            ['dashboard_menu_sub_extra_id' => 28, 'dashboard_menu_sub_id' => 74, 'nama_sub_menu_extra' => 'Handover'],
+            ['dashboard_menu_sub_extra_id' => 29, 'dashboard_menu_sub_id' => 75, 'nama_sub_menu_extra' => 'Asesmen Kebutuhan Edukasi'],
+            ['dashboard_menu_sub_extra_id' => 30, 'dashboard_menu_sub_id' => 75, 'nama_sub_menu_extra' => 'Pengkajian Keperawatan Kritis'],
+            ['dashboard_menu_sub_extra_id' => 31, 'dashboard_menu_sub_id' => 76, 'nama_sub_menu_extra' => 'Asesmen Status Fungsional'],
+            ['dashboard_menu_sub_extra_id' => 32, 'dashboard_menu_sub_id' => 76, 'nama_sub_menu_extra' => 'Respon Emosi'],
+            ['dashboard_menu_sub_extra_id' => 33, 'dashboard_menu_sub_id' => 76, 'nama_sub_menu_extra' => 'Asesmen Akhir Kehidupan'],
+            ['dashboard_menu_sub_extra_id' => 34, 'dashboard_menu_sub_id' => 76, 'nama_sub_menu_extra' => 'Uji Fungsi Asesment'],
+            ['dashboard_menu_sub_extra_id' => 35, 'dashboard_menu_sub_id' => 77, 'nama_sub_menu_extra' => 'Riwayat Penyakit'],
+            ['dashboard_menu_sub_extra_id' => 36, 'dashboard_menu_sub_id' => 77, 'nama_sub_menu_extra' => 'Riwayat Keluarga'],
+            ['dashboard_menu_sub_extra_id' => 37, 'dashboard_menu_sub_id' => 77, 'nama_sub_menu_extra' => 'Catatan Keperawatan Rajal'],
+            ['dashboard_menu_sub_extra_id' => 46, 'dashboard_menu_sub_id' => 93, 'nama_sub_menu_extra' => 'Intake'],
+            ['dashboard_menu_sub_extra_id' => 47, 'dashboard_menu_sub_id' => 93, 'nama_sub_menu_extra' => 'Output'],
+            ['dashboard_menu_sub_extra_id' => 66, 'dashboard_menu_sub_id' => 113, 'nama_sub_menu_extra' => 'Penilaian Nyeri'],
+            ['dashboard_menu_sub_extra_id' => 67, 'dashboard_menu_sub_id' => 113, 'nama_sub_menu_extra' => 'Metode Nyeri'],
+            ['dashboard_menu_sub_extra_id' => 68, 'dashboard_menu_sub_id' => 113, 'nama_sub_menu_extra' => 'Skrining Nyeri Perina'],
+            ['dashboard_menu_sub_extra_id' => 86, 'dashboard_menu_sub_id' => 133, 'nama_sub_menu_extra' => 'Monitoring Risiko Jatuh'],
+            ['dashboard_menu_sub_extra_id' => 87, 'dashboard_menu_sub_id' => 134, 'nama_sub_menu_extra' => 'Penilaian Risiko Dekubitus'],
+            ['dashboard_menu_sub_extra_id' => 88, 'dashboard_menu_sub_id' => 134, 'nama_sub_menu_extra' => 'Barthel Index'],
         ];
-
         foreach ($extras as $extra) {
             DB::table('dashboard_menu_sub_extra')->updateOrInsert(
                 ['dashboard_menu_sub_extra_id' => $extra['dashboard_menu_sub_extra_id']],
@@ -150,7 +178,6 @@ class EmrMasterSeeder extends Seeder
                 ])
             );
         }
-
         // ======== Form EMR ========
         // id_dash_menu = "menu.sub.extra" sesuai view header_ehr (concat_ws('.', ...)); null berarti tanpa dashboard.
         // slug = basename folder/file EMR (form_name di URL /emr/form/{form_name}/...).
@@ -181,7 +208,6 @@ class EmrMasterSeeder extends Seeder
             ['form_id' => 13, 'nama_form' => 'Tanda Vital',                          'slug' => 'tanda_vital',                        'id_dash_menu' => '2.12.3', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 14, 'nama_form' => 'Bundle VAP',                           'slug' => 'bundle_vap',                         'id_dash_menu' => '2.12.4', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             ['form_id' => 15, 'nama_form' => 'Alat Invasif',                         'slug' => 'alat_invasif',                       'id_dash_menu' => '2.12.5', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
-
             // ===== Fase P1 — Catatan Medis Lanjutan =====
             // Resume Medis: ringkasan episode rawat inap. Tersedia di RI/RJ/IGD.
             // id_dash_menu "1.13" (menu 1 "Catatan Medis", sub 13 tanpa extra).
@@ -202,8 +228,31 @@ class EmrMasterSeeder extends Seeder
             ['form_id' => 18, 'nama_form' => 'Pemulangan Pasien', 'slug' => 'pemulangan_pasien', 'id_dash_menu' => '6.34', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
             // Triage IGD: KHUSUS IGD. id_dash_menu "7.53".
             ['form_id' => 19, 'nama_form' => 'Triage IGD', 'slug' => 'triage_igd', 'id_dash_menu' => '7.53', 'ri' => 0, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            // ===== Form Fase P2 =====
+            ['form_id' => 22, 'nama_form' => 'Rencana Asuhan Keperawatan', 'slug' => 'rencana_asuhan_keperawatan', 'id_dash_menu' => '2.73.26', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 23, 'nama_form' => 'Issues Keperawatan', 'slug' => 'issues_keperawatan', 'id_dash_menu' => '2.73.27', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 24, 'nama_form' => 'Intake', 'slug' => 'intake', 'id_dash_menu' => '2.93.46', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 25, 'nama_form' => 'Output', 'slug' => 'output', 'id_dash_menu' => '2.93.47', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 26, 'nama_form' => 'Monitoring Cairan', 'slug' => 'monitoring_cairan', 'id_dash_menu' => '9.94', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 27, 'nama_form' => 'Penilaian Nyeri', 'slug' => 'penilaian_nyeri', 'id_dash_menu' => '9.113.66', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 28, 'nama_form' => 'Kesadaran & Pemberian O2', 'slug' => 'kesadaran_oksigen', 'id_dash_menu' => '9.95', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 29, 'nama_form' => 'Handover / Serah Terima', 'slug' => 'handover', 'id_dash_menu' => '2.74.28', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 30, 'nama_form' => 'Monitoring & Evaluasi Risiko Jatuh', 'slug' => 'monitoring_risiko_jatuh', 'id_dash_menu' => '8.133.86', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 31, 'nama_form' => 'Asesmen Kebutuhan Edukasi', 'slug' => 'asesmen_kebutuhan_edukasi', 'id_dash_menu' => '2.75.29', 'ri' => 1, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 32, 'nama_form' => 'Penilaian Risiko Dekubitus (Norton)', 'slug' => 'penilaian_risiko_dekubitus', 'id_dash_menu' => '8.134.87', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 33, 'nama_form' => 'Barthel Index', 'slug' => 'barthel_index', 'id_dash_menu' => '8.134.88', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 34, 'nama_form' => 'Asesmen Status Fungsional', 'slug' => 'asesmen_status_fungsional', 'id_dash_menu' => '8.76.31', 'ri' => 1, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 35, 'nama_form' => 'Pengkajian Keperawatan Kritis', 'slug' => 'pengkajian_keperawatan_kritis', 'id_dash_menu' => '2.75.30', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 36, 'nama_form' => 'Metode Nyeri', 'slug' => 'metode_nyeri', 'id_dash_menu' => '9.113.67', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 37, 'nama_form' => 'Body Map Nyeri', 'slug' => 'body_map_nyeri', 'id_dash_menu' => '9.114', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 38, 'nama_form' => 'Skrining Nyeri Perina', 'slug' => 'skrining_nyeri_perina', 'id_dash_menu' => '9.113.68', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 54, 'nama_form' => 'Catatan Keperawatan Rawat Jalan', 'slug' => 'catatan_keperawatan_rajal', 'id_dash_menu' => '8.77.37', 'ri' => 0, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 55, 'nama_form' => 'Riwayat Penyakit', 'slug' => 'riwayat_penyakit', 'id_dash_menu' => '8.77.35', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 56, 'nama_form' => 'Riwayat Keluarga', 'slug' => 'riwayat_keluarga', 'id_dash_menu' => '8.77.36', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 123, 'nama_form' => 'Asesmen Akhir Kehidupan', 'slug' => 'asesmen_akhir_kehidupan', 'id_dash_menu' => '8.76.33', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 124, 'nama_form' => 'Uji Fungsi & Asesment', 'slug' => 'uji_fungsi_asesment', 'id_dash_menu' => '8.76.34', 'ri' => 0, 'rj' => 1, 'igd' => 0, 'mcu' => 1],
+            ['form_id' => 125, 'nama_form' => 'Respon Emosi & Status Mental', 'slug' => 'respon_emosi', 'id_dash_menu' => '8.76.32', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
         ];
-
         foreach ($forms as $form) {
             DB::table('form')->updateOrInsert(
                 ['form_id' => $form['form_id']],
@@ -214,7 +263,6 @@ class EmrMasterSeeder extends Seeder
                 ])
             );
         }
-
         // ======== Objek Master ========
         // Basis data objek mengikuti penomoran OBJEK_ID_* di .env.example lama (1-68).
         $objeks = [
@@ -238,7 +286,6 @@ class EmrMasterSeeder extends Seeder
             83 => 'Jenis Konsultasi', 84 => 'Bagian Tujuan Konsultasi',
             85 => 'Dokter Tujuan Konsultasi', 86 => 'Tanggal Kontrol',
             87 => 'Indikasi Konsultasi', 88 => 'Bagian Rehabilitasi Medik',
-
             // Pengkajian risiko jatuh (lihat App\Helpers\RisikoJatuhHelper).
             // Instrumen dipilih otomatis dari usia: HDS anak, MFS dewasa, TUG untuk pasien lanjut usia.
             89 => 'Risiko Jatuh - Instrumen', 90 => 'Risiko Jatuh - Skor',
@@ -263,45 +310,38 @@ class EmrMasterSeeder extends Seeder
             114 => 'Keluhan Utama Harian', 115 => 'Catatan Keperawatan',
             116 => 'Eliminasi (Bj)', 117 => 'Intake Cairan (ml)',
             118 => 'Intake Makanan (persen)', 119 => 'Tidur (jam)', 120 => 'Catatan Tambahan',
-
             // Implementasi Keperawatan (form 9). `nama_implementasi` disimpan sebagai
             // snapshot supaya riwayat tetap terbaca bila master di-rename atau
             // di-soft-delete (pola sama dengan order_laboratorium_detail.nama_tindakan).
             121 => 'Implementasi', 122 => 'Nama Implementasi',
             123 => 'Tanggal Implementasi', 124 => 'Waktu Implementasi',
             125 => 'Keterangan Implementasi', 126 => 'Respon Implementasi',
-
             // Tindakan Medis (form 10)
             127 => 'Dokter Penyetuju', 128 => 'Jenis Permintaan',
             129 => 'Tanggal Tindakan', 130 => 'Waktu Tindakan',
             131 => 'Hasil/Kondisi Pasca Tindakan', 132 => 'Pemakaian Obat/BMHP',
             133 => 'Jenis Barang', 134 => 'Nomor Batch',
-
             // Assesmen Awal Medis Rawat Jalan (form 11). Sisanya (keluhan
             // utama, seluruh tanda vital, kesadaran, nyeri, BMI, keterangan)
             // REUSE objek yang sudah ada.
             135 => 'Diagnosa Kerja', 136 => 'Tujuan Kunjungan',
             137 => 'Tanggal Assesmen', 138 => 'Waktu Assesmen',
             139 => 'Dokter Pemeriksa', 140 => 'Skor Nyeri',
-
             // Assesmen Awal Medis Rawat Jalan (form 11) — pelengkap.
             141 => 'Anamnesis', 142 => 'Total Skor EWS',
             143 => 'Kategori Risiko EWS',
             144 => 'Parameter EWS Tidak Diukur',
-
             // SBAR (form 12). `alergi` & `keterangan` reuse objek 17 & 77.
             145 => 'Tanggal SBAR', 146 => 'Waktu SBAR',
             147 => 'Shift', 148 => 'Urgensi SBAR',
             149 => 'Cara Komunikasi', 150 => 'Penerima Informasi',
             151 => 'S - Situation', 152 => 'B - Background',
             153 => 'A - Assessment', 154 => 'R - Recommendation',
-
             // Tanda Vital / Observasi Harian (form 13). Sisanya (seluruh tanda
             // vital, GCS, kesadaran, oksigen, EWS, nyeri) REUSE objek yang
             // sudah ada.
             155 => 'Tanggal Observasi', 156 => 'Waktu Observasi',
             157 => 'Flow Rate Oksigen',
-
             // Bundle Pencegahan VAP (form 14): 10 butir bundle (vap_1..vap_10)
             // + 3 field ringkasan kepatuhan.
             158 => 'Bundle VAP 1 - Elevasi Kepala 30-45 Derajat',
@@ -317,7 +357,6 @@ class EmrMasterSeeder extends Seeder
             168 => 'Skor Kepatuhan Bundle VAP',
             169 => 'Persen Kepatuhan Bundle VAP',
             170 => 'Kategori Kepatuhan Bundle VAP',
-
             // Alat Invasif (form 15). Sengaja objek BARU semua — bukan reuse
             // objek 155/156 ("Tanggal/Waktu Observasi") yang maknanya berbeda
             // dan akan membingungkan saat laporan antar form.
@@ -325,7 +364,6 @@ class EmrMasterSeeder extends Seeder
             173 => 'Alat Invasif', 174 => 'Lokasi Pemasangan Alat Invasif',
             175 => 'Tanggal Lepas Alat Invasif', 176 => 'Jam Lepas Alat Invasif',
             177 => 'Lama Pemasangan Alat Invasif (Hari)',
-
             // ===== Objek 178-199: Fase P1 (Resume Medis, Care Plan, DAR, Visum) =====
             // ID dikunci di docs/ALOKASI_ID_GLOBAL.md §1 — jangan diubah/digeser.
             // --- Form 16 Resume Medis ---
@@ -345,7 +383,6 @@ class EmrMasterSeeder extends Seeder
             // --- Form 57 Catatan Medis Visum ---
             197 => 'Jenis Visum', 198 => 'Nomor Visum Et Repertum',
             199 => 'Permintaan Visum',
-
             // ===== Objek 200-224: Fase P1 Discharge Planning & Pemulangan =====
             200 => 'Tanggal Masuk RS', 201 => 'Estimasi / Rencana Hari Rawat',
             202 => 'Rencana Tanggal Pemulangan', 203 => 'Pengaruh Perubahan Kondisi',
@@ -361,15 +398,46 @@ class EmrMasterSeeder extends Seeder
             221 => 'Edukasi / Penyuluhan yang Sudah Diberikan', 222 => 'Manajemen Nyeri',
             223 => 'Barang & Hasil yang Disyerahkan',
             224 => 'Masalah Keperawatan / Kebidanan Selama Dirawat',
-
             // ===== Objek 225-235: Fase P1 Triage IGD =====
             225 => 'Keadaan Umum', 226 => 'Jalan Nafas', 227 => 'Sirkulasi',
             228 => 'Akral', 229 => 'Pupil', 230 => 'Refleks Cahaya',
             231 => 'Jenis Anamnesis', 232 => 'Lokasi Nyeri',
             233 => 'Frekuensi Nyeri', 234 => 'Karakteristik Nyeri',
             235 => 'Prioritas Triase IGD',
+            // ===== Objek 236-361 — Fase P2 (Asuhan Keperawatan, Cairan, Nyeri, Skala) =====
+            236 => 'Diagnosa Keperawatan', 237 => 'Nama Diagnosa Keperawatan', 238 => 'Tujuan Keperawatan', 239 => 'Satuan Waktu Tujuan',
+            240 => 'Kriteria Hasil Keperawatan', 241 => 'Intervensi Keperawatan', 242 => 'Masalah Keperawatan', 243 => 'Faktor Berhubungan Dengan',
+            244 => 'Tanggal Serah Terima', 245 => 'Waktu Serah Terima', 246 => 'Petugas Serah Terima', 247 => 'Nama Petugas Serah Terima',
+            248 => 'Petugas Terima', 249 => 'Nama Petugas Terima', 250 => 'Ruang Tujuan Serah Terima', 251 => 'Waktu Konfirmasi Penerima',
+            252 => 'Jumlah Pasien Diserahterimakan', 253 => 'Status Kelengkapan Serah Terima', 254 => 'Kemampuan Bicara', 255 => 'Jenis Bahasa',
+            256 => 'Perlu Penerjemah', 257 => 'Nilai Kebudayaan', 258 => 'Keterangan Kebudayaan', 259 => 'Hambatan Belajar',
+            260 => 'Kemampuan Baca', 261 => 'Kebutuhan Belajar', 262 => 'Fungsional Makan (Feeding)', 263 => 'Fungsional Mandi (Bathing)',
+            264 => 'Fungsional Perawatan Diri (Grooming)', 265 => 'Fungsional Berpakaian', 266 => 'Fungsional Buang Air Kecil', 267 => 'Fungsional Buang Air Besar',
+            268 => 'Fungsional Penggunaan Toilet', 269 => 'Fungsional Transfer', 270 => 'Fungsional Mobilitas', 271 => 'Fungsional Naik Turun Tangga',
+            272 => 'Skor Status Fungsional', 273 => 'Interpretasi Status Fungsional', 274 => 'Asal Masuk Pasien', 275 => 'Rincian Asal Masuk',
+            276 => 'Jalan Nafas', 277 => 'Deviasi Trakea', 278 => 'Suara Napas Terdengar', 279 => 'Sirkulasi dan Perfusi',
+            280 => 'Nilai Kritis', 281 => 'Riwayat Perawatan Berulang', 282 => 'Skor Nyeri Kritis', 283 => 'Riwayat Penyakit Keluarga',
+            284 => 'Hubungan Keluarga', 285 => 'Waktu Asesmen Awal Kehidupan', 286 => 'Waktu Asesmen Akhir Kehidupan', 287 => 'Respon Emosi',
+            288 => 'Status Mental', 289 => 'Kebutuhan Perlindungan', 290 => 'Kebutuhan Teridentifikasi', 291 => '`total_intake > kebutuhan_cairan` ( Indonesian: intake melebihi kebutuhan )',
+            292 => 'Nama Cairan Infus', 293 => 'Volume Masukkan Infus (cc)', 294 => '`sisa_infus < 0` (infus terlampaui)', 295 => 'Intake Oral (cc)',
+            296 => 'Intake Spoel (cc)', 297 => 'Intake Transfusi (cc)', 298 => 'Intake Syringe Pump (cc)', 299 => 'Intake Lainnya (cc)',
+            300 => 'Output Urine (cc)', 301 => 'Output Drain (cc)', 302 => 'Output NGT (cc)', 303 => 'Output WSD (cc)',
+            304 => 'Output IWL (cc)', 305 => 'Output Lainnya (cc)', 306 => '`total_output < 0.5 × kebutuhan_cairan` (oliguria)', 307 => 'Total Intake Cairan 24 Jam (cc)',
+            308 => 'Dosis Infus (cc)', 309 => 'IVFD (cc/menit)', 310 => 'Kebutuhan Cairan Harian (cc)', 311 => '`balance_cairan` di luar rentang ±500 cc/hari, **atau** kumulation > ±2000 cc',
+            312 => 'Keterangan Monitoring Cairan', 313 => 'Frekuensi Nyeri', 314 => 'Karakteristik Nyeri', 315 => 'Faktor Pemicu yang Memperberat Nyeri',
+            316 => 'Faktor yang Mengurangi Nyeri', 317 => 'Lokasi Nyeri (Teks)', 318 => 'Skor FLACC', 319 => 'Metode Skala Nyeri',
+            320 => 'FLACC Wajah (Face)', 321 => 'FLACC Kaki (Legs)', 322 => 'FLACC Aktifitas (Activity)', 323 => 'FLACC Menangis (Cry)',
+            324 => 'FLACC Konsolabilitas', 325 => 'Total Skor FLACC', 326 => 'Gambar Lokasi Nyeri', 327 => 'Keterangan Lokasi Nyeri',
+            328 => 'NIPS Ekspresi Wajah', 329 => 'NIPS Tangisan', 330 => 'NIPS Pola Napas', 331 => 'NIPS Gerakan Lengan',
+            332 => 'NIPS Gerakan Tungkai', 333 => 'NIPS Status Jaga', 334 => 'Total Skor NIPS', 335 => 'Interpretasi Skor Nyeri',
+            336 => 'Tanggal Monitoring Risiko Jatuh', 337 => 'Waktu Monitoring Risiko Jatuh', 338 => 'Status Monitoring Risiko Jatuh', 339 => 'Kejadian Jatuh',
+            340 => 'Waktu Kejadian Jatuh', 341 => 'Keterangan Kejadian Jatuh', 342 => 'Tindak Lanjut Kejadian Jatuh', 343 => 'Norton Kondisi Fisik Umum',
+            344 => 'Norton Kesadaran', 345 => 'Norton Aktivitas', 346 => 'Norton Mobilitas', 347 => 'Norton Inkontinensia',
+            348 => 'Total Skor Norton', 349 => 'Kategori Risiko Dekubitus', 350 => 'Barthel Transfer', 351 => 'Barthel Mobilisasi',
+            352 => 'Barthel Toilet', 353 => 'Barthel Bersih', 354 => 'Barthel Buang Air Besar', 355 => 'Barthel Buang Air Kecil',
+            356 => 'Barthel Mandi', 357 => 'Barthel Berpakaian', 358 => 'Barthel Makan', 359 => 'Barthel Naik Turun Tangga',
+            360 => 'Total Skor Barthel', 361 => 'Tingkat Ketergantungan Barthel',
         ];
-
         foreach ($objeks as $objekId => $namaObjek) {
             DB::table('objek')->updateOrInsert(
                 ['objek_id' => $objekId],
@@ -381,7 +449,6 @@ class EmrMasterSeeder extends Seeder
                 ]
             );
         }
-
         // ======== Mapping Form <-> Objek (objek_form_control) ========
         // Key = variabel (nama field di form EMR); value = objek_id.
         $mapping = [
@@ -418,7 +485,6 @@ class EmrMasterSeeder extends Seeder
                 'cara_pemberian_o2' => 19, 'ett' => 20, 'saturasi' => 15, 'ews' => 16,
                 'allo_anamnesa' => 63, 'nama_allo' => 64, 'hubungan_allo' => 65, 'bmi' => 58,
                 'nyeri' => 14, 'alergi' => 17,
-
                 // Pengkajian risiko jatuh (instrumen dipilih dari usia, lihat
                 // App\Helpers\RisikoJatuhHelper). Objek 66-68 (UP GO lama) tidak
                 // lagi dipakai form ini; mapping lamanya dibersihkan di bawah.
@@ -532,7 +598,6 @@ class EmrMasterSeeder extends Seeder
                 'kategori_ews' => 143,           // TURUNAN (App\Helpers\EwsHelper)
                 'ews_tidak_diukur' => 144,       // daftar parameter yang ditandai tidak diukur
             ],
-
             // SBAR (form 12): 4 unsur wajib + metadata komunikasi. Teks S & B
             // di-prefill otomatis dari EMR form lain (lihat SbarController),
             // tetap bisa diedit petugas sebelum disimpan.
@@ -550,7 +615,6 @@ class EmrMasterSeeder extends Seeder
                 'alergi' => 17,               // opsional, reuse objek 17 "Alergi"
                 'catatan_tambahan' => 77,     // opsional, reuse objek 77 "Keterangan"
             ],
-
             // Tanda Vital / Observasi Harian (form 13).
             //
             // Sengaja HANYA 3 objek baru (tanggal, waktu observasi, dan flow
@@ -560,7 +624,6 @@ class EmrMasterSeeder extends Seeder
             13 => [
                 'tanggal_observasi' => 155,    // wajib (date)
                 'waktu_observasi' => 156,      // wajib (jam, H:i)
-
                 // Tanda vital
                 'td_sistolik' => 6,            // wajib, parameter EWS
                 'td_diastolik' => 7,           // wajib
@@ -571,26 +634,21 @@ class EmrMasterSeeder extends Seeder
                 'berat_badan' => 8,            // opsional
                 'tinggi_badan' => 9,           // opsional
                 'bmi' => 58,                   // TURUNAN, dihitung ulang di server
-
                 // Kesadaran & pemberian oksigen
                 'kesadaran' => 51,             // wajib, parameter EWS
                 'oksigen' => 18,               // wajib, parameter EWS (Air/Oksigen)
                 'cara_oksigen' => 19,          // wajib bila oksigen = Oksigen
                 'flow_rate' => 157,            // L/menit, opsional
                 'ett' => 20,                   // radio Ya/Tidak
-
                 // Penilaian nyeri
                 'nyeri' => 14,
                 'skor_nyeri' => 140,           // opsional, relevan bila nyeri = Ya
-
                 // EVM (lihat App\Helpers\EwsHelper)
                 'total_ews' => 142,            // TURUNAN
                 'kategori_ews' => 143,         // TURUNAN
                 'ews_tidak_diukur' => 144,     // daftar parameter "tidak diukur"
-
                 'keterangan' => 77,            // reuse objek 77 "Keterangan"
             ],
-
             // Bundle Pencegahan VAP (form 14).
             //
             // 10 butir bundle memakai variabel BERSUFFIX vap_1..vap_10, bukan
@@ -606,7 +664,6 @@ class EmrMasterSeeder extends Seeder
                 'vap_kategori' => 170,         // TURUNAN, kategori kepatuhan
                 'catatan' => 77,               // reuse objek 77 "Keterangan"
             ],
-
             // Alat Invasif (form 15). Bentuknya SATU baris per EMR (satu alat),
             // jadi tidak perlu variabel bersuffix seperti butir bundle VAP.
             15 => [
@@ -618,9 +675,7 @@ class EmrMasterSeeder extends Seeder
                 'jam_lepas' => 176,           // opsional
                 'lama_pemasangan' => 177,     // TURUNAN, jumlah hari pasang -> lepas
             ],
-
             // ===== Fase P1 — Catatan Medis Lanjutan =====
-
             // Resume Medis (form 16). Pemeriksaan fisik 12 organ memakai SATU
             // objek (188) dengan 12 variabel bersuffix — sama seperti pola
             // butir bundle VAP: emrDetailByVariabel() melakukan
@@ -634,7 +689,6 @@ class EmrMasterSeeder extends Seeder
                 'indikasi_rawat_inap' => 180,
                 'riwayat_kesehatan_saat_ini' => 42,   // reuse "Riwayat Penyakit Sekarang"
                 'riwayat_penyakit_dahulu' => 41,   // reuse "Riwayat Penyakit Sebelumnya"
-
                 // Tanda vital & skor — seluruhnya reuse objek yang sudah ada.
                 'td_sistolik' => 6,
                 'td_diastolik' => 7,
@@ -648,7 +702,6 @@ class EmrMasterSeeder extends Seeder
                 'gcs_m' => 55,
                 'gcs_v' => 56,
                 'gcs_jumlah' => 57,   // TURUNAN
-
                 // Pemeriksaan fisik: 12 organ -> satu objek 188.
                 'pf_kepala' => 188,
                 'pf_mata' => 188,
@@ -662,13 +715,11 @@ class EmrMasterSeeder extends Seeder
                 'pf_kelenjar' => 188,
                 'pf_genitalia' => 188,
                 'pf_ekstremitas' => 188,
-
                 // Diagnosa resume.
                 'diagnosa_primer' => 181,
                 'diagnosa_sekunder' => 182,
                 'prosedur' => 183,
                 'komplikasi' => 184,
-
                 // Kondisi pulang / rujukan / kematian.
                 'kondisi_saat_pulang' => 185,
                 'catatan_alasan_pulang' => 77,   // reuse "Keterangan"
@@ -676,7 +727,6 @@ class EmrMasterSeeder extends Seeder
                 'meninggal' => 187,
                 'catatan_kematian' => 77,   // reuse "Keterangan"
             ],
-
             // Care Plan (form 20).
             20 => [
                 'tanggal_care_plan' => 195,
@@ -688,7 +738,6 @@ class EmrMasterSeeder extends Seeder
                 'kriteria_pemulangan' => 194,
                 'catatan' => 77,   // reuse "Keterangan"
             ],
-
             // DAR (form 21) — catatan kejadian forensik.
             21 => [
                 'tanggal_dar' => 196,
@@ -699,7 +748,6 @@ class EmrMasterSeeder extends Seeder
                 'tindakan_dar' => 5,    // reuse "Instruksi (I)"
                 'meninggal' => 187,  // reuse objek form 16
             ],
-
             // Catatan Medis Visum (form 57).
             57 => [
                 'tanggal_visum' => 155,  // reuse "Tanggal Observasi"
@@ -714,7 +762,6 @@ class EmrMasterSeeder extends Seeder
                 'kelainan_sebab' => 1,    // reuse "Subjective (S)"
                 'kelainan_akibat' => 4,    // reuse "Planning (P)"
             ],
-
             // Discharge Planning (form 17).
             17 => [
                 'tanggal_masuk_rs' => 200,
@@ -756,7 +803,6 @@ class EmrMasterSeeder extends Seeder
                 'edukasi_lain_2' => 214,
                 'catatan' => 77, // reuse "Keterangan"
             ],
-
             // Pemulangan Pasien (form 18).
             18 => [
                 'tanggal_pulang' => 155, // reuse "Tanggal Observasi"
@@ -817,7 +863,6 @@ class EmrMasterSeeder extends Seeder
                 'serah_penyerah_bayi' => 223,
                 'serah_lainnya' => 223,
             ],
-
             // Triage IGD (form 19). Hampir semua field me-reuse objek lama.
             19 => [
                 'tanggal_triase' => 155,
@@ -859,8 +904,203 @@ class EmrMasterSeeder extends Seeder
                 'prioritas_triase' => 235,
                 'catatan' => 77,
             ],
+            // ==== Fase P2 — form 22 ====
+            22 => [
+                'diagnosa_keperawatan_id' => 236, 'nama_diagnosa_keperawatan' => 237, 'tujuan_keperawatan' => 238,
+                'satuan_waktu_tujuan' => 239, 'kriteria_hasil' => 240, 'intervensi_keperawatan' => 241,
+                'indikasi_keperawatan' => 1, 'objektif_keperawatan' => 2, 'catatan_rencana' => 77,
+            ],
+            // ==== Fase P2 — form 23 ====
+            23 => [
+                'masalah_keperawatan_1' => 242, 'faktor_berhubungan_1' => 243, 'masalah_keperawatan_2' => 242,
+                'faktor_berhubungan_2' => 243, 'masalah_keperawatan_3' => 242, 'faktor_berhubungan_3' => 243,
+                'masalah_keperawatan_4' => 242, 'faktor_berhubungan_4' => 243, 'masalah_keperawatan_5' => 242,
+                'faktor_berhubungan_5' => 243, 'masalah_keperawatan_6' => 242, 'faktor_berhubungan_6' => 243,
+                'masalah_keperawatan_7' => 242, 'faktor_berhubungan_7' => 243, 'masalah_keperawatan_8' => 242,
+                'faktor_berhubungan_8' => 243, 'masalah_keperawatan_9' => 242, 'faktor_berhubungan_9' => 243,
+                'masalah_keperawatan_10' => 242, 'faktor_berhubungan_10' => 243,
+            ],
+            // ==== Fase P2 — form 24 ====
+            24 => [
+                'total_intake' => 291, 'nama_infus_1' => 292, 'volume_infus_1' => 293,
+                'sisa_infus_1' => 294, 'nama_infus_2' => 292, 'volume_infus_2' => 293,
+                'sisa_infus_2' => 294, 'nama_infus_3' => 292, 'volume_infus_3' => 293,
+                'sisa_infus_3' => 294, 'nama_infus_4' => 292, 'volume_infus_4' => 293,
+                'sisa_infus_4' => 294, 'nama_infus_5' => 292, 'volume_infus_5' => 293,
+                'sisa_infus_5' => 294, 'nama_infus_6' => 292, 'volume_infus_6' => 293,
+                'sisa_infus_6' => 294, 'oral' => 295, 'spoel' => 296,
+                'transfusi' => 297, 'syringe_pump_1' => 298, 'syringe_pump_2' => 298,
+                'syringe_pump_3' => 298, 'syringe_pump_4' => 298, 'syringe_pump_5' => 298,
+                'syringe_pump_6' => 298, 'intake_lainnya' => 299, 'ivfd_1' => 309,
+                'ivfd_2' => 309, 'ivfd_3' => 309, 'ivfd_4' => 309,
+                'ivfd_5' => 309, 'ivfd_6' => 309, 'catatan' => 77,
+            ],
+            // ==== Fase P2 — form 25 ====
+            25 => [
+                'urine' => 300, 'drain' => 301, 'ngt' => 302,
+                'wsd' => 303, 'iwl' => 304, 'output_lainnya' => 305,
+                'total_output' => 306, 'frekuensi_bab' => 116, 'karakter_bab' => 116,
+                'frekuensi_bak' => 116, 'karakter_bak' => 116, 'catatan' => 77,
+            ],
+            // ==== Fase P2 — form 26 ====
+            26 => [
+                'tanggal_monitoring' => 155, 'waktu_monitoring' => 156, 'berat_badan' => 8,
+                'suhu' => 11, 'nama_infus_1' => 292, 'dosis_infus_1' => 308,
+                'volume_infus_1' => 293, 'nama_infus_2' => 292, 'dosis_infus_2' => 308,
+                'volume_infus_2' => 293, 'nama_infus_3' => 292, 'dosis_infus_3' => 308,
+                'volume_infus_3' => 293, 'nama_infus_4' => 292, 'dosis_infus_4' => 308,
+                'volume_infus_4' => 293, 'nama_infus_5' => 292, 'dosis_infus_5' => 308,
+                'volume_infus_5' => 293, 'nama_infus_6' => 292, 'dosis_infus_6' => 308,
+                'volume_infus_6' => 293, 'sisa_infus_1' => 294, 'sisa_infus_2' => 294,
+                'sisa_infus_3' => 294, 'sisa_infus_4' => 294, 'sisa_infus_5' => 294,
+                'sisa_infus_6' => 294, 'ivfd_1' => 309, 'ivfd_2' => 309,
+                'ivfd_3' => 309, 'ivfd_4' => 309, 'ivfd_5' => 309,
+                'ivfd_6' => 309, 'intake_oral' => 295, 'intake_spoel' => 296,
+                'intake_transfusi' => 297, 'intake_lainnya' => 299, 'total_intake' => 291,
+                'output_urine' => 300, 'output_drain' => 301, 'output_ngt' => 302,
+                'output_wsd' => 303, 'output_iwl' => 304, 'output_lainnya' => 305,
+                'total_output' => 306, 'kebutuhan_cairan' => 310, 'balance_cairan' => 311,
+                'total_intake_24jam' => 307, 'keterangan_monitoring' => 312,
+            ],
+            // ==== Fase P2 — form 27 ====
+            27 => [
+                'tanggal_nyeri' => 155, 'waktu_nyeri' => 156, 'nyeri' => 14,
+                'metode_skala_nyeri' => 319, 'skor_nyeri' => 140, 'skor_flacc' => 318,
+                'frekuensi_nyeri' => 313, 'karakteristik_nyeri' => 314, 'pemicu_nyeri' => 315,
+                'meringankan_nyeri' => 316, 'lokasi_nyeri' => 317, 'gambar_lokasi_nyeri' => 326,
+                'intervensi_nyeri' => 5, 'catatan' => 77,
+            ],
+            // ==== Fase P2 — form 28 ====
+            28 => [
+                'tanggal_kesadaran' => 155, 'waktu_kesadaran' => 156, 'gcs_e' => 54,
+                'gcs_m' => 55, 'gcs_v' => 56, 'gcs_jumlah' => 57,
+                'kesadaran' => 51, 'dpo' => 59, 'pemberian_o2' => 18,
+                'flow_rate' => 157, 'cara_oksigen' => 19, 'ett' => 20,
+                'persentase_oksigen' => 20, 'saturasi' => 15, 'keterangan' => 77,
+            ],
+            // ==== Fase P2 — form 29 ====
+            29 => [
+                'tanggal_serah_terima' => 244, 'waktu_serah_terima' => 245, 'shift' => 147,
+                'jenis_serah_terima' => 40, 'petugas_serah_id' => 246, 'nama_petugas_serah' => 247,
+                'petugas_terima_id' => 248, 'nama_petugas_terima' => 249, 'ruang_tujuan' => 250,
+                'waktu_konfirmasi_terima' => 251, 'jumlah_pasien_serah_terima' => 252, 'status_kelengkapan_serah_terima' => 253,
+                'isi_serah_terima' => 2, 'catatan_serah_terima' => 77,
+            ],
+            // ==== Fase P2 — form 30 ====
+            30 => [
+                'tanggal_monitoring_jatuh' => 336, 'waktu_monitoring_jatuh' => 337, 'risiko_jatuh_instrumen' => 89,
+                'risiko_jatuh_skor' => 90, 'risiko_jatuh_label' => 91, 'risiko_jatuh_intervensi' => 92,
+                'risiko_jatuh_ringkasan' => 93, 'hds_1' => 94, 'hds_2' => 95,
+                'hds_3' => 96, 'hds_4' => 97, 'hds_5' => 98,
+                'hds_6' => 99, 'hds_7' => 100, 'mfs_1' => 101,
+                'mfs_2' => 102, 'mfs_3' => 103, 'mfs_4' => 104,
+                'mfs_5' => 105, 'mfs_6' => 106, 'syd_ts_bed' => 107,
+                'syd_ts_bangku' => 108, 'syd_ts_bantuan' => 109, 'syd_ms_bantuan' => 110,
+                'syd_ms_kursi_roda' => 111, 'syd_ms_imobil' => 112, 'tug_detik' => 113,
+                'status_monitoring' => 338, 'kejadian_jatuh' => 339, 'waktu_kejadian_jatuh' => 340,
+                'keterangan_kejadian_jatuh' => 341, 'tindak_lanjut_jatuh' => 342, 'intervensi_pencegahan' => 92,
+                'berat_badan' => 8, 'kesadaran' => 51, 'catatan' => 77,
+            ],
+            // ==== Fase P2 — form 31 ====
+            31 => [
+                'tingkat_pendidikan' => 23, 'kemampuan_bicara' => 254, 'jenis_bahasa' => 255,
+                'perlu_penerjemah' => 256, 'nilai_kebudayaan' => 257, 'keterangan_kebudayaan' => 258,
+                'kemampuan_baca' => 260, 'hambatan_belajar' => 259, 'kebutuhan_belajar' => 261,
+                'sedia_terima_edukasi' => 40, 'alasan_asesmen_ulang' => 77, 'materi_edukasi' => 114,
+                'respon_emosi_edukasi' => 3,
+            ],
+            // ==== Fase P2 — form 32 ====
+            32 => [
+                'tanggal_norton' => 155, 'waktu_norton' => 156, 'norton_kondisi_fisik_umum' => 343,
+                'norton_kesadaran' => 344, 'norton_aktivitas' => 345, 'norton_mobilitas' => 346,
+                'norton_inkontinensia' => 347, 'skor_norton' => 348, 'kategori_dekubitus' => 349,
+                'kesadaran' => 51, 'catatan' => 77,
+            ],
+            // ==== Fase P2 — form 33 ====
+            33 => [
+                'tanggal_barthel' => 155, 'waktu_barthel' => 156, 'barthel_transfer' => 350,
+                'barthel_mobilisasi' => 351, 'barthel_toilet' => 352, 'barthel_bersih' => 353,
+                'barthel_bab' => 354, 'barthel_bak' => 355, 'barthel_mandi' => 356,
+                'barthel_berpakaian' => 357, 'barthel_makan' => 358, 'barthel_tangga' => 359,
+                'barthel_skor' => 360, 'tingkat_ketergantungan' => 361, 'catatan' => 77,
+            ],
+            // ==== Fase P2 — form 34 ====
+            34 => [
+                'sf_makan' => 262, 'sf_mandi' => 263, 'sf_grooming' => 264,
+                'sf_berpakaian' => 265, 'sf_buang_air_kecil' => 266, 'sf_buang_air_besar' => 267,
+                'sf_toilet' => 268, 'sf_transfer' => 269, 'sf_mobilitas' => 270,
+                'sf_tangga' => 271, 'sf_skor' => 272, 'sf_interpretasi' => 273,
+            ],
+            // ==== Fase P2 — form 35 ====
+            35 => [
+                'asal_masuk' => 274, 'asal_masuk_detail' => 275, 'diagnosa_medis_kritis' => 40,
+                'jalan_nafas' => 276, 'deviasi_trakea' => 277, 'pernapasan_kritis' => 12,
+                'suara_nafas_terdengar' => 278, 'sirkulasi_perfusi' => 279, 'kesadaran_kritis' => 51,
+                'gcs_e' => 54, 'gcs_m' => 55, 'gcs_v' => 56,
+                'gcs_jumlah' => 57, 'skor_nyeri_kritis' => 282, 'nilai_kritis' => 280,
+                'eksposisi_kritis' => 2, 'catatan_kritis' => 115, 'masalah_keperawatan_kritis' => 242,
+                'dpo' => 59, 'alergi' => 17,
+            ],
+            // ==== Fase P2 — form 36 ====
+            36 => [
+                'metode_skala_nyeri' => 319, 'skor_nyeri' => 140, 'flacc_wajah' => 320,
+                'flacc_kaki' => 321, 'flacc_aktivitas' => 322, 'flacc_menangis' => 323,
+                'flacc_konsolabilitas' => 324, 'skor_flacc' => 325, 'interpretasi_nyeri' => 335,
+                'keterangan' => 77,
+            ],
+            // ==== Fase P2 — form 37 ====
+            37 => [
+                'tanggal_body_map' => 155, 'waktu_body_map' => 156, 'gambar_lokasi_nyeri' => 326,
+                'keterangan_lokasi' => 327, 'sisi_lokasi' => 327, 'catatan' => 77,
+            ],
+            // ==== Fase P2 — form 38 ====
+            38 => [
+                'tanggal_nips' => 155, 'waktu_nips' => 156, 'nips_ekspresi_wajah' => 328,
+                'nips_tangisan' => 329, 'nips_pola_napas' => 330, 'nips_gerakan_lengan' => 331,
+                'nips_gerakan_tungkai' => 332, 'nips_status_jaga' => 333, 'total_nips' => 334,
+                'interpretasi_nyeri' => 335, 'catatan' => 77,
+            ],
+            // ==== Fase P2 — form 54 ====
+            54 => [
+                'keluhan' => 114, 'kesadaran' => 51, 'td_sistolik' => 6,
+                'td_diastolik' => 7, 'nadi' => 10, 'pernapasan' => 12,
+                'suhu' => 11, 'saturasi' => 15, 'catatan_keperawatan' => 115,
+                'alergi' => 17, 'tanggal_catatan' => 155, 'waktu_catatan' => 156,
+            ],
+            // ==== Fase P2 — form 55 ====
+            55 => [
+                'diagnosa_medis' => 40, 'keluhan' => 13, 'riwayat_penyakit_sebelumnya' => 41,
+                'riwayat_penyakit_sekarang' => 42, 'infeksius_flag' => 43, 'menular_melalui' => 44,
+                'infeksius_memerlukan_isolasi' => 45, 'infeksius_hasil_penunjang' => 46, 'imunologi_flag' => 47,
+                'imunologi_memerlukan_isolasi' => 48, 'imunologi_pembatasan_pengunjung' => 49, 'imunologi_hasil_penunjang' => 50,
+                'riwayat_kemoterapi' => 52, 'riwayat_radioterapi' => 53, 'riwayat_operasi' => 61,
+                'vaksin_covid' => 62, 'alergi' => 17, 'riwayat_perawatan_berulang' => 281,
+                'catatan_riwayat' => 77,
+            ],
+            // ==== Fase P2 — form 56 ====
+            56 => [
+                'penyakit_keluarga' => 283, 'hubungan_keluarga' => 284, 'catatan_keluarga' => 77,
+            ],
+            // ==== Fase P2 — form 123 ====
+            123 => [
+                'tanggal_asesmen_akhir' => 137, 'waktu_asesmen_akhir' => 138, 'waktu_asesmen_awal' => 285,
+                'waktu_asesmen_akhir_hari' => 286, 'kesadaran_terminal' => 51, 'nyeri_terakhir' => 14,
+                'skor_nyeri' => 140, 'gejala_terminal' => 115, 'tindakan_paliatif' => 77,
+                'catatan_keluarga' => 120,
+            ],
+            // ==== Fase P2 — form 124 ====
+            124 => [
+                'tanggal_pelayanan' => 155, 'waktu_pelayanan' => 156, 'subjective' => 1,
+                'objective' => 2, 'diagnosis_fungsi' => 3, 'goal' => 4,
+                'diagnosis_medis' => 40, 'instruksi' => 5, 'evaluasi' => 77,
+                'edukasi_anjuran' => 77, 'frekuensi_kunjungan' => 77,
+            ],
+            // ==== Fase P2 — form 125 ====
+            125 => [
+                'respon_emosi' => 287, 'status_mental' => 288, 'kebutuhan_perlindungan' => 289,
+                'kebutuhan_teridentifikasi' => 290,
+            ],
         ];
-
         // Baris obat/BMHP (maks 20 baris per tindakan): variabel obat_1..obat_20
         // memakai objek 69 (Barang) dan jumlah_1..jumlah_20 memakai objek 70 (Jumlah).
         //
@@ -878,7 +1118,6 @@ class EmrMasterSeeder extends Seeder
             $mappingBarisObat['jumlah_'.$baris] = 70;
         }
         $mapping[10] = array_merge($mapping[10], $mappingBarisObat);
-
         // Butir bundle VAP (form 14): 10 variabel, satu per butir, dipetakan ke
         // objek 158-167. Suffiks dipakai dengan alasan yang sama seperti baris
         // obat/BMHP di atas — key HARUS unik agar seluruh butir ikut terbaca
@@ -888,18 +1127,15 @@ class EmrMasterSeeder extends Seeder
             $mappingButirVap['vap_'.$butir] = 157 + $butir;
         }
         $mapping[14] = array_merge($mapping[14], $mappingButirVap);
-
         foreach ($mapping as $formId => $variabels) {
             foreach ($variabels as $variabel => $objekId) {
                 $exists = DB::table('objek_form_control')
                     ->where('form_id', $formId)
                     ->where('variabel', $variabel)
                     ->exists();
-
                 if ($exists) {
                     continue;
                 }
-
                 DB::table('objek_form_control')->insert([
                     'form_id' => $formId,
                     'objek_id' => $objekId,
@@ -910,7 +1146,6 @@ class EmrMasterSeeder extends Seeder
                 ]);
             }
         }
-
         // Mapping variabel UP GO lama (objek 66-68) tidak lagi dipakai form 3:
         // bagian F diganti Pengkajian Risiko Jatuh berbasis usia. Soft-delete agar
         // tidak ikut ter-simpan kalau masih ada data lama.
@@ -922,7 +1157,6 @@ class EmrMasterSeeder extends Seeder
                 })
                 ->update(['status_batal' => 1, 'mod_time' => $now]);
         }
-
         // Isi objek_id data legacy yang tadinya NULL (dulu env('OBJEK_ID_*') kosong),
         // agar baca berbasis objek tetap cocok dengan data lama.
         EmrHelper::backfillObjekId(1);
@@ -947,7 +1181,29 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(17);
         EmrHelper::backfillObjekId(18);
         EmrHelper::backfillObjekId(19);
-
+        EmrHelper::backfillObjekId(22);
+        EmrHelper::backfillObjekId(23);
+        EmrHelper::backfillObjekId(24);
+        EmrHelper::backfillObjekId(25);
+        EmrHelper::backfillObjekId(26);
+        EmrHelper::backfillObjekId(27);
+        EmrHelper::backfillObjekId(28);
+        EmrHelper::backfillObjekId(29);
+        EmrHelper::backfillObjekId(30);
+        EmrHelper::backfillObjekId(31);
+        EmrHelper::backfillObjekId(32);
+        EmrHelper::backfillObjekId(33);
+        EmrHelper::backfillObjekId(34);
+        EmrHelper::backfillObjekId(35);
+        EmrHelper::backfillObjekId(36);
+        EmrHelper::backfillObjekId(37);
+        EmrHelper::backfillObjekId(38);
+        EmrHelper::backfillObjekId(54);
+        EmrHelper::backfillObjekId(55);
+        EmrHelper::backfillObjekId(56);
+        EmrHelper::backfillObjekId(123);
+        EmrHelper::backfillObjekId(124);
+        EmrHelper::backfillObjekId(125);
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
         $akses = [
@@ -998,7 +1254,6 @@ class EmrMasterSeeder extends Seeder
             // semua jenis rawat.
             ['profesi_id' => 1, 'form_id' => 15, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 15, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
-
             // ===== Fase P1 — Catatan Medis Lanjutan =====
             // Resume Medis (form 16): Dokter & Perawat full CRUD.
             ['profesi_id' => 1, 'form_id' => 16, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
@@ -1014,7 +1269,6 @@ class EmrMasterSeeder extends Seeder
             // baris untuk Perawat — dokumen bermeterai & bertanda tangan. Tanpa
             // baris akses, form tidak muncul di dashboard perawat & URL 403.
             ['profesi_id' => 1, 'form_id' => 57, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
-
             // Discharge Planning (form 17): Dokter & Perawat full CRUD.
             ['profesi_id' => 1, 'form_id' => 17, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 17, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
@@ -1024,18 +1278,61 @@ class EmrMasterSeeder extends Seeder
             // Triage IGD (form 19): Dokter & Perawat full CRUD.
             ['profesi_id' => 1, 'form_id' => 19, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 19, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 22, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 22, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 23, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 23, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 24, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 24, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 25, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 25, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 26, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 26, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 27, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 27, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 28, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 28, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 29, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 29, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 30, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 30, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 31, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 31, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 32, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 32, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 33, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 33, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 34, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 34, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 35, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 35, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 36, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 36, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 37, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 37, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 38, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 38, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 54, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 54, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 55, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 55, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 56, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 56, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 123, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 123, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 124, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 124, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 125, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 125, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
         ];
-
         foreach ($akses as $row) {
             $exists = DB::table('akses_ehr')
                 ->where('profesi_id', $row['profesi_id'])
                 ->where('form_id', $row['form_id'])
                 ->exists();
-
             if ($exists) {
                 continue;
             }
-
             DB::table('akses_ehr')->insert(array_merge($row, [
                 'input_time' => $now,
                 'input_user_id' => 1,

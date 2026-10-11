@@ -343,6 +343,35 @@ Menu baru: `dashboard_menu` **6 "Resume & Discharge"** (sub 33, 34) dan **7 "Gaw
 - **`Rule::requiredIf()` menerima closure TANPA argumen.** `RequiredIf::__construct` bertipe `(\Closure(): bool)|bool` dan `__toString()` memanggilnya dengan 0 argumen. Tulis `fn () => $request->input('x') === 'y'`, **bukan** `fn ($r) => $r->x === 'y'` — yang kedua fatal "Too few arguments" dan merusak setiap penyimpanan Triage IGD.
 - **Pint sudah dijalankan.** `tests/Feature/ExampleTest` gagal **sejak commit awal** (`/` mengembalikan 302 ke login, tesnya ekspektasi 200) — bukan regresi.
 
+## Fase P2 EMR — form 22–38, 54–56, 123–125 (SUDAH diimplementasikan)
+
+23 form, **363 variabel**, semua terverifikasi E2E. Menu baru `dashboard_menu` **8 "Penilaian Klinis"** (sub 76, 77, 133, 134) dan **9 "Monitoring"** (sub 94, 95, 113, 114); sub tambahan di menu 2: 73, 74, 75, 93. Extra baru 26–37, 46–47, 66–68, 86–88.
+
+Helper baru: `AsesmenKeperawatanHelper` (ADL form 34 + FLACC form 35), `CairanHelper` (ronde, IWL, flag), `NyeriHelper` (VAS/NIPS/FLACC), `DekubitusHelper` (Norton), `MonitoringRisikoJatuhHelper` (form 30).
+
+- **Arah skor tidak seragam — jangan diasumsikan.** Form 30 (risiko jatuh): **skor tinggi = risiko tinggi**. Form 32 (Norton) & 33 (Barthel): **skor rendah = ketergantungan tinggi**. Ketiganya dihitung ulang di server; nilai browser dibuang.
+- **Barthel inkontinensia berlawanan dengan form 34.** Barthel: `1 = kadang inkontinen`. Status fungsional (form 34): arahnya dibalik. Ini warisan instrumen asli — jangan disamakan.
+- **`akses_ehr` tidak seragam.** `handover` (29) `akses_update = 0` untuk semua profesi (append-only, serah terima tak bisa ditulis ulang). `monitoring_risiko_jatuh` (30), `penilaian_risiko_dekubitus` (32), `barthel_index` (33) `akses_delete = 0`. `asesmen_kebutuhan_edukasi` (31), `pengkajian_keperawatan_kritis` (35), `asesmen_status_fungsional` (34), `respon_emosi` (125), `asesmen_akhir_kehidupan` (123) `akses_delete = 0`. Form 22/23 tidak bisa dibuat oleh Dokter (`akses_create = 0`) — milik perawat. **Jangan "perbaiki" angka ini tanpa keputusan klinis.**
+- **`flag_abnormal` = flag, bukan indeks ronde.** Kolom `emr_detail.flag_abnormal` bernilai `1 = ABNORMAL`, `0 = normal`, `NULL = tidak dinilai`. **Tidak ada kolom ronde.** Nomor ronde dihitung saat baca lewat `CairanHelper::ronde()` (urut `tgl_jam, emr_id`), bukan disimpan. Controller menulis flag lewat helper-nya sendiri setelah `EmrHelper::insert/update`, di dalam transaksi yang sama — `EmrHelper` tidak diubah.
+- **Field kondisional di-set `null`, bukan `unset()`.** `unset()` menghapus baris `emr_detail` sehingga form kehilangan field yang memang ada di mapping. `null` berarti "tidak berlaku" dan aman untuk pembacaan ulang.
+- **Form 26 `sisa_infus_N` tetap input manual** (form 24 tidak punya kolom `dosis`, jadi tidak bisa diturunkan). Form 26 yang menurunkan `dosis − volume`.
+- **Form 37 `gambar_lokasi_nyeri`** = data URL PNG dari `<canvas>`, divalidasi `nullable|string|max:60000`, dinormalisasi jadi `null` bila bukan `data:image/png;base64,`. Aset di `public/img/nyeri/`.
+- **`Rule::requiredIf()` hanya dipakai bentuk string** (`'required_if:other,value'`) di seluruh Fase P2 — bentuk closure rawan salah arity.
+- **Partial `_vas_scale`, `_flacc_scale`, `_nips_scale`, `_body_map_nyeri`** di `moduls/EMR/PartialForm/`.
+
+### Harness verifikasi (WAJIB dipakai tiap menambah form)
+
+`tools/e2e.php` + `tools/lib_pay.php` di folder `tools/` (bukan root):
+
+```
+docker compose exec -T app php tools/e2e.php 22,24,26      # cek form tertentu
+docker compose exec -T app php tools/e2e.php               # cek semua form yang punya controller
+```
+
+`lib_pay.php` **membaca blok rules controller secara bracket-aware** — baik `validate([...])` langsung maupun blok `$var = [ ... ];` yang lalu di-`validate($var)` — lalu membuat payload yang LAYAK: opsi pertama dari `Rule::in` (`phpListValues()` memecah literal PHP dengan hormati kutip & kurung) / `SelectOption`, id nyata untuk `Rule::exists('tbl','col')` (rantai `->where()` ikut dihormati) dan `exists:tbl,col`, angka antara untuk `integer|numeric|min/max|between`, array untuk aturan `array`, dst. Output per form: `simpan=X/Y index upd del`. **Semua harus `OK`** — `simpan < Y` berarti ada field mapping yang tidak tersimpan (periksa `filteredData()`), `VALIDASI n` berarti payload tidak memenuhi aturan.
+
+**Harness membersihkan dirinya sendiri** di akhir run (`emr_detail` lalu `emr`). Kalau pernah dijalankan versi lama, bersihkan manual: hapus baris `emr_detail` yang `emr_id`-nya ada di `emr`, lalu `emr` — nilai uji `'Data Uji'` tidak boleh tertinggal.
+
 ## EMR dynamic forms
 
 - Route `/emr/form/{form_name}/{registrasi_detail_id}/{emr_id?}` (`emr.dynamic.index`): `DynamicFormController` first tries `App\Http\Controllers\EMR\{Studly}\{Studly}Controller`, else the view `moduls.emr.{slug}.index`.
@@ -471,3 +500,27 @@ Selain `GET /emr/form/{form_name}/{registrasi_detail_id}/{emr_id?}` (`emr.dynami
 ## Legacy Konsultasi (ListPasienRanapController)
 
 Query `ListPasienRanapController` baris 116/123/152 masih memakai `env('OBJEK_ID_JENIS_KONSULTASI', 151)`, `env('FORM_ID_KONSULTASI', 26)`, `env('OBJEK_ID_DOKTER_PENERIMA_KONSUL', 303)` dengan default numerik — **tidak** dimigrasikan ke EmrHelper karena form/objek konsultasi bukan bagian dari baseline EMR (1–4) dan belum ada di tabel `form`/`objek`. Biarkan default numerik; akan dibersihkan saat fitur konsultasi dipindahkan ke form dinamis.
+
+## Fase Nyeri — form 27, 36, 37, 38
+
+Rancangan: `docs/KONSEP_NYERI.md`. Semua terverifikasi E2E (`php e2e.php 27,36,37,38`, 41 variabel).
+
+| form | slug | `id_dash_menu` | Folder | Objek baru |
+|---|---|---|---|---|
+| 27 | `penilaian_nyeri` | `9.113.66` (sub 113 Nyeri + extra 66) | `EMR/PenilaianNyeri/` | 313-317, 326 |
+| 36 | `metode_nyeri` | `9.113.67` (extra 67) | `EMR/MetodeNyeri/` | 319-325, 335 |
+| 37 | `body_map_nyeri` | `9.114` (sub 114) | `EMR/BodyMapNyeri/` | 326, 327 |
+| 38 | `skrining_nyeri_perina` | `9.113.68` (extra 68) | `EMR/SkriningNyeriPerina/` | 328-334, 335 |
+
+- **Helper `App\Helpers\NyeriHelper`** adalah satu-satunya sumber definisi & ambang skala: `flacc()` (total + kategori, hanya bila 5/5 terisi), `nips()` (total + interpretasi, hanya bila 6/6 terisi), `kategori()`/`kategoriVas()`, `interpretasiNips()`, `normalisasiGambar()`. Definisi butir FLACC **dipinjam** dari `AsesmenKeperawatanHelper::flaccItems()` supaya tidak ada dua definisi (form 27, 36, 35).
+- **Skor SELALU dihitung ulang di server** — `skor_flacc` (27 & 36), `interpretasi_nyeri` (36 & 38), `total_nips` (38). Nilai browser dibuang di `filteredData()`. Skor parsial **tidak** disimpan (`NULL`), pola yang sama dengan `EwsHelper`.
+- **Form 27 butir FLACC tidak punya objek** (`flacc_wajah` dst. sengaja tidak ada di `objek_form_control`) karena sudah terwakili `skor_flacc`. Konsekuensinya: field itu **wajib dibaca dari `Request` SEBELUM `array_intersect_key()`** — pola `ews_na` (lihat R2 di doc). Konsekuensi lain: isian FLACC lama tidak bisa ditampilkan lagi saat edit; yang tampil hanya `skor_flacc`.
+- **Field kondisional dikosongkan (`null`), bukan `unset()`**, supaya baris `emr_detail`-nya tetap ada (kelengkapan mapping diverifikasi E2E) tapi nilainya tidak menyesatkan. Berlaku untuk `skor_flacc` saat metode bukan FLACC dan untuk seluruh blok pain score saat `nyeri = Tidak`.
+- **Form 37 menyimpan gambar tubuh sebagai data URL PNG** di `emr_detail.gambar_lokasi_nyeri` (kolom `TEXT` 64 KB), bukan di folder ARSIP seperti legacy. Validasi `nullable|string|max:60000` + `NyeriHelper::normalisasiGambar()` yang membuang nilai yang awalannya bukan `data:image/png;base64,`. Kanvas dikompresi jadi setengah ukuran sebelum submit. Aset: `public/img/nyeri/tubuh.png` & `public/img/nyeri/skala_nyeri.jpg`.
+- **Objek 327 dipakai dua variabel** (`keterangan_lokasi` + `sisi_lokasi`) — form 37 **dilarang** memakai `EmrHelper::emrDetailByObjek()`, hanya `emrDetailByVariabel()`.
+- **Partial baru**: `moduls/EMR/PartialForm/_vas_scale.blade.php`, `_flacc_scale.blade.php`, `_nips_scale.blade.php`, `_body_map_nyeri.blade.php`. Semuanya `@include` dengan array props (bukan komponen blade).
+- **Partial `_body_map_nyeri` memakai kanvas murni** — EaselJS legacy tidak ikut disalin. Tanda lokasi yang sudah tersimpan dimuat ulang sebagai gambar latar, sehingga tidak perlu menandai ulang saat edit.
+- **`SelectOption`**: key baru `frekuensi_nyeri_penilaian`, `karakteristik_nyeri_penilaian`, `sisi_lokasi`. Key `frekuensi_nyeri`/`karakteristik_nyeri` yang sudah ada milik pengkajian nyeri harian dan **sengaja tidak diubah** (nilai lama di `emr_detail` tidak boleh berubah artinya). `metode_skala_nyeri` & `ya_tidak_kapital` dipakai ulang.
+- **`karakteristik_nyeri` (form 27)** memakai `Rule::when($request->input('nyeri') === 'Ya', 'min:1')` — `min:1` polos harus bersyarat, karena array kosong tetap divalidasi walau rule-nya `nullable` dan tidak `required`.
+- Opsi "Lainnya" pada karakteristik disertai field teks bebas yang **sengaja tanpa atribut `name`**; JS menyisipkan input tersembunyi `karakteristik_nyeri[]` bernilai `Lainnya: <teks>`, dan `filteredData()` membuang entri `Lainnya` yang teksnya kosong.
+- **Cetak**: `print.blade.php` untuk keempat form BELUM ada — route `emr.*.print` hanya ditulis manual di `routes/web.php`, jadi perlu route dulu sebelum view cetak bisa dipakai.
