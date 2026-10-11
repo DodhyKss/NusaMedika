@@ -24,6 +24,9 @@ class EmrMasterSeeder extends Seeder
             // ===== Fase P2 — Asuhan Keperawatan, Cairan, Nyeri, Skala =====
             ['dashboard_menu_id' => 8, 'nama_menu' => 'Penilaian Klinis'],
             ['dashboard_menu_id' => 9, 'nama_menu' => 'Monitoring'],
+            // ===== Fase P3 — Gizi & Nutrisi, Farmasi, Order Penunjang =====
+            ['dashboard_menu_id' => 10, 'nama_menu' => 'Gizi & Nutrisi'],
+            ['dashboard_menu_id' => 11, 'nama_menu' => 'Farmasi'],
         ];
         foreach ($menus as $menu) {
             DB::table('dashboard_menu')->updateOrInsert(
@@ -114,6 +117,24 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_id' => 114, 'dashboard_menu_id' => 9, 'nama_sub_menu' => 'Body Map Nyeri'],
             ['dashboard_menu_sub_id' => 133, 'dashboard_menu_id' => 8, 'nama_sub_menu' => 'Risiko Jatuh'],
             ['dashboard_menu_sub_id' => 134, 'dashboard_menu_id' => 8, 'nama_sub_menu' => 'Penilaian Dekubitus'],
+            // ===== Fase P3 — Gizi & Nutrisi (menu 10) =====
+            // nama_sub_menu WAJIB menghasilkan slug = form.slug (dipakai sebagai
+            // form_name di URL dashboard pasien).
+            ['dashboard_menu_sub_id' => 153, 'dashboard_menu_id' => 10, 'nama_sub_menu' => 'Asesmen Gizi'],
+            ['dashboard_menu_sub_id' => 154, 'dashboard_menu_id' => 10, 'nama_sub_menu' => 'Detail Nutrisi'],
+            ['dashboard_menu_sub_id' => 155, 'dashboard_menu_id' => 10, 'nama_sub_menu' => 'Rekap Asesmen Nutrisi'],
+            ['dashboard_menu_sub_id' => 156, 'dashboard_menu_id' => 10, 'nama_sub_menu' => 'Pesan Makanan'],
+            ['dashboard_menu_sub_id' => 157, 'dashboard_menu_id' => 10, 'nama_sub_menu' => 'Diet Pasien'],
+            ['dashboard_menu_sub_id' => 158, 'dashboard_menu_id' => 10, 'nama_sub_menu' => 'ADIME'],
+            // ===== Fase P3 — Farmasi (menu 11) =====
+            ['dashboard_menu_sub_id' => 173, 'dashboard_menu_id' => 11, 'nama_sub_menu' => 'Daftar Terapi Obat'],
+            ['dashboard_menu_sub_id' => 174, 'dashboard_menu_id' => 11, 'nama_sub_menu' => 'Rekonsiliasi Obat'],
+            ['dashboard_menu_sub_id' => 175, 'dashboard_menu_id' => 11, 'nama_sub_menu' => 'Telaah Resep'],
+            ['dashboard_menu_sub_id' => 176, 'dashboard_menu_id' => 11, 'nama_sub_menu' => 'Telaah Obat'],
+            // ===== Fase P3 — Order Penunjang (menu 4 "Order") =====
+            ['dashboard_menu_sub_id' => 193, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Order Patologi'],
+            ['dashboard_menu_sub_id' => 194, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Order Mikrobiologi'],
+            ['dashboard_menu_sub_id' => 195, 'dashboard_menu_id' => 4, 'nama_sub_menu' => 'Order POCT'],
         ];
         foreach ($subMenus as $subMenu) {
             DB::table('dashboard_menu_sub')->updateOrInsert(
@@ -246,6 +267,24 @@ class EmrMasterSeeder extends Seeder
             ['form_id' => 36, 'nama_form' => 'Metode Nyeri', 'slug' => 'metode_nyeri', 'id_dash_menu' => '9.113.67', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
             ['form_id' => 37, 'nama_form' => 'Body Map Nyeri', 'slug' => 'body_map_nyeri', 'id_dash_menu' => '9.114', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
             ['form_id' => 38, 'nama_form' => 'Skrining Nyeri Perina', 'slug' => 'skrining_nyeri_perina', 'id_dash_menu' => '9.113.68', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            // ===== Fase P3 — Gizi & Nutrisi (menu 10) =====
+            ['form_id' => 39, 'nama_form' => 'Asesmen Gizi', 'slug' => 'asesmen_gizi', 'id_dash_menu' => '10.153', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 40, 'nama_form' => 'Detail Nutrisi', 'slug' => 'detail_nutrisi', 'id_dash_menu' => '10.154', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            // form 41 (Rekap Asesmen Nutrisi) BELUM di-seed: legacy tidak punya
+            // tabel konversi ambang SGA sehingga `kesimpulan` tak bisa diisi
+            // (lihat docs/TASK_FORM.md EMR-041, status ⛔).
+            ['form_id' => 42, 'nama_form' => 'Pesan Makanan & Monitoring Asupan', 'slug' => 'pesan_makanan', 'id_dash_menu' => '10.156', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 43, 'nama_form' => 'Diet Pasien', 'slug' => 'diet_pasien', 'id_dash_menu' => '10.157', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 44, 'nama_form' => 'ADIME', 'slug' => 'adime', 'id_dash_menu' => '10.158', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            // ===== Fase P3 — Farmasi (menu 11) =====
+            ['form_id' => 45, 'nama_form' => 'Daftar Terapi Obat', 'slug' => 'daftar_terapi_obat', 'id_dash_menu' => '11.173', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 46, 'nama_form' => 'Rekonsiliasi Obat', 'slug' => 'rekonsiliasi_obat', 'id_dash_menu' => '11.174', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 47, 'nama_form' => 'Telaah Resep', 'slug' => 'telaah_resep', 'id_dash_menu' => '11.175', 'ri' => 0, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 48, 'nama_form' => 'Telaah Obat', 'slug' => 'telaah_obat', 'id_dash_menu' => '11.176', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            // ===== Fase P3 — Order Penunjang Medis (menu 4 "Order") =====
+            ['form_id' => 49, 'nama_form' => 'Order Patologi', 'slug' => 'order_patologi', 'id_dash_menu' => '4.193', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 50, 'nama_form' => 'Order Mikrobiologi', 'slug' => 'order_mikrobiologi', 'id_dash_menu' => '4.194', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 51, 'nama_form' => 'Order POCT', 'slug' => 'order_poct', 'id_dash_menu' => '4.195', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
             ['form_id' => 54, 'nama_form' => 'Catatan Keperawatan Rawat Jalan', 'slug' => 'catatan_keperawatan_rajal', 'id_dash_menu' => '8.77.37', 'ri' => 0, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
             ['form_id' => 55, 'nama_form' => 'Riwayat Penyakit', 'slug' => 'riwayat_penyakit', 'id_dash_menu' => '8.77.35', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
             ['form_id' => 56, 'nama_form' => 'Riwayat Keluarga', 'slug' => 'riwayat_keluarga', 'id_dash_menu' => '8.77.36', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
@@ -437,6 +476,37 @@ class EmrMasterSeeder extends Seeder
             352 => 'Barthel Toilet', 353 => 'Barthel Bersih', 354 => 'Barthel Buang Air Besar', 355 => 'Barthel Buang Air Kecil',
             356 => 'Barthel Mandi', 357 => 'Barthel Berpakaian', 358 => 'Barthel Makan', 359 => 'Barthel Naik Turun Tangga',
             360 => 'Total Skor Barthel', 361 => 'Tingkat Ketergantungan Barthel',
+            362 => 'Tanggal Asesmen Gizi', 363 => 'Waktu Asesmen Gizi', 364 => 'Jenis Asesmen Gizi',
+            365 => 'Riwayat Penyakit Keluarga', 366 => 'Ketidaksukaan Makanan', 367 => 'Pengalaman Diet / Konsul Sebelumnya',
+            368 => 'Asupan Makanan SMRS', 369 => 'Z-Score', 370 => 'Lingkar Lengan Atas',
+            371 => 'Riwayat Penurunan Berat Badan', 372 => 'Biokimia Terkait Gizi', 373 => 'Nafsu Makan',
+            374 => 'Gigi Geligi', 375 => 'Gangguan Menelan / Menghisap / Mengunyah', 376 => 'Keluhan Fisik Klinis Gizi',
+            377 => 'Diagnosa Gizi', 378 => 'Kebutuhan Energi Pasien', 379 => 'Intervensi Gizi',
+            380 => 'Monitoring & Evaluasi (MONEV)', 381 => 'Sumber Rekomendasi',
+            382 => 'Instrumen Skrining Gizi', 383 => 'Jawaban Item Instrumen Gizi', 384 => 'Skor Skrining Gizi',
+            385 => 'Kesimpulan Gizi', 386 => 'Tanggal Evaluasi Ahli Gizi',
+            388 => 'Tanggal Pesan Makanan', 389 => 'Jenis Pesanan Makanan', 390 => 'Waktu Distribusi Pagi',
+            391 => 'Waktu Distribusi Siang', 392 => 'Waktu Distribusi Sore', 393 => 'Petugas Distribusi Pagi',
+            394 => 'Petugas Distribusi Siang', 395 => 'Petugas Distribusi Sore', 396 => 'Jenis Diet Pasien',
+            // ===== Fase P3 — Farmasi (KONSEP_FARMAKASI.md) =====
+            397 => 'Tanggal Daftar Terapi Obat', 398 => 'Waktu Daftar Terapi Obat', 399 => 'Status Pemberian Obat',
+            400 => 'Alasan Stop / Tunda Obat', 401 => 'Jam Pemberian Obat', 402 => 'Instrumen Rekonsiliasi',
+            403 => 'Lanjut pada Perawatan', 404 => 'Satuan Aturan Pakai', 405 => 'Dokter Preskripsi',
+            406 => 'Tanggal Resep / Mulai', 407 => 'Edukasi Obat Saat Pulang', 408 => 'Catatan Rekonsiliasi',
+            409 => 'Nomor Resep (ID Resep Farmasi)', 410 => 'Telaah 1 - Kejelasan Penulisan Resep',
+            411 => 'Telaah 2 - Tepat Cara Pemberian', 412 => 'Telaah 3 - Tepat Dosis',
+            413 => 'Telaah 4 - Tepat Frekuensi Pemberian', 414 => 'Telaah 5 - Tepat Obat',
+            415 => 'Telaah 6 - Tidak Ada Duplikasi', 416 => 'Telaah 7 - Tidak Ada Interaksi Obat',
+            417 => 'Catatan / Keterangan Telaah', 418 => 'Tanggal Telaah', 419 => 'Waktu Telaah',
+            420 => 'Telaah Obat 1 - Tepat Pasien', 421 => 'Telaah Obat 2 - Tepat Obat',
+            422 => 'Telaah Obat 3 - Tepat Dosis', 423 => 'Telaah Obat 4 - Tepat Cara Pemberian',
+            424 => 'Telaah Obat 5 - Tepat Waktu Pemberian', 425 => 'Catatan / Keterangan Telaah Obat',
+            // ===== Fase P3 — Order Penunjang Medis (KONSEP_PENUNJANG_MEDIS_LANJUTAN.md) =====
+            432 => 'Tanggal Pemeriksaan Patologi Anatomi', 433 => 'Jenis Pesanan Patologi Anatomi',
+            434 => 'Tanggal Pemeriksaan Mikrobiologi', 435 => 'Jenis Pemeriksaan Mikrobiologi',
+            436 => 'Unit Mikrobiologi', 437 => 'Spesimen Sumber Mikrobiologi', 438 => 'Tanggal Order POCT',
+            439 => 'Indikasi POCT', 440 => 'Tanggal Hasil Terakhir POCT', 441 => 'Waktu Hasil Terakhir POCT',
+            442 => 'Hasil Terakhir POCT',
         ];
         foreach ($objeks as $objekId => $namaObjek) {
             DB::table('objek')->updateOrInsert(
@@ -1061,6 +1131,80 @@ class EmrMasterSeeder extends Seeder
                 'interpretasi_nyeri' => 335, 'catatan' => 77,
             ],
             // ==== Fase P2 — form 54 ====
+            // ===== Fase P3 — Gizi & Nutrisi (KONSEP_ASESMEN_GIZI.md) =====
+            39 => [
+                'tanggal_asesmen' => 362, 'waktu_asesmen' => 363, 'jenis_asesmen' => 364,
+                'riwayat_penyakit' => 41, 'riwayat_penyakit_keluarga' => 365, 'diagnosa_medis' => 40,
+                'alergi' => 17, 'ketidaksukaan_makanan' => 366, 'pantangan_makan' => 30,
+                'pengalaman_diit' => 367, 'asupan_smrs' => 368, 'berat_badan' => 8, 'tinggi_badan' => 9,
+                'bmi' => 58, 'z_score' => 369, 'lingkar_lengan' => 370, 'bb_biasanya' => 371,
+                'biokimia' => 372, 'nafsu_makan' => 373, 'gigi_geligi' => 374,
+                'gangguan_menelan' => 375, 'gangguan_menghisap' => 375, 'gangguan_mengunyah' => 375,
+                'fkg_diare' => 376, 'fkg_edema_ascites' => 376, 'fkg_muntah' => 376,
+                'fkg_konstipasi' => 376, 'fkg_mual' => 376, 'fkg_hilang_lemak' => 376,
+                'td_sistolik' => 6, 'td_diastolik' => 7, 'nadi' => 10, 'suhu' => 11,
+                'pernapasan' => 12, 'saturasi' => 15, 'diagnosa_gizi' => 377,
+                'kebutuhan_energi' => 378, 'intervensi_gizi' => 379, 'monev' => 380, 'rekomendasi' => 381,
+            ],
+            40 => [
+                'instrumen' => 382, 'skor' => 384, 'kesimpulan' => 385,
+                'ahli_gizi_id' => 82, 'tanggal_evaluasi' => 386,
+            ],
+            42 => [
+                'tanggal_pesan' => 388, 'jenis_pesanan' => 389,
+                'waktu_pagi' => 390, 'waktu_siang' => 391, 'waktu_sore' => 392,
+                'petugas_pagi' => 393, 'petugas_siang' => 394, 'petugas_sore' => 395,
+                'prioritas' => 76, 'keterangan' => 77,
+            ],
+            43 => [
+                'jenis_diet' => 396, 'jenis_diagnosa_diet' => 377, 'keterangan' => 77,
+            ],
+            44 => [
+                'assessment' => 3, 'diagnosa_gizi' => 377, 'intervensi' => 379,
+                'monitor_asupan_makanan' => 380, 'monitor_hasil_lab' => 380,
+                'monitor_berat_badan' => 380, 'evaluasi' => 380, 'instruksi' => 5,
+                'tanggal_asesmen' => 362, 'waktu_asesmen' => 363,
+            ],
+            // ===== Fase P3 — Farmasi (KONSEP_FARMAKASI.md) =====
+            45 => [
+                'tanggal_terapi' => 397, 'waktu_terapi' => 398,
+                'dokter_instruksi_id' => 82, 'keterangan' => 77,
+            ],
+            46 => [
+                'rek_tab_aktif' => 402,
+                'pulang_edukasi_aturan_minum' => 407, 'pulang_edukasi_dosis' => 407,
+                'pulang_edukasi_cara_penggunaan' => 407, 'pulang_edukasi_penyimpanan' => 407,
+                'catatan_rekonsiliasi' => 408,
+            ],
+            47 => [
+                'nomor_resep_id' => 409, 'tanggal_telaah' => 418, 'waktu_telaah' => 419,
+                'petugas_id' => 82,
+                'telaah_1' => 410, 'telaah_2' => 411, 'telaah_3' => 412, 'telaah_4' => 413,
+                'telaah_5' => 414, 'telaah_6' => 415, 'telaah_7' => 416, 'telaah_catatan' => 417,
+                'prioritas' => 76, 'keterangan' => 77,
+            ],
+            48 => [
+                'nomor_resep_id' => 409,
+                'tobat_1' => 420, 'tobat_2' => 421, 'tobat_3' => 422, 'tobat_4' => 423,
+                'tobat_5' => 424, 'tobat_catatan' => 425,
+                'petugas_id' => 82, 'tanggal_telaah' => 418, 'waktu_telaah' => 419,
+                'keterangan' => 77,
+            ],
+            // ===== Fase P3 — Order Penunjang Medis (KONSEP_PENUNJANG_MEDIS_LANJUTAN.md) =====
+            49 => [
+                'tanggal_pemeriksaan' => 432, 'diagnosa_patologi' => 40, 'catatan' => 77,
+                'jenis_pesanan' => 433, 'prioritas' => 76,
+            ],
+            50 => [
+                'tanggal_pemeriksaan' => 434, 'diagnosa' => 40, 'catatan' => 77,
+                'unit_pemeriksaan' => 436, 'jenis_pemeriksaan' => 435, 'spesimen' => 437,
+                'jumlah_spesimen' => 70, 'prioritas' => 76,
+            ],
+            51 => [
+                'tanggal_order' => 438, 'diagnosa_poct' => 40, 'indikasi' => 439, 'catatan' => 77,
+                'prioritas' => 76, 'tanggal_hasil_terakhir' => 440, 'waktu_hasil_terakhir' => 441,
+                'hasil_terakhir' => 442,
+            ],
             54 => [
                 'keluhan' => 114, 'kesadaran' => 51, 'td_sistolik' => 6,
                 'td_diastolik' => 7, 'nadi' => 10, 'pernapasan' => 12,
@@ -1127,6 +1271,83 @@ class EmrMasterSeeder extends Seeder
             $mappingButirVap['vap_'.$butir] = 157 + $butir;
         }
         $mapping[14] = array_merge($mapping[14], $mappingButirVap);
+        // ===== Fase P3 — mapping bersuffix =====
+        //
+        // Alasan suffix sama seperti baris obat/BMHP form 10:
+        // EmrHelper::emrDetailByVariabel() melakukan pluck('value','variabel'),
+        // sehingga N baris untuk variabel yang sama akan tertimpa baris terakhir.
+        //
+        // Form 40 — Detail Nutrisi: 4 instrumen (SGA / MNA-SF / MST / MST-Anak).
+        // Semua item instrumen dipetakan ke objek 383 ("Jawaban Item Instrumen
+        // Gizi"); skor & kesimpulan (384/385) selalu dihitung ulang di server.
+        $mappingItemNutrisi = [];
+        for ($i = 1; $i <= 5; $i++) {          // SGA/NRS 5 parameter (skor 1-5)
+            $mappingItemNutrisi['sga_'.$i] = 383;
+        }
+        for ($i = 1; $i <= 4; $i++) {          // MNA-SF A-D (skor 0-3)
+            $mappingItemNutrisi['mna_'.$i] = 383;
+        }
+        for ($i = 1; $i <= 15; $i++) {         // MNA diagnosis khusus dewasa
+            $mappingItemNutrisi['mna_diag_'.$i] = 383;
+        }
+        foreach (['mst_a', 'mst_b', 'mst_c', 'mst_d', 'mst_e', 'mst_f1', 'mst_f2'] as $mst) {
+            $mappingItemNutrisi[$mst] = 383;  // MST 7 parameter
+        }
+        for ($i = 1; $i <= 4; $i++) {          // MST-Anak 4 item
+            $mappingItemNutrisi['mstak_'.$i] = 383;
+        }
+        for ($i = 1; $i <= 16; $i++) {         // MST-Anak diagnosis khusus
+            $mappingItemNutrisi['mstak_diag_'.$i] = 383;
+        }
+        $mapping[40] = array_merge($mapping[40], $mappingItemNutrisi);
+        // Form 45 — Daftar Terapi Obat: 20 baris obat, tiap baris 9 variabel
+        // bersuffix. Hanya barang_id yang disimpan (nama di-resolve dari master).
+        $mappingBarisTerapi = [];
+        for ($b = 1; $b <= 20; $b++) {
+            $mappingBarisTerapi['obat_'.$b] = 69;
+            $mappingBarisTerapi['jumlah_'.$b] = 70;
+            $mappingBarisTerapi['s_1_'.$b] = 71;
+            $mappingBarisTerapi['s_2_'.$b] = 72;
+            $mappingBarisTerapi['aturan_pakai_'.$b] = 73;
+            $mappingBarisTerapi['rute_'.$b] = 74;
+            $mappingBarisTerapi['status_'.$b] = 399;
+            $mappingBarisTerapi['alasan_stop_'.$b] = 400;
+            $mappingBarisTerapi['jam_masuk_'.$b] = 401;
+        }
+        $mapping[45] = array_merge($mapping[45], $mappingBarisTerapi);
+        // Form 46 — Rekonsiliasi Obat: 3 grup baris x 10 baris
+        // (riwayat_ / resep_ / pulang_). Suffiks agar tiap obat punya key unik.
+        $mappingBarisRekonsiliasi = [];
+        for ($b = 1; $b <= 10; $b++) {
+            // Grup riwayat — obat sebelum admisi
+            $mappingBarisRekonsiliasi['riwayat_nama_obat_'.$b] = 69;
+            $mappingBarisRekonsiliasi['riwayat_rute_'.$b] = 74;
+            $mappingBarisRekonsiliasi['riwayat_dosis_'.$b] = 73;
+            $mappingBarisRekonsiliasi['riwayat_freq_1_'.$b] = 71;
+            $mappingBarisRekonsiliasi['riwayat_freq_2_'.$b] = 72;
+            $mappingBarisRekonsiliasi['riwayat_lanjut_'.$b] = 403;
+            // Grup resep — obat dari resep/RS saat di rumah
+            $mappingBarisRekonsiliasi['resep_nama_obat_'.$b] = 69;
+            $mappingBarisRekonsiliasi['resep_rute_'.$b] = 74;
+            $mappingBarisRekonsiliasi['resep_dosis_'.$b] = 73;
+            $mappingBarisRekonsiliasi['resep_satuan_'.$b] = 404;
+            $mappingBarisRekonsiliasi['resep_freq_1_'.$b] = 71;
+            $mappingBarisRekonsiliasi['resep_freq_2_'.$b] = 72;
+            $mappingBarisRekonsiliasi['resep_dokter_'.$b] = 405;
+            $mappingBarisRekonsiliasi['resep_tgl_mulai_'.$b] = 406;
+            $mappingBarisRekonsiliasi['resep_keterangan_'.$b] = 77;
+            // Grup pulang — obat yang dibawa pulang
+            $mappingBarisRekonsiliasi['pulang_nama_obat_'.$b] = 69;
+            $mappingBarisRekonsiliasi['pulang_rute_'.$b] = 74;
+            $mappingBarisRekonsiliasi['pulang_dosis_'.$b] = 73;
+            $mappingBarisRekonsiliasi['pulang_satuan_'.$b] = 404;
+            $mappingBarisRekonsiliasi['pulang_freq_1_'.$b] = 71;
+            $mappingBarisRekonsiliasi['pulang_freq_2_'.$b] = 72;
+            $mappingBarisRekonsiliasi['pulang_dokter_'.$b] = 405;
+            $mappingBarisRekonsiliasi['pulang_tgl_mulai_'.$b] = 406;
+            $mappingBarisRekonsiliasi['pulang_keterangan_'.$b] = 77;
+        }
+        $mapping[46] = array_merge($mapping[46], $mappingBarisRekonsiliasi);
         foreach ($mapping as $formId => $variabels) {
             foreach ($variabels as $variabel => $objekId) {
                 $exists = DB::table('objek_form_control')
@@ -1144,6 +1365,31 @@ class EmrMasterSeeder extends Seeder
                     'input_user_id' => 1,
                     'status_batal' => 0,
                 ]);
+            }
+        }
+        // Soft-delete mapping aktif yang variabelnya sudah TIDAK lagi ada di
+        // $mapping. Tanpa ini baris lama tetap ikut terbaca (EmrHelper hanya
+        // memfilter status_batal), sehingga form punya variabel "hantu" yang
+        // tidak pernah dikirim controller — gejalanya `simpan` kurang dari
+        // jumlah variabel di e2e. Contoh nyata: `prioritas` pada form 48 yang
+        // dihapus dari konsep §6.5.
+        foreach ($mapping as $formId => $variabels) {
+            $aktif = DB::table('objek_form_control')
+                ->where('form_id', $formId)
+                ->where(function ($q) {
+                    $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                })
+                ->pluck('variabel')
+                ->all();
+
+            foreach (array_diff($aktif, array_keys($variabels)) as $variabelLama) {
+                DB::table('objek_form_control')
+                    ->where('form_id', $formId)
+                    ->where('variabel', $variabelLama)
+                    ->where(function ($q) {
+                        $q->whereNull('status_batal')->orWhere('status_batal', 0);
+                    })
+                    ->update(['status_batal' => 1, 'mod_time' => $now]);
             }
         }
         // Mapping variabel UP GO lama (objek 66-68) tidak lagi dipakai form 3:
@@ -1204,9 +1450,68 @@ class EmrMasterSeeder extends Seeder
         EmrHelper::backfillObjekId(123);
         EmrHelper::backfillObjekId(124);
         EmrHelper::backfillObjekId(125);
+        // ===== Fase P3 =====
+        foreach ([39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51] as $formIdP3) {
+            EmrHelper::backfillObjekId($formIdP3);
+        }
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
         $akses = [
+            // ===== Fase P3 — Gizi & Nutrisi =====
+            // Asesmen Gizi (39): Dokter + Perawat full CRUD.
+            ['profesi_id' => 1, 'form_id' => 39, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 39, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Detail Nutrisi (40): Dokter + Ahli Gizi (10) full CRUD; Perawat READ-ONLY
+            // (skor MNA-SF/MST diisi petugas gizi, bukan perawat).
+            ['profesi_id' => 1, 'form_id' => 40, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 40, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 10, 'form_id' => 40, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Pesan Makanan (42): diisi dapur/Ahli Gizi (10) & Perawat (2) full;
+            // Dokter READ-ONLY (dokter tidak menata jadwal distribusi).
+            ['profesi_id' => 1, 'form_id' => 42, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 42, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 10, 'form_id' => 42, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Diet Pasien (43): Ahli Gizi (10) & Dokter full; Perawat READ-ONLY.
+            ['profesi_id' => 1, 'form_id' => 43, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 43, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 10, 'form_id' => 43, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // ADIME (44): Perawat + Ahli Gizi full; Dokter read.
+            ['profesi_id' => 1, 'form_id' => 44, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 44, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 10, 'form_id' => 44, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // ===== Fase P3 — Farmasi =====
+            // Daftar Terapi Obat (45): Dokter full; Perawat create/read/update
+            // TANPA delete (rekam terapi tak boleh dihapus perawat);
+            // Apoteker (4) READ-ONLY.
+            ['profesi_id' => 1, 'form_id' => 45, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 45, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 4, 'form_id' => 45, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // Rekonsiliasi Obat (46): Dokter + Apoteker full; Perawat read.
+            ['profesi_id' => 1, 'form_id' => 46, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 46, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 4, 'form_id' => 46, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Telaah Resep (47): Apoteker + Dokter full; Perawat read.
+            ['profesi_id' => 1, 'form_id' => 47, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 47, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 4, 'form_id' => 47, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Telaah Obat (48): Apoteker full; Dokter read.
+            ['profesi_id' => 1, 'form_id' => 48, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 4, 'form_id' => 48, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // ===== Fase P3 — Order Penunjang Medis =====
+            // Pola identik dengan Order Laboratorium (form 6): order tetap dokter,
+            // profesi penunjang read-only.
+            // Order Patologi (49): Dokter CRUD; Perawat + Patolog Anatomi (15) read.
+            ['profesi_id' => 1, 'form_id' => 49, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 49, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 15, 'form_id' => 49, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // Order Mikrobiologi (50): Dokter CRUD; Perawat + Analis Lab (13) read.
+            ['profesi_id' => 1, 'form_id' => 50, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 50, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 13, 'form_id' => 50, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // Order POCT (51): Dokter CRUD; Perawat + Analis Lab (13) read.
+            ['profesi_id' => 1, 'form_id' => 51, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 51, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 13, 'form_id' => 51, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
             // Dokter (profesi 1): seluruh form
             ['profesi_id' => 1, 'form_id' => 1, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 1, 'form_id' => 2, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],

@@ -372,6 +372,47 @@ docker compose exec -T app php tools/e2e.php               # cek semua form yang
 
 **Harness membersihkan dirinya sendiri** di akhir run (`emr_detail` lalu `emr`). Kalau pernah dijalankan versi lama, bersihkan manual: hapus baris `emr_detail` yang `emr_id`-nya ada di `emr`, lalu `emr` — nilai uji `'Data Uji'` tidak boleh tertinggal.
 
+## Fase P3 EMR — Gizi & Farmasi, form 39–48 (SUDAH diimplementasikan)
+
+10 form ✅ (39, 40, 42, 43, 44, 45, 46, 47, 48 — 41 masih `⛔`), **637 variabel**.
+Menu baru `dashboard_menu` **10 "Gizi & Nutrisi"** (sub 153–158) dan **11 "Farmasi"** (sub 173–176).
+Sub baru di menu 4 "Order": 193/194/195 (form 49–51, belum dikerjakan). Objek baru **362–425**.
+
+Helper: `GiziHelper` (IMT, status gizi Belfanti, penurunan BB, 4 instrumen skrining), `FarmasiHelper` (7 kriteria telaah resep, 5 telaah obat, 7 kode status pemberian).
+
+- **`kesimpulan` SGA SENGAJA `null`.** Legacy hanya menampilkan total skor tanpa kategori, dan belum ada keputusan klinis tertulis mengenai ambang konversinya (docs/KONSEP_ASESMEN_GIZI.md §11 risiko #3). Menyimpan kategori hasil karangan menyesatkan — lebih baik hanya menampilkan skor. Form 41 (Rekap) `⛔` karena alasan sama. **Jangan "melengkapi" ambangnya tanpa keputusan klinis.**
+- **`GiziHelper::hitung()` hanya mengembalikan skor bila SEMUA butir instrumen aktif terisi.** Skor parsial selalu terlalu rendah. Item di luar instrumen aktif di-set `null` (bukan `unset()`) supaya baris `emr_detail` tetap ada.
+- **Diagnosis khusus MST-Anak menambah +3** (maks total 7); kategori 6–7 tetap "Risiko Tinggi". MNA-SF butir D sudah Radio 0/3 sehingga diagnosis khusus **tidak** ditambah dua kali.
+- **`min`/`max` HANYA boleh pada kolom numerik.** Aturan `required|string|max:2000` akan gagal bila harness/validasi menganggapnya numerik. Aturan ini juga alasan `GiziHelper` mengembalikan `null`, bukan `0`.
+- **Checkbox pakai `in:on,off` atau `in:0,1`, bukan `boolean`.** HTML checkbox mengirim string; `in:` lebih eksplisit di `emr_detail` dan lebih mudah dibaca.
+- **Baris obat WAJIB bersuffix** (`obat_1`..`obat_20`, form 45; `riwayat_*`/`resep_*`/`pulang_*` 1–10, form 46) — `emrDetailByVariabel()` melakukan `pluck('value','variabel')` sehingga N baris untuk variabel sama tertimpa baris terakhir. Total 184 + 246 baris mapping.
+- **Baris kosong dibuang SELURUH grupnya** di `filteredData()`, bukan hanya kolom kuncinya — supaya tidak ada baris yatim di `emr_detail`.
+- **Hanya `barang_id` yang disimpan**, bukan nama (konsisten dengan form 10). `Barang::aktif()` di-resolve saat render, dan id yang sudah soft-delete ditolak di server.
+- **Telaah (`telaah_*` / `tobat_*`) memakai hidden `off` + checkbox `on`** (pola legacy) supaya nilai selalu terkirim. `telaah_catatan`/`tobat_catatan` **wajib diisi server** bila ada butir `'off'` — dicek di `filteredData()`/`cekCatatanWajib()`, bukan hanya aturan `required_if`, karena key yang tidak dikirim tidak akan tersentuh validasi.
+- **`master_diet.nama_diet` adalah nilai yang tersimpan** di `emr_detail` (form 43 memvalidasi `exists:master_diet,nama_diet`). **Jangan mengganti nama diet di seeder** — data lama tidak lagi cocok.
+- **Field multi-pilih disimpan comma-separated dalam SATU baris** (`jenis_diagnosa_diet` = `"DM tipe 2,Hematuria"`), dipecah lagi di view dengan `explode(',')`. N baris dengan `variabel` sama = data hilang.
+- **Seeder soft-delete mapping aktif yang variabelnya sudah hilang dari `$mapping`.** Tanpa itu baris lama tetap terbaca dan form punya variabel "hantu" yang tidak pernah dikirim controller (gejalanya `simpan` < jumlah variabel).
+
+## Master Diet & Master Diagnosa Diet (Administrator → Manajemen Master)
+
+Prasyarat **PRE-05**, dipakai form 43 "Diet Pasien". Mengikuti pola `MasterImplementasi` persis (sub_menu 63 & 64, `urutan_sub_menu` 24–25, route auto dari `SubMenuRouteServiceProvider`).
+
+- **`nama_diet` dan `nama_diagnosa_diet` adalah nilai yang BENAR-BENAR tersimpan di `emr_detail`** — form 43 memvalidasinya `exists:master_diet,nama_diet`, dan `jenis_diagnosa_diet` menyimpan daftar nama diagnosis **comma-separated dalam satu baris** (bukan id). **Mengubah nama di master membuat riwayat EMR lama tidak lagi cocok.** Form edit menampilkan peringatan kuning; deskripsi diubah lewat kolom **Keterangan**, bukan dengan mengganti nama.
+- Tabel tidak punya kolom `id` (PK custom `master_diet_id` / `master_diagnosa_diet_id`) — `Rule::unique(...)->ignore($id, '<pk>')` **wajib eksplisit**.
+- `MasterDietMenuSeeder` sekaligus mengisi tabel `menu` id 6 dan `user_akses` admin, karena `ModulMenuSubMenuSeeder` (yang digenerate `seeder:sync-master-menu`) sudah dibuat sebelumnya dan tidak memuat sub-menu baru ini.
+
+## Order penunjang lanjutan (EMR, form 49–51) — data DI TABEL ORDER, bukan `emr_detail`
+
+Rancangan: `docs/KONSEP_PENUNJANG_MEDIS_LANJUTAN.md`. Tiga form — **Order Patologi** (49, slug `order_patologi`, sub 193), **Order Mikrobiologi** (50, `order_mikrobiologi`, sub 194), **Order POCT** (51, `order_poct`, sub 195) — semuanya di menu 4 "Order".
+
+- **Data order TIDAK disimpan di `emr_detail`.** `emr_id` pada URL `/emr/form/{slug}/{registrasi_detail_id}/{emr_id}` bermakna **`order_*_id`**. Tabel: `order_patologi`/`_detail`, `order_mikrobiologi`/`_detail`, `order_poct`/`_detail` (satu migration `2026_10_11_000002`, dual-driver).
+- **`PenunjangHelper` SEKARANG GENERIK TOTAL.** Menambah jenis order cukup menambah satu baris di tiga const: `PenunjangHelper::TABEL` (`jenis => [tabel, pk, tabelDetail, fk]`), `::PREFIX` (untuk nomor order), `::MODEL` (model Eloquent header). `findOrder()` dan `baseQuery()` **tidak lagi** bercabang `if ($jenis === 'lab')` — jangan menambahkan cabang baru, tambahkan const saja.
+- **Kolom khas per jenis** disimpan lewat patch terpisah setelah `buatOrder()`/`ubahOrder()` (payload generik tidak mengetahuinya): patologi `jenis_pesanan`, mikrobiologi `unit_pemeriksaan`/`jenis_pemeriksaan`/`spesimen`/`jumlah_spesimen`, POCT `indikasi`. Patel `jenis_pesanan` = `group_tindakan_id`.
+- **`jenis_pemeriksaan = Luar` wajib menyertakan nama laboratorium tujuan rujukan** di `catatan` (minimal 5 karakter, dicek server). Tanpa itu klaim rujukan tidak bisa ditelusuri.
+- **Item baris wajib anggota Master Group Tindakan** yang dipilih (`group_tindakan_tindakan`), dicek server via `PenunjangHelper::tindakanBagianMap()` — pesan "…tidak termasuk dalam Group Tindakan…". Tindakan tidak lagi punya kolom `bagian_id`, jadi **jangan** menulis validasi berbasis kolom itu.
+- **Harness untuk order form = `tools/e2e_order.php`, BUKAN `tools/e2e.php`.** `e2e.php` membangun payload dari aturan `validated()` dan tidak bisa mengisi item baris dari Group Tindakan, sehingga selalu gagal dengan "Minimal satu pemeriksaan wajib dipilih". `e2e_order.php` memanggil `PenunjangHelper::buatOrder() → ubahOrder() → batalkan()` untuk kelima jenis order (lab/rad/patologi/mikrobiologi/poct) dan membersihkan datanya di akhir.
+- Catatan tools: `pint.json` mengecualikan `tools`, jadi skrip harness boleh menaruh `use` di bawah bootstrap (Laravel tidak care di file non-autoload).
+
 ## EMR dynamic forms
 
 - Route `/emr/form/{form_name}/{registrasi_detail_id}/{emr_id?}` (`emr.dynamic.index`): `DynamicFormController` first tries `App\Http\Controllers\EMR\{Studly}\{Studly}Controller`, else the view `moduls.emr.{slug}.index`.

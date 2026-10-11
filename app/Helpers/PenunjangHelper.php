@@ -4,6 +4,9 @@ namespace App\Helpers;
 
 use App\Models\KelasRuang;
 use App\Models\OrderLaboratorium;
+use App\Models\OrderMikrobiologi;
+use App\Models\OrderPatologi;
+use App\Models\OrderPoct;
 use App\Models\OrderRadiologi;
 use App\Models\RegistrasiDetail;
 use Illuminate\Support\Facades\Auth;
@@ -18,13 +21,51 @@ use Illuminate\Support\Facades\DB;
 class PenunjangHelper
 {
     /**
-     * Penomoran order per jenis. Prefix: LAB / RAD.
+     * Peta jenis penunjang -> [tabel header, PK header, tabel detail, FK detail].
+     *
+     * Satu-satunya tempat yang perlu disentuh untuk menambah jenis order baru —
+     * seluruh method helper di bawah generik terhadap peta ini.
+     *
+     * - lab / rad        → form 6 & 7 (sudah ada)
+     * - patologi         → form 49 Order Patologi Anatomi (PRE-02)
+     * - mikrobiologi     → form 50 Order Mikrobiologi (PRE-03)
+     * - poct             → form 51 Order POCT (PRE-04)
+     */
+    private const TABEL = [
+        'lab' => ['order_laboratorium', 'order_laboratorium_id', 'order_laboratorium_detail', 'order_laboratorium_id'],
+        'rad' => ['order_radiologi', 'order_radiologi_id', 'order_radiologi_detail', 'order_radiologi_id'],
+        'patologi' => ['order_patologi', 'order_patologi_id', 'order_patologi_detail', 'order_patologi_id'],
+        'mikrobiologi' => ['order_mikrobiologi', 'order_mikrobiologi_id', 'order_mikrobiologi_detail', 'order_mikrobiologi_id'],
+        'poct' => ['order_poct', 'order_poct_id', 'order_poct_detail', 'order_poct_id'],
+    ];
+
+    /** Model Eloquent per jenis order (header). */
+    private const MODEL = [
+        'lab' => OrderLaboratorium::class,
+        'rad' => OrderRadiologi::class,
+        'patologi' => OrderPatologi::class,
+        'mikrobiologi' => OrderMikrobiologi::class,
+        'poct' => OrderPoct::class,
+    ];
+
+    /** Prefix nomor order per jenis. */
+    private const PREFIX = [
+        'lab' => 'LAB',
+        'rad' => 'RAD',
+        'patologi' => 'PAT',
+        'mikrobiologi' => 'MKB',
+        'poct' => 'POCT',
+    ];
+
+    /**
+     * Penomoran order per jenis. Prefix: LAB / RAD / PAT / MKB / POCT.
      */
     public static function generateNoOrder(string $jenis): string
     {
+        $jenis = static::normalizeJenis($jenis);
         [$table] = static::tables($jenis);
 
-        return GenerateHelper::generateNoOrder($jenis === 'lab' ? 'LAB' : 'RAD', $table, 'no_order');
+        return GenerateHelper::generateNoOrder(static::PREFIX[$jenis], $table, 'no_order');
     }
 
     /**
@@ -274,6 +315,11 @@ class PenunjangHelper
                 $detail['nilai_normal'] = $item['nilai_normal'] ?? null;
             }
 
+            if ($jenis === 'patologi') {
+                // Order Patologi punya kolom spesimen per baris (biopsy, sitologi, dll).
+                $detail['spesimen'] = $item['spesimen'] ?? null;
+            }
+
             DB::table($detailTable)->insert($detail);
         }
     }
@@ -413,7 +459,7 @@ class PenunjangHelper
     public static function findOrder(string $jenis, int $orderId): object
     {
         $jenis = static::normalizeJenis($jenis);
-        $model = $jenis === 'lab' ? OrderLaboratorium::class : OrderRadiologi::class;
+        $model = static::MODEL[$jenis];
 
         $order = $model::aktif()
             ->with(['pasien', 'dokter', 'petugasPelaksana', 'bagianAsal', 'bagianTujuan', 'registrasiDetail', 'registrasiDetailTujuan', 'details'])
@@ -432,7 +478,7 @@ class PenunjangHelper
     {
         $jenis = strtolower(trim($jenis));
 
-        if (! in_array($jenis, ['lab', 'rad'], true)) {
+        if (! array_key_exists($jenis, static::TABEL)) {
             throw new \InvalidArgumentException('Jenis penunjang tidak valid.');
         }
 
@@ -444,9 +490,7 @@ class PenunjangHelper
      */
     private static function tables(string $jenis): array
     {
-        return $jenis === 'lab'
-            ? ['order_laboratorium', 'order_laboratorium_id', 'order_laboratorium_detail', 'order_laboratorium_id']
-            : ['order_radiologi', 'order_radiologi_id', 'order_radiologi_detail', 'order_radiologi_id'];
+        return static::TABEL[$jenis];
     }
 
     private static function updateOrder(string $jenis, int $orderId, array $changes): void
@@ -464,14 +508,9 @@ class PenunjangHelper
     {
         $jenis = static::normalizeJenis($jenis);
 
-        return $jenis === 'lab'
-            ? OrderLaboratorium::aktif()->with([
-                'pasien', 'dokter', 'petugasPelaksana', 'bagianAsal', 'bagianTujuan',
-                'registrasiDetail.registrasi', 'registrasiDetailTujuan', 'details',
-            ])
-            : OrderRadiologi::aktif()->with([
-                'pasien', 'dokter', 'petugasPelaksana', 'bagianAsal', 'bagianTujuan',
-                'registrasiDetail.registrasi', 'registrasiDetailTujuan', 'details',
-            ]);
+        return static::MODEL[$jenis]::aktif()->with([
+            'pasien', 'dokter', 'petugasPelaksana', 'bagianAsal', 'bagianTujuan',
+            'registrasiDetail.registrasi', 'registrasiDetailTujuan', 'details',
+        ]);
     }
 }

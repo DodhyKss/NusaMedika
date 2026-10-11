@@ -80,11 +80,11 @@ Sebuah task berstatus ✅ bila **SEMUA** butir berikut terpenuhi:
 |---|---|---|---|---|---|---|---|
 | **P1** | Catatan Medis Lanjutan | 7 | 0 | 0 | 7 | 0 | **100%** |
 | **P2** | Asuhan Keperawatan | 23 | 0 | 0 | 23 | 0 | **100%** |
-| **P3** | Gizi, Farmasi & Penunjang | 13 | 12 | 0 | 0 | 1 | 0% |
+| **P3** | Gizi, Farmasi & Penunjang | 13 | 0 | 0 | 12 | 1 | **92%** |
 | **P4** | Kebidanan & MCU | 26 | 25 | 0 | 0 | 1 | 0% |
 | **P5** | Bedah, Anestesi & ICU | 23 | 20 | 0 | 0 | 3 | 0% |
 | **P6** | Onkologi, Psikososial & Formulir | 22 | 22 | 0 | 0 | 0 | 0% |
-| **Total** | 6 fase | **114** | **84** | 0 | **30** | **5** | **26%** |
+| **Total** | 6 fase | **114** | **72** | 0 | **42** | **5** | **37%** |
 
 
 
@@ -96,11 +96,11 @@ Sebuah task berstatus ✅ bila **SEMUA** butir berikut terpenuhi:
 
 | Task | Prasyarat | Dibutuhkan oleh | Status | Owner |
 |---|---|---|---|---|
-| `PRE-01` | Seed profesi baru di `MasterPegawaiSeeder`: 14 Kerohanian, 15 Patolog Anatomi, 16 Dokter Intensivis, 17 Dokter Anestesi, 18 Perawat Hemodialisa | form 50–53, 85–90, 99, 102–104, 112–115 | ⬜ |  |
-| `PRE-02` | Migration `order_patologi` + `order_patologi_detail` (dual-driver) | form 49 | ⬜ |  |
-| `PRE-03` | Migration `order_mikrobiologi` + `order_mikrobiologi_detail` (dual-driver) | form 50 | ⬜ |  |
-| `PRE-04` | Migration `order_poct` + `order_poct_detail` (dual-driver) | form 51 | ⬜ |  |
-| `PRE-05` | Tabel + CRUD + seeder `master_diet` dan `master_diagnosa_diet` | form 43 | ⬜ |  |
+| `PRE-01` | Seed profesi baru di `MasterPegawaiSeeder`: 14 Kerohanian, 15 Patolog Anatomi, 16 Dokter Intensivis, 17 Dokter Anestesi, 18 Perawat Hemodialisa | form 50–53, 85–90, 99, 102–104, 112–115 | ✅ |  |
+| `PRE-02` | Migration `order_patologi` + `order_patologi_detail` (dual-driver) | form 49 | ✅ |  |
+| `PRE-03` | Migration `order_mikrobiologi` + `order_mikrobiologi_detail` (dual-driver) | form 50 | ✅ |  |
+| `PRE-04` | Migration `order_poct` + `order_poct_detail` (dual-driver) | form 51 | ✅ |  |
+| `PRE-05` | Tabel + CRUD + seeder `master_diet` dan `master_diagnosa_diet` | form 43 | ✅ |  |
 | `PRE-06` | Migration `form_blanko`, `form_blanko_field`, `form_blanko_pengisian` + model | form 129 | ⬜ |  |
 | `PRE-07` | `EmrHelper`: isi kolom `emr_detail.flag_abnormal` saat simpan + helper baca ronde (`emrFlags()`, `rondeMonitoring()`) | semua form time-series | ⬜ |  |
 | `PRE-08` | Helper skoring (pola `RisikoJatuhHelper`): `NyeriHelper`, `DekubitusHelper`, `ApgarHelper`, `DownScoreHelper`, `EwsHelper` | form 27, 32, 33, 36, 66, 67 | ⬜ |  |
@@ -179,19 +179,19 @@ Sebuah task berstatus ✅ bila **SEMUA** butir berikut terpenuhi:
 
 | Task | Nama Form | `slug` | `id_dash_menu` | ri/rj/igd/mcu | Status | Owner | Dokumen Konsep | Folder Controller/View | Catatan / Prasyarat |
 |---|---|---|---|---|---|---|---|---|---|
-| `EMR-039` | Asesmen Gizi | `asesmen_gizi` | `10.153` | 1/1/1/0 | ⬜ |  | KONSEP_ASESMEN_GIZI.md | `EMR/AsesmenGizi/` · `moduls/EMR/AsesmenGizi/` | — |
-| `EMR-040` | Detail Nutrisi | `detail_nutrisi` | `10.154` | 1/0/0/0 | ⬜ |  | KONSEP_ASESMEN_GIZI.md | `EMR/DetailNutrisi/` · `moduls/EMR/DetailNutrisi/` | — |
+| `EMR-039` | Asesmen Gizi | `asesmen_gizi` | `10.153` | 1/1/1/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_ASESMEN_GIZI.md | `EMR/AsesmenGizi/` · `moduls/EMR/AsesmenGizi/` | — |
+| `EMR-040` | Detail Nutrisi | `detail_nutrisi` | `10.154` | 1/0/0/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_ASESMEN_GIZI.md | `EMR/DetailNutrisi/` · `moduls/EMR/DetailNutrisi/` | — |
 | `EMR-041` | Rekap Asesmen Nutrisi | `rekap_asesmen_nutrisi` | `10.155` | 1/0/0/0 | ⛔ |  | KONSEP_ASESMEN_GIZI.md | `EMR/RekapAsesmenNutrisi/` · `moduls/EMR/RekapAsesmenNutrisi/` | Legacy tidak punya tabel konversi ambang SGA — `kesimpulan` tak bisa diisi |
-| `EMR-042` | Pesan Makanan & Monitoring Asupan | `pesan_makanan` | `10.156` | 1/0/0/0 | ⬜ |  | KONSEP_ASESMEN_GIZI.md | `EMR/PesanMakanan/` · `moduls/EMR/PesanMakanan/` | — |
-| `EMR-043` | Diet Pasien | `diet_pasien` | `10.157` | 1/1/1/0 | ⬜ |  | KONSEP_ASESMEN_GIZI.md | `EMR/DietPasien/` · `moduls/EMR/DietPasien/` | Butuh **PRE-05** |
-| `EMR-044` | ADIME | `adime` | `10.158` | 1/0/0/0 | ⬜ |  | KONSEP_ASESMEN_GIZI.md | `EMR/Adime/` · `moduls/EMR/Adime/` | — |
-| `EMR-045` | Daftar Terapi Obat | `daftar_terapi_obat` | `11.173` | 1/1/1/0 | ⬜ |  | KONSEP_FARMAKASI.md | `EMR/DaftarTerapiObat/` · `moduls/EMR/DaftarTerapiObat/` | — |
-| `EMR-046` | Rekonsiliasi Obat | `rekonsiliasi_obat` | `11.174` | 1/1/1/0 | ⬜ |  | KONSEP_FARMAKASI.md | `EMR/RekonsiliasiObat/` · `moduls/EMR/RekonsiliasiObat/` | — |
-| `EMR-047` | Telaah Resep | `telaah_resep` | `11.175` | 0/1/1/0 | ⬜ |  | KONSEP_FARMAKASI.md | `EMR/TelaahResep/` · `moduls/EMR/TelaahResep/` | — |
-| `EMR-048` | Telaah Obat | `telaah_obat` | `11.176` | 1/0/0/0 | ⬜ |  | KONSEP_FARMAKASI.md | `EMR/TelaahObat/` · `moduls/EMR/TelaahObat/` | — |
-| `EMR-049` | Order Patologi | `order_patologi` | `4.193` | 1/1/1/0 | ⬜ |  | KONSEP_PENUNJANG_MEDIS_LANJUTAN.md | `EMR/OrderPatologi/` · `moduls/EMR/OrderPatologi/` | Butuh **PRE-02** |
-| `EMR-050` | Order Mikrobiologi | `order_mikrobiologi` | `4.194` | 1/1/1/0 | ⬜ |  | KONSEP_PENUNJANG_MEDIS_LANJUTAN.md | `EMR/OrderMikrobiologi/` · `moduls/EMR/OrderMikrobiologi/` | Profesi 15 baru (PRE-01) · **PRE-03** |
-| `EMR-051` | Order POCT | `order_poct` | `4.195` | 1/1/1/0 | ⬜ |  | KONSEP_PENUNJANG_MEDIS_LANJUTAN.md | `EMR/OrderPoct/` · `moduls/EMR/OrderPoct/` | Butuh **PRE-04** |
+| `EMR-042` | Pesan Makanan & Monitoring Asupan | `pesan_makanan` | `10.156` | 1/0/0/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_ASESMEN_GIZI.md | `EMR/PesanMakanan/` · `moduls/EMR/PesanMakanan/` | — |
+| `EMR-043` | Diet Pasien | `diet_pasien` | `10.157` | 1/1/1/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_ASESMEN_GIZI.md | `EMR/DietPasien/` · `moduls/EMR/DietPasien/` | Butuh **PRE-05** — `master_diet` + `master_diagnosa_diet` (selesai 2026-10-11) |
+| `EMR-044` | ADIME | `adime` | `10.158` | 1/0/0/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_ASESMEN_GIZI.md | `EMR/Adime/` · `moduls/EMR/Adime/` | — |
+| `EMR-045` | Daftar Terapi Obat | `daftar_terapi_obat` | `11.173` | 1/1/1/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_FARMAKASI.md | `EMR/DaftarTerapiObat/` · `moduls/EMR/DaftarTerapiObat/` | 184 baris bersuffix (obat_1..20), maks 20 obat |
+| `EMR-046` | Rekonsiliasi Obat | `rekonsiliasi_obat` | `11.174` | 1/1/1/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_FARMAKASI.md | `EMR/RekonsiliasiObat/` · `moduls/EMR/RekonsiliasiObat/` | 3 grup x 10 baris = 246 baris bersuffix |
+| `EMR-047` | Telaah Resep | `telaah_resep` | `11.175` | 0/1/1/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_FARMAKASI.md | `EMR/TelaahResep/` · `moduls/EMR/TelaahResep/` | — |
+| `EMR-048` | Telaah Obat | `telaah_obat` | `11.176` | 1/0/0/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_FARMAKASI.md | `EMR/TelaahObat/` · `moduls/EMR/TelaahObat/` | — |
+| `EMR-049` | Order Patologi | `order_patologi` | `4.193` | 1/1/1/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_PENUNJANG_MEDIS_LANJUTAN.md | `EMR/OrderPatologi/` · `moduls/EMR/OrderPatologi/` | Data di tabel `order_patologi` (bukan emr_detail); Butuh **PRE-02** ✅ |
+| `EMR-050` | Order Mikrobiologi | `order_mikrobiologi` | `4.194` | 1/1/1/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_PENUNJANG_MEDIS_LANJUTAN.md | `EMR/OrderMikrobiologi/` · `moduls/EMR/OrderMikrobiologi/` | Data di tabel `order_mikrobiologi`; Butuh **PRE-03** ✅ |
+| `EMR-051` | Order POCT | `order_poct` | `4.195` | 1/1/1/0 | ✅ |  | P3 · selesai 2026-10-11 | KONSEP_PENUNJANG_MEDIS_LANJUTAN.md | `EMR/OrderPoct/` · `moduls/EMR/OrderPoct/` | Data di tabel `order_poct`; Butuh **PRE-04** ✅ |
 
 ## 10. Fase P4 — Kebidanan & MCU
 
@@ -320,6 +320,10 @@ Task berikut **tidak bisa diselesaikan** tanpa keputusan manusia. Jangan dikerja
 | 2026-10-10 | File dibuat. 114 form (16–129) + 12 prasyarat + 15 form eksisting tercatat. 5 task `⛔`. |
 | 2026-10-11 | **Fase P2 selesai**: 23 form (22–38, 54–56, 123–125) → ✅. Tambah objek 236–361, menu 8 "Penilaian Klinis" & 9 "Monitoring", sub 73–77/93–95/113–114/133–134, extra 26–37/46–47/66–68/86–88. 6 helper baru. Semua terverifikasi E2E (363 variabel).
 | 2026-10-11 | Tambah harness E2E permanen `tools/e2e.php` + `tools/lib_pay.php` (payload builder introspektif dari aturan `validated()`).
+| 2026-10-11 | **Fase P3 berjalan (6/12 form)** — seeder P3 lengkap dimuat (objek 362-442, menu 10 "Gizi & Nutrisi" + 11 "Farmasi", sub 153-158/173-176/193-195, form 39-51 kecuali 41 `⛔`, mapping + `akses_ehr`). Helper baru `GiziHelper` (IMT/status gizi/4 instrumen skrining/penurunan BB) & `FarmasiHelper` (7 kriteria telaah resep, 5 telaah obat, 7 kode status pemberian). Selesai & terverifikasi E2E: **39, 40, 42, 44, 47, 48**. Seeder kini soft-delete mapping aktif yang variabelnya sudah hilang dari `$mapping` (perbaiki form 48 yang punya `prioritas` hantu). Regresi P1+P2 nihil: **36 form, 700 variabel, ALL OK**. Sisa P3: 45, 46 (Farmasi baris bersuffix), 43 (butuh PRE-05 `master_diet`), 49-51 (butuh PRE-01..04). |
+| 2026-10-11 | **Fase P3 Farmasi selesai + form 43** — form 45 (Daftar Terapi Obat, 184 baris suffix, maks 20 obat) & form 46 (Rekonsiliasi Obat, 3 grup x 10 baris = 246 baris suffix) ✅. Harness E2E kini bisa membaca aturan validasi yang ditulis di dalam loop (`expandRuleLoops()`: ekspansi `for ($b=1; $b<=self::MAKS_BARIS; $b++)`, konstanta kelas, dan variabel aturan lokal). `GiziHelper::kesimpulan()` untuk SGA sengaja mengembalikan **null** — belum ada ambang konversi klinis tertulis (KONSEP §11 risiko #3), jadi hanya skor yang ditampilkan. **PRE-05** partly: migration `master_diet` + `master_diagnosa_diet`, model, `MasterDietSeeder` (20 diet + 16 faktor penyerta); halaman CRUD admin belum. **PRE-01** ✅: profesi 14 Kerohanian, 15 Patolog Anatomi, 16 Dokter Intensivis, 17 Dokter Anestesi, 18 Perawat Hemodialisa. Verifikasi: **39 form, 1133 variabel, ALL OK**, pint bersih. Sisa P3: form 49, 50, 51 (butuh PRE-02/03/04 — tabel `order_patologi`, `order_mikrobiologi`, `order_poct` + detail). |
+| 2026-10-11 | **Fase P3 selesai 12/12 form** (kecuali 41 `⛔`) — form 49 Order Patologi, 50 Order Mikrobiologi, 51 Order POCT ✅. Ketiganya **TIDAK** memakai `emr_detail`: data order disimpan di tabel `order_patologi`, `order_mikrobiologi`, `order_poct` (+ `_detail`) seperti Order Laboratorium (form 6). **PRE-02/03/04 ✅**: satu migration `2026_10_11_000002` membuat keenam tabel (dual-driver), 6 model baru. `PenunjangHelper` kini generic total — menambah jenis order cukup menambah 1 baris di `PenunjangHelper::TABEL`, `::PREFIX`, dan `::MODEL`; `findOrder()`/`baseQuery()` tidak lagi bercabang `if ($jenis === 'lab')`. **Harness baru `tools/e2e_order.php`** untuk order: `tools/e2e.php` tidak bisa mengujinya karena butuh item baris dari Master Group Tindakan. Verifikasi akhir: **39 form, 1133 variabel, ALL OK** + **3 jenis order ALL OK**, pint bersih. |
+| 2026-10-11 | **PRE-05 ✅** — CRUD admin `Master Diet` (sub_menu 63) & `Master Diagnosa Diet` (sub_menu 64) di `Administrator → Manajemen Master`, mengikuti pola `MasterImplementasi` persis. 2 controller + 8 view (index/create/edit/_form per master), `MasterDietMenuSeeder` (idempotent, sekaligus memberi `user_akses` admin). 10 route auto-registered oleh `SubMenuRouteServiceProvider`; 6 halaman render 200; CRUD diuji end-to-end (create, tolak kode duplikat, update, soft delete). **Peringatan di form edit**: `nama_diet` adalah nilai yang TERSIMPAN di `emr_detail` (form 43 memvalidasi `exists:master_diet,nama_diet`) — mengubahnya memutus riwayat lama, jadi deskripsi diubah lewat kolom Keterangan. Regresi nihil: **39 form, 1133 variabel, ALL OK** + 3 jenis order. |
 | 2026-10-11 | **Verifikasi akhir P1+P2**: 30 form (16-38, 54-57, 123-125) lulus E2E penuh - **559 variabel**, `ALL OK`. Harness diperkuat: `min`/`max` hanya untuk kolom numerik, `phpListValues()` (pecah literal PHP hormati kutip/kurung), `Rule::exists()` objek + rantai `->where()`, blok rules `$var = [...]` yang di-*validate* via variabel, deteksi `array` tanpa kutip. Harness kini auto-bersihkan data uji di akhir run (sebelumnya meninggalkan 35 baris `emr` + 442 nilai "Data Uji"). `pint --test` bersih, 0 CJK/garbled. Integritas: objek 361, form 45, mapping 923, akses 98, menu 9, sub 31, extra 26, 0 data uji tersisa. |
 | 2026-10-10 | **Fase P1 selesai**: form 16, 17, 18, 19, 20, 21, 57 → ✅. Seeder (objek 178–235, menu 6–7, sub 33/34/53/54) + controller + blade. Semua terverifikasi E2E: store/mapping/index/update/delete + gate akses. 2 bug nyata ditemukan & diperbaiki (`Rule::requiredIf` wrong-arity di TriageIgd; `$metaTriase` undefined). |
 

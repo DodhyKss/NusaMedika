@@ -54,6 +54,14 @@ class MasterPegawaiSeeder extends Seeder
             ['profesi_id' => 11, 'nama_profesi' => 'Security'],
             ['profesi_id' => 12, 'nama_profesi' => 'Teknisi'],
             ['profesi_id' => 13, 'nama_profesi' => 'Analis Laboratorium'],
+            // ===== Prasyarat PRE-01 (Fase P3/P5): profesi penunjang & khusus =====
+            // ID 14 sudah dialokasikan ke Kerohanian (lihat ALOKASI_ID_GLOBAL.md §5)
+            // dan ID 15 ke Patolog Anatomi — JANGAN menomori ulang ke slot lain.
+            ['profesi_id' => 14, 'nama_profesi' => 'Kerohanian'],
+            ['profesi_id' => 15, 'nama_profesi' => 'Patolog Anatomi'],
+            ['profesi_id' => 16, 'nama_profesi' => 'Dokter Intensivis'],
+            ['profesi_id' => 17, 'nama_profesi' => 'Dokter Anestesi'],
+            ['profesi_id' => 18, 'nama_profesi' => 'Perawat Hemodialisa'],
         ];
 
         foreach ($profesis as $profesi) {

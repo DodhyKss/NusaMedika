@@ -119,6 +119,164 @@ function extractRuleBlocks(string $src): array
     return $out;
 }
 
+/**
+ * Nilaikan ekspresi kunci baris-bersuffix, mis:
+ *   `'obat_'.$b`       -> obat_3
+ *   `'obat_'.$b.'_x'`  -> obat_3_x
+ *
+ * Mengembalikan null bila ekspresi tidak berupa konkatenasi literal-quoted +
+ * variabel loop yang dikenali (mis. pemanggilan method), sehingga pemanggil
+ * bisa melewatinya alih-alih menghasilkan kunci yang salah.
+ */
+function evaluasiKunci(string $ekspresi, string $var, int $n): ?string
+{
+    $ekspresi = trim($ekspresi);
+    $q = preg_quote($var, '/');
+
+    if (! preg_match_all('/\x27([^\x27]*)\x27|\$'.$q.'/', $ekspresi, $bagian, PREG_SET_ORDER)) {
+        return null;
+    }
+
+    $hasil = '';
+    foreach ($bagian as $b) {
+        if (isset($b[1]) && $b[1] !== '') {
+            $hasil .= $b[1];
+        } else {
+            $hasil .= (string) $n;
+        }
+    }
+
+    // Sisanya harus kosong (hanya operator titik & spasi) agar ekspresi benar.
+    $sisa = preg_replace('/\x27[^\x27]*\x27|\$'.$q.'/', '', $ekspresi);
+    $sisa = str_replace(['.', ' ', '\t', '\n', '\r'], '', (string) $sisa);
+
+    return ($sisa === '' && $hasil !== '') ? $hasil : null;
+}
+
+/**
+ * Resolusi variabel yang isinya aturan validasi, mis.
+ *     $statusRule = 'nullable|in:1,T,K,A,ESO,TAP,stop';
+ *     $rules['status_'.$b] = $statusRule;
+ * sehingga aturan baris ikut terbaca utuh (bukan hanya nama variabelnya).
+ */
+function selfResolveRule(string $rule, string $src): string
+{
+    $rule = trim($rule);
+    if (! str_starts_with($rule, '$')) {
+        return $rule;
+    }
+    if (preg_match('/^\$(\w+)$/', $rule, $v)
+        && preg_match('/\$'.$v[1].'\s*=\s*([\x27\x22])(.*?)\1\s*;/s', $src, $isi)) {
+        return $isi[2];
+    }
+
+    return $rule;
+}
+
+/**
+ * Ekspansi aturan validasi yang ditulis di dalam loop numerik.
+ *
+ * Controller EMR menulis aturan baris-bersuffix lewat loop, mis.
+ *     for ($b = 1; $b <= 20; $b++) {
+ *         $rules['obat_'.$b]      = 'nullable|integer|exists:barang,barang_id';
+ *         $rules['jumlah_'.$b]    = 'nullable|numeric|min:0|max:10000';
+ *     }
+ *
+ * Aturan seperti ini tidak bisa dibaca regex biasa (kuncinya dihitung saat
+ * runtime), sehingga bentuk tersebut dipecah di sini menjadi kunci konkret
+ * (`obat_1` .. `obat_20`) supaya payload builder tetap bisa membuat payload
+ * yang LAYAK untuk setiap baris.
+ *
+ * @return array<string, string>  variabel => aturan
+ */
+function expandRuleLoops(string $src): array
+{
+    $out = [];
+
+    // Batas loop boleh berupa literal (20) ATAU konstanta kelas
+    // (self::MAKS_BARIS) — konstanta dibaca dari blok `const` di file yang sama.
+    $konstanta = [];
+    if (preg_match_all('/public\s+const\s+(\w+)\s*=\s*(\d+)\s*;/', $src, $kc, PREG_SET_ORDER)) {
+        foreach ($kc as $one) {
+            $konstanta[$one[1]] = (int) $one[2];
+        }
+    }
+    $batas = '(\d+|self::\w+)';
+
+    // PENTING: pola harus riwayat sampai-header `)` (termasuk `\$i++`),
+    // bukan berhenti di `;` — kalau berhenti di titik-semicolon, `bodyStart`
+    // masih berada di dalam header dan pemindaian brace salah.
+    $polaFor = '/for\s*\(\s*\$(\w+)\s*=\s*(\d+)\s*;\s*\$\1\s*<=?\s*'.$batas.'\s*;[^)]*\)/';
+    if (! preg_match_all($polaFor, $src, $loop, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
+        return $out;
+    }
+
+    foreach ($loop as $info) {
+        $var = $info[1][0];
+        $start = (int) $info[2][0];
+        $raw = $info[3][0];
+        if (preg_match('/^self::(\w+)$/', $raw, $kc2)) {
+            if (! isset($konstanta[$kc2[1]])) {
+                continue; // konstanta tidak ketemu (bisa dievaluasi dinamis) -> skip
+            }
+            $end = $konstanta[$kc2[1]];
+        } else {
+            $end = (int) $raw;
+        }
+        if ($end < $start || $end - $start > 200) {
+            continue; // guard: loop tak wajar / tak terhingga
+        }
+
+        // Ambil isi body: lewati whitespace lalu `{` pembuka, sampai `}` penutup.
+        $bodyStart = $info[0][1] + strlen($info[0][0]);
+        $len = strlen($src);
+        while ($bodyStart < $len && ctype_space($src[$bodyStart])) {
+            $bodyStart++;
+        }
+        if ($bodyStart >= $len || $src[$bodyStart] !== '{') {
+            continue; // bukan badan blok (mis. `for (...)` tanpa kurung kurawal)
+        }
+        $bodyStart++;
+        $depth = 1;
+        $i = $bodyStart;
+        for (; $i < $len && $depth > 0; $i++) {
+            if ($src[$i] === '{') { $depth++; }
+            elseif ($src[$i] === '}') { $depth--; }
+        }
+        $body = substr($src, $bodyStart, $i - $bodyStart - 1);
+
+        // Cari assignment di dalam body, lalu ganti $var dengan tiap angka.
+        // Tangkap EKSPESI kunci utuh (mis. `'obat_'.$b`), bukan hanya bagian
+        // dalam kutip — variabel loop berada di bagian KONKATENASI, jadi kalau
+        // hanya bagian kutip yang diambil, kuncinya tak pernah berubah.
+        $pattern = <<<'REGEX'
+~\$rules\s*\[\s*(.+?)\s*\]\s*=\s*(.+?);~s
+REGEX;
+        if (! preg_match_all($pattern, $body, $assign, PREG_SET_ORDER)) {
+            continue;
+        }
+
+        foreach ($assign as $a) {
+            $ekspresiKunci = $a[1];
+            $rule = trim($a[2]);
+            // Hanya ekspresi yang benar-benar memuat variabel loop yang
+            // di-ekspansi; sisanya bukan aturan baris-bersuffix.
+            if (strpos($ekspresiKunci, '$'.$var) === false) {
+                continue;
+            }
+            for ($n = $start; $n <= $end; $n++) {
+                $kunci = evaluasiKunci($ekspresiKunci, $var, $n);
+                if ($kunci === null) {
+                    continue;
+                }
+                $out[$kunci] = selfResolveRule($rule, $src);
+            }
+        }
+    }
+
+    return $out;
+}
+
 function ruleMap(string $absClass): array
 {
     $src = file_get_contents((new ReflectionClass($absClass))->getFileName());
@@ -179,6 +337,25 @@ function ruleMap(string $absClass): array
             $map[$v] ??= $f[2];
         }
     }
+    // Assignment per-baris: $rules['x'] = 'required|string';
+    // (dipakai controller yang menambah aturan di dalam foreach)
+    // Catatan: pakai preg_match_all (bukan preg_match) — build CLI container ini
+    // menolak argumen $flags pada preg_match, sementara preg_match_all normal.
+    $patternAssignment = <<<'REGEX'
+~\$\w+\[(?:\x27|\x22)([a-z0-9_]+)(?:\x27|\x22)\]\s*=\s*(.+?);~s
+REGEX;
+    if (preg_match_all($patternAssignment, $src, $as, PREG_SET_ORDER)) {
+        foreach ($as as $x) {
+            $map[trim($x[1], "'\"")] ??= trim($x[2]);
+        }
+    }
+
+    // Aturan hasil ekspansi loop MENANG atas pembacaan lain: loop selalu
+    // menulis ke $rules di dalam validated(), sedangkan pembacaan blok array
+    // bisa menemukan string pesan dari method lain (mis. $errors[...] = "...").
+    foreach (expandRuleLoops($src) as $variabel => $rule) {
+        $map[$variabel] = $rule;
+    }
 
     return $map;
 }
@@ -214,6 +391,13 @@ function optsFromRule(string $rule, string $src): ?string
         $vv = phpListValues($m[1]);
 
         return $vv[0] ?? null;
+    }
+    // Bentuk string: 'in:A,B,C' (dipisah tanda koma, tanpa tanda kutip)
+    if (preg_match('/(?:^|\\||\[|,)\s*[\'\"]?in[\'\"]?:([^\'|\]]+)/', $rule, $m)) {
+        $vv = phpListValues($m[1]);
+        if ($vv !== []) {
+            return $vv[0];
+        }
     }
     // Rule::in($this->opsi('key')) / ::opsi("key")
     if (preg_match("/\\\$this->opsi\(\s*'([^']+)'\s*\)/", $rule, $m)) {
@@ -374,6 +558,11 @@ function buildPayload(string $absClass, int $fid): array
         if (preg_match("/\bmax:(\d+)\b/", $rule, $mx) && preg_match('/\b(integer|numeric)\b/', $rule)) { $p[$v] = max(0, (int) floor(intval($mx[1]) / 2)); continue; }
         if (preg_match("/'date'|H:i/", $rule) && preg_match('/integer|numeric/', $rule)) {
             $p[$v] = 1;
+
+            continue;
+        }
+        if (preg_match('/(^|\\||\[|,)\s*[\'\"]?boolean[\'\"]?(\\||$|\s|,|\])/', $rule)) {
+            $p[$v] = true;
 
             continue;
         }
