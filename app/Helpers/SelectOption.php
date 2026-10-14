@@ -682,6 +682,165 @@ class SelectOption
                 ['value' => 'Melakukan Penilaian Ulang Risiko Jatuh Tiap Shift', 'label' => 'Melakukan Penilaian Ulang Risiko Jatuh Tiap Shift'],
                 ['value' => 'Kondisi Kamar Mandi Tidak Terkunci', 'label' => 'Kondisi Kamar Mandi Tidak Terkunci'],
             ],
+
+            // ===== Fase P5 — Hemodialisa (form 102–105) =====
+            'dialyzer' => [
+                ['value' => 'F6HPS', 'label' => 'F6HPS'],
+                ['value' => 'F8 HPS', 'label' => 'F8 HPS'],
+                ['value' => 'ELISIO 15 H', 'label' => 'ELISIO 15 H'],
+                ['value' => 'FX 80 CLASSIX', 'label' => 'FX 80 CLASSIX'],
+            ],
+            'dialysat' => [
+                ['value' => 'Bicarbonate', 'label' => 'Bicarbonate'],
+                ['value' => 'Acetate', 'label' => 'Acetate'],
+                ['value' => 'Citrate', 'label' => 'Citrate'],
+            ],
+            'akses_vaskuler' => [
+                ['value' => 'AV. Fistula', 'label' => 'AV. Fistula'],
+                ['value' => 'AV. Graft', 'label' => 'AV. Graft'],
+                ['value' => 'SN', 'label' => 'SN'],
+                ['value' => 'CDL', 'label' => 'CDL'],
+                ['value' => 'CDL Long Therm', 'label' => 'CDL Long Therm'],
+                ['value' => 'CDL Short Therm', 'label' => 'CDL Short Therm'],
+                ['value' => 'Femoral', 'label' => 'Femoral'],
+            ],
+            'hbsag' => [
+                ['value' => 'Negatif', 'label' => 'Negatif'],
+                ['value' => 'Positif', 'label' => 'Positif'],
+            ],
+            'care_plan_hd' => [
+                ['value' => 'sesuai', 'label' => 'Care Plan Sesuai'],
+                ['value' => 'tidak_sesuai', 'label' => 'Care Plan Tidak Sesuai'],
+            ],
+            'komunikasi_hd' => [
+                ['value' => 'ada_kendala', 'label' => 'Ada Kendala Komunikasi'],
+                ['value' => 'tidak_ada', 'label' => 'Tidak Ada Kendala'],
+                ['value' => 'lain', 'label' => 'Ada, Jelaskan'],
+            ],
+            'perawat_rumah' => [
+                ['value' => 'ada', 'label' => 'Ada Yang Merawat di Rumah'],
+                ['value' => 'tidak', 'label' => 'Tidak Ada'],
+                ['value' => 'lain', 'label' => 'Ada, Jelaskan'],
+            ],
+            'gaduh_gelisah' => [
+                ['value' => 'kondisi_saat_ini', 'label' => 'Kondisi Saat Ini'],
+                ['value' => 'tenang', 'label' => 'Tenang'],
+                ['value' => 'gelisah', 'label' => 'Gelisah'],
+                ['value' => 'takut_terhadap_tindakan', 'label' => 'Takut Terhadap Tindakan'],
+                ['value' => 'marah', 'label' => 'Marah'],
+                ['value' => 'mudah_tersinggung', 'label' => 'Mudah Tersinggung'],
+            ],
+
+            // ===== Fase P5 — Bedah & Anestesi (form 85–101) =====
+            'jenis_operasi' => [
+                ['value' => 'Efektif', 'label' => 'Efektif (Elektif)'],
+                ['value' => 'Darurat', 'label' => 'Darurat'],
+                ['value' => 'Semi Darurat', 'label' => 'Semi Darurat'],
+            ],
+            'jenis_anestesia' => [
+                ['value' => 'Umum', 'label' => 'Umum (General)'],
+                ['value' => 'Regional', 'label' => 'Regional'],
+                ['value' => 'Lokal', 'label' => 'Lokal'],
+                ['value' => 'Sedasi', 'label' => 'Sedasi'],
+                ['value' => 'Epidural', 'label' => 'Epidural'],
+                ['value' => 'Spinal', 'label' => 'Spinal'],
+            ],
+            'posisi_operasi' => [
+                ['value' => 'Supine', 'label' => 'Supine (Terlentang)'],
+                ['value' => 'Lateral', 'label' => 'Lateral (Miring)'],
+                ['value' => 'Prone', 'label' => 'Prone (Tengkurap)'],
+                ['value' => 'Lithotomy', 'label' => 'Lithotomy'],
+                ['value' => 'Semi Fowler', 'label' => 'Semi Fowler'],
+                ['value' => 'Trendelenburg', 'label' => 'Trendelenburg'],
+            ],
+            'klasifikasi_luka' => [
+                ['value' => 'I', 'label' => 'I — Bersih (Clean)'],
+                ['value' => 'II', 'label' => 'II — Bersih Terkontaminasi (Clean-Contaminated)'],
+                ['value' => 'III', 'label' => 'III — Terkontaminasi (Contaminated)'],
+                ['value' => 'IV', 'label' => 'IV — Kotor (Dirty)'],
+            ],
+            'asa_kelas' => [
+                ['value' => '1', 'label' => 'I — Pasien sehat'],
+                ['value' => '2', 'label' => 'II — Penyakit ringan/sedang sistemik'],
+                ['value' => '3', 'label' => 'III — Penyakit sistemik berat'],
+                ['value' => '4', 'label' => 'IV — Penyakit sistemik berat yang mengancam nyawa'],
+                ['value' => '5', 'label' => 'V — Moribund, tanpa operasi akan meninggal'],
+                ['value' => '6', 'label' => 'VI — Pasien otak mati (donor organ)'],
+            ],
+            'sisi_operasi' => [
+                ['value' => 'Kanan', 'label' => 'Kanan'],
+                ['value' => 'Kiri', 'label' => 'Kiri'],
+                ['value' => 'Bilateral', 'label' => 'Bilateral'],
+                ['value' => 'Tanpa Sisi', 'label' => 'Tanpa Sisi'],
+            ],
+            'keadaan_umum_bedah' => [
+                ['value' => 'Baik', 'label' => 'Baik'],
+                ['value' => 'Cukup', 'label' => 'Cukup'],
+                ['value' => 'Buruk', 'label' => 'Buruk'],
+            ],
+            'fase_operasi' => [
+                ['value' => 'Pre', 'label' => 'Pre Operasi'],
+                ['value' => 'Intra', 'label' => 'Intra Operasi'],
+                ['value' => 'Post', 'label' => 'Post Operasi'],
+            ],
+            'status_monitoring' => [
+                ['value' => 'Ongoing', 'label' => 'Sedang Berlangsung (Ongoing)'],
+                ['value' => 'Completed', 'label' => 'Selesai (Completed)'],
+            ],
+            'ok_tidak_ok' => [
+                ['value' => 'Ok', 'label' => 'Ok'],
+                ['value' => 'Tidak Ok', 'label' => 'Tidak Ok'],
+            ],
+            'sudah_belum' => [
+                ['value' => 'Sudah', 'label' => 'Sudah'],
+                ['value' => 'Belum', 'label' => 'Belum'],
+            ],
+            'prognosis_bedah' => [
+                ['value' => 'Dubia ad Bonam', 'label' => 'Dubia ad Bonam (Prognosis Baik)'],
+                ['value' => 'Dubia ad Malam', 'label' => 'Dubia ad Malam (Prognosis Buruk)'],
+            ],
+            'keadaan_umum_pulih' => [
+                ['value' => 'Baik', 'label' => 'Baik'],
+                ['value' => 'Cukup', 'label' => 'Cukup'],
+                ['value' => 'Buruk', 'label' => 'Buruk'],
+            ],
+            'trauma_pada' => [
+                ['value' => 'Trauma Tertutup', 'label' => 'Trauma Tertutup'],
+                ['value' => 'Trauma Terbuka', 'label' => 'Trauma Terbuka'],
+                ['value' => 'Elektif', 'label' => 'Tindakan Elektif'],
+            ],
+            'kualifikasi_bedah' => [
+                ['value' => 'Spesialis', 'label' => 'Spesialis Bedah'],
+                ['value' => 'Subspesialis', 'label' => 'Subspesialis'],
+                ['value' => 'Dokter Umum', 'label' => 'Dokter Umum (dalam pengawasan)'],
+            ],
+            'kondisi_luka_post' => [
+                ['value' => 'Kering', 'label' => 'Kering'],
+                ['value' => 'Basah', 'label' => 'Basah'],
+                ['value' => 'Eksudat Serosa', 'label' => 'Eksudat Serosa'],
+                ['value' => 'Eksudat Purulen', 'label' => 'Eksudat Purulen'],
+                ['value' => 'Nekrosis', 'label' => 'Nekrosis'],
+            ],
+            'sisi_visus' => [
+                ['value' => 'Baik', 'label' => 'Baik'],
+                ['value' => 'Sedang', 'label' => 'Sedang'],
+                ['value' => 'Buruk', 'label' => 'Buruk'],
+            ],
+            'resiko_jatuh_katarak' => [
+                ['value' => 'Risiko Tinggi', 'label' => 'Risiko Tinggi'],
+                ['value' => 'Tidak Berisiko', 'label' => 'Tidak Berisiko'],
+            ],
+            'mobilisasi_operasi' => [
+                ['value' => 'Mandiri', 'label' => 'Mandiri'],
+                ['value' => 'Dibantu', 'label' => 'Dibantu'],
+                ['value' => 'Tidak Dapat Bergerak', 'label' => 'Tidak Dapat Bergerak'],
+            ],
+            'status_emosi' => [
+                ['value' => 'Tenang', 'label' => 'Tenang'],
+                ['value' => 'Cemas', 'label' => 'Cemas'],
+                ['value' => 'Takut', 'label' => 'Takut'],
+                ['value' => 'Sedih', 'label' => 'Sedih'],
+            ],
         ];
     }
 

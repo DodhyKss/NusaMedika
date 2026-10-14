@@ -1063,6 +1063,24 @@ function buildPayload(string $absClass, int $fid): array
                 } catch (Throwable $e) {
                 }
             }
+            // Validasi lintas-field: ruangan tujuan != ruangan asal
+            // (Transfer Pasien Antar Ruangan, form 94 — guard after() server).
+            if ($v === 'ruangan_tujuan' && isset($p['ruangan_asal'])) {
+                if ($id !== null && $id !== $p['ruangan_asal']) {
+                    $p[$v] = $id;
+
+                    continue;
+                }
+                try {
+                    $alt = DB::table($m[1])->where($m[2], '!=', $p['ruangan_asal'])->value($m[2]);
+                    if ($alt !== null) {
+                        $p[$v] = $alt;
+
+                        continue;
+                    }
+                } catch (Throwable $e) {
+                }
+            }
             $p[$v] = $id ?? 1;
 
             continue;
@@ -1143,7 +1161,12 @@ function buildPayload(string $absClass, int $fid): array
             continue;
         }
         if (preg_match('/(^|\\|)date\\b/', $rule) || str_contains($v, 'tanggal')) {
-            $p[$v] = '2026-10-10';
+            // after*:today (mis. rencana operasi) butuh hari ini — default
+            // '2026-10-10' sudah lewat dan divalidasi gagal. before*:today
+            // tetap memakai tanggal lampau (aman untuk semua form lama).
+            $p[$v] = preg_match('/(?:^|\|)after(?:_or_equal)?:today\b/', $rule)
+                ? date('Y-m-d')
+                : '2026-10-10';
 
             continue;
         }
@@ -1167,6 +1190,39 @@ function buildPayload(string $absClass, int $fid): array
     // naikkan g supaya payload tetap layak.
     if (isset($p['obstetrik_g'], $p['obstetrik_p'], $p['obstetrik_a'])) {
         $p['obstetrik_g'] = max((int) $p['obstetrik_g'], (int) $p['obstetrik_p'] + (int) $p['obstetrik_a']);
+    }
+
+    // Pre Hemodialisa (form 102): jam_selesai > jam_mulai.
+    if (isset($p['jam_mulai'], $p['jam_selesai'])) {
+        $p['jam_mulai'] = '08:00';
+        $p['jam_selesai'] = '11:00';
+    }
+    // tanggal_hd_berikutnya after tanggal_pertemuan.
+    if (isset($p['tanggal_hd_berikutnya'], $p['tanggal_pertemuan'])) {
+        $p['tanggal_hd_berikutnya'] = date('Y-m-d', strtotime(((string) $p['tanggal_pertemuan']).' +1 day'));
+    }
+    // akses_* minimal satu 'on' (semua default 'off' dari in:off,on).
+    $aksesKeys = ['akses_fistula', 'akses_graft', 'akses_sndl', 'akses_cdl', 'akses_cdl_thermo', 'akses_femoral'];
+    if (isset($p['akses_fistula'])) {
+        $anyOn = false;
+        foreach ($aksesKeys as $ak) {
+            if (($p[$ak] ?? 'off') === 'on') {
+                $anyOn = true;
+                break;
+            }
+        }
+        if (! $anyOn) {
+            $p['akses_fistula'] = 'on';
+        }
+    }
+    // komunikasi_lain/perawat_rumah_lain = 'on' → keterangan wajib.
+    if (isset($p['komunikasi_keterangan'])) {
+        $p['komunikasi_keterangan'] = 'Tidak ada kendala';
+        $p['perawat_rumah_keterangan'] = 'Tidak berlaku';
+    }
+    // form 103/104: berat_badan >= bb_kering.
+    if (isset($p['berat_badan'], $p['bb_kering'])) {
+        $p['bb_kering'] = min((float) $p['bb_kering'], (float) $p['berat_badan']);
     }
 
     return $p;

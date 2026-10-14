@@ -30,6 +30,10 @@ class EmrMasterSeeder extends Seeder
             // ===== Fase P4 — Kebidanan & Neonatal, Medical Check Up =====
             ['dashboard_menu_id' => 13, 'nama_menu' => 'Kebidanan & Neonatal'],
             ['dashboard_menu_id' => 14, 'nama_menu' => 'Medical Check Up'],
+            // ===== Fase P5 — ICU & Hemodialisa =====
+            ['dashboard_menu_id' => 12, 'nama_menu' => 'ICU & Hemodialisa'],
+            // ===== Fase P5 — Bedah & Anestesi =====
+            ['dashboard_menu_id' => 15, 'nama_menu' => 'Bedah & Anestesi'],
         ];
         foreach ($menus as $menu) {
             DB::table('dashboard_menu')->updateOrInsert(
@@ -167,6 +171,30 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_id' => 285, 'dashboard_menu_id' => 14, 'nama_sub_menu' => 'Gizi MCU'],
             ['dashboard_menu_sub_id' => 286, 'dashboard_menu_id' => 14, 'nama_sub_menu' => 'Urologi MCU'],
             ['dashboard_menu_sub_id' => 287, 'dashboard_menu_id' => 14, 'nama_sub_menu' => 'Psikologi MCU'],
+            // ===== Fase P5 — ICU & Hemodialisa (menu 12) =====
+            ['dashboard_menu_sub_id' => 213, 'dashboard_menu_id' => 12, 'nama_sub_menu' => 'Kriteria Masuk ICU'],
+            ['dashboard_menu_sub_id' => 214, 'dashboard_menu_id' => 12, 'nama_sub_menu' => 'Kriteria Keluar ICU'],
+            ['dashboard_menu_sub_id' => 215, 'dashboard_menu_id' => 12, 'nama_sub_menu' => 'Pre Hemodialisa'],
+            ['dashboard_menu_sub_id' => 216, 'dashboard_menu_id' => 12, 'nama_sub_menu' => 'Intra Hemodialisa'],
+            ['dashboard_menu_sub_id' => 217, 'dashboard_menu_id' => 12, 'nama_sub_menu' => 'Post Hemodialisa'],
+            ['dashboard_menu_sub_id' => 218, 'dashboard_menu_id' => 12, 'nama_sub_menu' => 'Triage Hemodialisa'],
+            // ===== Fase P5 — Bedah & Anestesi (menu 15) =====
+            // Sub 297 (form 89 WHO), 305 (form 97 invasif), 308 (form 100
+            // angiografi) TIDAK di-seed — form ⛔ menunggu keputusan klinis.
+            ['dashboard_menu_sub_id' => 293, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Asesmen Pra Bedah'],
+            ['dashboard_menu_sub_id' => 294, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Evaluasi Pre-Anestesi & Sedasi'],
+            ['dashboard_menu_sub_id' => 295, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Asesmen Post-Anestesi & Sedasi'],
+            ['dashboard_menu_sub_id' => 296, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Monitoring Anestesi & Sedasi'],
+            ['dashboard_menu_sub_id' => 298, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Check List Kesiapan Anestesi'],
+            ['dashboard_menu_sub_id' => 299, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Pengkajian Operasi'],
+            ['dashboard_menu_sub_id' => 300, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Laporan Operasi'],
+            ['dashboard_menu_sub_id' => 301, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Catatan Bedah'],
+            ['dashboard_menu_sub_id' => 302, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Transfer Pasien'],
+            ['dashboard_menu_sub_id' => 303, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Penandaan Lokasi Operasi'],
+            ['dashboard_menu_sub_id' => 304, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Penandaan Pasien'],
+            ['dashboard_menu_sub_id' => 306, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Surveilans Luka Insisi'],
+            ['dashboard_menu_sub_id' => 307, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Catatan Anestesia'],
+            ['dashboard_menu_sub_id' => 309, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Asesmen Katarak'],
         ];
         foreach ($subMenus as $subMenu) {
             DB::table('dashboard_menu_sub')->updateOrInsert(
@@ -330,6 +358,29 @@ class EmrMasterSeeder extends Seeder
             // (skor 6 tak tercakup) — lihat docs/TASK_FORM.md EMR-067, status ⛔.
             ['form_id' => 68, 'nama_form' => 'Inisiasi Menyusui Dini', 'slug' => 'inisiasi_menyusui_dini', 'id_dash_menu' => '13.262', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
             ['form_id' => 69, 'nama_form' => 'Skrining MDPK/MPP', 'slug' => 'skrining_mpp', 'id_dash_menu' => '13.263', 'ri' => 1, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
+            // ===== Fase P5 — ICU & Hemodialisa (menu 12) =====
+            ['form_id' => 52, 'nama_form' => 'Kriteria Masuk ICU', 'slug' => 'kriteria_masuk_icu', 'id_dash_menu' => '12.213', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 53, 'nama_form' => 'Kriteria Keluar ICU', 'slug' => 'kriteria_keluar_icu', 'id_dash_menu' => '12.214', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 102, 'nama_form' => 'Pre Hemodialisa', 'slug' => 'pre_hemodialisa', 'id_dash_menu' => '12.215', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 103, 'nama_form' => 'Intra Hemodialisa', 'slug' => 'intra_hemodialisa', 'id_dash_menu' => '12.216', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 104, 'nama_form' => 'Post Hemodialisa', 'slug' => 'post_hemodialisa', 'id_dash_menu' => '12.217', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 105, 'nama_form' => 'Triage Hemodialisa', 'slug' => 'triage_hemodialisa', 'id_dash_menu' => '12.218', 'ri' => 0, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
+            // ===== Fase P5 — Bedah & Anestesi (menu 15) =====
+            // Form 89/97/100 ⛔ (hard-gate WHO/invasif/angiografi) TIDAK di-seed.
+            ['form_id' => 85, 'nama_form' => 'Asesmen Pra Bedah', 'slug' => 'asesmen_pra_bedah', 'id_dash_menu' => '15.293', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 86, 'nama_form' => 'Evaluasi Pre-Anestesi & Sedasi', 'slug' => 'evaluasi_pre_anestesi_sedasi', 'id_dash_menu' => '15.294', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 87, 'nama_form' => 'Asesmen Post-Anestesi & Sedasi', 'slug' => 'asesmen_post_anestesi_sedasi', 'id_dash_menu' => '15.295', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 88, 'nama_form' => 'Monitoring Anestesi & Sedasi', 'slug' => 'monitoring_anestesi_sedasi', 'id_dash_menu' => '15.296', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 90, 'nama_form' => 'Check List Kesiapan Anestesi', 'slug' => 'checklist_kesiapan_anestesi', 'id_dash_menu' => '15.298', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 91, 'nama_form' => 'Pengkajian Operasi', 'slug' => 'pengkajian_operasi', 'id_dash_menu' => '15.299', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 92, 'nama_form' => 'Laporan Operasi', 'slug' => 'laporan_operasi', 'id_dash_menu' => '15.300', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 93, 'nama_form' => 'Catatan Bedah', 'slug' => 'catatan_bedah', 'id_dash_menu' => '15.301', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 94, 'nama_form' => 'Transfer Pasien Antar Ruangan', 'slug' => 'transfer_pasien', 'id_dash_menu' => '15.302', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 95, 'nama_form' => 'Penandaan Lokasi Operasi', 'slug' => 'penandaan_lokasi_operasi', 'id_dash_menu' => '15.303', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 96, 'nama_form' => 'Penandaan Pasien', 'slug' => 'penandaan_pasien', 'id_dash_menu' => '15.304', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 98, 'nama_form' => 'Surveilans Luka Insisi', 'slug' => 'surveilans_luka_insisi', 'id_dash_menu' => '15.306', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 99, 'nama_form' => 'Catatan Anestesia', 'slug' => 'catatan_anestesia', 'id_dash_menu' => '15.307', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 101, 'nama_form' => 'Asesmen Katarak', 'slug' => 'asesmen_katarak', 'id_dash_menu' => '15.309', 'ri' => 0, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
             // ===== Fase P4 — Medical Check Up (menu 14) =====
             ['form_id' => 70, 'nama_form' => 'Kesimpulan MCU', 'slug' => 'kesimpulan_mcu', 'id_dash_menu' => '14.273', 'ri' => 0, 'rj' => 0, 'igd' => 0, 'mcu' => 1],
             ['form_id' => 71, 'nama_form' => 'Catatan Keperawatan / TTV MCU', 'slug' => 'ttv_mcu', 'id_dash_menu' => '14.274', 'ri' => 0, 'rj' => 0, 'igd' => 0, 'mcu' => 1],
@@ -607,6 +658,148 @@ class EmrMasterSeeder extends Seeder
             661 => 'Objektif Gizi MCU',             662 => 'Status Gizi & Pola Diet MCU',             664 => 'Pemeriksaan Fisik Urologi MCU',
             667 => 'Status Psikologis MCU',             668 => 'Skala Cemas & Depresi MCU',             669 => 'Interpretasi Psikologi MCU',
             670 => 'Saran Psikologi MCU',
+
+            // ===== Fase P5 — Kriteria Masuk ICU (447–457) =====
+            447 => 'Tanggal Kriteria ICU', 448 => 'Waktu Kriteria ICU', 449 => 'Nilai Kriteria Klinis',
+            450 => 'Status Kriteria Klinis', 451 => 'Jumlah Kriteria Terpenuhi', 452 => 'Kesimpulan Kriteria Masuk ICU',
+            453 => 'DPJP / Dokter Jaga', 454 => 'DPJP ICU', 455 => 'Informed Consent Tindakan Invasif',
+            456 => 'Prioritas Masuk ICU', 457 => 'Kontra Indikasi Masuk ICU',
+            // ===== Fase P5 — Kriteria Keluar ICU (458–471) =====
+            458 => 'Tanggal Keluar ICU', 459 => 'Waktu Keluar ICU', 460 => 'Diagnosa Keluar ICU',
+            461 => 'Dokter Konsultan ICU', 462 => 'Kelayakan Life Support', 463 => 'Status Kriteria Keluar ICU',
+            464 => 'Parameter Stabil — Tekanan Darah', 465 => 'Parameter Stabil — Nadi',
+            466 => 'Parameter Stabil — Frekuensi Pernapasan', 467 => 'Parameter Stabil — Suhu',
+            468 => 'Parameter Stabil — CVP', 469 => 'Keterangan Kriteria IV',
+            470 => 'Kesimpulan Keluar ICU', 471 => 'Status Kelayakan Keluar ICU',
+            // ===== Fase P5 — Hemodialisa (473–535, 472 reserved) =====
+            473 => 'Tanggal Pengkajian HD', 474 => 'Waktu Pengkajian HD', 475 => 'Type Mesin HD',
+            476 => 'Dialiser', 477 => 'Berat Badan Awal Sesi HD', 478 => 'Berat Badan Kering',
+            479 => 'Lama HD Rencana (jam)', 480 => 'Tanggal Screening Akses', 481 => 'Catatan Screening Akses',
+            482 => 'Jenis Dialyzer', 483 => 'Jenis Dialysat', 484 => 'Jenis Akses Vaskuler',
+            485 => 'Dosis Sirkulasi (Heparin)', 486 => 'Dosis Awal / Bolus (Heparin)',
+            487 => 'Dosis Maintenance (Heparin)', 488 => 'Tanpa Heparinisasi — Penyebab',
+            489 => 'Prog Bilas NS 0,9% 100 cc/jam', 490 => 'Jam Mulai HD', 491 => 'Jam Selesai HD',
+            492 => 'Lama Dialisis (menit)', 493 => 'Ultra Filtrasi (ml)', 494 => 'Qb / Aliran Darah (ml/mnt)',
+            495 => 'TBV / Total Blood Volume (ml)', 496 => 'Tanggal Laboratorium', 497 => 'Waktu Laboratorium',
+            498 => 'Hb (g/dL)', 499 => 'Ureum (mg/dL)', 500 => 'Creatinine (mg/dL)', 501 => 'HBsAg',
+            502 => 'Kalium (mEq/L)', 503 => 'SGOT (U/L)', 504 => 'SGPT (U/L)', 505 => 'Transfusi Darah',
+            506 => 'D 40%', 507 => 'Ca. Gluconas', 508 => 'Hasil Pemeriksaan Lain', 509 => 'KCL',
+            510 => 'Renxamin', 511 => 'Erythropoietin', 512 => 'Riwayat Kesehatan Saat Ini',
+            513 => 'Kendala Komunikasi', 514 => 'Riwayat Psikososial / Perawat Rumah',
+            515 => 'Asesmen Gaduh Gelisah', 516 => 'Diagnosa Keperawatan', 517 => 'Evaluasi Keperawatan',
+            518 => 'Tanggal HD Berikutnya', 519 => 'Data Focus', 520 => 'KU Pasien',
+            521 => 'Berat Badan Sesi Sebelumnya', 522 => 'Qb / Aliran Darah Intra (ml/mnt)',
+            523 => 'UFR / Ultrafiltration Rate (ml/jam)', 524 => 'Volume Ultrafiltrasi (L)',
+            525 => 'D 40% (ampul)', 526 => 'Masalah Keperawatan', 527 => 'Tindakan Keperawatan',
+            528 => 'Terapi Obat', 529 => 'TBV Post HD (ml)', 530 => 'UFG / Target Ultrafiltration (L)',
+            531 => 'Kt/V', 532 => 'Convective Volume (L)', 533 => 'Care Plan',
+            534 => 'Informed Consent', 535 => 'Administrasi',
+            // ===== Fase P5 — Bedah & Anestesi (762–979, tanpa band 89/97/100) =====
+            // Form 85 Asesmen Pra Bedah (762–774)
+            762 => 'Tanggal Asesmen Pra Bedah', 763 => 'Jam Asesmen Pra Bedah',
+            764 => 'Dokter Penilai Pra Bedah', 765 => 'Temuan & Diagnosis Pra Operasi',
+            766 => 'Tanggal & Jam Rencana Operasi', 767 => 'Rencana Tindakan Operasi',
+            768 => 'Kebutuhan Edukasi Pra Bedah', 769 => 'Kebutuhan Edukasi Lainnya',
+            770 => 'Hasil Laboratorium Pra Bedah', 771 => 'Hasil Radiologi & Penunjang Lain',
+            772 => 'Rencana Komplikasi', 773 => 'Back Up Plan',
+            774 => 'Prognosis Dubia',
+            // Form 86 Evaluasi Pre-Anestesi (775–793)
+            775 => 'Tanggal Evaluasi Pre-Anestesi', 776 => 'Jam Evaluasi Pre-Anestesi',
+            777 => 'Dokter Anestesi Penilai Pre-Anestesi', 778 => 'Anamnesis Pre-Anestesi',
+            779 => 'Jalan Napas & Tidur Jalan', 780 => 'Sistem Pernapasan Pre-Anestesi',
+            781 => 'Sistem Kardiovaskular Pre-Anestesi', 782 => 'Sistem Saraf Pre-Anestesi',
+            783 => 'Sistem Endokrin & Metabolik', 784 => 'Sistem Ginjal & Kencing',
+            785 => 'Sistem Pencernaan Pre-Anestesi', 786 => 'Sistem Darah & Koagulasi',
+            787 => 'Alergi Pre-Anestesi', 788 => 'Kajar & Risiko Aspirasi',
+            789 => 'Skor ASA', 790 => 'Rencana Anestesi', 791 => 'Rencana Sedasi',
+            792 => 'Persetujuan Anestesi', 793 => 'Catatan Evaluasi Pre-Anestesi',
+            // Form 87 Asesmen Post-Anestesi (794–809)
+            794 => 'Tanggal Asesmen Post-Anestesi', 795 => 'Jam Asesmen Post-Anestesi',
+            796 => 'Dokter Anestesi Penilai Post-Anestesi', 797 => 'Skor Aldrete',
+            798 => 'Skor Bromage', 799 => 'Skor Steward', 800 => 'Skor PADSS',
+            801 => 'Kriteria Pemulihan', 802 => 'Komplikasi Post-Anestesi',
+            803 => 'Intake Oral', 804 => 'Mobilisasi Post-Anestesi',
+            805 => 'Keadaan Umum Pasien Pulih', 806 => 'Keselamatan Pasien Pulih',
+            807 => 'Perawatan Ruang Bedah', 808 => 'Formulir Pasien Pulih',
+            809 => 'Rekomendasi Pasien Pulih',
+            // Form 88 Monitoring Anestesi (810–819)
+            810 => 'Tanggal Monitoring Anestesi', 811 => 'Jam Monitoring Anestesi',
+            812 => 'Hemodinamik Monitoring', 813 => 'Suhu Tubuh Monitoring',
+            814 => 'Ventilasi & Oksigenasi Monitoring', 815 => 'Kesadaran Monitoring',
+            816 => 'Nyeri & Ketidaknyamanan Monitoring', 817 => 'Catatan Peristiwa Kritis',
+            818 => 'Lampiran Monitoring Anestesi', 819 => 'Status Monitoring Anestesi',
+            // Form 90 Check List Kesiapan Anestesi (834–841)
+            834 => 'Tanggal Checklist Kesiapan Anestesi', 835 => 'Jam Checklist Kesiapan Anestesi',
+            836 => 'Mesin & Alat Anestesi', 837 => 'Oksigen & Ventilasi',
+            838 => 'Monitor & Akses Vaskular', 839 => 'Farmasi & Persiapan',
+            840 => 'Persetujuan & Dokumentasi', 841 => 'Catatan Kesiapan Anestesi',
+            // Form 91 Pengkajian Operasi (842–851)
+            842 => 'Tanggal Pengkajian Operasi', 843 => 'Jam Pengkajian Operasi',
+            844 => 'Tahap Pengkajian Operasi', 845 => 'Aspek Pre Operasi',
+            846 => 'Aspek Intra Operasi', 847 => 'Aspek Post Operasi',
+            848 => 'Rencana Keperawatan Operasi', 849 => 'Kebutuhan Nutrisi Operasi',
+            850 => 'Kebutuhan Edukasi Operasi', 851 => 'Catatan Pengkajian Operasi',
+            // Form 92 Laporan Operasi (852–866, 983–984)
+            852 => 'Tanggal Laporan Operasi', 853 => 'Jam Mulai Operasi',
+            854 => 'Nama Tindakan Operasi', 855 => 'Jenis Operasi Laporan',
+            856 => 'Dokter Bedah Operator', 857 => 'Dokter Anestesi Laporan',
+            858 => 'Diagnosa Pra Operasi', 859 => 'Diagnosa Pasca Operasi',
+            860 => 'Temuan Operasi', 861 => 'Prosedur Operasi',
+            862 => 'Komplikasi & Transfusi Operasi', 863 => 'Instrumen & Kasa Terpakai',
+            864 => 'Specimen Operasi', 865 => 'Kehilangan Darah & Ruang Pasca Operasi',
+            866 => 'Instruksi Pasca Operasi',
+            983 => 'Jam Selesai Operasi', 984 => 'Lama Operasi',
+            // Form 93 Catatan Bedah (867–882)
+            867 => 'Tanggal Catatan Bedah', 868 => 'Jam Catatan Bedah',
+            869 => 'Dokter Bedah Penulis Catatan', 870 => 'Petugas Pendamping Catatan Bedah',
+            871 => 'Aspek Pre Operasi Bedah', 872 => 'Pemeriksaan Fisik Intra Operasi Bedah',
+            873 => 'Posisi & Lokasi Operasi', 874 => 'Alat & Perlengkapan Operasi',
+            875 => 'Kebutuhan Kamar & Klarifikasi', 876 => 'Pembedahan, Pembiusan & Drainase',
+            877 => 'Torniquet & Diathermi', 878 => 'Cairan & Darah',
+            879 => 'Sirkuler & Asisten', 880 => 'Instruksi Pasca Operasi Catatan Bedah',
+            881 => 'Diagnosa Medis Catatan Bedah', 882 => 'Jenis Operasi Catatan Bedah',
+            // Form 94 Transfer Pasien (883–897)
+            883 => 'Tanggal Transfer', 884 => 'Jam Transfer',
+            885 => 'Ruangan Asal Transfer', 886 => 'Ruangan Tujuan Transfer',
+            887 => 'Kategori Transfer', 888 => 'Identitas Pasien Transfer',
+            889 => 'Dokter & Perawat Transfer', 890 => 'Diagnosis Medis Transfer',
+            891 => 'Diagnosis Keperawatan Transfer', 892 => 'Masalah Keperawatan Transfer',
+            893 => 'Kebutuhan Khusus & Kewaspadaan', 894 => 'Prosedur & Peralatan Transfer',
+            895 => 'Dokumen Pendukung Transfer', 896 => 'Penerima Pasien Transfer',
+            897 => 'Tanda Tangan Penerimaan',
+            // Form 95 Penandaan Lokasi Operasi (898–902)
+            898 => 'Tanggal Penandaan Lokasi', 899 => 'Jam Penandaan Lokasi',
+            900 => 'Lokasi Operasi', 901 => 'Penanda & Lampiran', 902 => 'Petugas & Konfirmasi Penandaan',
+            // Form 96 Penandaan Pasien (903–910)
+            903 => 'Tanggal Penandaan Pasien', 904 => 'Jam Penandaan Pasien',
+            905 => 'Penanda Alergi', 906 => 'Keterangan Alergi Ditandai',
+            907 => 'Penanda Hepatitis', 908 => 'Penanda HIV',
+            909 => 'Penanda TB', 910 => 'Penanda Geriatri',
+            // Form 98 Surveilans Luka Insisi (924–936)
+            924 => 'Identitas Operasi Surveilans', 925 => 'Trauma Pada Surveilans',
+            926 => 'Tanggal MRS Surveilans', 927 => 'Tanggal Operasi Surveilans',
+            928 => 'Jam Operasi Surveilans', 929 => 'Lama Operasi Surveilans',
+            930 => 'Kualifikasi Dokter Bedah Surveilans', 931 => 'Klasifikasi Luka Insisi',
+            932 => 'Pencegahan Infeksi Luka', 933 => 'Tanda Infeksi Luka',
+            934 => 'Kondisi Luka Postsurgikal', 935 => 'Drainase Luka',
+            936 => 'Keterangan Surveilans Luka',
+            // Form 99 Catatan Anestesia (937–954)
+            937 => 'Tanggal Catatan Anestesia', 938 => 'Jam Mulai Anestesia',
+            939 => 'Jam Selesai Anestesia', 940 => 'Lama Anestesia',
+            941 => 'Dokter Anestesia', 942 => 'Perawat Anestesia',
+            943 => 'Jenis Anestesia Catatan', 944 => 'Jalan Napas & Ventilasi Anestesia',
+            945 => 'Sirkuit & Perlengkapan Anestesia', 946 => 'Posisi & Fixasi Anestesia',
+            947 => 'Monitoring Anestesia', 948 => 'Hasil Laboratorium Penunjang Anestesia',
+            949 => 'Riwayat Penyakit & Alergi Anestesia', 950 => 'Vaskular, Monitoring & Obat Intraop',
+            951 => 'Kejadian Tidak Terduga Anestesia', 952 => 'Penanganan Intraoperatif Anestesia',
+            953 => 'Kondisi Akhir Anestesia', 954 => 'Instruksi Pasca Anestesia',
+            // Form 101 Asesmen Katarak (968–979)
+            968 => 'Tanggal Asesmen Katarak', 969 => 'Jam Asesmen Katarak',
+            970 => 'DPJP Utama Asesmen Katarak', 971 => 'Skrining Risiko Jatuh Katarak',
+            972 => 'Diagnosis Keperawatan Katarak', 973 => 'Tujuan & Kriteria Hasil Katarak',
+            974 => 'Intervensi Pre Operasi Katarak', 975 => 'Intervensi Post Operasi Katarak',
+            976 => 'Skala Nyeri Katarak', 977 => 'Jadwal Pemberian Obat Katarak',
+            978 => 'Pemeriksaan Mata Katarak', 979 => 'Visus Pasca Operasi Katarak',
         ];
         foreach ($objeks as $objekId => $namaObjek) {
             DB::table('objek')->updateOrInsert(
@@ -1964,6 +2157,181 @@ class EmrMasterSeeder extends Seeder
                 'respon_emosi' => 287, 'status_mental' => 288, 'kebutuhan_perlindungan' => 289,
                 'kebutuhan_teridentifikasi' => 290,
             ],
+            // ==== Fase P5 — form 52 Kriteria Masuk ICU ====
+            // `dpjp` (objek 453) TIDAK di-mapping: hanya tampil read-only dari
+            // penanggung_rawat, tidak disimpan (KONSEP §3.2).
+            52 => [
+                'tanggal_kriteria' => 447, 'waktu_kriteria' => 448, 'diagnosa' => 40,
+                'dpjp_icu' => 454, 'td_nilai' => 449, 'td_status' => 450,
+                'gcs_e' => 54, 'gcs_m' => 55, 'gcs_v' => 56, 'gcs_jumlah' => 57,
+                'informed_consent' => 455, 'prioritas_icu' => 456, 'kontra_indikasi' => 457,
+                'jumlah_kriteria_terpenuhi' => 451, 'kesimpulan' => 452, 'catatan' => 77,
+            ],
+            // ==== Fase P5 — form 53 Kriteria Keluar ICU ====
+            53 => [
+                'tanggal_keluar_icu' => 458, 'waktu_keluar_icu' => 459, 'diagnosa_keluar_icu' => 460,
+                'dokter_konsultan_icu' => 461, 'kr1_status' => 471, 'kr2_status' => 463,
+                'kr3_tensi' => 464, 'kr3_nadi' => 465, 'kr3_rr' => 466, 'kr3_suhu' => 467,
+                'kr3_gcs' => 57, 'kr3_cvp' => 468, 'kr3_status' => 471,
+                'kr4_status' => 471, 'kr4_lain' => 469, 'kesimpulan' => 470, 'catatan' => 77,
+            ],
+
+            // ==== Fase P5 — form 102 Pre Hemodialisa (KONSEP §5.5, 80 baris) ====
+            102 => [
+                'tanggal_pertemuan' => 473, 'waktu_pertemuan' => 474,
+                'subjective' => 1, 'objective' => 2,
+                'bb_awal' => 477, 'berat_badan' => 8, 'bb_kering' => 478,
+                'type_hd' => 475, 'riwayat_alergi' => 17, 'dialiser' => 476,
+                'td_sistolik' => 6, 'td_diastolik' => 7, 'nadi' => 10,
+                'pernapasan' => 12, 'suhu' => 11, 'saturasi' => 15,
+                'ews' => 16, 'kesadaran' => 51,
+                'gcs_e' => 54, 'gcs_m' => 55, 'gcs_v' => 56, 'gcs_jumlah' => 57,
+                'dializer' => 482, 'dialisat' => 483,
+                'akses_fistula' => 484, 'akses_graft' => 484, 'akses_sndl' => 484,
+                'akses_cdl' => 484, 'akses_cdl_thermo' => 484, 'akses_femoral' => 484,
+                'dosis_sirkulasi' => 485, 'dosis_bolus' => 486,
+                'dosis_maintenance' => 487, 'tanpa_heparinisasi' => 488, 'prog_bilas' => 489,
+                'jam_mulai' => 490, 'jam_selesai' => 491, 'lama_hd' => 492,
+                'uf' => 493, 'qb' => 494, 'tbv' => 495,
+                'tgl_laborat' => 496, 'jam_laborat' => 497,
+                'hb' => 498, 'ureum' => 499, 'creatinine' => 500,
+                'hbsag' => 501, 'kalium' => 502, 'sgot' => 503, 'sgpt' => 504,
+                'hasil_pemeriksaan_lain' => 508,
+                'transfusi' => 505, 'd40' => 506, 'ca_glukonas' => 507,
+                'kcl' => 509, 'renxamin' => 510, 'erythropoietin' => 511,
+                'riwayat_kesehatan_saat_ini' => 512,
+                'komunikasi_ada_kendala' => 513, 'komunikasi_tidak_ada' => 513,
+                'komunikasi_lain' => 513, 'komunikasi_keterangan' => 513,
+                'perawat_rumah_ada' => 514, 'perawat_rumah_tidak' => 514,
+                'perawat_rumah_lain' => 514, 'perawat_rumah_keterangan' => 514,
+                'gaduh_kondisi_saat_ini' => 515, 'gaduh_tenang' => 515,
+                'gaduh_gelisah' => 515, 'gaduh_takut_tindakan' => 515,
+                'gaduh_marah' => 515, 'gaduh_mudah_tersinggung' => 515,
+                'diagnosa_keperawatan' => 516, 'planning' => 4, 'evaluasi' => 517,
+                'tanggal_hd_berikutnya' => 518, 'lama_hd_rencana' => 479,
+                'screening_akses_tanggal' => 480, 'screening_akses_catatan' => 481,
+                'keterangan' => 77,
+            ],
+
+            // ==== Fase P5 — form 103 Intra Hemodialisa (KONSEP §6.4, 31 baris) ====
+            103 => [
+                'tanggal_pertemuan' => 473, 'waktu_pertemuan' => 474,
+                'data_focus' => 519, 'ku_pasien' => 520,
+                'td_sistolik' => 6, 'td_diastolik' => 7,
+                'nadi' => 10, 'pernapasan' => 12, 'suhu' => 11, 'saturasi' => 15, 'ews' => 16,
+                'berat_badan' => 8, 'bb_kering' => 478, 'bb_sebelumnya' => 521,
+                'qb' => 522, 'ufr' => 523, 'ufv' => 524, 'd40' => 525,
+                'hb' => 498, 'ureum' => 499, 'creatinine' => 500,
+                'hbsag' => 501, 'kalium' => 502, 'sgot' => 503, 'sgpt' => 504,
+                'hasil_pemeriksaan_lain' => 508,
+                'masalah_keperawatan' => 526, 'tindakan_keperawatan' => 527, 'terapi_obat' => 528,
+                'evaluasi' => 517, 'keterangan' => 77,
+            ],
+
+            // ==== Fase P5 — form 104 Post Hemodialisa (KONSEP §7.4, 37 baris) ====
+            104 => [
+                'tanggal_pertemuan' => 473, 'waktu_pertemuan' => 474,
+                'data_focus' => 519, 'ku_pasien' => 520,
+                'td_sistolik' => 6, 'td_diastolik' => 7,
+                'nadi' => 10, 'pernapasan' => 12, 'suhu' => 11, 'saturasi' => 15, 'ews' => 16,
+                'berat_badan' => 8, 'bb_kering' => 478, 'bb_sebelumnya' => 521,
+                'hb' => 498, 'ureum' => 499, 'creatinine' => 500,
+                'hbsag' => 501, 'kalium' => 502, 'sgot' => 503, 'sgpt' => 504,
+                'hasil_pemeriksaan_lain' => 508,
+                'masalah_keperawatan' => 526, 'tindakan_keperawatan' => 527, 'terapi_obat' => 528,
+                'evaluasi' => 517, 'keterangan' => 77,
+                'tbv' => 529, 'ufg' => 530, 'kt_v' => 531, 'convective_volume' => 532,
+                'transfusi' => 505, 'd40' => 506, 'ca_glukonas' => 507,
+                'kcl' => 509, 'renxamin' => 510, 'erythropoietin' => 511,
+            ],
+
+            // ==== Fase P5 — form 105 Triage Hemodialisa (KONSEP §8.4, 6 baris) ====
+            105 => [
+                'keluhan' => 13, 'bb_kering' => 478, 'berat_badan' => 8,
+                'care_plan' => 533, 'informed_consent' => 534, 'administrasi' => 535,
+            ],
+
+            // ==== Fase P5 — form 85 Asesmen Pra Bedah (KONSEP §3, 25 baris) ====
+            // 5 variabel checkbox kebutuhan_edukasi_* (objek 768) memakai nama
+            // snake_case — label item edukasi masih provisional (KONSEP §3).
+            85 => [
+                'tanggal_asesmen' => 762, 'jam_asesmen' => 763, 'dokter_penilai_id' => 764,
+                'keluhan' => 13,
+                'diagnosa_pra_operasi' => 765, 'temuan_fisik_pra_bedah' => 765,
+                'riwayat_alergi' => 17,
+                'tanggal_rencana_operasi' => 766, 'jam_rencana_operasi' => 766,
+                'jenis_operasi' => 767, 'rencana_tindakan_operasi' => 767,
+                'kebutuhan_edukasi_persiapan_mentas' => 768,
+                'kebutuhan_edukasi_persiapan_lensa' => 768,
+                'kebutuhan_edukasi_puasa' => 768,
+                'kebutuhan_edukasi_pemberian_obat' => 768,
+                'kebutuhan_edukasi_lainnya' => 768,
+                'kebutuhan_edukasi_lain' => 769,
+                'hasil_laboratorium' => 770, 'hasil_radiologi' => 771, 'hasil_penunjang_lain' => 771,
+                'kemungkinan_komplikasi' => 772, 'rencana_komplikasi' => 772,
+                'back_up_plan' => 773,
+                'prognosis_dubia_ad_bonam' => 774, 'catatan_prognosis' => 774,
+            ],
+
+            // ==== Fase P5 — form 86 Evaluasi Pre-Anestesi & Sedasi (KONSEP §4, 62 baris) ====
+            // `pernafasan_2` dari tabel field TIDAK dimapping (hanya catatan
+            // "reassign" di KONSEP; blok Mapping §4 tidak memuatnya).
+            86 => [
+                'tanggal_evaluasi' => 775, 'jam_evaluasi' => 776,
+                'dokter_anestesi_id' => 777,
+                'nama_pasien' => 778, 'tanggal_lahir' => 778, 'jenis_kelamin' => 778,
+                'pekerjaan' => 778, 'riwayat_penyakit_keluarga' => 778, 'riwayat_pengobatan' => 778,
+                'jalan_nafas' => 779, 'gangguan_pernafasan' => 779, 'snoring' => 779,
+                'pernapasan' => 780, 'penyakit_paru' => 780, 'suhu' => 780, 'td' => 780, 'nadi' => 780,
+                'jantung' => 781, 'op_jantung_koroner' => 781, 'serangan_jantung' => 781,
+                'hipertensi' => 781, 'riwayat_transfusi' => 781,
+                'saraf_perifer' => 782, 'pingsan' => 782, 'kejang' => 782, 'stroke' => 782, 'saraf' => 782,
+                'hamil_bulan' => 783, 'diabetes' => 783, 'gangguan_tiroid' => 783,
+                'obesitas' => 783, 'gula_darah' => 783,
+                'ginjal_gagal' => 784, 'susah_kencing' => 784, 'kreatinin' => 784, 'ureum' => 784,
+                'abdomen' => 785, 'maag' => 785, 'muntah' => 785, 'faring' => 785,
+                'gigi_geligi' => 785, 'mobilitas' => 785,
+                'anemia' => 786, 'leukosit' => 786, 'trombosit' => 786,
+                'kadar_gula_darah' => 786, 'prothrombin_time' => 786,
+                'alergi_latraks' => 787, 'alergi_makanan' => 787, 'alergi_plaster' => 787,
+                'alergi_obat_timbul' => 787,
+                'kajar_aspirasi' => 788, 'ceklis_equip_emergi' => 788, 'perlu_alat_bantu' => 788,
+                'asa' => 789, 'nyeri' => 14,
+                'tipe_anestesia' => 790, 'anes_umum' => 790, 'anes_regional' => 790,
+                'sedasi' => 791,
+                'persetujuan_anestesi' => 792,
+                'catatan_evaluasi' => 793,
+            ],
+
+            // ==== Fase P5 — form 87 Asesmen Post-Anestesi & Sedasi (KONSEP §5, 46 baris) ====
+            // 4 total skor (alderete/bromage/steward/padss) + kriteria_pemulihan
+            // adalah TURUNAN — dihitung ulang oleh SkorPemulihanHelper di server.
+            87 => [
+                'tanggal_asesmen' => 794, 'jam_asesmen' => 795, 'dokter_anestesi_id' => 796,
+                'skor_alderete_kesadaran' => 797, 'skor_alderete_aktivitas' => 797,
+                'skor_alderete_ventilasi' => 797, 'skor_alderete_warna_kulit' => 797,
+                'skor_alderete_total' => 797,
+                'skor_bromage_tangan' => 798, 'skor_bromage_lengan' => 798,
+                'skor_bromage_kaki' => 798, 'skor_bromage_total' => 798,
+                'skor_steward_pergerakan' => 799, 'skor_steward_pernapasan' => 799,
+                'skor_steward_kesadaran' => 799, 'skor_steward_total' => 799,
+                'skor_padss_vas' => 800, 'skor_padss_aktivitas' => 800, 'skor_padss_total' => 800,
+                'kriteria_pemulihan' => 801,
+                'kesadaran' => 51,
+                'sistolik' => 6, 'diastolik' => 7, 'nadi' => 10, 'pernapasan' => 12,
+                'suhu' => 11, 'saturasi' => 15,
+                'nyeri' => 14,
+                'komplikasi_1' => 802, 'komplikasi_2' => 802, 'komplikasi_3' => 802,
+                'komplikasi_4' => 802, 'komplikasi_5' => 802, 'komplikasi_6' => 802,
+                'skala_nyeri' => 802,
+                'intake_oral_ada' => 803, 'intake_oral_catatan' => 803,
+                'mobilisasi' => 804, 'mobilisasi_catatan' => 804,
+                'keadaan_umum' => 805,
+                'keselamatan_id' => 806, 'keselamatan_lokasi' => 806, 'keselamatan_site' => 806,
+                'ruangan_tujuan' => 807,
+                'formulir_tertunda' => 808,
+                'rekomendasi' => 809,
+            ],
         ];
         // Baris obat/BMHP (maks 20 baris per tindakan): variabel obat_1..obat_20
         // memakai objek 69 (Barang) dan jumlah_1..jumlah_20 memakai objek 70 (Jumlah).
@@ -2078,11 +2446,21 @@ class EmrMasterSeeder extends Seeder
         $mappingSkriningMpp = [
             'tanggal_skrining' => 155, 'jam_skrining' => 156,
         ];
-        for ($i = 1; $i <= 4; $i++) { $mappingSkriningMpp['risiko_tinggi_'.$i] = 600; }
-        for ($i = 1; $i <= 4; $i++) { $mappingSkriningMpp['risiko_pembiayaan_'.$i] = 601; }
-        for ($i = 1; $i <= 4; $i++) { $mappingSkriningMpp['kasus_kompleks_'.$i] = 602; }
-        for ($i = 1; $i <= 2; $i++) { $mappingSkriningMpp['risiko_lama_rawat_'.$i] = 603; }
-        for ($i = 1; $i <= 4; $i++) { $mappingSkriningMpp['risiko_psikososial_'.$i] = 604; }
+        for ($i = 1; $i <= 4; $i++) {
+            $mappingSkriningMpp['risiko_tinggi_'.$i] = 600;
+        }
+        for ($i = 1; $i <= 4; $i++) {
+            $mappingSkriningMpp['risiko_pembiayaan_'.$i] = 601;
+        }
+        for ($i = 1; $i <= 4; $i++) {
+            $mappingSkriningMpp['kasus_kompleks_'.$i] = 602;
+        }
+        for ($i = 1; $i <= 2; $i++) {
+            $mappingSkriningMpp['risiko_lama_rawat_'.$i] = 603;
+        }
+        for ($i = 1; $i <= 4; $i++) {
+            $mappingSkriningMpp['risiko_psikososial_'.$i] = 604;
+        }
         $mappingSkriningMpp['risiko_tinggi_lainnya'] = 605;
         $mappingSkriningMpp['risiko_pembiayaan_lainnya'] = 605;
         $mappingSkriningMpp['kasus_kompleks_lainnya'] = 605;
@@ -2095,6 +2473,188 @@ class EmrMasterSeeder extends Seeder
             $mappingSkriningMpp['formb_paraf_'.$i] = 610;
         }
         $mapping[69] = array_merge($mapping[69], $mappingSkriningMpp);
+        // ===== Fase P5 — form 52: variabel bersuffix nilai/status kriteria =====
+        // 18 nilai (objek 449) + 18 status (objek 450) berbagi objek — pola
+        // "satu objek, banyak variabel" seperti EWS/Nyeri. Suffix wajib
+        // (emrDetailByVariabel pluck per-variabel). Grup 1 butir (td,
+        // pasca_bedah, obat) memakai nama polos tanpa index (td_nilai dst.)
+        // mengikuti KONSEP §3.2.
+        $mappingIcu52 = [];
+        $jumlahPerGrup = ['resp' => 7, 'td' => 1, 'nadi' => 6, 'ekg' => 2, 'pasca_bedah' => 1, 'obat' => 1];
+        foreach ($jumlahPerGrup as $prefix => $n) {
+            for ($i = 1; $i <= $n; $i++) {
+                $key = $n === 1 ? $prefix : $prefix.'_'.$i;
+                $mappingIcu52[$key.'_nilai'] = 449;
+                $mappingIcu52[$key.'_status'] = 450;
+            }
+        }
+        $mapping[52] = array_merge($mapping[52], $mappingIcu52);
+        // ===== Fase P5 — form 53: 8 butir kelayakan life support (objek 462) =====
+        $mappingIcu53 = [];
+        foreach (['masker_nrm', 'masker_rm', 'jackson_rees', 'ventilator', 'dopamin', 'dobutamin', 'vascon', 'adrenalin'] as $butir) {
+            $mappingIcu53['kr1_'.$butir] = 462;
+        }
+        $mapping[53] = array_merge($mapping[53], $mappingIcu53);
+        // ===== Fase P5 — form 88 Monitoring Anestesi & Sedasi (KONSEP §6, 106 baris) =====
+        // Baris monitoring berkala memakai suffix 1..20 (menit 0,5,15,30 wajib,
+        // sisanya opsional) — variabel wajib unik per baris.
+        $mapping[88] = [
+            'tanggal_monitoring' => 810, 'jam_mulai' => 811, 'jam_selesai' => 811,
+            'kejadian_kritis' => 817, 'lampiran_monitoring' => 818, 'status_monitoring' => 819,
+        ];
+        for ($i = 1; $i <= 20; $i++) {
+            $mapping[88]['hemodinamik_'.$i] = 812;
+            $mapping[88]['suhu_'.$i] = 813;
+            $mapping[88]['oksigenasi_'.$i] = 814;
+            $mapping[88]['kesadaran_'.$i] = 815;
+            $mapping[88]['nyeri_'.$i] = 816;
+        }
+        // ===== Fase P5 — form 90 Check List Kesiapan Anestesi (KONSEP §8, 9 baris) =====
+        $mapping[90] = [
+            'tanggal_checklist' => 834, 'jam_checklist' => 835,
+            'mesin_anestesi_ok' => 836, 'mesin_anestesi_keterangan' => 836,
+            'oksigen_ventilasi_ok' => 837, 'monitor_akses_ok' => 838,
+            'farmasi_persiapan_ok' => 839, 'consent_dokumentasi_ok' => 840,
+            'catatan_kesiapan' => 841,
+        ];
+        // ===== Fase P5 — form 91 Pengkajian Pre/Intra/Post Operasi (KONSEP §9, 25 baris) =====
+        $mapping[91] = [
+            'tanggal_pengkajian' => 842, 'jam_pengkajian' => 843, 'fase' => 844,
+            'keluhan_utama' => 13,
+            'riwayat_alergi' => 17,
+            'riwayat_penyakit' => 845, 'riwayat_operasi' => 845, 'jenis_operasi' => 845,
+            'status_emosi' => 845, 'skala_cemas' => 845, 'data_penunjang' => 845, 'persiapan_darah' => 845,
+            'pemeriksaan_fisik_intra' => 846, 'posisi_operasi_intra' => 846, 'keadaan_umum_intra' => 846,
+            'asa_intra' => 846, 'ruangan_pulih' => 846,
+            'nyeri_post' => 847, 'skor_nyeri_post' => 847, 'mobilisasi_post' => 847, 'luka_operasi' => 847,
+            'rencana_keperawatan' => 848, 'kebutuhan_nutrisi' => 849, 'edukasi_pasien' => 850,
+            'catatan_pengkajian' => 851,
+        ];
+        // ===== Fase P5 — form 92 Laporan Operasi (KONSEP §10, 25 baris + loop komplikasi) =====
+        $mapping[92] = [
+            'tanggal_laporan' => 852, 'jam_mulai_operasi' => 853,
+            'jam_selesai_operasi' => 983, 'lama_operasi' => 984,
+            'nama_tindakan_operasi' => 854, 'jenis_anas_umum' => 854, 'jenis_anas_lokal' => 854,
+            'jenis_operasi' => 855,
+            'dokter_bedah_operator' => 856, 'dokter_anestesi' => 857,
+            'diagnosa_pra_operasi' => 858, 'diagnosa_pasca_operasi' => 859,
+            'temuan_operasi' => 860, 'prosedur_operasi' => 861,
+            'transfusi_darah' => 862, 'jumlah_transfusi' => 862, 'implan_pasang' => 862, 'jenis_implan' => 862,
+            'instrumen_kasa' => 863,
+            'specimen_diterima' => 864, 'nama_specimen' => 864,
+            'kehilangan_darah' => 865, 'cairan_masuk' => 865, 'ruangan_pasca_operasi' => 865,
+            'instruksi_pasca_operasi' => 866,
+        ];
+        for ($i = 1; $i <= 6; $i++) {
+            $mapping[92]['komplikasi_operasi_'.$i] = 862;
+        }
+        // ===== Fase P5 — form 93 Catatan Bedah (KONSEP §11, 28 baris) =====
+        $mapping[93] = [
+            'tanggal_catatan' => 867, 'jam_catatan' => 868, 'dokter_bedah' => 869, 'petugas_pendamping' => 870,
+            'prabedah' => 871, 'pre_operasi' => 871,
+            'pemeriksaan_fisik' => 872, 'kulit' => 872, 'warna_kulit' => 872, 'keadaan_umum' => 872,
+            'posisi_operasi' => 873, 'lokasi_operasi' => 873,
+            'peralatan' => 874, 'pasang_alat' => 874,
+            'kebutuhan_kamar' => 875, 'klarifikasi' => 875,
+            'pembedahan' => 876, 'pembiusan' => 876, 'pemakaian_drain' => 876,
+            'torniquet' => 877, 'diathermi' => 877,
+            'jumlah_cairan' => 878, 'perawatan_darah' => 878,
+            'sirkuler_a' => 879, 'asisten' => 879,
+            'instruksi' => 880, 'diagnosa_medis' => 881,
+            'jenis_operasi' => 882,
+        ];
+        // ===== Fase P5 — form 94 Transfer Pasien Antar Ruangan (KONSEP §12, 41 baris + loop dokter) =====
+        $mapping[94] = [
+            'tanggal_transfer' => 883, 'jam_transfer' => 884,
+            'ruangan_asal' => 885, 'ruangan_tujuan' => 886, 'kategori_transfer' => 887,
+            'identitas_pasien' => 888, 'dpjp_utama' => 888,
+            'dokter_pengantar' => 889, 'perawat_ruangan' => 889,
+            'diagnosa_medis' => 890, 'diagnosa_keperawatan' => 891, 'masalah_keperawatan' => 892,
+            'kebutuhan_khusus' => 893, 'kewaspadaan' => 893,
+            'nama_terapi_obat' => 894, 'terapi_infus' => 894, 'oksigen' => 894,
+            'gangguan_indra' => 894, 'prosedur_transfer' => 894, 'peralatan' => 894, 'perlu_alat_bantu' => 894,
+            'riwayat_alergi' => 17,
+            'sistolik' => 6, 'diastolik' => 7, 'nadi' => 10, 'pernapasan' => 12, 'suhu' => 11, 'kesadaran' => 51,
+            'gcs_eye' => 54, 'gcs_motorik' => 55, 'gcs_verbal' => 56, 'gcs_score' => 57,
+            'dokumen_pendukung' => 895, 'hasil_lab' => 895, 'hasil_usg' => 895, 'hasil_radiologi' => 895,
+            'konsultasi' => 895, 'catatan_transfer' => 895,
+            'nama_penerima' => 896, 'tanggal_penerimaan' => 897, 'jam_penerimaan' => 897,
+        ];
+        for ($i = 1; $i <= 5; $i++) {
+            $mapping[94]['dokter_rawat_'.$i] = 889;
+        }
+        // ===== Fase P5 — form 95 Penandaan Lokasi Operasi (KONSEP §13, 9 var + 1 var tanpa objek) =====
+        // `alasan_penandaan` objek_id NULL — field safety gate KONSEP §13
+        // ("konfirmasi_pasien = Tidak ⇒ wajib menyertakan alasan") yang
+        // terlewat dari tabel field / Mapping §13.
+        $mapping[95] = [
+            'tanggal_penandaan' => 898, 'jam_penandaan' => 899,
+            'nama_tindakan' => 900, 'lokasi_anatomi' => 900, 'sisi_operasi' => 900,
+            'jenis_penandaan' => 901, 'lampiran_penandaan' => 901,
+            'petugas_penanda' => 902, 'konfirmasi_pasien' => 902,
+            'alasan_penandaan' => null,
+        ];
+        // ===== Fase P5 — form 96 Penandaan Pasien (KONSEP §14, 9 var + loop alergi 1..5) =====
+        $mapping[96] = [
+            'tanggal_penandaan' => 903, 'jam_penandaan' => 904,
+            'penanda_alergi' => 905, 'penanda_hepatitis' => 907, 'jenis_hepatitis' => 907,
+            'penanda_hiv' => 908, 'penanda_tb' => 909,
+            'penanda_geriatri' => 910, 'alasan_geriatri' => 910,
+        ];
+        for ($i = 1; $i <= 5; $i++) {
+            $mapping[96]['alergi_'.$i] = 906;
+        }
+        // ===== Fase P5 — form 98 Surveilans Luka Insisi (KONSEP §16, 12 var + loop 2×5) =====
+        // `keterangan_trauma` objek_id NULL — field safety gate KONSEP §16
+        // ("trauma_pada = Ada ⇒ wajib keterangan") yang terlewat dari tabel field.
+        $mapping[98] = [
+            'jenis_operasi' => 924, 'kamar_operasi' => 924, 'trauma_pada' => 925,
+            'tgl_mrs' => 926, 'tgl_operasi' => 927, 'jam_operasi' => 928, 'lama_operasi' => 929,
+            'dokter_bedah' => 930, 'klasifikasi_luka' => 931,
+            'kondisi_luka_post' => 934, 'drainase_luka' => 935, 'keterangan_surveilans' => 936,
+            'keterangan_trauma' => null,
+        ];
+        for ($i = 1; $i <= 5; $i++) {
+            $mapping[98]['profilaksis_'.$i] = 932;
+            $mapping[98]['tanda_infeksi_'.$i] = 933;
+        }
+        // ===== Fase P5 — form 99 Catatan Anestesia (KONSEP §17, 32 var) =====
+        // Variabel ikut blok Mapping — `ruang_tujuan` (bukan `pesakit_ruang`
+        // yang tertulis di tabel field §17, preseden form 87/94).
+        $mapping[99] = [
+            'tanggal_catatan' => 937, 'jam_mulai' => 938, 'jam_selesai' => 939, 'lama_anestesia' => 940,
+            'dokter_anestesi' => 941, 'perawat_anestesi' => 942, 'jenis_anestesi' => 943,
+            'airway' => 944, 'airway_2' => 944, 'ventilasi' => 944,
+            'sirkuit' => 945, 'caudel' => 945,
+            'posisi' => 946, 'monitor' => 947, 'asa' => 947,
+            'penunjang_lab' => 948, 'riwayat_penyakit' => 949, 'saraf_perifer' => 949,
+            'vaskular' => 950, 'obat_cairan_intraop' => 950,
+            'sistolik' => 6, 'diastolik' => 7, 'nadi' => 10, 'pernapasan' => 12, 'suhu' => 11,
+            'saturasi' => 15, 'kesadaran' => 51,
+            'kejadian_tidak_terduga' => 951, 'penanganan_intraop' => 952, 'kondisi_akhir' => 953,
+            'instruksi_pasca' => 954, 'ruang_tujuan' => 954,
+        ];
+        // ===== Fase P5 — form 101 Asesmen Katarak (KONSEP §19, 62 var) =====
+        $mapping[101] = [
+            'tanggal_asesmen' => 968, 'jam_asesmen' => 969, 'dpjp_utama' => 970,
+            'keluhan' => 13, 'kesadaran' => 51,
+            'resiko_jatuh' => 971, 'edukasi' => 971,
+            'diagnosa_keperawatan' => 972, 'tujuan_kriteria_hasil' => 973,
+            'intervensi_pre_operasi' => 974, 'intervensi_post_operasi' => 975,
+            'skala_nyeri' => 976,
+        ];
+        for ($i = 1; $i <= 5; $i++) {
+            $mapping[101]['jam_pemberian_obat_'.$i] = 977;
+            $mapping[101]['nama_obat_'.$i] = 977;
+            $mapping[101]['sistolik_'.$i] = 6;
+            $mapping[101]['diastolik_'.$i] = 7;
+            $mapping[101]['nadi_'.$i] = 10;
+            $mapping[101]['suhu_'.$i] = 11;
+            $mapping[101]['pernapasan_'.$i] = 12;
+            $mapping[101]['skala_nyeri_'.$i] = 976;
+            $mapping[101]['visus_kanan_'.$i] = 978;
+            $mapping[101]['visus_kiri_'.$i] = 979;
+        }
         foreach ($mapping as $formId => $variabels) {
             foreach ($variabels as $variabel => $objekId) {
                 $exists = DB::table('objek_form_control')
@@ -2206,6 +2766,10 @@ class EmrMasterSeeder extends Seeder
             70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84] as $formIdP4) {
             EmrHelper::backfillObjekId($formIdP4);
         }
+        // ===== Fase P5 — ICU & Hemodialisa =====
+        foreach ([52, 53, 102, 103, 104, 105, 85] as $formIdP5) {
+            EmrHelper::backfillObjekId($formIdP5);
+        }
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
         $akses = [
@@ -2264,6 +2828,68 @@ class EmrMasterSeeder extends Seeder
             ['profesi_id' => 1, 'form_id' => 51, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 51, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
             ['profesi_id' => 13, 'form_id' => 51, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // ===== Fase P5 — ICU & Hemodialisa =====
+            // Form 52 (Kriteria Masuk ICU): keputusan transfer — Dokter full;
+            // Perawat & Dokter Intensivis READ (bukan kewenangan menulis).
+            ['profesi_id' => 1, 'form_id' => 52, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 52, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 16, 'form_id' => 52, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // Form 53 (Kriteria Keluar ICU): Dokter & Dokter Anestesi (17) yang
+            // memutuskan; Perawat & Dokter Intensivis READ.
+            ['profesi_id' => 1, 'form_id' => 53, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 53, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 16, 'form_id' => 53, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 17, 'form_id' => 53, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            // Form 102 Pre Hemodialisa: Dokter full; Perawat (2) & Perawat HD (18) CRUD tanpa delete.
+            ['profesi_id' => 1, 'form_id' => 102, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 102, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 18, 'form_id' => 102, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            // Form 103 Intra Hemodialisa: identik 102.
+            ['profesi_id' => 1, 'form_id' => 103, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 18, 'form_id' => 103, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 103, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            // Form 104 Post Hemodialisa: identik 103.
+            ['profesi_id' => 1, 'form_id' => 104, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 18, 'form_id' => 104, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 104, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            // Form 105 Triage Hemodialisa: Dokter full; Perawat & Perawat HD CRUD tanpa delete.
+            ['profesi_id' => 1, 'form_id' => 105, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 105, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 18, 'form_id' => 105, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            // Form 85 Asesmen Pra Bedah (KONSEP §3): Dokter full CRUD;
+            // Perawat READ-ONLY (diisi dokter penilai pra bedah).
+            ['profesi_id' => 1, 'form_id' => 85, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 85, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // ===== Fase P5 — Bedah & Anestesi (band 86) =====
+            ['profesi_id' => 1, 'form_id' => 86, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 86, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // ===== Fase P5 — Bedah & Anestesi (band 87) =====
+            ['profesi_id' => 1, 'form_id' => 87, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 87, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // ===== Fase P5 — Bedah & Anestesi (band 88) =====
+            ['profesi_id' => 1, 'form_id' => 88, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 88, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // ===== Fase P5 — Bedah & Anestesi (band 90) =====
+            ['profesi_id' => 1, 'form_id' => 90, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 90, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // ===== Fase P5 — Bedah & Anestesi (band 91) =====
+            ['profesi_id' => 1, 'form_id' => 91, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 91, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 92, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 92, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 93, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 93, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 94, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 94, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 95, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 96, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 96, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 98, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 98, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 99, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 99, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 101, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 101, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             // ===== Fase P4 — Kebidanan & MCU =====
             // Form 67 (Down Score) tidak di-seed — status ⛔ di docs/TASK_FORM.md.
             ['profesi_id' => 1, 'form_id' => 59, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
