@@ -77,7 +77,9 @@ function splitEntries(string $body): array
 function extractRuleBlocks(string $src): array
 {
     $out = [];
-    if (! preg_match_all('/->validate\(\s*\[/', $src, $hits, PREG_OFFSET_CAPTURE)) {
+    // Tangkap baik `->validate([...])` maupun `\Validator::make($x, [...])`
+    // (form P4 memakai Validator::make untuk aturan after()/cross-field).
+    if (! preg_match_all('/(?:->validate\(\s*\[|Validator::make\([^,]+,\s*\[)/', $src, $hits, PREG_OFFSET_CAPTURE)) {
         return $out;
     }
     foreach ($hits[0] as $h) {
@@ -154,6 +156,31 @@ function evaluasiKunci(string $ekspresi, string $var, int $n): ?string
 }
 
 /**
+ * Sama dengan evaluasiKunci() tapi untuk nilai foreach yang BUKAN angka
+ * (string konstanta, mis. 'risiko_tinggi'). Dipakai expandRuleLoops().
+ */
+function evaluasiKunciForeach(string $ekspresi, string $var, $nilai): ?string
+{
+    $ekspresi = trim($ekspresi);
+    $q = preg_quote($var, '/');
+    if (! preg_match_all('/\x27([^\x27]*)\x27|\$'.$q.'/', $ekspresi, $bagian, PREG_SET_ORDER)) {
+        return null;
+    }
+    $hasil = '';
+    foreach ($bagian as $b) {
+        if (isset($b[1]) && $b[1] !== '') {
+            $hasil .= $b[1];
+        } else {
+            $hasil .= (string) $nilai;
+        }
+    }
+    $sisa = preg_replace('/\x27[^\x27]*\x27|\$'.$q.'/', '', $ekspresi);
+    $sisa = str_replace(['.', ' ', '\t', '\n', '\r'], '', (string) $sisa);
+
+    return ($sisa === '' && $hasil !== '') ? $hasil : null;
+}
+
+/**
  * Resolusi variabel yang isinya aturan validasi, mis.
  *     $statusRule = 'nullable|in:1,T,K,A,ESO,TAP,stop';
  *     $rules['status_'.$b] = $statusRule;
@@ -174,6 +201,330 @@ function selfResolveRule(string $rule, string $src): string
 }
 
 /**
+ * Ambil isi blok `{ ... }` yang mengikuti header loop pada offset tertentu.
+ *
+ * Header loop sudah Includes `foreach (...)` / `for (...)` TANPA brace, jadi
+ * caller hanya perlu melewati whitespace lalu brace pembuka.
+ *
+ * @return string|null isi body, atau null bila tidak ditemukan
+ */
+function loopBodyAt(string $src, int $offset): ?string
+{
+    $len = strlen($src);
+    $i = $offset;
+    while ($i < $len && ctype_space($src[$i])) {
+        $i++;
+    }
+    if ($i >= $len || $src[$i] !== '{') {
+        return null;
+    }
+    $i++;
+    $depth = 1;
+    $start = $i;
+    for (; $i < $len && $depth > 0; $i++) {
+        // Abaikan brace di dalam string/komentar agar depth tidakenyesatkan.
+        $c = $src[$i];
+        if ($c === "'" || $c === '"') {
+            $q = $c;
+            $i++;
+            while ($i < $len && $src[$i] !== $q) {
+                if ($src[$i] === '\\') {
+                    $i++;
+                } $i++;
+            }
+
+            continue;
+        }
+        if ($c === '{') {
+            $depth++;
+        } elseif ($c === '}') {
+            $depth--;
+            if ($depth === 0) {
+                return substr($src, $start, $i - $start);
+            }
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Baca blok `return [ 'x' => 'rule', ... ];` di dalam method
+ * `rulesTambahan()` (hook subclass `McuSpesialistikController`).
+ *
+ * @return array<string, string>
+ */
+function expandRulesTambahan(string $src): array
+{
+    if (! preg_match('/function\s+rulesTambahan\s*\([^)]*\)\s*(?::\s*array)?\s*\{/s', $src, $m, PREG_OFFSET_CAPTURE)) {
+        return [];
+    }
+    $pos = $m[0][1];
+    if (! preg_match('/return\s*\[/s', $src, $r, PREG_OFFSET_CAPTURE, $pos)) {
+        return [];
+    }
+    $start = strpos($src, '[', $r[0][1]);
+    if ($start === false) {
+        return [];
+    }
+    $depth = 0;
+    $q = null;
+    $len = strlen($src);
+    for ($i = $start; $i < $len; $i++) {
+        $c = $src[$i];
+        if ($q !== null) {
+            if ($c === '\\' && $q === "'") {
+                $i++;
+
+                continue;
+            }
+            if ($c === $q) {
+                $q = null;
+            }
+
+            continue;
+        }
+        if ($c === "'" || $c === '"') {
+            $q = $c;
+
+            continue;
+        }
+        if ($c === '[') {
+            $depth++;
+        } elseif ($c === ']') {
+            $depth--;
+            if ($depth === 0) {
+                $out = [];
+                foreach (splitEntries(substr($src, $start + 1, $i - $start - 1)) as $k => $v) {
+                    $out[$k] = $v;
+                }
+
+                return $out;
+            }
+        }
+    }
+
+    return [];
+}
+
+/**
+ * Baca blok literal `$rules = [ 'a' => '...', ... ];` dari sebuah source.
+ *
+ * Berbeda dari `extractRuleBlocks()` (yang mencari blok `validate([...])`),
+ * fungsi ini menangkap variabel apa pun yang namanya persis `$rules` lalu
+ * memecah isinya sebagai pasangan variabel => aturan.
+ *
+ * @return array<string, string>
+ */
+function expandRuleBlocks(string $src): array
+{
+    $out = [];
+    if (! preg_match_all('/\$rules\s*=\s*\[/', $src, $m, PREG_OFFSET_CAPTURE)) {
+        return $out;
+    }
+
+    foreach ($m as $satu) {
+        $start = strpos($src, '[', $satu[0][1]);
+        if ($start === false) {
+            continue;
+        }
+        $depth = 0;
+        $q = null;
+        $len = strlen($src);
+        for ($i = $start; $i < $len; $i++) {
+            $c = $src[$i];
+            if ($q !== null) {
+                if ($c === '\\' && $q === "'") {
+                    $i++;
+
+                    continue;
+                }
+                if ($c === $q) {
+                    $q = null;
+                }
+
+                continue;
+            }
+            if ($c === "'" || $c === '"') {
+                $q = $c;
+
+                continue;
+            }
+            if ($c === '[') {
+                $depth++;
+            } elseif ($c === ']') {
+                $depth--;
+                if ($depth === 0) {
+                    foreach (splitEntries(substr($src, $start + 1, $i - $start - 1)) as $k => $v) {
+                        $out[$k] ??= trim($v);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    return $out;
+}
+
+/**
+ * Ekspansi aturan validasi yang kunci-nya dihitung dari loop koleksi data.
+ *
+ * Contoh di McuSpesialistikController:
+ *     foreach ($organ as $o) {
+ *         $rules[$o['kunci'].'_ada'] = 'required|in:0,1';
+ *         $rules[$o['kunci']]      = 'nullable|string|max:2000';
+ *     }
+ *
+ * Kuncinya bukan literal, sehingga ekspansi loop biasa tidak bisa menjangkau.
+ * Fungsi ini membaca definisi koleksi (`McuSpesialistikHelper::organ($slug)`)
+ * yang dirujuk lewat variabel, lalu membangkitkan pasangan aturan konkret.
+ *
+ * @return array<string, string>
+ */
+function expandRuleKoleksi(string $src, string $class): array
+{
+    $out = [];
+
+    // Forehead: `foreach ( <ekspresi> as $item )` — koleksi boleh berupa
+    // variabel (`$organ`) ATAU panggilan statis langsung
+    // (`McuSpesialistikHelper::organ($this->slug)`).
+    $polaLoop = '/foreach\s*\(\s*(.+?)\s+as\s+\$(\w+)\s*\)/s';
+    if (! preg_match_all($polaLoop, $src, $loop, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
+        return $out;
+    }
+
+    foreach ($loop as $info) {
+        $ekspresiKoleksi = trim($info[1][0]);
+        $varItem = $info[2][0];
+
+        // Hanya koleksi yang berasal dari panggilan statik helper yang
+        // bisa dievaluasi; variabel biasa ditangani `expandRuleLoops()`.
+        $nilaiKoleksi = selfResolveCollection($src, $class, $ekspresiKoleksi);
+        if (! is_array($nilaiKoleksi)) {
+            continue;
+        }
+
+        $body = loopBodyAt($src, $info[0][1] + strlen($info[0][0]));
+        if ($body === null) {
+            continue;
+        }
+
+        // $rules[$item['kunci'].'_ada'] = '...'  (bersuffix literal)
+        $polaAturan = <<<'REGEX'
+~\$rules\s*\[\s*\$(\w+)\s*\[\x27([^\x27]*)\x27\s*\]\s*\.\s*\x27([^\x27]*)\x27\s*\]\s*=\s*(.+?);~s
+REGEX;
+        // $rules[$item['kunci']] = '...'
+        $polaPolos = <<<'REGEX'
+~\$rules\s*\[\s*\$(\w+)\s*\[\x27([^\x27]*)\x27\s*\]\s*\]\s*=\s*(.+?);~s
+REGEX;
+
+        $aturan = [];
+        if (preg_match_all($polaAturan, $body, $mm, PREG_SET_ORDER)) {
+            foreach ($mm as $x) {
+                $aturan[] = ['var' => $x[1], 'suffix' => $x[3], 'rule' => trim($x[4])];
+            }
+        }
+        if (preg_match_all($polaPolos, $body, $mm, PREG_SET_ORDER)) {
+            foreach ($mm as $x) {
+                $aturan[] = ['var' => $x[1], 'suffix' => '', 'rule' => trim($x[3])];
+            }
+        }
+        if ($aturan === []) {
+            continue;
+        }
+
+        foreach ($nilaiKoleksi as $item) {
+            if (! is_array($item) || ! isset($item['kunci'])) {
+                continue;
+            }
+            foreach ($aturan as $a) {
+                if ($a['var'] !== $varItem) {
+                    continue;
+                }
+                $out[$item['kunci'].$a['suffix']] = $a['rule'];
+            }
+        }
+    }
+
+    return $out;
+}
+
+/**
+ * Nilaikan `$var = Helper::method('slug')` / `Helper::method(SLUG_CONST)`.
+ *
+ * Hanya memanggil method STATIK pada kelas yang sedang diproses (kelas
+ * controller atau helper yang di-`use`) — tidak ada input tak tepercaya yang
+ * dievaluasi, dan hasilnya hanya dipakai untuk membangkitkan kunci aturan
+ * validasi pada harness.
+ */
+function selfResolveCollection(string $src, string $class, string $ekspresi): ?array
+{
+    $ekspresi = trim($ekspresi);
+
+    // Bentuk: Helper::method('slug') atau Helper::method($this->slug)
+    if (! preg_match('/^([A-Za-z0-9_\\\\]+)::(\w+)\((.*)\)$/s', $ekspresi, $m)) {
+        // Bentuk: $var yang nilainya panggilan statis — resolusi 1 tingkat.
+        if (preg_match('/^\$(\w+)$/', $ekspresi, $mv)) {
+            if (preg_match('/\$'.preg_quote($mv[1], '/').'\s*=\s*([A-Za-z0-9_\\\\]+)::(\w+)\(([^;]*)\)\s*;/', $src, $as)) {
+                return selfResolveCollection($src, $class, $as[1].'::'.$as[2].'('.$as[3].')');
+            }
+        }
+
+        return null;
+    }
+
+    [$kelas, $metode, $argumen] = [$m[1], $m[2], trim($m[3])];
+
+    // Hanya izinkan kelas yang dirujuk di file ini.
+    if (! str_contains($src, $kelas)) {
+        return null;
+    }
+
+    // Nama kelas biasanya ditulis tanpa namespace; resolve lewat `use`.
+    if (! str_contains($kelas, '\\')) {
+        if (preg_match_all('/^use\s+([A-Za-z0-9_\\\\]+)(?:\s+as\s+(\w+))?\s*;/m', $src, $uu, PREG_SET_ORDER)) {
+            foreach ($uu as $satu) {
+                $alias = ($satu[2] ?? '') !== ''
+                    ? $satu[2]
+                    : substr(strrchr('\\'.$satu[1], '\\'), 1);
+                if ($alias === $kelas) {
+                    $kelas = $satu[1];
+                    break;
+                }
+            }
+        }
+    }
+
+    if (! class_exists($kelas) || ! method_exists($kelas, $metode)) {
+        return null;
+    }
+
+    // Argumen hanya boleh literal string atau properti objek — tanpa eval bebas.
+    if ($argumen === '') {
+        $hasil = $kelas::$metode();
+    } elseif (preg_match("/^['\"]([^'\"]*)['\"]$/", $argumen, $a)) {
+        $hasil = $kelas::$metode($a[1]);
+    } elseif (preg_match('/^\$this->(\w+)$/', $argumen, $a)) {
+        $objek = new $class;
+        if (! property_exists($objek, $a[1])) {
+            return null;
+        }
+        $reflect = new ReflectionProperty($objek, $a[1]);
+        $reflect->setAccessible(true);
+        $nilai = $reflect->getValue($objek);
+        if (! is_string($nilai)) {
+            return null;
+        }
+        $hasil = $kelas::$metode($nilai);
+    } else {
+        return null;
+    }
+
+    return is_array($hasil) ? $hasil : null;
+}
+
+/**
  * Ekspansi aturan validasi yang ditulis di dalam loop numerik.
  *
  * Controller EMR menulis aturan baris-bersuffix lewat loop, mis.
@@ -187,7 +538,7 @@ function selfResolveRule(string $rule, string $src): string
  * (`obat_1` .. `obat_20`) supaya payload builder tetap bisa membuat payload
  * yang LAYAK untuk setiap baris.
  *
- * @return array<string, string>  variabel => aturan
+ * @return array<string, string> variabel => aturan
  */
 function expandRuleLoops(string $src): array
 {
@@ -196,12 +547,75 @@ function expandRuleLoops(string $src): array
     // Batas loop boleh berupa literal (20) ATAU konstanta kelas
     // (self::MAKS_BARIS) — konstanta dibaca dari blok `const` di file yang sama.
     $konstanta = [];
-    if (preg_match_all('/public\s+const\s+(\w+)\s*=\s*(\d+)\s*;/', $src, $kc, PREG_SET_ORDER)) {
+    if (preg_match_all('/(?:public|private|protected)\s+const\s+(\w+)\s*=\s*(\d+)\s*;/', $src, $kc, PREG_SET_ORDER)) {
         foreach ($kc as $one) {
             $konstanta[$one[1]] = (int) $one[2];
         }
     }
     $batas = '(\d+|self::\w+)';
+
+    // foreach ($arr as $x) / foreach ($arr as $x => $y) — konstanta kelas
+    // dibaca dari `const NAMA = [ ... ];` (array literal, hormati kutip).
+    // Dipakai form 69 (Skrining MPP) yang me-loop KATEGORI_RISIKO /
+    // ASPEK_FORM_A, bukan angka.
+    $konstantaArray = [];
+    if (preg_match_all('/(?:public|private|protected)?\s*const\s+(\w+)\s*=\s*\[(.*?)\];/s', $src, $ka, PREG_SET_ORDER)) {
+        foreach ($ka as $one) {
+            $isi = [];
+            if (preg_match_all('/\x27([^\x27]*)\x27\s*(?:=>|,)/', $one[2], $kv, PREG_SET_ORDER)) {
+                foreach ($kv as $kvOne) {
+                    $isi[] = $kvOne[1];
+                }
+            } elseif (preg_match_all('/(\d+)\s*(?:=>|,)/', $one[2], $kn, PREG_SET_ORDER)) {
+                foreach ($kn as $knOne) {
+                    $isi[] = (int) $knOne[1];
+                }
+            }
+            $konstantaArray[$one[1]] = $isi;
+        }
+    }
+    $polaForeach = '/foreach\s*\(\s*(?:self::(\w+)|\[\s*([^\]]*)\])\s+as\s+\$(\w+)/';
+    if (preg_match_all($polaForeach, $src, $fe, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
+        foreach ($fe as $info) {
+            if ($info[1][1] >= 0) {
+                $nama = $info[1][0];
+                if (! isset($konstantaArray[$nama])) {
+                    continue;
+                }
+                $iterable = $konstantaArray[$nama];
+            } else {
+                $iterable = phpListValues($info[2][0]);
+            }
+            if ($iterable === []) {
+                continue;
+            }
+            $var = $info[3][0];
+            $body = loopBodyAt($src, $info[0][1] + strlen($info[0][0]));
+            if ($body === null) {
+                continue;
+            }
+            $pattern = <<<'REGEX'
+~\$rules\s*\[\s*(.+?)\s*\]\s*=\s*(.+?);~s
+REGEX;
+            if (! preg_match_all($pattern, $body, $assign, PREG_SET_ORDER)) {
+                continue;
+            }
+            foreach ($assign as $a) {
+                $ekspresiKunci = $a[1];
+                $rule = trim($a[2]);
+                if (strpos($ekspresiKunci, '$'.$var) === false) {
+                    continue;
+                }
+                foreach ($iterable as $nilai) {
+                    $kunci = evaluasiKunciForeach($ekspresiKunci, $var, $nilai);
+                    if ($kunci === null) {
+                        continue;
+                    }
+                    $out[$kunci] = selfResolveRule($rule, $src);
+                }
+            }
+        }
+    }
 
     // PENTING: pola harus riwayat sampai-header `)` (termasuk `\$i++`),
     // bukan berhenti di `;` — kalau berhenti di titik-semicolon, `bodyStart`
@@ -227,23 +641,11 @@ function expandRuleLoops(string $src): array
             continue; // guard: loop tak wajar / tak terhingga
         }
 
-        // Ambil isi body: lewati whitespace lalu `{` pembuka, sampai `}` penutup.
-        $bodyStart = $info[0][1] + strlen($info[0][0]);
-        $len = strlen($src);
-        while ($bodyStart < $len && ctype_space($src[$bodyStart])) {
-            $bodyStart++;
+        // Ambil isi body.
+        $body = loopBodyAt($src, $info[0][1] + strlen($info[0][0]));
+        if ($body === null) {
+            continue;
         }
-        if ($bodyStart >= $len || $src[$bodyStart] !== '{') {
-            continue; // bukan badan blok (mis. `for (...)` tanpa kurung kurawal)
-        }
-        $bodyStart++;
-        $depth = 1;
-        $i = $bodyStart;
-        for (; $i < $len && $depth > 0; $i++) {
-            if ($src[$i] === '{') { $depth++; }
-            elseif ($src[$i] === '}') { $depth--; }
-        }
-        $body = substr($src, $bodyStart, $i - $bodyStart - 1);
 
         // Cari assignment di dalam body, lalu ganti $var dengan tiap angka.
         // Tangkap EKSPESI kunci utuh (mis. `'obat_'.$b`), bukan hanya bagian
@@ -295,22 +697,41 @@ function ruleMap(string $absClass): array
     // Blok rules yang dipisah: $var = [ ... ]; lalu validate($var)
     if (preg_match_all('/->validate\(\s*\$(\w+)/', $src, $vars)) {
         foreach ($vars[1] as $vn) {
-            if (preg_match('/\$' . $vn . '\s*=\s*\[/', $src, $at, PREG_OFFSET_CAPTURE)) {
+            if (preg_match('/\$'.$vn.'\s*=\s*\[/', $src, $at, PREG_OFFSET_CAPTURE)) {
                 $start = strpos($src, '[', $at[0][1]);
-                if ($start === false) { continue; }
-                $depth = 0; $q = null; $len = strlen($src);
+                if ($start === false) {
+                    continue;
+                }
+                $depth = 0;
+                $q = null;
+                $len = strlen($src);
                 for ($i = $start; $i < $len; $i++) {
                     $c = $src[$i];
                     if ($q !== null) {
-                        if ($c === '\\' && $q === "'") { $i++; continue; }
-                        if ($c === $q) { $q = null; }
+                        if ($c === '\\' && $q === "'") {
+                            $i++;
+
+                            continue;
+                        }
+                        if ($c === $q) {
+                            $q = null;
+                        }
+
                         continue;
                     }
-                    if ($c === "'" || $c === '"') { $q = $c; continue; }
-                    if ($c === '[') { $depth++; } elseif ($c === ']') {
+                    if ($c === "'" || $c === '"') {
+                        $q = $c;
+
+                        continue;
+                    }
+                    if ($c === '[') {
+                        $depth++;
+                    } elseif ($c === ']') {
                         $depth--;
                         if ($depth === 0) {
-                            foreach (splitEntries(substr($src, $start + 1, $i - $start - 1)) as $k => $v) { $map[$k] ??= $v; }
+                            foreach (splitEntries(substr($src, $start + 1, $i - $start - 1)) as $k => $v) {
+                                $map[$k] ??= $v;
+                            }
                             break;
                         }
                     }
@@ -337,6 +758,52 @@ function ruleMap(string $absClass): array
             $map[$v] ??= $f[2];
         }
     }
+    // Aturan berbentuk variabel lokal: `'x' => $visus` — resolve ke array
+    // literal `$visus = [ ... ];` atau string `$visus = '...';` di file yang sama.
+    foreach ($map as $variabel => $rule) {
+        $r = trim($rule);
+        if (preg_match('/^\$(\w+)$/', $r, $m)) {
+            $vn = $m[1];
+            // Array literal: $visus = [ 'required', 'string', ... ];
+            // Elemen berbentuk konkatenasi (mis. 'regex:'.self::POLA) di-resolve
+            // dulu sebelum digabung — phpListValues akan memotong kutipnya.
+            if (preg_match('/\$'.preg_quote($vn, '/').'\s*=\s*\[([^\]]*)\]/s', $src, $mm)) {
+                $bagian = phpListValues($mm[1]);
+                foreach ($bagian as $i => $e) {
+                    // phpListValues sudah memotong kutip di ujung, jadi pola
+                    // menerima bentuk 'regex:X'.self::C maupun regex:X'.self::C.
+                    if (preg_match("/^'([^']*)'\s*\.\s*self::(\w+)$/", $e, $cm)
+                        || preg_match("/^([^']*)'\s*\.\s*self::(\w+)$/", $e, $cm)) {
+                        $rcArr = new ReflectionClass($absClass);
+                        if ($rcArr->hasConstant($cm[2])) {
+                            $bagian[$i] = $cm[1].$rcArr->getConstant($cm[2]);
+                        }
+                    }
+                }
+                $map[$variabel] = "'".implode('|', $bagian)."'";
+
+                continue;
+            }
+            // String literal: $visus = 'required|string';
+            if (preg_match('/\$'.preg_quote($vn, '/')."\s*=\s*'([^']*)'/", $src, $mm)) {
+                $map[$variabel] = "'".$mm[1]."'";
+            }
+        }
+        // Konkatenasi string + const kelas: 'regex:'.self::POLA_VISUS
+        elseif (preg_match("/^'([^']*)'\s*\.\s*self::(\w+)$/", $r, $m)) {
+            $rcSelf = new ReflectionClass($absClass);
+            if ($rcSelf->hasConstant($m[2])) {
+                $nilai = $rcSelf->getConstant($m[2]);
+                $map[$variabel] = "'".$m[1].$nilai."'";
+            }
+        }
+    }
+
+    // Hook rulesTambahan() pada subclass MCU spesialis.
+    foreach (expandRulesTambahan($src) as $variabel => $rule) {
+        $map[$variabel] ??= $rule;
+    }
+
     // Assignment per-baris: $rules['x'] = 'required|string';
     // (dipakai controller yang menambah aturan di dalam foreach)
     // Catatan: pakai preg_match_all (bukan preg_match) — build CLI container ini
@@ -350,11 +817,36 @@ REGEX;
         }
     }
 
+    // Aturan diwarisi dari kelas induk: subclass yang men-thin (mis. 9 form MCU
+    // yang extends McuSpesialistikController) tidak mendefinisikan aturan
+    // sendiri — semuanya ada di induknya.
+    $kelas = new ReflectionClass($absClass);
+    $induk = $kelas->getParentClass();
+    while ($induk) {
+        $srcInduk = file_get_contents($induk->getFileName());
+        // $absClass (bukan nama induk) yang dipakai agar `$this->slug`
+        // terbaca dari kelas KONKRET — kelas induk bisa abstract.
+        foreach (expandRuleKoleksi($srcInduk, $absClass) as $variabel => $rule) {
+            $map[$variabel] ??= $rule;
+        }
+        // Blok literal `$rules = [ 'a' => '...', ... ];` di kelas induk.
+        foreach (expandRuleBlocks($srcInduk) as $variabel => $rule) {
+            $map[$variabel] ??= $rule;
+        }
+        foreach (expandRuleLoops($srcInduk) as $variabel => $rule) {
+            $map[$variabel] ??= $rule;
+        }
+        $induk = $induk->getParentClass();
+    }
+
     // Aturan hasil ekspansi loop MENANG atas pembacaan lain: loop selalu
     // menulis ke $rules di dalam validated(), sedangkan pembacaan blok array
     // bisa menemukan string pesan dari method lain (mis. $errors[...] = "...").
     foreach (expandRuleLoops($src) as $variabel => $rule) {
         $map[$variabel] = $rule;
+    }
+    foreach (expandRuleKoleksi($src, $absClass) as $variabel => $rule) {
+        $map[$variabel] ??= $rule;
     }
 
     return $map;
@@ -363,29 +855,69 @@ REGEX;
 /** Pisahkan daftar literal PHP jadi elemen, hormati kutip & kurung. */
 function phpListValues(string $s): array
 {
-    $out = []; $buf = ''; $q = null; $depth = 0; $len = strlen($s);
+    $out = [];
+    $buf = '';
+    $q = null;
+    $depth = 0;
+    $len = strlen($s);
     for ($i = 0; $i < $len; $i++) {
         $c = $s[$i];
         if ($q !== null) {
-            if ($c === '\\' && $q === "'") { $buf .= $c.($s[$i+1] ?? ''); $i++; continue; }
-            if ($c === $q) { $q = null; }
+            if ($c === '\\' && $q === "'") {
+                $buf .= $c.($s[$i + 1] ?? '');
+                $i++;
+
+                continue;
+            }
+            if ($c === $q) {
+                $q = null;
+            }
             $buf .= $c;
+
             continue;
         }
-        if ($c === "'" || $c === '"') { $q = $c; $buf .= $c; continue; }
-        if ($c === '[' || $c === '(') { $depth++; }
-        if ($c === ']' || $c === ')') { $depth--; }
-        if ($c === ',' && $depth === 0) { $out[] = trim($buf); $buf = ''; continue; }
+        if ($c === "'" || $c === '"') {
+            $q = $c;
+            $buf .= $c;
+
+            continue;
+        }
+        if ($c === '[' || $c === '(') {
+            $depth++;
+        }
+        if ($c === ']' || $c === ')') {
+            $depth--;
+        }
+        if ($c === ',' && $depth === 0) {
+            $out[] = trim($buf);
+            $buf = '';
+
+            continue;
+        }
         $buf .= $c;
     }
-    if (trim($buf) !== '') { $out[] = trim($buf); }
+    if (trim($buf) !== '') {
+        $out[] = trim($buf);
+    }
 
     return array_values(array_filter(array_map(fn ($t) => trim(trim($t), "'\" "), $out), fn ($t) => $t !== ''));
 }
 
-
 function optsFromRule(string $rule, string $src): ?string
 {
+    // regex berisi alternasi pecahan Snellen (\d+/\d+) → kirim contoh valid.
+    // Pola lain yang tidak dikenal dibiarkan agar fallback biasa menang.
+    if (str_contains($rule, 'regex:') && str_contains($rule, '\\d+\\/\\d+')) {
+        return '6/6';
+    }
+    // regex durasi HH:MM (^\d{1,2}:\d{2}$) → kirim contoh valid.
+    if (str_contains($rule, 'regex:') && str_contains($rule, '\\d{1,2}:\\d{2}')) {
+        return '01:30';
+    }
+    // regex persentase/digit (mis. ^\d{1,3}%?$) → kirim contoh valid.
+    if (str_contains($rule, 'regex:') && str_contains($rule, '\\d{1,3}')) {
+        return '50';
+    }
     // Rule::in([ 'A', 'B' ])
     if (preg_match("/Rule::in\(\s*\[((?:[^\]]|\](?!\)))*)\]/s", $rule, $m)) {
         $vv = phpListValues($m[1]);
@@ -396,7 +928,10 @@ function optsFromRule(string $rule, string $src): ?string
     if (preg_match('/(?:^|\\||\[|,)\s*[\'\"]?in[\'\"]?:([^\'|\]]+)/', $rule, $m)) {
         $vv = phpListValues($m[1]);
         if ($vv !== []) {
-            return $vv[0];
+            // Checkbox pola legacy (hidden "0" + checkbox "1"): kirim nilai "1"
+            // supaya after() server benar-benar menguji cabang tercentang.
+            // Daftar lain (mis. `in:Ya,Tidak,N/A`) tetap pakai opsi pertama.
+            return (count($vv) === 2 && $vv[0] === '0' && $vv[1] === '1') ? '1' : $vv[0];
         }
     }
     // Rule::in($this->opsi('key')) / ::opsi("key")
@@ -466,6 +1001,16 @@ function buildPayload(string $absClass, int $fid): array
     $p = [];
     foreach (EmrHelper::objekVariabels($fid) as $v) {
         $rule = trim($rm[$v] ?? '');
+        // Checkbox pola legacy (hidden "0" + checkbox "1") yang nullable:
+        // JANGAN diisi payload — hidden "0" mengalahkan aturan in:0,1 dan
+        // after() server melewati grup bila tidak ada nilai selain "0"/kosong.
+        // Aturan `required|in:0,1` TIDAK dilewati (butuh nilai).
+        // Aturan enum NON-nullable harus tetap diisi — `in:0,1,2` (APGAR) bukan
+        // checkbox dan wajib mendapat nilai valid dari daftar.
+        if (! str_contains($rule, 'required')
+            && preg_match('/\bin:(0,1|1,0|on,off|off,on)(?:\s*(\||$))/', $rule)) {
+            continue;
+        }
         $o = $rule !== '' ? optsFromRule($rule, $src) : null;
         if ($o !== null) {
             $p[$v] = $o;
@@ -545,17 +1090,38 @@ function buildPayload(string $absClass, int $fid): array
             continue;
         }
         if (preg_match("/\bbetween:(\d+),(\d+)/", $rule, $m)) {
-            $p[$v] = (int) round((intval($m[1]) + intval($m[2])) / 2); continue;
+            $p[$v] = (int) round((intval($m[1]) + intval($m[2])) / 2);
+
+            continue;
         }
         // min:N / max:N terpisah (bukan between) -> pilih nilai yang memenuhi
-        if (preg_match("/\\bmin:(\\d+)\\b/", $rule, $mn) && preg_match('/\\b(integer|numeric)\\b/', $rule)) {
+        if (preg_match('/\\bmin:(\\d+)\\b/', $rule, $mn) && preg_match('/\\b(integer|numeric)\\b/', $rule)) {
             $lo = (int) $mn[1];
             $hi = preg_match("/\bmax:(\d+)\b/", $rule, $mx) ? (int) $mx[1] : null;
-            if ($hi !== null && $hi >= $lo) { $p[$v] = (int) round(($lo + $hi) / 2); continue; }
+            if ($hi !== null && $hi >= $lo) {
+                $p[$v] = (int) round(($lo + $hi) / 2);
+
+                continue;
+            }
             $default = ['40' => 120, '30' => 170, '20' => 80, '10' => 36, '5' => 20, '1' => 3, '0' => 1];
-            $p[$v] = $default[(string) $lo] ?? $lo; continue;
+            $p[$v] = $default[(string) $lo] ?? $lo;
+
+            continue;
         }
-        if (preg_match("/\bmax:(\d+)\b/", $rule, $mx) && preg_match('/\b(integer|numeric)\b/', $rule)) { $p[$v] = max(0, (int) floor(intval($mx[1]) / 2)); continue; }
+        if (preg_match("/\bmax:(\d+)\b/", $rule, $mx) && preg_match('/\b(integer|numeric)\b/', $rule)) {
+            $p[$v] = max(0, (int) floor(intval($mx[1]) / 2));
+
+            continue;
+        }
+        // max:N pada kolom teks → potong contok "Data Uji" agar muat.
+        if (preg_match("/\bmax:(\d+)\b/", $rule, $mx) && ! preg_match('/\b(integer|numeric|date)\b/', $rule)) {
+            $n = (int) $mx[1];
+            if ($n > 0) {
+                $p[$v] = mb_substr('Data Uji', 0, $n);
+
+                continue;
+            }
+        }
         if (preg_match("/'date'|H:i/", $rule) && preg_match('/integer|numeric/', $rule)) {
             $p[$v] = 1;
 
@@ -594,6 +1160,13 @@ function buildPayload(string $absClass, int $fid): array
             continue;
         }
         $p[$v] = 'Data Uji';
+    }
+
+    // Validasi lintas-field: p + a <= g (Asesmen Kebidanan, form 59).
+    // Angka default harness membuat p = a = g = 1 sehingga selalu melanggar;
+    // naikkan g supaya payload tetap layak.
+    if (isset($p['obstetrik_g'], $p['obstetrik_p'], $p['obstetrik_a'])) {
+        $p['obstetrik_g'] = max((int) $p['obstetrik_g'], (int) $p['obstetrik_p'] + (int) $p['obstetrik_a']);
     }
 
     return $p;

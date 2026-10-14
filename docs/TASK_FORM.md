@@ -197,32 +197,32 @@ Sebuah task berstatus ✅ bila **SEMUA** butir berikut terpenuhi:
 
 | Task | Nama Form | `slug` | `id_dash_menu` | ri/rj/igd/mcu | Status | Owner | Dokumen Konsep | Folder Controller/View | Catatan / Prasyarat |
 |---|---|---|---|---|---|---|---|---|---|
-| `EMR-059` | Asesmen Khusus Kebidanan & Penyakit Kandungan | `asesmen_kebidanan` | `13.253` | 1/1/0/0 | ⬜ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/AsesmenKebidanan/` · `moduls/EMR/AsesmenKebidanan/` | — |
-| `EMR-060` | Pengkajian Awal Keperawatan Perina | `pengkajian_perina` | `13.254` | 1/0/0/0 | ⬜ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/PengkajianPerina/` · `moduls/EMR/PengkajianPerina/` | — |
-| `EMR-061` | Pengkajian Awal Keperawatan Non-Perina | `pengkajian_non_perina` | `13.255` | 1/0/0/0 | ⬜ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/PengkajianNonPerina/` · `moduls/EMR/PengkajianNonPerina/` | — |
-| `EMR-062` | Kala I-IV | `kala_persalinan` | `13.256` | 1/0/0/0 | ⬜ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/KalaPersalinan/` · `moduls/EMR/KalaPersalinan/` | — |
-| `EMR-063` | Riwayat Persalinan Sekarang | `riwayat_persalinan` | `13.257` | 1/0/0/0 | ⬜ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/RiwayatPersalinan/` · `moduls/EMR/RiwayatPersalinan/` | — |
-| `EMR-064` | Pelaksanaan Bayi Baru Lahir | `bayi_baru_lahir` | `13.258` | 1/0/0/0 | ⬜ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/BayiBaruLahir/` · `moduls/EMR/BayiBaruLahir/` | — |
-| `EMR-065` | Riwayat Resusitasi Bayi | `riwayat_resusitasi_bayi` | `13.259` | 1/0/0/0 | ⬜ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/RiwayatResusitasiBayi/` · `moduls/EMR/RiwayatResusitasiBayi/` | — |
-| `EMR-066` | Penilaian Bayi dengan APGAR Score | `penilaian_bayi_dengan_apgar_score` | `13.260` | 1/0/0/0 | ⬜ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/PenilaianBayiDenganApgarScore/` · `moduls/EMR/PenilaianBayiDenganApgarScore/` | — |
+| `EMR-059` | Asesmen Khusus Kebidanan & Penyakit Kandungan | `asesmen_kebidanan` | `13.253` | 1/1/0/0 | ✅ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/AsesmenKebidanan/` · `moduls/EMR/AsesmenKebidanan/` | — |
+| `EMR-060` | Pengkajian Awal Keperawatan Perina | `pengkajian_perina` | `13.254` | 1/0/0/0 | ✅ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/PengkajianPerina/` · `moduls/EMR/PengkajianPerina/` | — |
+| `EMR-061` | Pengkajian Awal Keperawatan Non-Perina | `pengkajian_non_perina` | `13.255` | 1/0/0/0 | ✅ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/PengkajianNonPerina/` · `moduls/EMR/PengkajianNonPerina/` | — |
+| `EMR-062` | Kala I-IV | `kala_persalinan` | `13.256` | 1/0/0/0 | ✅ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/KalaPersalinan/` · `moduls/EMR/KalaPersalinan/` | — |
+| `EMR-063` | Riwayat Persalinan Sekarang | `riwayat_persalinan` | `13.257` | 1/0/0/0 | ✅ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/RiwayatPersalinan/` · `moduls/EMR/RiwayatPersalinan/` | — |
+| `EMR-064` | Pelaksanaan Bayi Baru Lahir | `bayi_baru_lahir` | `13.258` | 1/0/0/0 | ✅ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/BayiBaruLahir/` · `moduls/EMR/BayiBaruLahir/` | — |
+| `EMR-065` | Riwayat Resusitasi Bayi | `riwayat_resusitasi_bayi` | `13.259` | 1/0/0/0 | ✅ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/RiwayatResusitasiBayi/` · `moduls/EMR/RiwayatResusitasiBayi/` | — |
+| `EMR-066` | Penilaian Bayi dengan APGAR Score | `penilaian_bayi_dengan_apgar_score` | `13.260` | 1/0/0/0 | ✅ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/PenilaianBayiDenganApgarScore/` · `moduls/EMR/PenilaianBayiDenganApgarScore/` | — |
 | `EMR-067` | Down Score (Neonatal) | `down_score` | `13.261` | 1/0/0/0 | ⛔ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/DownScore/` · `moduls/EMR/DownScore/` | Tabel interpretasi Down Score legacy bolong (skor 6 tak tercakup) |
-| `EMR-068` | Inisiasi Menyusui Dini | `inisiasi_menyusui_dini` | `13.262` | 1/0/0/0 | ⬜ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/InisiasiMenyusuiDini/` · `moduls/EMR/InisiasiMenyusuiDini/` | — |
-| `EMR-069` | Skrining MDPK/MPP | `skrining_mpp` | `13.263` | 1/1/0/0 | ⬜ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/SkriningMpp/` · `moduls/EMR/SkriningMpp/` | — |
-| `EMR-070` | Kesimpulan MCU | `kesimpulan_mcu` | `14.273` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/KesimpulanMcu/` · `moduls/EMR/KesimpulanMcu/` | — |
-| `EMR-071` | Catatan Keperawatan / TTV MCU | `ttv_mcu` | `14.274` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/TtvMcu/` · `moduls/EMR/TtvMcu/` | — |
-| `EMR-072` | Visus Mata MCU | `visus_mata_mcu` | `14.275` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/VisusMataMcu/` · `moduls/EMR/VisusMataMcu/` | — |
-| `EMR-073` | Obstetri MCU | `obstetri_mcu` | `14.276` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/ObstetriMcu/` · `moduls/EMR/ObstetriMcu/` | — |
-| `EMR-074` | Penyakit Dalam MCU | `penyakit_dalam_mcu` | `14.277` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/PenyakitDalamMcu/` · `moduls/EMR/PenyakitDalamMcu/` | — |
-| `EMR-075` | Jantung MCU | `jantung_mcu` | `14.278` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/JantungMcu/` · `moduls/EMR/JantungMcu/` | — |
-| `EMR-076` | THT MCU | `tht_mcu` | `14.279` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/ThtMcu/` · `moduls/EMR/ThtMcu/` | — |
-| `EMR-077` | Mata MCU | `mata_mcu` | `14.280` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/MataMcu/` · `moduls/EMR/MataMcu/` | — |
-| `EMR-078` | Gigi MCU | `gigi_mcu` | `14.281` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/GigiMcu/` · `moduls/EMR/GigiMcu/` | — |
-| `EMR-079` | OBGYN MCU | `obgyn_mcu` | `14.282` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/ObgynMcu/` · `moduls/EMR/ObgynMcu/` | — |
-| `EMR-080` | Bedah MCU | `bedah_mcu` | `14.283` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/BedahMcu/` · `moduls/EMR/BedahMcu/` | — |
-| `EMR-081` | Neurologi MCU | `neurologi_mcu` | `14.284` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/NeurologiMcu/` · `moduls/EMR/NeurologiMcu/` | — |
-| `EMR-082` | Gizi MCU | `gizi_mcu` | `14.285` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/GiziMcu/` · `moduls/EMR/GiziMcu/` | — |
-| `EMR-083` | Urologi MCU | `urologi_mcu` | `14.286` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/UrologiMcu/` · `moduls/EMR/UrologiMcu/` | — |
-| `EMR-084` | Psikologi MCU | `psikologi_mcu` | `14.287` | 0/0/0/1 | ⬜ |  | KONSEP_FORM_MCU.md | `EMR/PsikologiMcu/` · `moduls/EMR/PsikologiMcu/` | — |
+| `EMR-068` | Inisiasi Menyusui Dini | `inisiasi_menyusui_dini` | `13.262` | 1/0/0/0 | ✅ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/InisiasiMenyusuiDini/` · `moduls/EMR/InisiasiMenyusuiDini/` | — |
+| `EMR-069` | Skrining MDPK/MPP | `skrining_mpp` | `13.263` | 1/1/0/0 | ✅ |  | KONSEP_OBSTETRI_NEONATAL.md | `EMR/SkriningMpp/` · `moduls/EMR/SkriningMpp/` | — |
+| `EMR-070` | Kesimpulan MCU | `kesimpulan_mcu` | `14.273` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/KesimpulanMcu/` · `moduls/EMR/KesimpulanMcu/` | — |
+| `EMR-071` | Catatan Keperawatan / TTV MCU | `ttv_mcu` | `14.274` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/TtvMcu/` · `moduls/EMR/TtvMcu/` | — |
+| `EMR-072` | Visus Mata MCU | `visus_mata_mcu` | `14.275` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/VisusMataMcu/` · `moduls/EMR/VisusMataMcu/` | — |
+| `EMR-073` | Obstetri MCU | `obstetri_mcu` | `14.276` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/ObstetriMcu/` · `moduls/EMR/ObstetriMcu/` | — |
+| `EMR-074` | Penyakit Dalam MCU | `penyakit_dalam_mcu` | `14.277` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/PenyakitDalamMcu/` · `moduls/EMR/PenyakitDalamMcu/` | — |
+| `EMR-075` | Jantung MCU | `jantung_mcu` | `14.278` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/JantungMcu/` · `moduls/EMR/JantungMcu/` | — |
+| `EMR-076` | THT MCU | `tht_mcu` | `14.279` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/ThtMcu/` · `moduls/EMR/ThtMcu/` | — |
+| `EMR-077` | Mata MCU | `mata_mcu` | `14.280` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/MataMcu/` · `moduls/EMR/MataMcu/` | — |
+| `EMR-078` | Gigi MCU | `gigi_mcu` | `14.281` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/GigiMcu/` · `moduls/EMR/GigiMcu/` | — |
+| `EMR-079` | OBGYN MCU | `obgyn_mcu` | `14.282` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/ObgynMcu/` · `moduls/EMR/ObgynMcu/` | — |
+| `EMR-080` | Bedah MCU | `bedah_mcu` | `14.283` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/BedahMcu/` · `moduls/EMR/BedahMcu/` | — |
+| `EMR-081` | Neurologi MCU | `neurologi_mcu` | `14.284` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/NeurologiMcu/` · `moduls/EMR/NeurologiMcu/` | — |
+| `EMR-082` | Gizi MCU | `gizi_mcu` | `14.285` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/GiziMcu/` · `moduls/EMR/GiziMcu/` | — |
+| `EMR-083` | Urologi MCU | `urologi_mcu` | `14.286` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/UrologiMcu/` · `moduls/EMR/UrologiMcu/` | — |
+| `EMR-084` | Psikologi MCU | `psikologi_mcu` | `14.287` | 0/0/0/1 | ✅ |  | KONSEP_FORM_MCU.md | `EMR/PsikologiMcu/` · `moduls/EMR/PsikologiMcu/` | — |
 
 ## 11. Fase P5 — Bedah, Anestesi & ICU
 
@@ -325,5 +325,6 @@ Task berikut **tidak bisa diselesaikan** tanpa keputusan manusia. Jangan dikerja
 | 2026-10-11 | **Fase P3 selesai 12/12 form** (kecuali 41 `⛔`) — form 49 Order Patologi, 50 Order Mikrobiologi, 51 Order POCT ✅. Ketiganya **TIDAK** memakai `emr_detail`: data order disimpan di tabel `order_patologi`, `order_mikrobiologi`, `order_poct` (+ `_detail`) seperti Order Laboratorium (form 6). **PRE-02/03/04 ✅**: satu migration `2026_10_11_000002` membuat keenam tabel (dual-driver), 6 model baru. `PenunjangHelper` kini generic total — menambah jenis order cukup menambah 1 baris di `PenunjangHelper::TABEL`, `::PREFIX`, dan `::MODEL`; `findOrder()`/`baseQuery()` tidak lagi bercabang `if ($jenis === 'lab')`. **Harness baru `tools/e2e_order.php`** untuk order: `tools/e2e.php` tidak bisa mengujinya karena butuh item baris dari Master Group Tindakan. Verifikasi akhir: **39 form, 1133 variabel, ALL OK** + **3 jenis order ALL OK**, pint bersih. |
 | 2026-10-11 | **PRE-05 ✅** — CRUD admin `Master Diet` (sub_menu 63) & `Master Diagnosa Diet` (sub_menu 64) di `Administrator → Manajemen Master`, mengikuti pola `MasterImplementasi` persis. 2 controller + 8 view (index/create/edit/_form per master), `MasterDietMenuSeeder` (idempotent, sekaligus memberi `user_akses` admin). 10 route auto-registered oleh `SubMenuRouteServiceProvider`; 6 halaman render 200; CRUD diuji end-to-end (create, tolak kode duplikat, update, soft delete). **Peringatan di form edit**: `nama_diet` adalah nilai yang TERSIMPAN di `emr_detail` (form 43 memvalidasi `exists:master_diet,nama_diet`) — mengubahnya memutus riwayat lama, jadi deskripsi diubah lewat kolom Keterangan. Regresi nihil: **39 form, 1133 variabel, ALL OK** + 3 jenis order. |
 | 2026-10-11 | **Verifikasi akhir P1+P2**: 30 form (16-38, 54-57, 123-125) lulus E2E penuh - **559 variabel**, `ALL OK`. Harness diperkuat: `min`/`max` hanya untuk kolom numerik, `phpListValues()` (pecah literal PHP hormati kutip/kurung), `Rule::exists()` objek + rantai `->where()`, blok rules `$var = [...]` yang di-*validate* via variabel, deteksi `array` tanpa kutip. Harness kini auto-bersihkan data uji di akhir run (sebelumnya meninggalkan 35 baris `emr` + 442 nilai "Data Uji"). `pint --test` bersih, 0 CJK/garbled. Integritas: objek 361, form 45, mapping 923, akses 98, menu 9, sub 31, extra 26, 0 data uji tersisa. |
+| 2026-10-14 | **Fase P4 Kebidanan selesai (kecuali 67 `⛔`)** — form 59–66 & 68 → ✅ (9 form, 401 variabel, ALL OK). Form 59 `AsesmenKebidanan` (77 var, cross-field `p+a<=g` ditangani di harness `lib_pay`), 60 `PengkajianPerina` (135 var, SAP head-to-toe + checkbox pola legacy), 62 `KalaPersalinan` (18 var, validasi duplikat kala per kunjungan + panel APGAR read-only). **Gotcha harness**: komentar `//` berkutip di dalam array literal `$rules` merusak parse key `ruleMap` (key berikutnya tertelan jadi bagian nilai entry sebelumnya) — hindari komentar di dalam array rules. `ruleMap` missing=0 untuk form 59/60. Regresi: jalankan `e2e.php 59,60,61,62,63,64,65,66,68`. |
 | 2026-10-10 | **Fase P1 selesai**: form 16, 17, 18, 19, 20, 21, 57 → ✅. Seeder (objek 178–235, menu 6–7, sub 33/34/53/54) + controller + blade. Semua terverifikasi E2E: store/mapping/index/update/delete + gate akses. 2 bug nyata ditemukan & diperbaiki (`Rule::requiredIf` wrong-arity di TriageIgd; `$metaTriase` undefined). |
 

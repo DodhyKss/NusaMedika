@@ -94,6 +94,19 @@ foreach ($ids as $fid) {
         $q->select('emr_id')->from('emr')->where('form_id', $fid);
     })->delete();
     DB::table('emr')->where('form_id', $fid)->delete();
+
+    // Kesimpulan MCU punya soft-gate: store ditolak bila BELUM ADA satupun
+    // form organ yang terisi pada kunjungan yang sama. Sebelum memanggil
+    // store, tanam satu EMR organ minimal (bedah_mcu, 5 variabel) lalu
+    // biarkan pembersihan akhir run menghapusnya bersama data uji lain.
+    if ($slug === 'kesimpulan_mcu') {
+        $organId = DB::table('form')->where('slug', 'bedah_mcu')->value('form_id');
+        if ($organId) {
+            $organVars = EmrHelper::objekVariabels((int) $organId);
+            $organPayload = buildPayload("App\\Http\\Controllers\\EMR\\BedahMcu\\BedahMcuController", (int) $organId);
+            EmrHelper::insert((int) $organId, array_intersect_key($organPayload, array_flip($organVars)), 12);
+        }
+    }
     auth()->loginUsingId($cu);
     session(['profesi_id' => profOf($cu)]);
     $rq = Request::create('/x', 'POST', $p);
