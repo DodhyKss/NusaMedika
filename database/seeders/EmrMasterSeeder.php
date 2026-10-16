@@ -34,6 +34,11 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_id' => 12, 'nama_menu' => 'ICU & Hemodialisa'],
             // ===== Fase P5 — Bedah & Anestesi =====
             ['dashboard_menu_id' => 15, 'nama_menu' => 'Bedah & Anestesi'],
+            // ===== Fase P6 — Onkologi & Darah =====
+            ['dashboard_menu_id' => 18, 'nama_menu' => 'Onkologi & Darah'],
+            // ===== Fase P6 — Psikososial & Kerohanian =====
+            ['dashboard_menu_id' => 16, 'nama_menu' => 'Psikososial & Kerohanian'],
+            ['dashboard_menu_id' => 17, 'nama_menu' => 'Surveilans Infeksi'],
         ];
         foreach ($menus as $menu) {
             DB::table('dashboard_menu')->updateOrInsert(
@@ -195,6 +200,49 @@ class EmrMasterSeeder extends Seeder
             ['dashboard_menu_sub_id' => 306, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Surveilans Luka Insisi'],
             ['dashboard_menu_sub_id' => 307, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Catatan Anestesia'],
             ['dashboard_menu_sub_id' => 309, 'dashboard_menu_id' => 15, 'nama_sub_menu' => 'Asesmen Katarak'],
+            // ===== Fase P6 — Onkologi & Darah (menu 18) =====
+            ['dashboard_menu_sub_id' => 353, 'dashboard_menu_id' => 18, 'nama_sub_menu' => 'Asesmen Kemoterapi'],
+            ['dashboard_menu_sub_id' => 354, 'dashboard_menu_id' => 18, 'nama_sub_menu' => 'Pemantauan Kemoterapi'],
+            ['dashboard_menu_sub_id' => 355, 'dashboard_menu_id' => 18, 'nama_sub_menu' => 'Asesmen Pemberian Darah'],
+            // Sub 356 memakai ejaan "Assesmen" (dua s) supaya Str::slug() persis
+            // sama dengan form.slug `assesmen_transfusi` (terkunci ALOKASI §7).
+            // Nama satu-s ("Asesmen Transfusi") membuat DynamicFormController::
+            // delegateToSpecificController() 404 saat store/update dari dashboard.
+            ['dashboard_menu_sub_id' => 356, 'dashboard_menu_id' => 18, 'nama_sub_menu' => 'Assesmen Transfusi'],
+            ['dashboard_menu_sub_id' => 357, 'dashboard_menu_id' => 18, 'nama_sub_menu' => 'Monitoring Transfusi'],
+            ['dashboard_menu_sub_id' => 358, 'dashboard_menu_id' => 18, 'nama_sub_menu' => 'Double Check High Alert'],
+            // ===== Fase P6 — Psikososial & Kerohanian (menu 16) =====
+            // Sub 313/314 memakai ejaan "Assesmen" (dua s) supaya Str::slug()
+            // persis sama dengan form.slug (terkunci ALOKASI §7) dan
+            // Str::studly() cocok dengan folder controller AssesmenPsikologi /
+            // AssesmenSpiritual. Nama satu-s ("Asesmen Psikologi") membuat
+            // dashboard menampilkan halaman Unsupported: fallback view
+            // `moduls.EMR.{slug}.index` tidak ada dan studly-nya salah folder.
+            // Preseden: sub 10 produksi ("Assesmen Awal Medis Rawat Jalan",
+            // dua s) & sub 356 Batch A.
+            ['dashboard_menu_sub_id' => 313, 'dashboard_menu_id' => 16, 'nama_sub_menu' => 'Assesmen Psikologi'],
+            ['dashboard_menu_sub_id' => 314, 'dashboard_menu_id' => 16, 'nama_sub_menu' => 'Assesmen Spiritual'],
+            ['dashboard_menu_sub_id' => 315, 'dashboard_menu_id' => 16, 'nama_sub_menu' => 'Permintaan Kerohanian'],
+            ['dashboard_menu_sub_id' => 316, 'dashboard_menu_id' => 16, 'nama_sub_menu' => 'Bukti Kerohanian'],
+            // ===== Fase P6 — Surveilans Infeksi (menu 17, KONSEP_SURVEILANS_INFEKSI.md) =====
+            // Sub 333 tanpa "/" (Str::slug membuang slash tanpa separator); sub 338
+            // "Asesmen Restraint" satu s = form.slug `asesmen_restraint` (lihat §1 KONSEP).
+            ['dashboard_menu_sub_id' => 333, 'dashboard_menu_id' => 17, 'nama_sub_menu' => 'Surveilans CVC PICC'],
+            ['dashboard_menu_sub_id' => 334, 'dashboard_menu_id' => 17, 'nama_sub_menu' => 'Surveilans IV Catheter'],
+            ['dashboard_menu_sub_id' => 335, 'dashboard_menu_id' => 17, 'nama_sub_menu' => 'Surveilans Kateter Urine'],
+            ['dashboard_menu_sub_id' => 336, 'dashboard_menu_id' => 17, 'nama_sub_menu' => 'Surveilans Tirah Baring'],
+            ['dashboard_menu_sub_id' => 337, 'dashboard_menu_id' => 17, 'nama_sub_menu' => 'Screening Akses'],
+            ['dashboard_menu_sub_id' => 338, 'dashboard_menu_id' => 17, 'nama_sub_menu' => 'Asesmen Restraint'],
+            ['dashboard_menu_sub_id' => 339, 'dashboard_menu_id' => 17, 'nama_sub_menu' => 'Observasi Restraint'],
+            // ===== Fase P6 — Formulir & Rujukan (menu 5, KONSEP_FORMULIR_RUJUKAN.md) =====
+            // Sub 236 sengaja TANPA "&" maupun kata penghubung — Str::slug()
+            // membuang karakter tsb, bukan menggantinya (lihat §1 KONSEP).
+            ['dashboard_menu_sub_id' => 233, 'dashboard_menu_id' => 5, 'nama_sub_menu' => 'Rekam Medis Rujukan'],
+            ['dashboard_menu_sub_id' => 234, 'dashboard_menu_id' => 5, 'nama_sub_menu' => 'Surat Keterangan Sehat'],
+            ['dashboard_menu_sub_id' => 235, 'dashboard_menu_id' => 5, 'nama_sub_menu' => 'Pesan Penunjang'],
+            ['dashboard_menu_sub_id' => 236, 'dashboard_menu_id' => 5, 'nama_sub_menu' => 'SPRI Rujukan Balik'],
+            // ===== Fase P6 — Katalog Form Blanko (form 129, KONSEP_KATALOG_FORM_BLANKO.md §7.1) =====
+            ['dashboard_menu_sub_id' => 373, 'dashboard_menu_id' => 5, 'nama_sub_menu' => 'Katalog Form Blanko'],
         ];
         foreach ($subMenus as $subMenu) {
             DB::table('dashboard_menu_sub')->updateOrInsert(
@@ -381,6 +429,34 @@ class EmrMasterSeeder extends Seeder
             ['form_id' => 98, 'nama_form' => 'Surveilans Luka Insisi', 'slug' => 'surveilans_luka_insisi', 'id_dash_menu' => '15.306', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
             ['form_id' => 99, 'nama_form' => 'Catatan Anestesia', 'slug' => 'catatan_anestesia', 'id_dash_menu' => '15.307', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
             ['form_id' => 101, 'nama_form' => 'Asesmen Katarak', 'slug' => 'asesmen_katarak', 'id_dash_menu' => '15.309', 'ri' => 0, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
+            // ===== Fase P6 — Onkologi & Darah (menu 18) =====
+            ['form_id' => 106, 'nama_form' => 'Asesmen Kemoterapi', 'slug' => 'asesmen_kemoterapi', 'id_dash_menu' => '18.353', 'ri' => 1, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 107, 'nama_form' => 'Pemantauan Kemoterapi', 'slug' => 'pemantauan_kemoterapi', 'id_dash_menu' => '18.354', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 108, 'nama_form' => 'Asesmen Pasien dengan Darah', 'slug' => 'asesmen_pemberian_darah', 'id_dash_menu' => '18.355', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 109, 'nama_form' => 'Assesmen Transfusi', 'slug' => 'assesmen_transfusi', 'id_dash_menu' => '18.356', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 110, 'nama_form' => 'Monitoring Transfusi Darah', 'slug' => 'monitoring_transfusi', 'id_dash_menu' => '18.357', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 111, 'nama_form' => 'Double Check Obat High Alert', 'slug' => 'double_check_high_alert', 'id_dash_menu' => '18.358', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            // ===== Fase P6 — Psikososial & Kerohanian (menu 16) =====
+            ['form_id' => 112, 'nama_form' => 'Asesmen Psikologi Pasien & Keluarga', 'slug' => 'assesmen_psikologi', 'id_dash_menu' => '16.313', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 113, 'nama_form' => 'Asesmen Spiritual', 'slug' => 'assesmen_spiritual', 'id_dash_menu' => '16.314', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 114, 'nama_form' => 'Permintaan Pelayanan Kerohanian', 'slug' => 'permintaan_kerohanian', 'id_dash_menu' => '16.315', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 115, 'nama_form' => 'Bukti Pelayanan Kerohanian', 'slug' => 'bukti_kerohanian', 'id_dash_menu' => '16.316', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            // ===== Fase P6 — Surveilans Infeksi & Restraint (116–122, KONSEP_SURVEILANS_INFEKSI.md) =====
+            ['form_id' => 116, 'nama_form' => 'Surveilans Pasien Terpasang CVC/PICC', 'slug' => 'surveilans_cvc_picc', 'id_dash_menu' => '17.333', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 117, 'nama_form' => 'Surveilans Pasien Terpasang IV Catheter Perifer', 'slug' => 'surveilans_iv_catheter', 'id_dash_menu' => '17.334', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 118, 'nama_form' => 'Surveilans Pasien Terpasang Kateter Urine', 'slug' => 'surveilans_kateter_urine', 'id_dash_menu' => '17.335', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 119, 'nama_form' => 'Surveilans Pasien Tirah Baring Total', 'slug' => 'surveilans_tirah_baring', 'id_dash_menu' => '17.336', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 120, 'nama_form' => 'Screening Akses Vaskular', 'slug' => 'screening_akses', 'id_dash_menu' => '17.337', 'ri' => 1, 'rj' => 0, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 121, 'nama_form' => 'Asesmen Pasien Restraint', 'slug' => 'asesmen_restraint', 'id_dash_menu' => '17.338', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 122, 'nama_form' => 'Observasi Restraint', 'slug' => 'observasi_restraint', 'id_dash_menu' => '17.339', 'ri' => 1, 'rj' => 0, 'igd' => 0, 'mcu' => 0],
+            // ===== Fase P6 — Formulir & Rujukan (58 & 126–128, KONSEP_FORMULIR_RUJUKAN.md) =====
+            ['form_id' => 58, 'nama_form' => 'Rekam Medis Rujukan', 'slug' => 'rekam_medis_rujukan', 'id_dash_menu' => '5.233', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            ['form_id' => 126, 'nama_form' => 'Surat Keterangan Sehat', 'slug' => 'surat_keterangan_sehat', 'id_dash_menu' => '5.234', 'ri' => 0, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
+            ['form_id' => 127, 'nama_form' => 'Pesan Bedah / Cathlab / Endoscopy / ESWL', 'slug' => 'pesan_penunjang', 'id_dash_menu' => '5.235', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 0],
+            // nama_form pakai "&" (ALOKASI §6) — slug tetap dari sub 236 `SPRI Rujukan Balik`.
+            ['form_id' => 128, 'nama_form' => 'SPRI & Program Rujukan Balik', 'slug' => 'spri_rujukan_balik', 'id_dash_menu' => '5.236', 'ri' => 1, 'rj' => 1, 'igd' => 0, 'mcu' => 0],
+            // ===== Fase P6 — Katalog Form Blanko (129) — TANPA objek & TANPA mapping =====
+            ['form_id' => 129, 'nama_form' => 'Katalog Form Blanko', 'slug' => 'katalog_form_blanko', 'id_dash_menu' => '5.373', 'ri' => 1, 'rj' => 1, 'igd' => 1, 'mcu' => 1],
             // ===== Fase P4 — Medical Check Up (menu 14) =====
             ['form_id' => 70, 'nama_form' => 'Kesimpulan MCU', 'slug' => 'kesimpulan_mcu', 'id_dash_menu' => '14.273', 'ri' => 0, 'rj' => 0, 'igd' => 0, 'mcu' => 1],
             ['form_id' => 71, 'nama_form' => 'Catatan Keperawatan / TTV MCU', 'slug' => 'ttv_mcu', 'id_dash_menu' => '14.274', 'ri' => 0, 'rj' => 0, 'igd' => 0, 'mcu' => 1],
@@ -800,6 +876,161 @@ class EmrMasterSeeder extends Seeder
             974 => 'Intervensi Pre Operasi Katarak', 975 => 'Intervensi Post Operasi Katarak',
             976 => 'Skala Nyeri Katarak', 977 => 'Jadwal Pemberian Obat Katarak',
             978 => 'Pemeriksaan Mata Katarak', 979 => 'Visus Pasca Operasi Katarak',
+            // ===== Fase P6 — Onkologi & Darah (993–1032, KONSEP_ONKOLOGI_TRANSFUSI.md) =====
+            // Form 106 Asesmen Kemoterapi
+            993 => 'Siklus & Regimen Kemoterapi',
+            994 => 'DPJP Utama',
+            995 => 'Hasil Penunjang Terjadwal',
+            996 => 'Tanggal Pemberian Obat Kemoterapi',
+            997 => 'Pemasangan Alat Akses',
+            998 => 'Jenis Obat Kemoterapi',
+            999 => 'Reaksi Kemoterapi',
+            1000 => 'Kondisi Rahim',
+            1001 => 'Perawat & Keluarga Pendamping',
+            1002 => 'Masalah Keperawatan Kemoterapi',
+            // Form 107 Pemantauan Kemoterapi
+            1003 => 'Tanggal & Jam Pemantauan Kemoterapi',
+            1004 => 'Pemberian Premedikasi',
+            1005 => 'Jam Monitoring Kemoterapi',
+            1006 => 'Cairan & Obat Kemoterapi',
+            1007 => 'Keluhan & Efek Samping Obat',
+            1008 => 'Total Cairan Kemoterapi (cc)',
+            // Form 108 Asesmen Pasien dengan Darah
+            1009 => 'Golongan Darah & Rh',
+            1010 => 'Dasar Penentuan Golongan Darah',
+            1011 => 'Jenis Darah yang Diminta',
+            1012 => 'Jumlah Darah yang Diminta',
+            1013 => 'Alasan Transfusi',
+            1014 => 'Riwayat Transfusi & Reaksi Alergi',
+            1015 => 'Tanggal Permintaan Darah',
+            1016 => 'Dokter Pemohon Darah',
+            // Form 109 Assesmen Transfusi
+            1017 => 'Tanggal & Waktu Persiapan Transfusi',
+            1018 => 'Identitas Labu Darah',
+            1019 => 'Keadaan Umum & Keluhan',
+            1020 => 'Verifikasi Ganda Darah - Perawat 1',
+            1021 => 'Verifikasi Ganda Darah - Perawat 2',
+            1022 => 'Petugas Verifikasi Transfusi',
+            // Form 110 Monitoring Transfusi Darah
+            1023 => 'No. Labu Darah (Monitoring)',
+            1024 => 'Darah Masuk per Ronde (cc)',
+            1025 => 'Komponen Darah',
+            1026 => 'Gejala Fisik Transfusi',
+            1027 => 'Tanda Tanda Vital during Transfusi',
+            1028 => 'Tindakan & Catatan Transfusi',
+            1029 => 'Keluhan Pasien',
+            // Form 111 Double Check Obat High Alert
+            1030 => 'Tanggal & Jam Pemberian High Alert',
+            1031 => 'Pengecekan 5 Benar - Perawat 1',
+            1032 => 'Pengecekan 5 Benar & Verifikasi Ganda',
+            // ===== Fase P6 — Psikososial & Kerohanian (671–690, KONSEP_PSIKOSOSIAL_KEROHANIAN.md) =====
+            // Form 112 Asesmen Psikologi
+            671 => 'Ketersediaan Orang yang Dapat Dihubungi',
+            672 => 'Nama Keluarga yang Dihubungi',
+            673 => 'Status/Hubungan Keluarga',
+            674 => 'Alamat Keluarga',
+            675 => 'No. HP/Telp. Keluarga',
+            676 => 'Rencana Perawatan Selanjutnya',
+            677 => 'Persiapan Lingkungan Rumah',
+            678 => 'Nama Perawat di Rumah',
+            679 => 'Perlu Fasilitasi Rumah Sakit',
+            680 => 'Reaksi Pasien atas Penyakitnya',
+            681 => 'Kebutuhan Pribadi & Reaksi Keluarga',
+            // Form 113 Asesmen Spiritual
+            682 => 'Masalah Keperawatan (Manajemen Gejala)',
+            683 => 'Perlu Pelayanan & Kebutuhan Kerohanian',
+            684 => 'Petugas Kerohanian',
+            // Form 114 & 115 — Permintaan / Bukti Pelayanan Kerohanian
+            685 => 'Nama Petugas Kerohanian',
+            686 => 'Umur Petugas Kerohanian',
+            687 => 'Jenis Kelamin Petugas Kerohanian',
+            688 => 'Agama Petugas Kerohanian',
+            689 => 'Tanggal & Waktu Pelayanan Kerohanian',
+            690 => 'Hari & Tempat Pelayanan Kerohanian',
+            // ===== Fase P6 — Surveilans Infeksi & Restraint (691–729, KONSEP_SURVEILANS_INFEKSI.md §10) =====
+            // Form 116 Surveilans CVC/PICC
+            691 => 'Lokasi Pemasangan CVC/PICC',
+            692 => 'Nomor Kateter CVC/PICC',
+            693 => 'Jenis CVC/PICC (Lumen)',
+            694 => 'Status Pemasangan & Pelepasan CVC/PICC',
+            695 => 'Tanggal Pemasangan & Pelepasan CVC/PICC',
+            696 => 'Item Pencegahan BSI - Kebersihan Tangan & Aseptik',
+            697 => 'Item Pencegahan BSI - Alat Pelindung, Antiseptik & Dressing',
+            698 => 'Gejala & Tanda BSI (Kriteria CLABSI)',
+            // Form 117 Surveilans IV Catheter Perifer
+            699 => 'Lokasi IV Catheter',
+            700 => 'Nomor IV Catheter',
+            701 => 'Jenis Cairan/Terapi',
+            702 => 'Item Pencegahan IV - Pemasangan, Nomor & Cairan',
+            703 => 'Item Pencegahan IV - Fiksasi, Tangan, Dressing & Dokumentasi',
+            704 => 'Skor & Gejala PIVAS',
+            705 => 'Tanggal Pemasangan & Pelepasan IV Catheter',
+            // Form 118 Surveilans Kateter Urine
+            706 => 'Jenis Kateter Urine',
+            707 => 'Nomor Kateter Urine',
+            708 => 'Item Pencegahan ISK - Aseptik, Posisi Kateter & Perawatan Urin Bag',
+            709 => 'Item Pencegahan ISK - Gelas Ukur & Indikasi',
+            710 => 'Gejala & Tanda ISK',
+            711 => 'Tanggal Pemasangan & Pelepasan Kateter Urine',
+            // Form 119 Surveilans Tirah Baring Total (HAP)
+            712 => 'Bundle Pencegahan HAP',
+            713 => 'Suhu Tubuh & Leukosit pada Gejala HAP',
+            714 => 'Antibiotik yang Diberikan',
+            715 => 'Sekresi Trakea & Hasil Kultur Sputum',
+            // Form 120 Screening Akses Vaskular
+            716 => 'Jenis Screening Akses',
+            717 => 'Kondisi Akses & Steal Syndrome',
+            718 => 'Kondisi CDL, Exit Site & Kondisi Pasien',
+            719 => 'Tanda CDL Disfungsi/Malfungsi & Terkait Pasien',
+            // Form 121 Asesmen Pasien Restraint
+            720 => 'Penilaian Gaduh Gelisah & Order Dokter',
+            721 => 'Kebutuhan Restraint Non Farmakologis',
+            722 => 'Restraint Farmakologis',
+            723 => 'Kriteria Penghentian Restraint',
+            724 => 'Status Mental',
+            725 => 'Informasi & Edukasi Pasien/Keluarga',
+            // Form 122 Observasi Restraint (objek formula, KONSEP §9)
+            726 => 'Fungsi Kognitif',
+            727 => 'Tanda Cedera / Luka',
+            728 => 'Asupan Makanan, Minuman & Posisi Fiksasi',
+            729 => 'PANSS-EC (Dokter)',
+            // ===== Fase P6 — Formulir & Rujukan (730–761, KONSEP_FORMULIR_RUJUKAN.md) =====
+            // Form 58 Rekam Medis Rujukan
+            730 => 'Tanggal Pengantar & Rencana Rawat',
+            731 => 'Tingkat Urgensi Rujukan',
+            732 => 'Indikasi Rawat Inap',
+            733 => 'Rencana Pemeriksaan Penunjang',
+            734 => 'Terapi Perawatan',
+            735 => 'Dokter Rawat Pengirim',
+            736 => 'Kebutuhan Pelayanan',
+            737 => 'Kebutuhan Kamar',
+            738 => 'Data Pendamping Pasien',
+            // Form 126 Surat Keterangan Sehat
+            739 => 'Nomor Surat Keterangan Sehat',
+            740 => 'Hasil Pemeriksaan Fisik',
+            741 => 'Pemeriksaan Mata',
+            // Form 127 Pesan Bedah / Cathlab / Endoscopy / ESWL
+            742 => 'Jenis Pesan Penunjang',
+            743 => 'Asal Ruangan Entry & Unit Pelaksanaan',
+            744 => 'Jenis Tindakan Penunjang',
+            745 => 'Tanggal & Jam Rencana Tindakan',
+            746 => 'Jam Keputusan SC / EMERGENCY',
+            747 => 'Rencana Masuk Ruangan',
+            748 => 'No. Handphone & Kontak Keluarga',
+            749 => 'Alat Khusus yang Diperlukan',
+            750 => 'Status SC / SC Emergency / IC',
+            751 => 'Pre Tindakan, Anestesi & Dokter Operator',
+            // Form 128 SPRI & Program Rujukan Balik
+            752 => 'Jenis Formulir',
+            753 => 'Nomor SEP & No. Rujukan',
+            754 => 'Alasan Rujukan Balik',
+            755 => 'Persiapan Tindakan',
+            756 => 'Rencana Pemeriksaan Penunjang',
+            757 => 'Terapi & Obat yang Masih Diberikan',
+            758 => 'Anjuran & Instruksi',
+            759 => 'Tanggal Kontrol Rujukan Balik',
+            760 => 'Dokter Pengarah',
+            761 => 'Faskes Tujuan Rujukan Balik',
         ];
         foreach ($objeks as $objekId => $namaObjek) {
             DB::table('objek')->updateOrInsert(
@@ -2655,6 +2886,312 @@ class EmrMasterSeeder extends Seeder
             $mapping[101]['visus_kanan_'.$i] = 978;
             $mapping[101]['visus_kiri_'.$i] = 979;
         }
+        // ===== Fase P6 — form 106 Asesmen Kemoterapi (KONSEP §3, 32 var) =====
+        $mapping[106] = [
+            'tanggal_asesmen' => 155, 'waktu_asesmen' => 156,
+            'riwayat_operasi' => 61, 'riwayat_kemoterapi' => 52, 'riwayat_radioterapi' => 53,
+            'siklus' => 993, 'protokol' => 993, 'dpjp_utama' => 994, 'diagnosis' => 40,
+            'penunjang_1' => 995, 'penunjang_2' => 995, 'penunjang_3' => 995, 'penunjang_4' => 995,
+            'tanggal_pemberian_obat' => 996, 'pasang_alat' => 997, 'jenis_obat' => 998,
+            'reaksi_kemoterapi' => 999, 'ket_reaksi' => 999, 'kondisi_rahim' => 1000,
+            'perawat_kemoterapi' => 1001, 'keluarga_kemoterapi' => 1001,
+            'nyeri_kemoterapi' => 1002, 'isi_nyeri_kemoterapi' => 1002,
+            'resiko_kemoterapi' => 1002, 'isi_resiko_kemoterapi' => 1002,
+            'cemas_kemoterapi' => 1002, 'isi_cemas_kemoterapi' => 1002,
+            'nutrisi_kemoterapi' => 1002, 'isi_nutrisi_kemoterapi' => 1002,
+            'infeksi_kemoterapi' => 1002, 'isi_infeksi_kemoterapi' => 1002,
+            'skala_nyeri' => 140,
+        ];
+        // ===== Fase P6 — form 107 Pemantauan Kemoterapi (KONSEP §4, 254 var) =====
+        // Var TTV tanpa suffix TIDAK dideklarasi — tiap baris memakai suffix
+        // (sistolik_1..dst) supaya tidak ada var mati yang tak pernah dikirim.
+        $mapping[107] = [
+            'tanggal_pemantauan' => 1003, 'jam_pemantauan' => 1003,
+            'total_cairan' => 1008, 'perawat_ruangan' => 82,
+        ];
+        for ($baris = 1; $baris <= 5; $baris++) {
+            $mapping[107]['premed_'.$baris] = 1004;
+            $mapping[107]['premed_dosis_'.$baris] = 1004;
+        }
+        for ($baris = 1; $baris <= 20; $baris++) {
+            $mapping[107]['jam_'.$baris] = 1005;
+            $mapping[107]['cairan_'.$baris] = 1006;
+            $mapping[107]['obat_'.$baris] = 1006;
+            $mapping[107]['dosis_'.$baris] = 1006;
+            $mapping[107]['sistolik_'.$baris] = 6;
+            $mapping[107]['diastolik_'.$baris] = 7;
+            $mapping[107]['nadi_'.$baris] = 10;
+            $mapping[107]['pernapasan_'.$baris] = 12;
+            $mapping[107]['suhu_'.$baris] = 11;
+            $mapping[107]['skala_nyeri_'.$baris] = 140;
+            $mapping[107]['keluhan_'.$baris] = 1007;
+            $mapping[107]['efek_samping_'.$baris] = 1007;
+        }
+        // ===== Fase P6 — form 108 Asesmen Pasien dengan Darah (KONSEP §5, 12 var) =====
+        $mapping[108] = [
+            'golongan_darah' => 1009, 'rhesus' => 1009, 'dasar_penentuan' => 1010,
+            'nomor_hasil_lab' => 1010,
+            'jenis_darah' => 1011, 'jumlah_darah' => 1012, 'alasan_transfusi' => 1013,
+            'pernah_transfusi' => 1014, 'reaksi_alergi' => 1014,
+            'pantangan_transfusi' => 29, 'tanggal_permintaan' => 1015,
+            'dokter_pemohon_id' => 1016,
+        ];
+        // ===== Fase P6 — form 109 Assesmen Transfusi (KONSEP §6, 22 var) =====
+        $mapping[109] = [
+            'tanggal_persiapan' => 1017, 'waktu_persiapan' => 1017,
+            'no_labu_darah' => 1018, 'jumlah_labu_darah' => 1018, 'jenis_labu_darah' => 1018,
+            'keadaan_umum' => 1019, 'keluhan' => 1019,
+            'dc1_identitas' => 1020, 'dc1_jumlah' => 1020, 'dc1_jenis' => 1020, 'dc1_golongan' => 1020,
+            'dc2_identitas' => 1021, 'dc2_jumlah' => 1021, 'dc2_jenis' => 1021, 'dc2_golongan' => 1021,
+            'perawat_1_id' => 1022, 'perawat_2_id' => 1022,
+            'sistolik' => 6, 'diastolik' => 7, 'nadi' => 10, 'pernapasan' => 12, 'suhu' => 11,
+        ];
+        // ===== Fase P6 — form 110 Monitoring Transfusi Darah (KONSEP §7, 33 var) =====
+        $mapping[110] = [
+            'tanggal_evaluasi' => 155, 'jam' => 156,
+            'no_labu_darah' => 1023, 'darah_masuk' => 1024, 'komponen_darah' => 1025,
+            'tindakan' => 1028, 'keluhan' => 1029, 'skala_nyeri' => 140,
+            'sistolik' => 6, 'diastolik' => 7, 'nadi' => 10, 'pernapasan' => 12, 'suhu' => 11,
+        ];
+        for ($i = 1; $i <= 10; $i++) {
+            $mapping[110]['gejala_'.$i] = 1026;
+            $mapping[110]['tanda_'.$i] = 1027;
+        }
+        // ===== Fase P6 — form 111 Double Check Obat High Alert (KONSEP §8, 231 var) =====
+        $mapping[111] = [
+            'tanggal_pemberian' => 1030, 'waktu_pemberian' => 1030,
+            'cek_identitas_p1' => 1032, 'cek_identitas_p2' => 1032,
+            'cek_jumlah_p1' => 1032, 'cek_jumlah_p2' => 1032,
+            'cek_jenis_p1' => 1032, 'cek_jenis_p2' => 1032,
+            'perawat_1_id' => 82, 'perawat_2_id' => 82,
+            'jumlah_baris' => null, // TURUNAN — objek_id NULL (PANDUAN §2.6)
+        ];
+        for ($baris = 1; $baris <= 20; $baris++) {
+            $mapping[111]['ha_obat_'.$baris] = 69;
+            $mapping[111]['ha_p1_identitas_'.$baris] = 1031;
+            $mapping[111]['ha_p1_obat_'.$baris] = 1031;
+            $mapping[111]['ha_p1_dosis_'.$baris] = 1031;
+            $mapping[111]['ha_p1_cara_'.$baris] = 1031;
+            $mapping[111]['ha_p1_waktu_'.$baris] = 1031;
+            $mapping[111]['ha_p2_identitas_'.$baris] = 1032;
+            $mapping[111]['ha_p2_obat_'.$baris] = 1032;
+            $mapping[111]['ha_p2_dosis_'.$baris] = 1032;
+            $mapping[111]['ha_p2_cara_'.$baris] = 1032;
+            $mapping[111]['ha_p2_waktu_'.$baris] = 1032;
+        }
+        // ===== Fase P6 — form 112 Asesmen Psikologi (KONSEP §3, 34 var) =====
+        // Item checkbox WAJIB bersuffix (emrDetailByVariabel menimpa baris
+        // dengan variabel sama) — pola butir Bundle VAP form 14.
+        $mapping[112] = [
+            'hubungan_keluarga' => 671, 'nama_keluarga' => 672, 'status_keluarga' => 673,
+            'alamat_keluarga' => 674, 'hp_keluarga' => 675, 'rencana_rawat' => 676,
+            'lingkungan' => 677, 'perawat_rumah' => 678, 'fasilitasi_rs' => 679,
+            'tanggal_asesmen' => 155, 'waktu_asesmen' => 156,
+        ];
+        for ($i = 1; $i <= 8; $i++) {
+            $mapping[112]['psi_info_'.$i] = 680;
+        }
+        $mapping[112]['psi_masalah_1'] = 681;
+        $mapping[112]['psi_masalah_2'] = 681;
+        for ($i = 1; $i <= 10; $i++) {
+            $mapping[112]['psi_keluarga_'.$i] = 681;
+        }
+        for ($i = 1; $i <= 3; $i++) {
+            $mapping[112]['psi_mk_keluarga_'.$i] = 681;
+        }
+        // ===== Fase P6 — form 113 Asesmen Spiritual (KONSEP §4, 16 var) =====
+        $mapping[113] = [
+            'spiritual' => 683, 'rohani_1' => 683, 'rohani_2' => 683, 'rohani_3' => 683,
+            'petugas_spiritual' => 684, 'petugas_rohani_1' => 684,
+            'petugas_rohani_2' => 684, 'petugas_rohani_3' => 684,
+        ];
+        for ($i = 1; $i <= 8; $i++) {
+            $mapping[113]['masalah_'.$i] = 682;
+        }
+        // ===== Fase P6 — form 114 Permintaan Pelayanan Kerohanian (KONSEP §5, 4 var) =====
+        $mapping[114] = [
+            'nama_rohani' => 685, 'umur_rohani' => 686,
+            'jk_rohani' => 687, 'agama_rohani' => 688,
+        ];
+        // ===== Fase P6 — form 115 Bukti Pelayanan Kerohanian (KONSEP §6, 8 var) =====
+        $mapping[115] = [
+            'nama_anggota_rohani' => 685, 'umur_anggota_rohani' => 686,
+            'jk_anggota_rohani' => 687, 'agama_anggota_rohani' => 688,
+            'tanggal_rohani' => 689, 'jam_rohani' => 689,
+            'hari_rohani' => 690, 'tempat_rohani' => 690,
+        ];
+        // ===== Fase P6 — form 116 Surveilans CVC/PICC (KONSEP §3, 34 var) =====
+        // Checkbox/opsi "satu Ya" divalidasi di controller (guard after), bukan di rule.
+        $mapping[116] = [
+            'tanggal_evaluasi' => 155, 'waktu_evaluasi' => 156,
+            'lokasi_subclavia' => 691, 'lokasi_jugularis' => 691,
+            'lokasi_femoralis' => 691, 'lokasi_lainnya' => 691,
+            'cath_12' => 692, 'cath_7' => 692, 'cath_5' => 692,
+            'cath_4' => 692, 'cath_3' => 692, 'cath_lainnya' => 692,
+            'cvc_4lumen' => 693, 'cvc_3lumen' => 693, 'cvc_2lumen' => 693, 'cvc_1lumen' => 693,
+            'bsi_pasang' => 694, 'bsi_lepas' => 694,
+            'tanggal_pasang' => 695, 'tanggal_lepas' => 695,
+            'keterangan' => 77,
+        ];
+        for ($i = 1; $i <= 2; $i++) {
+            $mapping[116]['bsi_'.$i] = 696;
+        }
+        for ($i = 3; $i <= 7; $i++) {
+            $mapping[116]['bsi_'.$i] = 697;
+        }
+        for ($i = 8; $i <= 13; $i++) {
+            $mapping[116]['bsi_'.$i] = 698;
+        }
+        // ===== Fase P6 — form 117 Surveilans IV Catheter (KONSEP §4, 19 var) =====
+        $mapping[117] = [
+            'tanggal_evaluasi' => 155, 'waktu_evaluasi' => 156,
+            'lokasi_iv' => 699, 'nomor_iv' => 700, 'jenis_cairan' => 701,
+            'iv_1' => 702, 'iv_2' => 702, 'iv_3' => 702,
+            'iv_4' => 703, 'iv_5' => 703, 'iv_6' => 703, 'iv_7' => 703,
+            'pivas_skor' => 704, 'pivas_gejala_1' => 704, 'pivas_gejala_2' => 704,
+            'pivas_gejala_3' => 704, 'pivas_gejala_4' => 704,
+            'tanggal_pasang' => 705, 'tanggal_lepas' => 705,
+        ];
+        // ===== Fase P6 — form 118 Surveilans Kateter Urine (KONSEP §5, 30 var) =====
+        $mapping[118] = [
+            'tanggal_evaluasi' => 155, 'waktu_evaluasi' => 156,
+            'jenis_kath_silikon' => 706, 'jenis_kath_folly' => 706, 'jenis_kath_lainnya' => 706,
+            'no_kath_6' => 707, 'no_kath_8' => 707, 'no_kath_10' => 707,
+            'no_kath_12' => 707, 'no_kath_14' => 707,
+            'isk_10' => 709, 'isk_11' => 709,
+            'tanggal_pasang' => 711, 'tanggal_lepas' => 711,
+        ];
+        for ($i = 1; $i <= 9; $i++) {
+            $mapping[118]['isk_'.$i] = 708;
+        }
+        for ($i = 1; $i <= 7; $i++) {
+            $mapping[118]['isk_gejala_'.$i] = 710;
+        }
+        // ===== Fase P6 — form 119 Surveilans Tirah Baring/HAP (KONSEP §6, 21 var) =====
+        $mapping[119] = [
+            'tanggal_evaluasi' => 155, 'waktu_evaluasi' => 156,
+            'hap_suhu_1' => 713, 'hap_suhu_2' => 713, 'hap_suhu_3' => 713,
+            'hap_leukosit_1' => 713, 'hap_leukosit_2' => 713, 'hap_leukosit_3' => 713,
+            'hap_sekresi_1' => 715, 'hap_sekresi_2' => 715,
+            'hap_kultur_1' => 715, 'hap_kultur_2' => 715, 'hap_kultur_3' => 715,
+            'keterangan' => 77,
+        ];
+        for ($i = 1; $i <= 4; $i++) {
+            $mapping[119]['hap_'.$i] = 712;
+        }
+        for ($i = 1; $i <= 3; $i++) {
+            $mapping[119]['hap_ab_'.$i] = 714;
+        }
+        // ===== Fase P6 — form 120 Screening Akses Vaskular (KONSEP §7, 31 var) =====
+        $mapping[120] = [
+            'jenis_spesimen' => 716,
+            'aks_disfungsi_1' => 719, 'aks_disfungsi_2' => 719, 'aks_disfungsi_3' => 719,
+            'aks_nyeri_1' => 719, 'aks_nyeri_2' => 719, 'aks_nyeri_3' => 719, 'aks_nyeri_4' => 719,
+        ];
+        for ($i = 1; $i <= 3; $i++) {
+            $mapping[120]['aks_area_'.$i] = 717;
+        }
+        for ($i = 1; $i <= 9; $i++) {
+            $mapping[120]['aks_steal_'.$i] = 717;
+        }
+        for ($i = 1; $i <= 4; $i++) {
+            $mapping[120]['aks_cdl_'.$i] = 718;
+        }
+        for ($i = 1; $i <= 6; $i++) {
+            $mapping[120]['aks_exit_'.$i] = 718;
+        }
+        $mapping[120]['aks_pasien_1'] = 718;
+        // ===== Fase P6 — form 121 Asesmen Pasien Restraint (KONSEP §8, 55 var) =====
+        // Catatan KONSEP: field asesmen adalah `tgl_edukasi` (mapping KONSEP `tgl_edikasi`
+        // adalah typo) — seeder/controller/view memakai `tgl_edukasi`.
+        $mapping[121] = [
+            'tanggal_asesmen' => 155, 'waktu_asesmen' => 156,
+            'gaduh_1' => 720, 'gaduh_2' => 720, 'gaduh_3' => 720,
+            'gaduh_4' => 720, 'gaduh_5' => 720, 'order_dokter' => 720,
+            'nonfarm_1' => 721, 'nonfarm_2' => 721, 'nonfarm_3' => 721,
+            'nonfarm_4' => 721, 'nonfarm_5' => 721,
+            'stop_1' => 723, 'stop_2' => 723, 'stop_3' => 723,
+            'stop_4' => 723, 'stop_5' => 723, 'stop_6' => 723, 'stop_lainnya' => 723,
+            'status_mental' => 724, 'status_mental_lainnya' => 724,
+            'kesadaran' => 51, 'sistolik' => 6, 'diastolik' => 7,
+            'nadi' => 10, 'pernapasan' => 12, 'suhu' => 11,
+            'tgl_edukasi' => 725, 'jam_edukasi' => 725, 'nama_petugas' => 725,
+            'nama_keluarga' => 725, 'nama_petugas_melepas' => 725,
+            'tgl_melepas' => 725, 'jam_melepas' => 725,
+        ];
+        for ($i = 1; $i <= 10; $i++) {
+            $mapping[121]['farmak_'.$i] = 722;
+            $mapping[121]['farmak_dosis_'.$i] = 722;
+        }
+        // ===== Fase P6 — form 122 Observasi Restraint (KONSEP §9, 11 var) =====
+        // Payload FLAT + indeks `ronde` (pola Monitoring Transfusi form 110), bukan
+        // `ronde[N][var]` seperti KONSEP §9 — deviasi terdokumentasi. Indeks ronde
+        // disimpan di emr_detail.flag_abnormal, bukan di mapping.
+        $mapping[122] = [
+            'waktu_observasi' => 156,
+            'sistolik' => 6, 'diastolik' => 7, 'nadi' => 10,
+            'pernapasan' => 12, 'suhu' => 11,
+            'kognitif' => 726, 'luka' => 727,
+            'asupan_makanan' => 728, 'posisi_fiksasi' => 728,
+            'panses_ec' => 729,
+        ];
+        // ===== Fase P6 — form 58 Rekam Medis Rujukan (KONSEP §3, 20 var) =====
+        $mapping[58] = [
+            'tanggal_pengantar' => 730, 'tgl_rencana_ranap' => 730,
+            'tingkat_urgensi' => 731,
+            'indikasi_rawat_inap' => 732,
+            'rencana_pemeriksaan_penunjang' => 733,
+            'terapi_keperawatan' => 734,
+            'dokter_rawat' => 735,
+            'kebutuhan_pelayanan' => 736,
+            'kebutuhan_kamar' => 737,
+            'screening_covid' => 738, 'kriteria_covid' => 738, 'ews' => 738,
+            'oksigen' => 738, 'ventilator' => 738, 'monitor' => 738, 'syringe_pump' => 738,
+            'diagnosis' => 40,   // reuse Diagnosa Medis
+            'handphone' => 60,   // reuse Nomor Handphone
+            'alasan' => 77,      // reuse Keterangan
+            'dirujuk_ke' => 186, // reuse Dirujuk Ke (milik form 16; TASK_FORM EMR-058)
+        ];
+        // ===== Fase P6 — form 126 Surat Keterangan Sehat (KONSEP §4, 8 var) =====
+        $mapping[126] = [
+            'no_surat' => 739,
+            'pemeriksaan_fisik' => 740,
+            'mata' => 741,
+            'keterangan' => 77,  // reuse Keterangan
+            'bb' => 8, 'tb' => 9, 'sistolik' => 6, 'diastolik' => 7,
+        ];
+        // ===== Fase P6 — form 127 Pesan Penunjang (KONSEP §5, 23 var; kelas_id TIDAK dimapping) =====
+        $mapping[127] = [
+            'jenis_pesan' => 742,
+            'bagian_asal' => 743, 'unit_pelaksanaan_id' => 743,
+            'diagnosa_medis' => 40,   // reuse Diagnosa Medis
+            'jenis_tindakan' => 744,
+            'tgl_rencana_tindakan' => 745, 'jam_rencana_tindakan' => 745,
+            'jam_keputusan_sc' => 746,
+            'jenis_rawat_rencana' => 747, 'tgl_rencana_ranap' => 747,
+            'handphone' => 60, 'handphone_keluarga' => 748,
+            'pasang_alat' => 749, 'alat_khusus' => 749,
+            'sc' => 750, 'sc_emergency' => 750, 'ic' => 750,
+            'pra_tindakan' => 751, 'jenis_anestesi' => 751,
+            'dokter_operator_id' => 751, 'dpjp_utama' => 751,
+            'bb' => 8, 'tb' => 9,
+        ];
+        // ===== Fase P6 — form 128 SPRI & Program Rujukan Balik (KONSEP §6, 14 var) =====
+        $mapping[128] = [
+            'jenis_formulir' => 752,
+            'no_sep' => 753, 'no_rujukan' => 753,
+            'alasan' => 754,
+            'persiapan_tindakan' => 755,
+            'rencana_pemeriksaan_penunjang' => 756,
+            'terapi_obat' => 757,
+            'anjuran' => 758,
+            'tanggal_kontrol' => 759,
+            'dokter_pengarah_id' => 760,
+            'faskes_tujuan' => 761,
+            'diagnosis' => 40,    // reuse Diagnosa Medis
+            'anamnesis' => 1,     // reuse Subjective (S)
+            'pemeriksaan_fisik' => 2, // reuse Objective (O)
+        ];
         foreach ($mapping as $formId => $variabels) {
             foreach ($variabels as $variabel => $objekId) {
                 $exists = DB::table('objek_form_control')
@@ -2769,6 +3306,14 @@ class EmrMasterSeeder extends Seeder
         // ===== Fase P5 — ICU & Hemodialisa =====
         foreach ([52, 53, 102, 103, 104, 105, 85] as $formIdP5) {
             EmrHelper::backfillObjekId($formIdP5);
+        }
+        // ===== Fase P6 — Onkologi & Darah =====
+        foreach ([106, 107, 108, 109, 110, 111] as $formIdP6) {
+            EmrHelper::backfillObjekId($formIdP6);
+        }
+        // ===== Fase P6 — Formulir & Rujukan =====
+        foreach ([58, 126, 127, 128] as $formIdRujukan) {
+            EmrHelper::backfillObjekId($formIdRujukan);
         }
         // ======== Akses EHR per profesi ========
         // Idempotent: lewati kombinasi profesi+form yang sudah ada (tanpa bentrok dengan level/bagian lain).
@@ -2890,6 +3435,86 @@ class EmrMasterSeeder extends Seeder
             ['profesi_id' => 2, 'form_id' => 99, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 1, 'form_id' => 101, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
             ['profesi_id' => 2, 'form_id' => 101, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // ===== Fase P6 — Onkologi & Darah =====
+            // Asesmen Kemoterapi (106): Dokter + Perawat full CRUD.
+            ['profesi_id' => 1, 'form_id' => 106, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 106, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Pemantauan Kemoterapi (107): Dokter + Perawat full CRUD.
+            ['profesi_id' => 1, 'form_id' => 107, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 107, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Asesmen Pasien dengan Darah (108): Dokter + Perawat full; Analis Lab (13) read.
+            ['profesi_id' => 1, 'form_id' => 108, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 108, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 13, 'form_id' => 108, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // Assesmen Transfusi (109): Dokter + Perawat full; Analis Lab (13) read.
+            ['profesi_id' => 1, 'form_id' => 109, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 109, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 13, 'form_id' => 109, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // Monitoring Transfusi Darah (110): Dokter + Perawat full CRUD.
+            ['profesi_id' => 1, 'form_id' => 110, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 110, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Double Check Obat High Alert (111): Perawat + Apoteker (4) full;
+            // Dokter (1) read-only (diisi petugas, bukan DPJP).
+            ['profesi_id' => 1, 'form_id' => 111, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 2, 'form_id' => 111, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 4, 'form_id' => 111, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // ===== Fase P6 — Psikososial & Kerohanian =====
+            // Asesmen Psikologi (112): Dokter + Perawat full; Perekam Medis (7) read.
+            ['profesi_id' => 1, 'form_id' => 112, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 112, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 7, 'form_id' => 112, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // Asesmen Spiritual (113): Dokter + Perawat + Kerohanian (14) full.
+            ['profesi_id' => 1, 'form_id' => 113, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 113, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 14, 'form_id' => 113, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Permintaan Kerohanian (114): Dokter + Kerohanian (14) full;
+            // Perawat (2) create/read (pengajuan unit, revisi oleh petugas rohani).
+            ['profesi_id' => 1, 'form_id' => 114, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 114, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            ['profesi_id' => 14, 'form_id' => 114, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // Bukti Kerohanian (115): Dokter + Kerohanian (14) full; Perawat (2) read.
+            ['profesi_id' => 1, 'form_id' => 115, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 14, 'form_id' => 115, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 115, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // ===== Fase P6 — Surveilans Infeksi & Restraint =====
+            // 116–119 Surveilans: Dokter + Perawat full; Sanitarian (9) create/read/update
+            // tanpa delete (penyusun klasifikasi BSI/PIVAS/ISK/HAP).
+            ['profesi_id' => 1, 'form_id' => 116, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 116, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 9, 'form_id' => 116, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 117, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 117, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 9, 'form_id' => 117, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 118, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 118, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 9, 'form_id' => 118, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            ['profesi_id' => 1, 'form_id' => 119, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 119, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 9, 'form_id' => 119, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
+            // 120–122 Screening Akses + Restraint: Dokter + Perawat full CRUD.
+            ['profesi_id' => 1, 'form_id' => 120, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 120, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 121, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 121, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 1, 'form_id' => 122, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 122, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            // ===== Fase P6 — Formulir & Rujukan (KONSEP_FORMULIR_RUJUKAN.md §Akses EHR) =====
+            // 58 Rekam Medis Rujukan: Dokter full, Perawat read-only.
+            ['profesi_id' => 1, 'form_id' => 58, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 58, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // 126 Surat Keterangan Sehat: Dokter full, Perekam Medis (7) buat+baca.
+            ['profesi_id' => 1, 'form_id' => 126, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 7, 'form_id' => 126, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // 127 Pesan Penunjang: Dokter full, Perawat read-only.
+            ['profesi_id' => 1, 'form_id' => 127, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 127, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // 128 SPRI & Program Rujukan Balik: Dokter full, Perawat read-only.
+            ['profesi_id' => 1, 'form_id' => 128, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 128, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 0, 'akses_read' => 1, 'akses_update' => 0, 'akses_delete' => 0],
+            // ===== Fase P6 — Katalog Form Blanko (129, KONSEP §7.1) — wajib utk header_ehr =====
+            // Dokter full; Perawat isi+baca+ubah (tanpa hapus).
+            ['profesi_id' => 1, 'form_id' => 129, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],
+            ['profesi_id' => 2, 'form_id' => 129, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 0],
             // ===== Fase P4 — Kebidanan & MCU =====
             // Form 67 (Down Score) tidak di-seed — status ⛔ di docs/TASK_FORM.md.
             ['profesi_id' => 1, 'form_id' => 59, 'level_id' => 1, 'bagian_id' => null, 'akses_create' => 1, 'akses_read' => 1, 'akses_update' => 1, 'akses_delete' => 1],

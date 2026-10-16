@@ -34,7 +34,9 @@
                                                     @foreach($extras as $extra)
                                                         @php
                                                             $folder_name = Str::slug($extra['nama'], '_');
-                                                            $menuUrl = route('emr.dynamic.index', ['form_name' => $folder_name, 'registrasi_detail_id' => $registrasi_detail_id]);
+                                                            $menuUrl = $folder_name === 'katalog_form_blanko'
+                                                                ? route('emr.katalog_form_blanko.index', ['registrasi_detail_id' => $registrasi_detail_id])
+                                                                : route('emr.dynamic.index', ['form_name' => $folder_name, 'registrasi_detail_id' => $registrasi_detail_id]);
                                                         @endphp
                                                         <a href="{{ $menuUrl }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600">{{ ucwords($extra['nama']) }}</a>
                                                     @endforeach
@@ -44,7 +46,9 @@
                                     @else
                                         @php
                                             $folder_name = Str::slug($subMenuName, '_');
-                                            $menuUrl = route('emr.dynamic.index', ['form_name' => $folder_name, 'registrasi_detail_id' => $registrasi_detail_id]);
+                                            $menuUrl = $folder_name === 'katalog_form_blanko'
+                                                ? route('emr.katalog_form_blanko.index', ['registrasi_detail_id' => $registrasi_detail_id])
+                                                : route('emr.dynamic.index', ['form_name' => $folder_name, 'registrasi_detail_id' => $registrasi_detail_id]);
                                         @endphp
                                         <a href="{{ $menuUrl }}" target="emr_frame" onclick="document.getElementById('emr_placeholder').style.display='none'; document.getElementById('emr_loader').classList.remove('hidden');" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600">{{ ucwords($subMenuName) }}</a>
                                     @endif

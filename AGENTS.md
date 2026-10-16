@@ -608,3 +608,121 @@ Rancangan: `docs/KONSEP_ICU_HEMODIALISA.md` + `docs/KONSEP_BEDAH_ANESTESI.md`. S
 - **Form 99 (Catatan Anestesia)**: 32 variabel (objek 937–954 + reuse 6, 7, 10, 11, 12, 15, 51); akses Dokter & Perawat full CRUD (RI+IGD). Variabel **`ruang_tujuan`** ikut blok Mapping (tabel field §17 menulis `pesakit_ruang` — preseden form 87/94). `lama_anestesia` **TURUNAN** server (`'N menit'`, pola form 92; preview JS readonly + hidden). Guard `after()`: `jam_selesai >= jam_mulai`; `caudel` wajib bila `jenis_anestesi ∈ {Epidural, Spinal}` (rule `nullable` + guard; **di-null-kan selain Epidural/Spinal** — tabel field seragam "wajib" tapi validasi §17 menentukan conditional, preseden form 91); chain `kejadian_tidak_terduga` non-kosong ⇒ `penanganan_intraop` wajib. Literal: `jenis_anestesi => in:Umum,Regional,Epidural,Spinal,Sedasi` (5 nilai KONSEP — key SelectOption `jenis_anestesia` punya 6 dgn Lokal, jangan dipakai), `airway => in:Ada,Tidak_ada` (Difficult airway dari legacy `catatan_anestesia.php`), `ventilasi => in:Spontan,Assisted,Controlled`, `asa => in:1,2,3,4,5,6`, `posisi` = SelectOption `posisi_operasi`, `sirkuit` text bebas (legacy checkbox → ikuti KONSEP text). Tanda vital `integer|min:0` tanpa between; `kesadaran` array rule SelectOption; `x-select_dokter` + `x-select_pegawai` + `x-select-ruang-perawatan`.
 - **Form 101 (Asesmen Katarak)**: 62 variabel (12 + loop 5×10 baris; objek 968–979 + reuse 13, 51, 6, 7, 10, 11, 12; flags 0/1/0/0 = RJ only; akses Dokter & Perawat full CRUD). 1 guard `after()`: `resiko_jatuh = 'Risiko Tinggi'` ⇒ `intervensi_pre_operasi` min-5 karakter (pola form 90; harness kirim nilai pertama `in:` → guard teruji E2E). Literal: `resiko_jatuh => in:Risiko Tinggi,Tidak Berisiko` (**opsi KONSEP §19; legacy memakai 'Risiko Jatuh Tinggi'/'Tidak Berisiko Jatuh' — ikuti KONSEP**), `skala_nyeri`/`skala_nyeri_1..5 => integer|between:0,10` (VAS 0–10 dari legacy `skala_nyeri_vas_simple()`), baris obat `nullable` (wajib=tidak per tabel), baris TTV+visus 1..5 semua `required`. **Bug pelajaran: salah ketik `?>` alih-alih `}}` pada `{{ $v('visus_kiri_'.$i) }}` di blade** membuat regex echo Blade menelan lintas baris → `index=500 syntax error` walau `simpan` sukses; diagnosis = `Blade::compileString()` per potongan.
 - **Sisa P5 (`⬜`)**: tidak ada — seluruh 20 form P5 wajib selesai. `⛔` menunggu keputusan klinis: 89, 97, 100.
+
+## Fase P6 EMR — Batch A: Onkologi & Pemberian Darah (SUDAH diimplementasikan)
+
+Rancangan: `docs/KONSEP_ONKOLOGI_TRANSFUSI.md`. Selesai & terverifikasi E2E (**6 form, 584 variabel, ALL OK**; regresi penuh `FAILURES: 3` = baseline order_resep/patologi/mikrobiologi, `e2e_order.php` ALL OK, pint PASS).
+
+| form | slug | `id_dash_menu` | Folder |
+|---|---|---|---|
+| 106 | `asesmen_kemoterapi` | `18.353` | `EMR/AsesmenKemoterapi/` |
+| 107 | `pemantauan_kemoterapi` | `18.354` | `EMR/PemantauanKemoterapi/` |
+| 108 | `asesmen_pemberian_darah` | `18.355` | `EMR/AsesmenPemberianDarah/` |
+| 109 | `assesmen_transfusi` | `18.356` | `EMR/AssesmenTransfusi/` |
+| 110 | `monitoring_transfusi` | `18.357` | `EMR/MonitoringTransfusi/` |
+| 111 | `double_check_high_alert` | `18.358` | `EMR/DoubleCheckHighAlert/` |
+
+Menu baru `dashboard_menu` **18 "Onkologi & Darah"** (sub 353–358). Objek baru **993–1032**. Prasyarat: `SelectOption` +7 key (`protokol_kemoterapi`, `jenis_alat_akses_kemo`, `rhesus`, `jenis_komponen_darah`, `keadaan_umum_transfusi`, `gejala_reaksi_transfusi`, `tanda_reaksi_transfusi`), `EmrHelper` +`emrDetailRonde()`/`insertRonde()`/`hapusRonde()`, harness dukung `different:`, migration `2026_10_15_000001_add_flag_alert_to_barang_table` + `BarangSeeder` `flag_alert=1` (8 obat).
+
+- **Sub 356 WAJIB `Assesmen Transfusi` (dua s)** — slug dashboard = `Str::slug(nama_sub_menu)`; `DynamicFormController::delegateToSpecificController` baris 134 `abort_unless($form, 404)` menolak slug yang tidak ada di tabel `form` (KONSEP minta satu-s = design error; folder controller/view juga `AssesmenTransfusi`).
+- **Form 110 = time-series berbasis `flag_abnormal`** (pola form 122): indeks ronde disimpan di `emr_detail.flag_abnormal` (store UPDATE NULL→1, update = `hapusRonde`+`insertRonde`); pembacaan **wajib `EmrHelper::emrDetailRonde()`** — `emrDetailByVariabel()` melumatkan antar ronde. Payload **FLAT** (deviasi terdokumentasi, bukan `ronde.N.*`); hidden input `ronde` (di luar `fieldset disabled`) menentukan ronde aktif; navigasi chip ronde + "Tambah Ronde ?ronde=N"; `jumlah_ronde` tidak dimapping. Badge reaksi berat = tampilan JS (gejala 7/9, tanda 1/5). Guard `darah_masuk` kumulatif vs DB ronde N-1 (inert ronde 1).
+- **Form 107**: baris suffix `*_N` maks 20 (12 kolom) + premed 1..5; guard per-baris (`jam_N` terisi ⇒ 12 kolom wajib; minimal 1 baris); `total_cairan` TURUNAN (sum `cairan_N`); `perawat_ruangan` read-only prefill `Auth::user()->pegawai`.
+- **Form 109**: `perawat_2_id ...|different:perawat_1_id`; 8 butir DC ditulis **literal penuh** (pelajaran form 88 — lihat pelajaran loop di bawah); badge "TIDAK SESUAI" + peringatan beda `jumlah_darah` vs form 108 (`latestValuesByVariabel(108, ...)`) non-blocking; opsi `jenis_labu_darah` difilter 5 nilai (rule tanpa `Lainnya`).
+- **Form 111**: `ha_obat_N` teks bebas tanpa `exists` (datalist master `Barang flag_alert=1` — legacy bukan id); guard `cekBaris()` (obat terisi ⇒ 10 checkbox `ha_p1/p2_*_N` truthy, `ValidationException` per key); `jumlah_baris` TURUNAN; checkbox ternormalisasi `'1'`/`null` di `filteredData()`. **Aturan loop 111 ditulis literal per baris di dalam `for`** — `evaluasiKunci()` `lib_pay.php` hanya mengevaluasi SATU variabel loop; key bersarang (`$rules['ha_p1_'.$kolom.'_'.$b]`) → `sisa='$kolom'` → return null → aturan TIDAK terbaca harness & payload `'Data Uji'` gagal `boolean`.
+- **Pelajaran Batch A**: (1) `layouts/iframe` dulu TIDAK merender `@stack('scripts')` — **9 view EMR (45,46,47,48,39,40,49,50,51) memakai `@push('scripts')` sehingga JS-nya mati** → stack sudah ditambahkan ke `layouts/iframe` + tool `tools/render_check.php` (`php tools/render_check.php <form_id> <penanda>` — GET form, cek penanda skrip di HTML; jalankan lagi kalau curiga JS mati). (2) Jangan `<form>` bersarang di dalam slot `x-emr-split-layout` (komponen sudah merender `<form>` + `@csrf`). (3) `@json()` dengan koma internal (`array_map(fn..., $x)`) dipecah oleh Blade → pra-hitung jadi variabel `@php`. (4) Konten slot di luar `@slot`/field `disabled` — hidden input penting (`ronde`) diletakkan sebelum `<fieldset disabled>` agar selalu terkirim.
+
+## Fase P6 EMR — Batch B: Psikososial & Kerohanian (SUDAH diimplementasikan)
+
+Rancangan: `docs/KONSEP_PSIKOSOSIAL_KEROHANIAN.md`. Selesai & terverifikasi E2E (**4 form, 62 variabel, ALL OK**; regresi penuh `FAILURES: 3` = baseline order_resep/patologi/mikrobiologi, `e2e_order.php` ALL OK, pint PASS, `render_check.php` 4/4 penanda ADA).
+
+| form | slug | `id_dash_menu` | Folder | var |
+|---|---|---|---|---|
+| 112 | `assesmen_psikologi` | `16.313` | `EMR/AssesmenPsikologi/` | 34 |
+| 113 | `assesmen_spiritual` | `16.314` | `EMR/AssesmenSpiritual/` | 16 |
+| 114 | `permintaan_kerohanian` | `16.315` | `EMR/PermintaanKerohanian/` | 4 |
+| 115 | `bukti_kerohanian` | `16.316` | `EMR/BuktiKerohanian/` | 8 |
+
+Menu baru `dashboard_menu` **16 "Psikososial & Kerohanian"** (sub 313–316). Objek baru **671–690**. Prasyarat: `SelectOption` +`hari_kerohanian` (SENIN..MINGGU, value kapital; kunci `layanan_kerohanian` **tidak dibuat** — tidak ada field pemakai).
+
+- **Sub 313/314 sengaja dua-s `Assesmen Psikologi`/`Assesmen Spiritual`** (KONSEP §1/ALOKASI §7 minta satu-s) — preseden produksi sub 10 + Batch A sub 356. Controller dibangun dari `Str::studly(form.slug)` tapi seluruh URL/gate hardcode `self::SLUG`; slug dua-s dibutuhkan `DynamicFormController::delegateToSpecificController` baris 134.
+- **`bukti_kerohanian.hari_rohani` diturunkan server** di `filteredData()` dari `date('w', strtotime(tanggal_rohani))` — deviasi vs `abort_if` 422 KONSEP §6 (harness kirim `2026-10-10` = **Sabtu** + `SENIN` → guard selalu gagal). UI sinkron via JS peta `HARI[date.getDay()]`. **`config/app.php` locale = `en`** → jangan Carbon `translatedFormat('l')` untuk hari Indonesia.
+- **Form 112** blok kontak (nama/status/**alamat**/hp) + `perawat_rumah` + `fasilitasi_rs` = `required_if`/`nullable` dinamis → `filteredData()` null-kan + JS toggle `display`+`disabled`. Checkbox `psi_*`/`masalah_*` = hidden `0` + checkbox `1`, rule `nullable|in:0,1` (harness skip; `array_fill_keys` menjamin key ada). `petugas_*` form 113 di-null-kan bila radio gerbang ≠ `Ya`.
+- **Partial baru `PartialForm/kerohanian_identitas_pasien.blade.php`** — identitas read-only (RM/nama/umur/JK/agama/ruangan dari master) untuk form 114/115; JK pakai `match`, umur Carbon `->age`.
+- **Cetak `print.blade.php` tidak diimplementasikan** — konsisten seluruh form P5/P6 (semua view `printUrl=''`).
+- **Pelajaran Batch B**: rule loop **key bersarang** (`$rules['x_'.$b]`) gagal dibaca harness — tulis literal per baris (idem Batch A); `render_check.php` penanda = **string literal** (regex `\|` TIDAK dicocokkan); E2E hanya cek kode HTTP — buat view SEBELUM jalankan `e2e.php`.
+
+## Fase P6 EMR — Batch C: Surveilans Infeksi & Restraint (SUDAH diimplementasikan)
+
+Rancangan: `docs/KONSEP_SURVEILANS_INFEKSI.md`. Selesai & terverifikasi E2E (**7 form, 201 variabel, ALL OK**; regresi penuh `FAILURES: 3` = baseline order_resep/patologi/mikrobiologi, `e2e_order.php` ALL OK, pint PASS, `render_check.php` 7/7 penanda ADA).
+
+| form | slug | `id_dash_menu` | Folder | var |
+|---|---|---|---|---|
+| 116 | `surveilans_cvc_picc` | `17.333` | `EMR/SurveilansCvcPicc/` | 34 |
+| 117 | `surveilans_iv_catheter` | `17.334` | `EMR/SurveilansIvCatheter/` | 19 |
+| 118 | `surveilans_kateter_urine` | `17.335` | `EMR/SurveilansKateterUrine/` | 30 |
+| 119 | `surveilans_tirah_baring` | `17.336` | `EMR/SurveilansTirahBaring/` | 21 |
+| 120 | `screening_akses` | `17.337` | `EMR/ScreeningAkses/` | 31 |
+| 121 | `asesmen_restraint` | `17.338` | `EMR/AsesmenRestraint/` | 55 |
+| 122 | `observasi_restraint` | `17.339` | `EMR/ObservasiRestraint/` | 11 |
+
+Menu baru `dashboard_menu` **17 "Surveilans Infeksi"** (sub 333–339). Objek baru **691–729**. Prasyarat: `SelectOption` +3 key (`jenis_screening_akses`, `opsi_pivas`, `ukuran_kateter_urine`), harness `lib_pay` +`grupTepatSatu()` (grup checkbox "tepat satu Ya" utk 116/118 — tanpa special-case ini `optsFromRule` mengirim `'Ya'` ke SEMUA anggota grup dan guard `after()` server `cekSatuYa` selalu gagal saat E2E).
+
+- **Guards `after()`**: 116 `cekSatuYa` 3 grup (lokasi/cath/lumen; grup "lainnya" boleh menampung nol Ya bila teks terisi); 117 PIVAS (skor 0 ⇒ `pivas_gejala_1 = '1'`, skor ≥ 3 ⇒ `pivas_gejala_4 = '1'` — harness kirim skor 0 + semua gejala `'1'` ⇒ guard lolos & teruji); 118 `cekSatuYa` jenis + nomor kateter; 121 guard minimal kebutuhan restraint + `stop_lainnya`/`status_mental_lainnya` wajib saat cabangnya aktif.
+- **Form 120**: `jenis_spesimen` (AV SHUNT/CIMINO vs VASKULER CDL) menentukan blok aktif — blok NON-aktif di-`null` di `filteredData()` (baris `emr_detail` tetap ada → `simpan` E2E penuh); view `isiKosong()` mengisi select blok tersembunyi dgn `'Tidak'` karena rules server `required` utk SEMUA `aks_*`.
+- **Form 121**: `tgl_edukasi` mengikuti blok Mapping KONSEP (tabel field menulis ejaan berbeda — preseden 87/94/99); checkbox legacy hidden `0` + checkbox `1` utk `gaduh_/nonfarm_/stop_` (`in:0,1`/`nullable|boolean` → harness skip nullable, kirim `'1'` utk required); 10 baris `farmak_*` ditulis literal.
+- **Form 122**: pola ronde form 110 — indeks ronde disimpan di `emr_detail.flag_abnormal`, payload FLAT, pembacaan wajib `EmrHelper::emrDetailRonde()`; hidden `ronde` diletakkan SEBELUM `<fieldset disabled>` (tanpa `<form>` bersarang).
+- **Cetak `print.blade.php` TIDAK diimplementasikan** — konsisten seluruh form P5/P6 (`printUrl=''`).
+
+### Pelajaran Batch C — 3 bug parser harness `tools/lib_pay.php` (E2E 116–120 senyap `simpan=0`)
+
+Gejala khas: store diam-diam gagal TANPA baris `VALIDASI n` (controller menangkap `ValidationException` → redirect), `upd=404`. Diagnosis cepat: script PHP kecil yang memanggil `ReflectionMethod('validated')` langsung & mencetak `$e->errors()`, plus dump `ruleMap('App\Http\Controllers\EMR\{Slug}\{Slug}Controller')` per form.
+
+1. **Aturan `'literal'.implode(',', self::KONST)` tidak ter-resolve** → payload harness berisi nilai sampah → validasi `in:` "tidak valid". Fixed: `resolveImplodeKonstanta()` dijalankan sebagai langkah TERAKHIR `ruleMap()` (menutupi semua sumber aturan). **WAJIB tulis pola regex dgn string single-quote** — `\2` backreference di dalam string PHP double-quoted diinterpretasi PHP sbg escape octal `chr(2)`, jadi regex tidak pernah match (bug halus, mudah terlewat).
+2. **Pola header `foreach` berhenti di nama variabel** (`foreach (... as $key`) tanpa `)`) → `loopBodyAt()` selalu `null` (hanya melewati whitespace, bukan `)`) → **SEMUA cabang foreach-loop di `expandRuleLoops` tidak pernah bekerja** (bukan cuma form Batch C — form lama kebetulan pakai `for`-loop/literal). Pola kini disampai ke `)` (termasuk var kedua `=> $y`), dan iterable di-resolve oleh `iterableForeach()`: `self::KONST` · `array_merge(self::A, self::B, ['x'])` · array literal inline `[...]`; ekspresi lain → `null` (skip, aman).
+3. **Parser `const NAMA = [ ... ];` kehilangan elemen TERAKHIR** bila tanpa trailing comma (regex capture butuh `,`/`=>` setelah kutip) → append koma buatan sebelum capture.
+
+Lesson operasional untuk form berikutnya: **dukungan harness kini mencakup loop `foreach (array_merge(...))` dan rules implode-konstanta** — menulis bentuk itu di controller aman; namun key BERSARANG (lebih dari 1 variabel loop, mis. `$rules['a_'.$k.'_'.$b]`) tetap tidak didukung → tulis literal per baris (pelajaran Batch A/B).
+
+## Fase P6 EMR — Batch D: Formulir Rujukan (SUDAH diimplementasikan)
+
+Rancangan: `docs/KONSEP_FORMULIR_RUJUKAN.md`. Selesai & terverifikasi E2E (**4 form, 65 variabel, ALL OK**; regresi penuh `FAILURES: 3` = baseline order_resep/patologi/mikrobiologi, `e2e_order.php` ALL OK, pint PASS, `render_check.php` 4/4 penanda ADA).
+
+| form | slug | `id_dash_menu` | Folder | var |
+|---|---|---|---|---|
+| 58 | `rekam_medis_rujukan` | `5.233` | `EMR/RekamMedisRujukan/` | 20 |
+| 126 | `surat_keterangan_sehat` | `5.234` | `EMR/SuratKeteranganSehat/` | 8 |
+| 127 | `pesan_penunjang` | `5.235` | `EMR/PesanPenunjang/` | 23 |
+| 128 | `spri_rujukan_balik` | `5.236` | `EMR/SpriRujukanBalik/` | 14 |
+
+Sub baru di menu 5 "Formulir": **233–236**. Objek baru **730–761** (32; reuse 1, 2, 6, 7, 8, 9, 40, 60, 77, 186). Prasyarat: `SelectOption` +9 key (`tingkat_urgensi_rujukan`, `indikasi_rawat_inap`, `kebutuhan_pelayanan`, `kebutuhan_kamar`, `status_sc`, `jenis_pesan_penunjang`, `alat_khusus_penunjang`, `jenis_anestesi`, `pra_tindakan_penunjang`), helper baru **`DiagnosisHelper::terakhir($registrasiDetailId)`** (emr_detail objek 40 terbaru non-kosong — pengganti `diagnosisDokter()` legacy, dipakai form 58 & 128).
+
+- **Deviasi besar form 127**: **tanpa filter kategori tindakan** — master legacy `detail_tindakan_bedah` tidak ada di skema baru, jadi `jenis_tindakan` memakai `exists:tindakan,tindakan_id` + **guard `after()` `Tindakan::aktif()`** (tolak id nonaktif). `kelas_id` TIDAK dimapping (read-only display dari `pasien_nasabah.hak_kelas_id` → `kelas_ruang`); `unit_pelaksanaan_id` = semua `bagian` aktif; `alat_khusus` checkbox array → server `implode(', ')` jadi SATU baris string, di view dipecah lagi dengan **guard `is_array($raw)` dulu** (old() pasca-gagal validasi berbentuk array — pelajaran form 94). `filteredData()`: `jenis_anestesi` null bila `jenis_pesan` bukan ENDOSCOPY/ESWL; `alat_khusus` null bila `pasang_alat` ≠ `Ada` (`tgl_rencana_ranap` TIDAK di-null — ikut KONSEP harfiah).
+- **Form 126 `no_surat` tidak divalidasi** — dibentuk di `store()` server: `sprintf('%02d', $urut+1)` count emr_detail objek 739 non-batal + `'/ KDPM / SKS / ' . romawi . ' / ' . now()->format('Y')`; **bulan romawi array manual `I..XII`** — `config/app.php` locale `en` sehingga Carbon `translatedFormat` tidak berbahasa Indonesia. `update()` mempertahankan nilai lama. `keterangan` = **dua `required_if` bertaut** (`SEHAT DENGAN CATATAN MEDIS` / `TIDAK SEHAT`). Prefill tanda vital = emr_detail objek 8/9/6/7 terakhir kunjungan (create-only).
+- **Form 128**: prefill create `anamnesis` ← SOAP `subjective`, `pemeriksaan_fisik` ← `objective` (form 2), `diagnosis` ← `DiagnosisHelper::terakhir` (form 2 tak punya var `diagnosis`), `alasan` default const `ALASAN_PRB`; **`terapi_obat` prefill resep terakhir TIDAK diimplementasikan** (FarmasiHelper hanya telaah) — deviasi. `filteredData()`: SPRI → `tanggal_kontrol` null. `required_if:jenis_formulir,PROGRAM RUJUKAN BALIK` tetap literal — nilai berspasi aman (yang memecah argumen hanya koma).
+- **Form 58**: objek 186 `dirujuk_ke` dipinjam dari form 16; prefill `handphone` ← `pasien.no_hp`, `tanggal_pengantar` default hari ini (create-only); `kriteria_covid` null bila `screening_covid` ≠ Ya.
+- **Partial baru `PartialForm/pasien_identitas_rujukan.blade.php`** — identitas read-only (RM/nama/JK/usia/**alamat**/ruangan) untuk keempat form, di-`@include` tanpa var props (baca `$registrasi_detail` dari scope), di dalam `<fieldset>`.
+- Toggle view pakai **`style.display`** (bukan class `hidden` — pelajaran form 10/Tailwind v4); penanda render_check: `cek58Rujukan`, `cek126Sks`, `cek127Penunjang`, `cek128Spri`.
+- **Cetak `print.blade.php` TIDAK diimplementasikan** — konsisten seluruh form P5/P6 (`printUrl=''`).
+- Rules `'required|in:'.implode(',', array_column(SelectOption::get(...), 'value'))` terbukti dipahami harness (`resolveImplodeKonstanta`) — dipakai utk `indikasi_rawat_inap`/`kebutuhan_*`/`pra_tindakan`.
+
+## Fase P6 EMR — Batch E: Katalog Form Blanko (SUDAH diimplementasikan)
+
+Rancangan: `docs/KONSEP_KATALOG_FORM_BLANKO.md`. **PRE-06 + EMR-129 (form 129 `katalog_form_blanko`, `5.373`, flags 1/1/1/1) selesai & terverifikasi** — `tools/e2e_blanko.php` **ALL OK (27 langkah)**, regresi `e2e.php` `FAILURES: 3` = baseline (+ baris `katalog_form_blanko DILEWATI`), `e2e_order.php` ALL OK, `render_check.php 129` penanda ADA via delegasi, pint PASS.
+
+**KUNCI: fitur ini TIDAK memakai `emr`/`emr_detail`** — tiga tabel sendiri: `form_blanko`, `form_blanko_field`, `form_blanko_pengisian` (`2026_10_15_000002–000004`, dual-driver + `resetSequences()`). Data pengisian di `form_blanko_pengisian.data` (JSON) + `ringkasan` + `__versi`.
+
+**File utama:**
+- Model: `FormBlanko` (scopeAktif/fields/pengisian), `FormBlankoField` (casts array), `FormBlankoPengisian` (scopeAktif).
+- Admin: `Administrator/ManajemenEMR/KatalogFormBlanko/KatalogFormBlankoController.php` + 4 view (`index`, `form`, `builder`, `kartu`); 6 rute auto + **1 rute manual** `POST /katalog_form_blanko/{id}/publish` (`admin.katalog_form_blanko.publish` — publish DI LUAR form edit; jangan ditaruh nested di `form()`).
+- EMR: `EMR/KatalogFormBlanko/KatalogFormBlankoController.php` + view `EMR/KatalogFormBlanko/{index,isi,print_blanko,print}.blade.php` + `partials/{field,riwayat}.blade.php`; **7 rute manual di `routes/web.php`** — `cetak` & `print` **didefinisikan dulu** + `whereNumber('form_blanko')` di rute `isi` (literal `cetak`/`print` jangan tertangkap parameter `{form_blanko}`); `EmrDashboard` cabang slug → `route('emr.katalog_form_blanko.index', ...)` di 2 spot, delegasi `DynamicFormController` (`/emr/form/katalog_form_blanko/{registrasi_detail_id}`) tetap jalan.
+- Harness: **`tools/e2e_blanko.php`** (3 fase: admin user 1 → dokter user 3 → destroy/cleanup; template uji `BLNKO-E2E` dibuat lewat **alur HTTP penuh** store→update-fields→publish sehingga sekaligus menguji admin; idempoten via `bersihkan()`).
+
+**Pelajaran Batch E (bug nyata):**
+1. **`Model::insert()` / `Builder::update()` LEWATI cast Eloquent** — `sinkronField` awalnya memakai dua jalur itu → cast JSON `opsi`/`validasi`/`setelan` tidak diterapkan → `"Array to string conversion"` saat PUT admin (field=0, semua fase berikutnya cascade gagal). **Fix: instance `$model->fill($payload); $model->save();`** + scope `where('form_blanko_id', ...)` (sekalian perbaiki ID lintas-template).
+2. **Harness dua user, satu store session** — `app('session')->driver()` singleton; setelah `sesiBaru(3)` fase 2, variabel `$s1` fase 1 sudah tidak sah → rute admin fase 3 **403**. Fix: `sesiBaru(1)` ulang sebelum fase 3.
+3. **Cek pesan validasi via render GET berikutnya** (`str_contains($html, 'Kolom Tanggal Pemeriksaan wajib diisi')`) — `session('errors')` di luar request terbaca sebagai **array** (`[0 => 'default']`), bukan `ViewErrorBag`. Locale runtime = **id** (`APP_LOCALE=id`) meski `config/app.php` default `en`.
+4. DynamicFormController delegasi: **param type-hint model di-resolve container** jadi method `isi(Request $r, FormBlanko $form_blanko, ...)` menerima model KOSONG saat dipanggil via `/emr/form/{slug}/...` → semua method pakai **param untyped + `findOrFail` manual**; named params ekstra dari `route()` diabaikan, jadi delegasi & redirect EmrDashboard (cabang slug, 2 spot) tetap kompatibel.
+
+**Deviasi terdokumentasi vs KONSEP (ikut di TASK_FORM baris EMR-129):** filter adaptif di PHP (bukan `whereJsonContains` — kompatibel dua driver, kosong = wildcard); field builder **tanpa drag-drop** (Naik/Turun + JS renumber + server-side `fields[i][...]` names fallback; `old('fields')` dipertahankan saat validasi gagal); opsi = textarea **`value|label`** per baris; validasi/setelan = input tunggal JSON-ish; **tipe `select2` dirender select stasis** (opsi terisi) / input teks — mesin AJAX tidak diintegrasikan (`source` tetap disimpan sbg intent); `objek_id` selalu NULL di UI; kontradiksi flag §7.2 vs ALOKASI → **ikut ALOKASI (1/1/1/1)**; UI `select` ≠ tipe `set` (data JSON nilai persis, set via JS).
+
+**Jalur verifikasi ulang:** `php tools/e2e_blanko.php` · `php tools/e2e.php` (FAILURES: 3 + DILEWATI) · `php tools/e2e_order.php` · `php tools/render_check.php 129 cek129Katalog` · `vendor/bin/pint --dirty`.

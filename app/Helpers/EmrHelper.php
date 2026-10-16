@@ -298,6 +298,74 @@ class EmrHelper
         });
     }
 
+    /**
+     * Baca seluruh ronde time-series suatu EMR (form 110 & 122).
+     * Kunci array = indeks ronde (`emr_detail.flag_abnormal`), nilai = var => value.
+     * DILARANG memakai emrDetailByVariabel() untuk form ini — pluck per variabel
+     * menimpa baris antar ronde sehingga hanya ronde terakhir yang terbaca.
+     */
+    public static function emrDetailRonde(int $emrId): array
+    {
+        return DB::table('emr_detail')
+            ->where('emr_id', $emrId)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->whereNotNull('flag_abnormal')
+            ->orderBy('flag_abnormal')
+            ->orderBy('objek_id')
+            ->get()
+            ->groupBy('flag_abnormal')
+            ->map(fn ($rows) => $rows->pluck('value', 'variabel'))
+            ->all();
+    }
+
+    /**
+     * Sisipkan satu ronde pada EMR yang sudah ada; `flag_abnormal` = nomor ronde.
+     * (Bentuk kolom sama dengan flag abnormal form lain — beda emr_id, jadi
+     * tidak saling berefek.)
+     */
+    public static function insertRonde(int $emrId, int $formId, array $data, int $ronde): void
+    {
+        $now = now();
+        $userId = Auth::user()->user_id ?? null;
+
+        foreach ($data as $variabel => $value) {
+            if (! is_string($variabel)) {
+                continue;
+            }
+            DB::table('emr_detail')->insert([
+                'emr_id' => $emrId,
+                'objek_id' => static::objekId($formId, $variabel),
+                'variabel' => $variabel,
+                'value' => is_array($value) ? json_encode($value) : $value,
+                'flag_abnormal' => $ronde,
+                'input_time' => $now,
+                'input_user_id' => $userId,
+            ]);
+        }
+    }
+
+    /**
+     * Soft-delete seluruh baris satu ronde (untuk ditimpa ulang oleh update).
+     */
+    public static function hapusRonde(int $emrId, int $ronde): void
+    {
+        $now = now();
+
+        DB::table('emr_detail')
+            ->where('emr_id', $emrId)
+            ->where('flag_abnormal', $ronde)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->update([
+                'status_batal' => 1,
+                'mod_time' => $now,
+                'mod_user_id' => Auth::user()->user_id ?? null,
+            ]);
+    }
+
     public static function getHistoryForForm(string $slug, int $registrasiDetailId)
     {
         $registrasiDetail = RegistrasiDetail::with('registrasi')->find($registrasiDetailId);

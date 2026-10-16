@@ -75,5 +75,12 @@ class BarangSeeder extends Seeder
                 ]
             );
         }
+
+        // Form EMR 111 (Double Check Obat High Alert): seluruh obat ditandai
+        // high-alert sebagai prefill <datalist>. Linkage `peresepan_obat_dispense`
+        // belum ada di skema ini, jadi sumbernya murni master barang.
+        DB::table('barang')
+            ->where('jenis_barang_id', $obat)
+            ->update(['flag_alert' => 1]);
     }
 }

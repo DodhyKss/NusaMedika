@@ -58,6 +58,7 @@ class DatabaseSeeder extends Seeder
             'master_diet', 'master_diagnosa_diet',
             'dashboard_menu', 'dashboard_menu_sub', 'dashboard_menu_sub_extra', 'form', 'akses_ehr',
             'objek', 'objek_form_control',
+            'form_blanko', 'form_blanko_field', 'form_blanko_pengisian',
             'kategori_tindakan', 'tindakan', 'tindakan_harga',
             'group_tindakan', 'group_tindakan_tindakan',
             'order_laboratorium', 'order_laboratorium_detail',

@@ -62,6 +62,13 @@ $okN = 0;
 $totalVar = 0;
 foreach ($ids as $fid) {
     $slug = DB::table('form')->where('form_id', $fid)->value('slug');
+    // Form 129 Katalog Form Blanko menyimpan data di tabel sendiri
+    // (form_blanko*) — bukan emr/emr_detail. Diverifikasi tools/e2e_blanko.php.
+    if ($slug === 'katalog_form_blanko') {
+        printf("  %-30s DILEWATI (tabel sendiri form_blanko*, bukan emr_detail)\n", $slug);
+
+        continue;
+    }
     $studly = Str::studly($slug);
     $cls = "App\\Http\\Controllers\\EMR\\$studly\\{$studly}Controller";
     if (! class_exists($cls)) {

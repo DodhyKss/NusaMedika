@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\Administrator\ManajemenEMR\KatalogFormBlanko\KatalogFormBlankoController as AdminKatalogFormBlankoController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\EMR\DynamicFormController;
 use App\Http\Controllers\EMR\EmrDashboard\EmrDashboardController;
+use App\Http\Controllers\EMR\KatalogFormBlanko\KatalogFormBlankoController;
 use App\Http\Controllers\EMR\Konsultasi\KonsultasiController;
 use App\Http\Controllers\EMR\Soap\SoapController;
 use App\Http\Controllers\Farmasi\Resep\ListPesananResep\ListPesananResepController;
@@ -64,6 +66,30 @@ Route::middleware('auth')->group(function () {
     // ============ ROUTE KONSULTASI (EMR/Cetak) ============= #
     // Aksi non-CRUD konsultasi (cetak slip/rencana kontrol) didaftarkan manual.
     Route::get('/emr/konsultasi/print/{emr_id}', [KonsultasiController::class, 'print'])->name('emr.konsultasi.print');
+
+    // ============ ROUTE KATALOG FORM BLANKO (EMR, form 129) ============= #
+    // Data disimpan di tabel sendiri (form_blanko*), bukan emr/emr_detail.
+    // Rute cetak/print didefinisikan dulu + whereNumber('form_blanko') di
+    // rute isi agar literal 'cetak'/'print' tidak tertangkap parameter.
+    Route::get('/emr/katalog-form-blanko/cetak/{form_blanko}', [KatalogFormBlankoController::class, 'cetakBlanko'])
+        ->whereNumber('form_blanko')->name('emr.katalog_form_blanko.cetak');
+    Route::get('/emr/katalog-form-blanko/print/{form_blanko}/{registrasi_detail_id}/{pengisian_id}', [KatalogFormBlankoController::class, 'print'])
+        ->whereNumber('form_blanko')->whereNumber('registrasi_detail_id')->whereNumber('pengisian_id')->name('emr.katalog_form_blanko.print');
+    Route::get('/emr/katalog-form-blanko/{registrasi_detail_id}', [KatalogFormBlankoController::class, 'index'])
+        ->whereNumber('registrasi_detail_id')->name('emr.katalog_form_blanko.index');
+    Route::get('/emr/katalog-form-blanko/{form_blanko}/{registrasi_detail_id}/{pengisian_id?}', [KatalogFormBlankoController::class, 'isi'])
+        ->whereNumber('form_blanko')->whereNumber('registrasi_detail_id')->whereNumber('pengisian_id')->name('emr.katalog_form_blanko.isi');
+    Route::post('/emr/katalog-form-blanko/{form_blanko}/{registrasi_detail_id}', [KatalogFormBlankoController::class, 'store'])
+        ->whereNumber('form_blanko')->whereNumber('registrasi_detail_id')->name('emr.katalog_form_blanko.store');
+    Route::put('/emr/katalog-form-blanko/{form_blanko}/{registrasi_detail_id}/{pengisian_id}', [KatalogFormBlankoController::class, 'update'])
+        ->whereNumber('form_blanko')->whereNumber('registrasi_detail_id')->whereNumber('pengisian_id')->name('emr.katalog_form_blanko.update');
+    Route::delete('/emr/katalog-form-blanko/{form_blanko}/{registrasi_detail_id}/{pengisian_id}', [KatalogFormBlankoController::class, 'destroy'])
+        ->whereNumber('form_blanko')->whereNumber('registrasi_detail_id')->whereNumber('pengisian_id')->name('emr.katalog_form_blanko.destroy');
+
+    // ============ ROUTE KATALOG FORM BLANKO (Admin publish) ============= #
+    // Publish/versi+1 di luar form utama edit (nested form tidak boleh).
+    Route::post('/katalog_form_blanko/{katalog_form_blanko}/publish', [AdminKatalogFormBlankoController::class, 'publish'])
+        ->whereNumber('katalog_form_blanko')->name('admin.katalog_form_blanko.publish');
 
     // ============ ROUTE INVENTORY ============= #
     // Aksi non-CRUD pemesanan (setujui/tolak/batal) didaftarkan manual agar reusable.

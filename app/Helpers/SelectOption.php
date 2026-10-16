@@ -398,6 +398,18 @@ class SelectOption
                 ['value' => 'ya', 'label' => 'Ya'],
                 ['value' => 'tidak', 'label' => 'Tidak'],
             ],
+            // ===== Fase P6 — Psikososial & Kerohanian (form 115) =====
+            // Value KAPITAL mengikuti legacy `bukti_pelayanan_kerohanian.php`
+            // (langsung dipakai di formulir cetak) — jangan diganti huruf kecil.
+            'hari_kerohanian' => [
+                ['value' => 'SENIN', 'label' => 'Senin'],
+                ['value' => 'SELASA', 'label' => 'Selasa'],
+                ['value' => 'RABU', 'label' => 'Rabu'],
+                ['value' => 'KAMIS', 'label' => 'Kamis'],
+                ['value' => 'JUMAT', 'label' => 'Jumat'],
+                ['value' => 'SABTU', 'label' => 'Sabtu'],
+                ['value' => 'MINGGU', 'label' => 'Minggu'],
+            ],
             // Key `ada_tidak` untuk pilihan Ada / Tidak Ada (form 31).
             'ada_tidak' => [
                 ['value' => 'ada', 'label' => 'Ada'],
@@ -840,6 +852,158 @@ class SelectOption
                 ['value' => 'Cemas', 'label' => 'Cemas'],
                 ['value' => 'Takut', 'label' => 'Takut'],
                 ['value' => 'Sedih', 'label' => 'Sedih'],
+            ],
+            // ===== Fase P6 — Onkologi & Darah (form 106–111) =====
+            'protokol_kemoterapi' => [
+                ['value' => 'PROTOKOL KEMOTERAPI TC', 'label' => 'Protokol Kemoterapi TC'],
+                ['value' => 'GEMSITABINE DAN DOCETAXEL', 'label' => 'Gemsitabine dan Docetaxel'],
+                ['value' => 'HERCEPTIN', 'label' => 'Herceptin'],
+                ['value' => 'DOCETAXEL CARBOPLATIN GINEKOLOGI ONKOLOGI', 'label' => 'Docetaxel Carboplatin (Ginekologi Onkologi)'],
+                ['value' => 'Lainnya', 'label' => 'Lainnya'],
+            ],
+            'jenis_alat_akses_kemo' => [
+                ['value' => 'Infus', 'label' => 'Infus'],
+                ['value' => 'Catheter', 'label' => 'Catheter'],
+                ['value' => 'Lainnya', 'label' => 'Lainnya'],
+            ],
+            'rhesus' => [
+                ['value' => 'Positif', 'label' => 'Positif'],
+                ['value' => 'Negatif', 'label' => 'Negatif'],
+            ],
+            'jenis_komponen_darah' => [
+                ['value' => 'Whole Blood', 'label' => 'Whole Blood'],
+                ['value' => 'Packed Red Cell', 'label' => 'Packed Red Cell'],
+                ['value' => 'Plasma', 'label' => 'Plasma'],
+                ['value' => 'Platelet', 'label' => 'Platelet'],
+                ['value' => 'Cryoprecipitate', 'label' => 'Cryoprecipitate'],
+                ['value' => 'Lainnya', 'label' => 'Lainnya'],
+            ],
+            'keadaan_umum_transfusi' => [
+                ['value' => 'Baik', 'label' => 'Baik'],
+                ['value' => 'Cukup', 'label' => 'Cukup'],
+                ['value' => 'Buruk', 'label' => 'Buruk'],
+            ],
+            // Legacy form_pemantauan_transfusi.php — daftar gejala persis 10 item.
+            'gejala_reaksi_transfusi' => [
+                ['value' => 'Gatal', 'label' => 'Gatal'],
+                ['value' => 'Palpitasi', 'label' => 'Palpitasi'],
+                ['value' => 'Sakit Kepala', 'label' => 'Sakit Kepala'],
+                ['value' => 'Nyeri di Daerah Pemasangan Jarum Transfusi', 'label' => 'Nyeri di Daerah Pemasangan Jarum Transfusi'],
+                ['value' => 'Nyeri Punggung atau Nyeri Daerah Pangkal Paha', 'label' => 'Nyeri Punggung atau Nyeri Daerah Pangkal Paha'],
+                ['value' => 'Cemas', 'label' => 'Cemas'],
+                ['value' => 'Sesak Napas Ringan', 'label' => 'Sesak Napas Ringan'],
+                ['value' => 'Nyeri Dada', 'label' => 'Nyeri Dada'],
+                ['value' => 'Gangguan Pernafasan', 'label' => 'Gangguan Pernafasan'],
+                ['value' => 'Tidak Ada', 'label' => 'Tidak Ada'],
+            ],
+            // Legacy punya 11 tanda (termasuk "Tidak Ada"); mengikuti KONSEP §7
+            // hanya 10 tanda klinis — "Tidak Ada" diwakili oleh semua checkbox
+            // tidak tercentang.
+            'tanda_reaksi_transfusi' => [
+                ['value' => 'Urtikaria', 'label' => 'Urtikaria'],
+                ['value' => 'Bercak Merah (Rash)', 'label' => 'Bercak Merah (Rash)'],
+                ['value' => 'Flushing Kulit Menjadi Merah', 'label' => 'Flushing Kulit Menjadi Merah'],
+                ['value' => 'Kaku / Rigor', 'label' => 'Kaku / Rigor'],
+                ['value' => 'Demam', 'label' => 'Demam'],
+                ['value' => 'Gelisah', 'label' => 'Gelisah'],
+                ['value' => 'Takikardi', 'label' => 'Takikardi'],
+                ['value' => 'Hipotensi', 'label' => 'Hipotensi'],
+                ['value' => 'Hemoglobinuria', 'label' => 'Hemoglobinuria'],
+                ['value' => 'Perdarahan Tidak Diketahui Alasannya (DIC)', 'label' => 'Perdarahan Tidak Diketahui Alasannya (DIC)'],
+            ],
+            // ===== Fase P6 — Surveilans Infeksi & Restraint (KONSEP_SURVEILANS_INFEKSI.md) =====
+            'jenis_screening_akses' => [
+                ['value' => 'SCREENING AKSES AV SHUNT/CIMINO', 'label' => 'Screening Akses AV Shunt / Cimino'],
+                ['value' => 'SCREENING AKSES VASKULER CDL', 'label' => 'Screening Akses Vaskuler CDL'],
+            ],
+            'opsi_pivas' => [
+                ['value' => '0', 'label' => '0 — Tidak ada gejala'],
+                ['value' => '1', 'label' => '1'],
+                ['value' => '2', 'label' => '2'],
+                ['value' => '3', 'label' => '3'],
+                ['value' => '4', 'label' => '4 — Gejala berat'],
+            ],
+            'ukuran_kateter_urine' => [
+                ['value' => '6', 'label' => '6'],
+                ['value' => '8', 'label' => '8'],
+                ['value' => '10', 'label' => '10'],
+                ['value' => '12', 'label' => '12'],
+                ['value' => '14', 'label' => '14'],
+            ],
+            // ===== Fase P6 — Formulir & Rujukan (KONSEP_FORMULIR_RUJUKAN.md) =====
+            'tingkat_urgensi_rujukan' => [
+                ['value' => 'Rawat Tindakan Elektif', 'label' => 'Rawat Tindakan Elektif'],
+                ['value' => 'Rawat IGD / Tindakan Cito IGD', 'label' => 'Rawat IGD / Tindakan Cito IGD'],
+            ],
+            'indikasi_rawat_inap' => [
+                ['value' => 'Pro Endoscopy', 'label' => 'Pro Endoscopy'],
+                ['value' => 'Pro Bronchoscopy', 'label' => 'Pro Bronchoscopy'],
+                ['value' => 'Pro CAG', 'label' => 'Pro CAG'],
+                ['value' => 'Pro PCI', 'label' => 'Pro PCI'],
+                ['value' => 'Pro Kemoterapi', 'label' => 'Pro Kemoterapi'],
+                ['value' => 'Pro MOW', 'label' => 'Pro MOW'],
+                ['value' => 'Pro Operasi Katarak', 'label' => 'Pro Operasi Katarak'],
+                ['value' => 'Pro Injeksi', 'label' => 'Pro Injeksi'],
+                ['value' => 'Pro Transfusi', 'label' => 'Pro Transfusi'],
+                ['value' => 'Sesak Nafas', 'label' => 'Sesak Nafas'],
+                ['value' => 'Nyeri Dada', 'label' => 'Nyeri Dada'],
+                ['value' => 'Nyeri Abdomen', 'label' => 'Nyeri Abdomen'],
+                ['value' => 'Kedaruratan Psikiatri', 'label' => 'Kedaruratan Psikiatri'],
+                ['value' => 'Repair CDL', 'label' => 'Repair CDL'],
+                ['value' => 'Lainnya', 'label' => 'Lainnya'],
+            ],
+            'kebutuhan_pelayanan' => [
+                ['value' => 'Preventif', 'label' => 'Preventif'],
+                ['value' => 'Paliatif', 'label' => 'Paliatif'],
+                ['value' => 'Kuratif', 'label' => 'Kuratif'],
+                ['value' => 'Rehabilitatif', 'label' => 'Rehabilitatif'],
+            ],
+            'kebutuhan_kamar' => [
+                ['value' => 'HCU', 'label' => 'HCU'],
+                ['value' => 'ICCU', 'label' => 'ICCU'],
+                ['value' => 'Kebidanan', 'label' => 'Kebidanan'],
+                ['value' => 'VK', 'label' => 'VK'],
+                ['value' => 'Perina', 'label' => 'Perina'],
+                ['value' => 'Bayi', 'label' => 'Bayi'],
+                ['value' => 'Ruang Biasa', 'label' => 'Ruang Biasa'],
+                ['value' => 'Ruang Khusus B20', 'label' => 'Ruang Khusus B20'],
+                ['value' => 'Ruang Isolasi', 'label' => 'Ruang Isolasi'],
+            ],
+            'status_sc' => [
+                ['value' => 'Ya', 'label' => 'Ya'],
+                ['value' => 'Tidak', 'label' => 'Tidak'],
+            ],
+            'jenis_pesan_penunjang' => [
+                ['value' => 'BEDAH', 'label' => 'Pesan Bedah'],
+                ['value' => 'CATHLAB', 'label' => 'Pesan Cathlab'],
+                ['value' => 'ENDOSCOPY', 'label' => 'Pesan Endoscopy'],
+                ['value' => 'ESWL', 'label' => 'Pesan ESWL'],
+            ],
+            'alat_khusus_penunjang' => [
+                ['value' => 'C-Arm dengan kontras', 'label' => 'C-Arm dengan kontras'],
+                ['value' => 'C-Arm Non Kontras', 'label' => 'C-Arm Non Kontras'],
+                ['value' => 'USG', 'label' => 'USG'],
+                ['value' => 'Lainnya', 'label' => 'Lainnya'],
+            ],
+            // Nilai harus persis dengan literal `in:` KONSEP §5 (5 nilai — berbeda
+            // dengan key `jenis_anestesia` yang punya 6 nilai Regional/Lokal).
+            'jenis_anestesi' => [
+                ['value' => 'Umum', 'label' => 'Umum'],
+                ['value' => 'Spinal', 'label' => 'Spinal'],
+                ['value' => 'Epidural', 'label' => 'Epidural'],
+                ['value' => 'Lokal', 'label' => 'Lokal'],
+                ['value' => 'Sedasi', 'label' => 'Sedasi'],
+            ],
+            // Opsi DESAIN (KONSEP §5 hanya menyebut "Persiapan pra tindakan"
+            // tanpa daftar; legacy tidak punya field ini) — label provisional.
+            'pra_tindakan_penunjang' => [
+                ['value' => 'Tidak Ada', 'label' => 'Tidak Ada'],
+                ['value' => 'Puasa (NPO)', 'label' => 'Puasa (NPO)'],
+                ['value' => 'Pre-medikasi', 'label' => 'Pre-medikasi'],
+                ['value' => 'Antibiotik Profilaksis', 'label' => 'Antibiotik Profilaksis'],
+                ['value' => 'Persiapan Kulit / Skin Prep', 'label' => 'Persiapan Kulit / Skin Prep'],
+                ['value' => 'Pemasangan Urine Kateter', 'label' => 'Pemasangan Urine Kateter'],
+                ['value' => 'Lainnya', 'label' => 'Lainnya'],
             ],
         ];
     }

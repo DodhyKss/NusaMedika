@@ -127,12 +127,15 @@ class ModulMenuSubMenuSeeder extends Seeder
             ['sub_menu_id' => 60, 'menu_id' => 6, 'nama_sub_menu' => 'Master Group Tindakan', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterGroupTindakan/master_group_tindakan', 'urutan_sub_menu' => 21],
             ['sub_menu_id' => 61, 'menu_id' => 6, 'nama_sub_menu' => 'Master Tarif', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterTarif/master_tarif', 'urutan_sub_menu' => 22],
             ['sub_menu_id' => 62, 'menu_id' => 6, 'nama_sub_menu' => 'Master Implementasi', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterImplementasi/master_implementasi', 'urutan_sub_menu' => 23],
+            ['sub_menu_id' => 63, 'menu_id' => 6, 'nama_sub_menu' => 'Master Diet', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterDiet/master_diet', 'urutan_sub_menu' => 24],
+            ['sub_menu_id' => 64, 'menu_id' => 6, 'nama_sub_menu' => 'Master Diagnosa Diet', 'file_sub_menu' => 'Administrator/ManajemenMaster/MasterDiagnosaDiet/master_diagnosa_diet', 'urutan_sub_menu' => 25],
             // Menu Manajemen User (7) - Administrator
             ['sub_menu_id' => 18, 'menu_id' => 7, 'nama_sub_menu' => 'User', 'file_sub_menu' => 'Administrator/ManajemenUser/User/user', 'urutan_sub_menu' => 1],
             // Menu Manajemen EMR (8) - Administrator
             ['sub_menu_id' => 30, 'menu_id' => 8, 'nama_sub_menu' => 'Dashboard Menu', 'file_sub_menu' => 'Administrator/ManajemenEMR/DashboardMenu/dashboard_menu', 'urutan_sub_menu' => 1],
             ['sub_menu_id' => 31, 'menu_id' => 8, 'nama_sub_menu' => 'Akses EHR', 'file_sub_menu' => 'Administrator/ManajemenEMR/AksesEhr/akses_ehr', 'urutan_sub_menu' => 2],
             ['sub_menu_id' => 32, 'menu_id' => 8, 'nama_sub_menu' => 'Form', 'file_sub_menu' => 'Administrator/ManajemenEMR/Form/form', 'urutan_sub_menu' => 3],
+            ['sub_menu_id' => 65, 'menu_id' => 8, 'nama_sub_menu' => 'Katalog Form Blanko', 'file_sub_menu' => 'Administrator/ManajemenEMR/KatalogFormBlanko/katalog_form_blanko', 'urutan_sub_menu' => 4],
             // Menu Pesanan (9) - Inventory
             ['sub_menu_id' => 33, 'menu_id' => 9, 'nama_sub_menu' => 'Buat Pesanan', 'file_sub_menu' => 'Inventory/Pesanan/BuatPesanan/buat_pesanan', 'urutan_sub_menu' => 1],
             ['sub_menu_id' => 34, 'menu_id' => 9, 'nama_sub_menu' => 'Setujui Pesanan', 'file_sub_menu' => 'Inventory/Pesanan/SetujuiPesanan/setujui_pesanan', 'urutan_sub_menu' => 2],

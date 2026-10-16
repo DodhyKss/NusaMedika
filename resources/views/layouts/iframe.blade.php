@@ -36,5 +36,9 @@
 
     {{-- Dialog konfirmasi/ peringatan global (window.nusaConfirm). --}}
     <x-confirm-alert />
+
+    {{-- Beberapa form EMR menaruh JS via @push('scripts'); tanpa stack ini
+         seluruh skrip mereka tidak pernah dirender (baris dinamis mati). --}}
+    @stack('scripts')
 </body>
 </html>

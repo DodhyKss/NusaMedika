@@ -201,6 +201,35 @@ function selfResolveRule(string $rule, string $src): string
 }
 
 /**
+ * Resolve aturan berbentuk konkatenasi + implode konstanta kelas, mis.
+ *     'required|in:'.implode(',', self::JAWABAN)
+ * menjadi literal utuh
+ *     'required|in:Ya,Tidak,N/A'
+ * sehingga optsFromRule() membaca daftar nilai enum dengan benar (tanpa ini
+ * payload harness mengirim nilai sampah -> validasi `in:` selalu gagal).
+ */
+function resolveImplodeKonstanta(string $rule, ReflectionClass $rc): string
+{
+    if (! str_contains($rule, 'implode(')) {
+        return $rule;
+    }
+    // Pola pakai single-quote: `\2` di string PHP double-quoted akan jadi
+    // escape octal chr(2), bukan backreference regex.
+    if (! preg_match('/^\'([^\']*)\'\s*\.\s*implode\(\s*([\'"])(.*?)\2\s*,\s*self::(\w+)\s*\)(.*)$/s', $rule, $m)) {
+        return $rule;
+    }
+    if (! $rc->hasConstant($m[4])) {
+        return $rule;
+    }
+    $nilai = $rc->getConstant($m[4]);
+    if (! is_array($nilai)) {
+        return $rule;
+    }
+
+    return $m[1].implode((string) $m[3], $nilai).trim($m[5]);
+}
+
+/**
  * Ambil isi blok `{ ... }` yang mengikuti header loop pada offset tertentu.
  *
  * Header loop sudah Includes `foreach (...)` / `for (...)` TANPA brace, jadi
@@ -525,6 +554,54 @@ function selfResolveCollection(string $src, string $class, string $ekspresi): ?a
 }
 
 /**
+ * Evaluasi ekspresi iterable sebuah `foreach (...)` menjadi daftar nilai.
+ *
+ * Didukung: `self::KONST`, `array_merge(self::A, self::B, ['x'])`, dan
+ * array literal inline `[...]`. Ekspresi lain (variabel, method call)
+ * mengembalikan null supaya pemanggil melewati loop tersebut.
+ *
+ * @return array<int, mixed>|null
+ */
+function iterableForeach(string $expr, array $konstantaArray): ?array
+{
+    $expr = trim($expr);
+
+    if (preg_match('/^self::(\w+)$/', $expr, $m)) {
+        return $konstantaArray[$m[1]] ?? null;
+    }
+
+    if (preg_match('/^array_merge\s*\((.*)\)$/s', $expr, $m)) {
+        $hasil = [];
+        foreach (phpListValues($m[1]) as $arg) {
+            if (preg_match('/^self::(\w+)$/', $arg, $c)) {
+                $bagian = $konstantaArray[$c[1]] ?? null;
+                if ($bagian === null) {
+                    return null;
+                }
+                $hasil = array_merge($hasil, $bagian);
+
+                continue;
+            }
+            if (str_starts_with($arg, '[') && str_ends_with($arg, ']')) {
+                $hasil = array_merge($hasil, phpListValues(substr($arg, 1, -1)));
+
+                continue;
+            }
+
+            return null;
+        }
+
+        return $hasil;
+    }
+
+    if (str_starts_with($expr, '[') && str_ends_with($expr, ']')) {
+        return phpListValues(substr($expr, 1, -1));
+    }
+
+    return null;
+}
+
+/**
  * Ekspansi aturan validasi yang ditulis di dalam loop numerik.
  *
  * Controller EMR menulis aturan baris-bersuffix lewat loop, mis.
@@ -562,11 +639,14 @@ function expandRuleLoops(string $src): array
     if (preg_match_all('/(?:public|private|protected)?\s*const\s+(\w+)\s*=\s*\[(.*?)\];/s', $src, $ka, PREG_SET_ORDER)) {
         foreach ($ka as $one) {
             $isi = [];
-            if (preg_match_all('/\x27([^\x27]*)\x27\s*(?:=>|,)/', $one[2], $kv, PREG_SET_ORDER)) {
+            // Koma buatan di ujung supaya elemen TERAKHIR tanpa trailing
+            // comma tetap tertangkap (mis. const LOKASI = [a, b, c];).
+            $body = $one[2].',';
+            if (preg_match_all('/\x27([^\x27]*)\x27\s*(?:=>|,)/', $body, $kv, PREG_SET_ORDER)) {
                 foreach ($kv as $kvOne) {
                     $isi[] = $kvOne[1];
                 }
-            } elseif (preg_match_all('/(\d+)\s*(?:=>|,)/', $one[2], $kn, PREG_SET_ORDER)) {
+            } elseif (preg_match_all('/(\d+)\s*(?:=>|,)/', $body, $kn, PREG_SET_ORDER)) {
                 foreach ($kn as $knOne) {
                     $isi[] = (int) $knOne[1];
                 }
@@ -574,22 +654,18 @@ function expandRuleLoops(string $src): array
             $konstantaArray[$one[1]] = $isi;
         }
     }
-    $polaForeach = '/foreach\s*\(\s*(?:self::(\w+)|\[\s*([^\]]*)\])\s+as\s+\$(\w+)/';
+    // Header WAJIB disampai ke tanda penutup `)` — loopBodyAt() mulai membaca
+    // dari akhir match dan hanya melewati whitespace, jadi match yang berhenti
+    // di nama variabel (`... as $key`) selalu gagal menemukan `{`.
+    // `=> $y` kedua opsional ditangkap supaya header tidak bocor ke `)`.
+    $polaForeach = '/foreach\s*\(\s*((?:[^;{}])+?)\s+as\s+\$(\w+)(?:\s*=>\s*\$\w+)?\s*\)/s';
     if (preg_match_all($polaForeach, $src, $fe, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
         foreach ($fe as $info) {
-            if ($info[1][1] >= 0) {
-                $nama = $info[1][0];
-                if (! isset($konstantaArray[$nama])) {
-                    continue;
-                }
-                $iterable = $konstantaArray[$nama];
-            } else {
-                $iterable = phpListValues($info[2][0]);
-            }
-            if ($iterable === []) {
+            $iterable = iterableForeach(trim($info[1][0]), $konstantaArray);
+            if ($iterable === null || $iterable === []) {
                 continue;
             }
-            $var = $info[3][0];
+            $var = $info[2][0];
             $body = loopBodyAt($src, $info[0][1] + strlen($info[0][0]));
             if ($body === null) {
                 continue;
@@ -849,6 +925,14 @@ REGEX;
         $map[$variabel] ??= $rule;
     }
 
+    // Bentuk 'literal'.implode(',', self::KONST) (dari array literal maupun
+    // loop) di-resolve jadi daftar enum konkret — langkah TERAKHIR supaya
+    // menutupi semua sumber aturan di atas.
+    $rcImplode = new ReflectionClass($absClass);
+    foreach ($map as $variabel => $rule) {
+        $map[$variabel] = resolveImplodeKonstanta((string) $rule, $rcImplode);
+    }
+
     return $map;
 }
 
@@ -993,6 +1077,33 @@ function optsFromRule(string $rule, string $src): ?string
     return null;
 }
 
+/**
+ * Grup checkbox "tepat satu Ya" untuk form Surveilans Infeksi (116 CVC/PICC,
+ * 118 Kateter Urine). Mengembalikan daftar anggota grup bila $v anggotanya,
+ * null selain itu.
+ */
+function grupTepatSatu(string $v): ?array
+{
+    static $map = null;
+    if ($map === null) {
+        $grup = [
+            ['lokasi_subclavia', 'lokasi_jugularis', 'lokasi_femoralis'],
+            ['cath_12', 'cath_7', 'cath_5', 'cath_4', 'cath_3'],
+            ['cvc_4lumen', 'cvc_3lumen', 'cvc_2lumen', 'cvc_1lumen'],
+            ['jenis_kath_silikon', 'jenis_kath_folly'],
+            ['no_kath_6', 'no_kath_8', 'no_kath_10', 'no_kath_12', 'no_kath_14'],
+        ];
+        $map = [];
+        foreach ($grup as $g) {
+            foreach ($g as $m) {
+                $map[$m] = $g;
+            }
+        }
+    }
+
+    return $map[$v] ?? null;
+}
+
 function buildPayload(string $absClass, int $fid): array
 {
     $rc = new ReflectionClass($absClass);
@@ -1009,6 +1120,16 @@ function buildPayload(string $absClass, int $fid): array
         // checkbox dan wajib mendapat nilai valid dari daftar.
         if (! str_contains($rule, 'required')
             && preg_match('/\bin:(0,1|1,0|on,off|off,on)(?:\s*(\||$))/', $rule)) {
+            continue;
+        }
+        // Grup checkbox "tepat satu Ya" (form 116/118 Surveilans Infeksi):
+        // anggota pertama grup = 'Ya', sisanya 'Tidak'. Tanpa special-case ini
+        // optsFromRule mengirim 'Ya' ke SEMUA anggota dan guard after() server
+        // (hitung Ya > 1) selalu gagal saat E2E.
+        $g = grupTepatSatu($v);
+        if ($g !== null) {
+            $p[$v] = $g[0] === $v ? 'Ya' : 'Tidak';
+
             continue;
         }
         $o = $rule !== '' ? optsFromRule($rule, $src) : null;
@@ -1223,6 +1344,30 @@ function buildPayload(string $absClass, int $fid): array
     // form 103/104: berat_badan >= bb_kering.
     if (isset($p['berat_badan'], $p['bb_kering'])) {
         $p['bb_kering'] = min((float) $p['bb_kering'], (float) $p['berat_badan']);
+    }
+
+    // Validasi lintas-field: `different:field` (Assesmen Transfusi 109 &
+    // Double Check High Alert 111 — perawat_2_id wajib != perawat_1_id).
+    // Dua kolom exists:pegawai sama-sama memakai id pertama, jadi ambil id
+    // alternatif dari tabel yang sama.
+    foreach ($rm as $v => $rule) {
+        $rule = (string) $rule;
+        if (! isset($p[$v]) || ! preg_match('/\bdifferent:([a-z0-9_]+)/', $rule, $m)) {
+            continue;
+        }
+        $lain = $m[1];
+        if (! isset($p[$lain]) || (string) $p[$v] !== (string) $p[$lain]) {
+            continue;
+        }
+        if (preg_match('/exists:([a-z0-9_]+),([a-z0-9_]+)/', $rule, $em)) {
+            try {
+                $alt = DB::table($em[1])->where($em[2], '!=', $p[$lain])->value($em[2]);
+                if ($alt !== null) {
+                    $p[$v] = $alt;
+                }
+            } catch (Throwable $e) {
+            }
+        }
     }
 
     return $p;
