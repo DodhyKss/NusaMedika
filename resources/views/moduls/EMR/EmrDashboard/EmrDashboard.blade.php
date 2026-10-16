@@ -5,12 +5,12 @@
 <x-informasi-pasien />
 
 <!-- EMR Tabs / Navigation -->
-<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden min-h-[500px]" data-no-loader="true">
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm min-h-[500px]" data-no-loader="true">
     <div class="border-b border-slate-700 bg-slate-800 flex flex-wrap">
         @if(isset($ehrMenus) && count($ehrMenus) > 0)
             @foreach($ehrMenus as $menuName => $subMenus)
                 <div class="relative group">
-                    <button type="button" onclick="toggleDropdown(this)" class="flex items-center gap-2 px-5 py-3.5 text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 min-w-max transition-colors border-b-2 border-transparent hover:border-blue-400 focus:outline-none cursor-pointer">
+                    <button type="button" onclick="toggleDropdown(event, this)" class="flex items-center gap-2 px-5 py-3.5 text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 min-w-max transition-colors border-b-2 border-transparent hover:border-blue-400 focus:outline-none cursor-pointer">
                         {{ ucwords($menuName) }}
                         @if(is_array($subMenus) && count($subMenus) > 0 && !isset($subMenus['id']))
                             <svg class="w-3.5 h-3.5 ml-1 opacity-70 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -19,7 +19,7 @@
                     
                     @if(is_array($subMenus) && count($subMenus) > 0 && !isset($subMenus['id']))
                         <!-- Dropdown Sub Menu -->
-                        <div class="submenu hidden absolute left-full top-0 w-64 bg-white border border-slate-200 rounded-lg shadow-xl z-50">
+                        <div class="submenu hidden absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-xl z-[100]">
                             <div class="py-2">
                                 @foreach($subMenus as $subMenuName => $extras)
                                     @if(is_array($extras) && !isset($extras['id']) && count($extras) > 0)
@@ -29,7 +29,7 @@
                                                 <svg class="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                             </a>
                                             <!-- Sub-Dropdown (Extra) -->
-                                            <div class="extra-submenu hidden absolute left-full top-0 w-64 bg-white border border-slate-200 rounded-lg shadow-xl transition-all z-50 -ml-1">
+                                            <div class="extra-submenu hidden absolute top-0 left-full ml-1 w-64 bg-white border border-slate-200 rounded-lg shadow-xl transition-all z-[100]">
                                                 <div class="py-2">
                                                     @foreach($extras as $extra)
                                                         @php
@@ -62,7 +62,7 @@
     </div>
 
     <!-- Tab Content Area (Iframe) -->
-    <div class="relative bg-slate-50/30 w-full h-[650px]">
+    <div class="relative bg-slate-50/30 w-full h-[650px] overflow-hidden rounded-b-xl">
         
         <!-- Loading Overlay -->
         <div id="emr_loader" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-50/80 backdrop-blur-sm z-20 hidden">
@@ -92,61 +92,146 @@
     function closeAllDropdowns() {
         document.querySelectorAll('.submenu, .extra-submenu').forEach(menu => {
             menu.classList.add('hidden');
+            resetPosisi(menu);
         });
     }
 
-    document.addEventListener('click', function(e) {
-        // 1. Jika yang diklik adalah link menu tujuan (bukan tombol toggle submenu)
-        if (e.target.closest('a') && !e.target.closest('a').hasAttribute('onclick') || (e.target.closest('a') && !e.target.closest('a').getAttribute('onclick').includes('toggleExtraDropdown'))) {
-            // Kita ingin menu tertutup setelah item dipilih
-            closeAllDropdowns();
+    function resetPosisi(menu) {
+        menu.style.left = '';
+        menu.style.right = '';
+        menu.style.top = '';
+        menu.style.bottom = '';
+        menu.style.marginLeft = '';
+        menu.style.marginRight = '';
+    }
+
+    function pasangPosisi(menu, anchor, jenis) {
+        resetPosisi(menu);
+        menu.classList.remove('hidden');
+
+        const rectMenu = menu.getBoundingClientRect();
+        const rectAnchor = anchor.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const gap = 8;
+        const margin = 8;
+
+        if (jenis === 'bawah') {
+            // Buka ke bawah; flip ke atas bila melewati batas bawah viewport
+            menu.style.top = '100%';
+            menu.style.left = '0';
+            menu.style.marginTop = gap + 'px';
+
+            if (rectAnchor.bottom + gap + rectMenu.height + margin > vh) {
+                menu.style.top = 'auto';
+                menu.style.bottom = '100%';
+                menu.style.marginTop = '0';
+                menu.style.marginBottom = gap + 'px';
+            }
+
+            // Flip horizontal bila melewati batas kanan viewport
+            if (rectAnchor.left + rectMenu.width + margin > vw) {
+                menu.style.left = 'auto';
+                menu.style.right = '0';
+            }
+        } else {
+            // Sub-extra: default ke kanan; flip ke kiri bila melewati batas kanan
+            menu.style.top = '0';
+            menu.style.left = '100%';
+            menu.style.marginLeft = gap + 'px';
+
+            if (rectAnchor.right + gap + rectMenu.width + margin > vw) {
+                menu.style.left = 'auto';
+                menu.style.right = '100%';
+                menu.style.marginLeft = '0';
+                menu.style.marginRight = gap + 'px';
+            }
+
+            // Flip vertical bila melewati batas bawah viewport
+            if (rectAnchor.top + rectMenu.height + margin > vh) {
+                menu.style.top = 'auto';
+                menu.style.bottom = '0';
+            }
         }
-        
-        // 2. Jika klik terjadi di luar area menu sama sekali
-        else if (!e.target.closest('.group')) {
+    }
+
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a');
+        if (link) {
+            const onclick = link.getAttribute('onclick') || '';
+            if (!onclick.includes('toggleExtraDropdown')) {
+                closeAllDropdowns();
+            }
+        } else if (!e.target.closest('.group')) {
             closeAllDropdowns();
         }
     });
 
-    // 3. Jika klik terjadi di dalam iframe (iframe iframe merebut fokus dari window utama)
+    // Klik di dalam iframe membuat window utama blur — tutup menu agar tidak nyangkut
     window.addEventListener('blur', function() {
         closeAllDropdowns();
     });
 
-    function toggleDropdown(button) {
-        const submenu = button.nextElementSibling;
+    window.addEventListener('resize', function() {
+        closeAllDropdowns();
+    });
 
-        // Tutup submenu lain yang selevel
+    function toggleDropdown(event, button) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        const submenu = button.nextElementSibling;
+        if (!submenu || !submenu.classList.contains('submenu')) {
+            return;
+        }
+
+        const sedangTerbuka = !submenu.classList.contains('hidden');
+
         document.querySelectorAll('.submenu').forEach(menu => {
             if (menu !== submenu) {
                 menu.classList.add('hidden');
+                resetPosisi(menu);
             }
         });
-        
-        // Tutup semua extra-submenu jika ada yang terbuka
         document.querySelectorAll('.extra-submenu').forEach(menu => {
             menu.classList.add('hidden');
+            resetPosisi(menu);
         });
 
-        // Toggle submenu yang diklik
-        submenu.classList.toggle('hidden');
+        if (sedangTerbuka) {
+            submenu.classList.add('hidden');
+            resetPosisi(submenu);
+        } else {
+            pasangPosisi(submenu, button, 'bawah');
+        }
     }
 
     function toggleExtraDropdown(event, link) {
         event.preventDefault();
-        event.stopPropagation(); // Mencegah click menyebar ke document (agar menu tidak tertutup otomatis)
-        
+        event.stopPropagation();
+
         const extraSubmenu = link.nextElementSibling;
-        
-        // Tutup extra-submenu lain jika ada yang terbuka
+        if (!extraSubmenu || !extraSubmenu.classList.contains('extra-submenu')) {
+            return;
+        }
+
+        const sedangTerbuka = !extraSubmenu.classList.contains('hidden');
+
         document.querySelectorAll('.extra-submenu').forEach(menu => {
             if (menu !== extraSubmenu) {
                 menu.classList.add('hidden');
+                resetPosisi(menu);
             }
         });
 
-        // Toggle extra-submenu yang diklik
-        extraSubmenu.classList.toggle('hidden');
+        if (sedangTerbuka) {
+            extraSubmenu.classList.add('hidden');
+            resetPosisi(extraSubmenu);
+        } else {
+            pasangPosisi(extraSubmenu, link, 'samping');
+        }
     }
 </script>
 @endsection
