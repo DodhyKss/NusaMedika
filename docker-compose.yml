@@ -1,53 +1,94 @@
 services:
+  # ---------------------------------------------------------------------------
+  #  web — Apache 2.4 (rewrite + proxy_fcgi) → PHP-FPM service `app`
+  #  Akses: http://localhost:8081
+  # ---------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: apache
+    image: nusamedika-web:dev
+    container_name: nusamedika_web
+    ports:
+      - "8081:80"
+    volumes:
+      - ./:/var/www/html
+    env_file:
+      - .env
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  #  app — PHP 8.3 FPM (aplikasi Laravel + tempat artisan)
+  #  Dijalankan sebagai uid 1000 -> file hasil artisan tetap milik user host.
+  # ---------------------------------------------------------------------------
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: nusamedika-app:dev
+      target: fpm
+    image: nusamedika-fpm:dev
     container_name: nusamedika_app
-    network_mode: "host"
-    # Menjalankan proses sebagai user host (uid 1000) agar file yang dibuat
-    # dari dalam container (mis. via artisan) ber-owner user host, bukan root,
-    # sehingga mudah diedit/dihapus dari komputer lokal.
     user: "1000:1000"
     env_file:
       - .env
     environment:
-      # Memastikan koneksi database
-      DB_CONNECTION: "${DB_CONNECTION}"
-      DB_HOST: "${DB_HOST}"
-      DB_PORT: "${DB_PORT}"
-      DB_DATABASE: "${DB_DATABASE}"
-      DB_USERNAME: "${DB_USERNAME}"
-      DB_PASSWORD: "${DB_PASSWORD}"
-      # Menggunakan sync/file/database agar tidak bergantung pada redis
-      CACHE_STORE: file
-      QUEUE_CONNECTION: sync
-      SESSION_DRIVER: file
-    # Mem-binding folder saat ini ke dalam container secara live (Hot Reloading)
+      COMPOSER_HOME: /tmp/composer
     volumes:
       - ./:/var/www/html
-    # Otomatis install dependency (jika belum ada) lalu jalankan built-in server PHP
-    command: sh -c "composer install && php artisan serve --host=0.0.0.0 --port=8000"
+    command: sh -c "composer install --no-interaction --prefer-dist --optimize-autoloader && exec php-fpm --nodaemonize"
+    restart: unless-stopped
 
-  db:
-    image: mysql:8.0
-    container_name: nusamedika_db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: "${DB_DATABASE:-meditech}"
-      MYSQL_USER: "${DB_USERNAME:-meditech}"
-      MYSQL_PASSWORD: "${DB_PASSWORD:-meditech}"
-    ports:
-      - "3306:3306"
+  # ---------------------------------------------------------------------------
+  #  redis — OPSIONAL (profile `redis`)
+  #  Cara pakai: docker compose --profile redis up -d
+  #  Tanpa service ini aplikasi tetap jalan (cache=file, session=file, queue=sync)
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: nusamedika_redis
+    profiles:
+      - redis
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./deploy/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  #  queue — worker antrean (profile `redis`, hanya perlu bila QUEUE_CONNECTION=redis)
+  # ---------------------------------------------------------------------------
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: fpm
+    image: nusamedika-fpm:dev
+    container_name: nusamedika_queue
+    profiles:
+      - redis
+    user: "1000:1000"
+    env_file:
+      - .env
+    environment:
+      COMPOSER_HOME: /tmp/composer
+    volumes:
+      - ./:/var/www/html
+    command: sh -c "until [ -f vendor/autoload.php ]; do sleep 2; done; exec php artisan queue:work redis --sleep=3 --tries=3 --timeout=1800"
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  #  vite — dev server frontend (node), network host supaya HMR & asset URL
+  #  http://localhost:5173 bisa diakses browser di host.
+  # ---------------------------------------------------------------------------
   vite:
     image: node:22-alpine
     container_name: nusamedika_vite
@@ -56,9 +97,5 @@ services:
       - .env
     volumes:
       - ./:/var/www/html
-    # Otomatis install dependency npm lalu jalankan vite server
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     network_mode: "host"
-
-volumes:
-  mysql_data:

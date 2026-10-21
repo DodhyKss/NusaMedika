@@ -1,0 +1,17 @@
+[Unit]
+Description=NusaMedika (manual) - Queue Worker
+After=network.target redis-server.service
+
+[Service]
+Type=simple
+User=__USER__
+Group=__GROUP__
+WorkingDirectory=__APP_DIR__
+Restart=always
+RestartSec=5
+ExecStart=/usr/bin/php __APP_DIR__/artisan queue:work redis --sleep=3 --tries=3 --timeout=1800 --max-time=3600
+StandardOutput=append:__APP_DIR__/storage/logs/queue-worker.log
+StandardError=append:__APP_DIR__/storage/logs/queue-worker.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=NusaMedika (manual) - Laravel Scheduler timer
+Requires=nusamedika-scheduler.service
+
+[Timer]
+OnCalendar=*:*:00
+Persistent=true
+Unit=nusamedika-scheduler.service
+
+[Install]
+WantedBy=timers.target

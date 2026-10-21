@@ -1,0 +1,10 @@
+[Unit]
+Description=NusaMedika (manual) - Laravel Scheduler
+After=network.target redis-server.service
+
+[Service]
+Type=oneshot
+User=__USER__
+Group=__GROUP__
+WorkingDirectory=__APP_DIR__
+ExecStart=/usr/bin/php __APP_DIR__/artisan schedule:run

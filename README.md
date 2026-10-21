@@ -17,9 +17,13 @@ Dokumen ini adalah panduan lengkap: arsitektur, struktur proyek, cara kerja, lib
 5. [Seeder](#5-seeder)
 6. [Command-command](#6-command-command)
 7. [Instalasi dengan Docker](#7-instalasi-dengan-docker)
-8. [Instalasi Manual](#8-instalasi-manual)
+8. [Instalasi Manual](#8-instalasi-manual-tanpa-docker) — panduan lengkap: [`deploy/README-MANUAL.md`](deploy/README-MANUAL.md)
 9. [Konfigurasi Environment](#9-konfigurasi-environment)
 10. [Troubleshooting](#10-troubleshooting)
+
+> Dokumentasi deployment tambahan:
+> - [`deploy/README.md`](deploy/README.md) — ringkasan stack Docker (Apache + PHP-FPM + Redis opsional)
+> - [`deploy/README-MANUAL.md`](deploy/README-MANUAL.md) — instalasi manual di host (tanpa Docker)
 
 ---
 
@@ -55,9 +59,11 @@ Dokumen ini adalah panduan lengkap: arsitektur, struktur proyek, cara kerja, lib
 
 ### Infrastruktur
 
-- **PHP 8.3** dengan ekstensi: `pdo_pgsql`, `pgsql`, `mbstring`, `exif`, `pcntl`, `bcmath`, `gd`, `zip`, `intl`, `opcache`, `curl`, `git`, `unzip`, `postgresql-client`, `tzdata`.
-- **PostgreSQL** sebagai database utama (server database **eksternal** — tidak ada service database di dalam compose).
-- **Docker + Docker Compose** untuk lingkungan pengembangan (2 service: `app` dan `vite`, lihat bagian Instalasi Docker).
+- **Apache 2.4** sebagai web server (container `web`) — `mod_rewrite` + `mod_proxy_fcgi`, DocumentRoot `public/`, akses <http://localhost:8081>.
+- **PHP 8.3 FPM** (container `app`) dengan ekstensi: `pdo_mysql mysqlnd`, `pdo_pgsql`, `pgsql`, `mbstring`, `exif`, `pcntl`, `bcmath`, `gd`, `zip`, `intl`, `opcache`, `redis`, `curl`, `git`, `unzip`, `postgresql-client`, `tzdata`.
+- **Redis** (container `redis`) — **opsional** untuk cache / session / queue (profile `redis`). Tanpanya aplikasi tetap jalan dengan driver `file`/`sync`.
+- **MySQL / PostgreSQL eksternal** sebagai database — **tidak ada service database di dalam Docker**; seluruh konfigurasi DB hanya di `.env` (`DB_*`).
+- **Docker + Docker Compose** untuk seluruh lingkungan (service: `web`, `app`, `redis`, `queue`, `vite` — lihat bagian Instalasi Docker).
 
 ---
 
@@ -116,8 +122,9 @@ NusaMedika/
 │           ├── {Modul}/{Menu}/{SubMenu}/{basename}*.blade.php  # halaman per sub-menu
 │           └── EMR/                      # EmrDashboard, Soap, PartialForm, dsb.
 ├── routes/web.php                        # Route manual (auth, dashboard, EMR, API). Route CRUD lain otomatis.
-├── docker-compose.yml                    # Service app (php artisan serve :8000) + vite (:5173)
-├── Dockerfile                            # Image php:8.3-cli + ekstensi + composer
+├── docker-compose.yml                    # Service web (Apache :8081) + app (PHP-FPM) + redis (opsional) + queue + vite (:5173)
+├── Dockerfile                            # Image php:8.3-fpm multi-target: `fpm` & `apache` (proxy_fcgi)
+├── deploy/                               # Konfigurasi container: vhost Apache, tuning PHP-FPM, redis.conf, panduan
 ├── vite.config.js                        # Konfigurasi Vite (input css/js, tailwind, font, port 5173)
 ├── package.json                          # Dependensi npm & script build/dev
 ├── composer.json                         # Dependensi composer & script (dev, test, lint, format)
@@ -296,12 +303,17 @@ Command ini (`App\Console\Commands\SyncMasterMenuSeeder`) membaca record **aktif
 
 | Kebutuhan | Perintah |
 | :--- | :--- |
-| Build image & start semua service | `docker compose up -d --build` |
-| Start ulang dengan konfigurasi `.env` terbaru | `docker compose up -d --force-recreate app vite` |
+| Build image & start semua service (tanpa Redis) | `docker compose up -d --build` |
+| Start dengan Redis aktif | `docker compose --profile redis up -d --build` |
+| Start ulang dengan konfigurasi `.env` terbaru | `docker compose up -d --force-recreate app web` |
 | Lihat status container | `docker compose ps` |
-| Log app real-time | `docker compose logs -f app` |
+| Status + Redis | `docker compose --profile redis ps` |
+| Log Apache (web) | `docker compose logs -f web` |
+| Log PHP-FPM (app) | `docker compose logs -f app` |
 | Log vite | `docker compose logs -f vite` |
+| Log Redis | `docker compose exec redis redis-cli monitor` |
 | Masuk shell container app | `docker compose exec -it app bash` |
+| Redis CLI | `docker compose exec redis redis-cli` |
 | Stop container | `docker compose down` |
 | Hapus container + volume | `docker compose down -v` |
 
@@ -326,7 +338,7 @@ Command ini (`App\Console\Commands\SyncMasterMenuSeeder`) membaca record **aktif
 | Bersihkan semua cache (optimize:clear) | `docker compose exec app php artisan optimize:clear` |
 | Jalankan test suite | `docker compose exec app php artisan test` |
 | Tail log real-time | `docker compose exec app php artisan pail` |
-| Queue worker (jika perlu) | `docker compose exec app php artisan queue:work` / `queue:listen` |
+| Queue worker (kalau Redis aktif) | `docker compose exec app php artisan queue:work redis` / `queue:listen` |
 | Format kode (Pint) | `docker compose exec app vendor/bin/pint` |
 | Cek style (Pint test-mode) | `docker compose exec app vendor/bin/pint --test` |
 
@@ -352,11 +364,13 @@ Command ini (`App\Console\Commands\SyncMasterMenuSeeder`) membaca record **aktif
 
 ## 7. Instalasi dengan Docker
 
+Stack: **Apache 2.4 + PHP 8.3 FPM (+ Redis opsional)**, database **eksternal**.
+
 ### Prasyarat
 
 - Docker Engine (Docker Desktop di Windows/macOS, atau daemon Docker di Linux).
 - Plugin **Docker Compose v2** (sudah termasuk di Docker Desktop / diinstal terpisah di Linux).
-- Server **PostgreSQL** yang bisa diakses (bisa dari host yang sama, atau server lain; koneksi ditentukan oleh `.env`).
+- Server **MySQL** (atau PostgreSQL) yang bisa diakses — **di luar Docker**; koneksi ditentukan oleh `.env`.
 
 ### Langkah-langkah
 
@@ -373,15 +387,30 @@ Command ini (`App\Console\Commands\SyncMasterMenuSeeder`) membaca record **aktif
    cp .env.example .env
    ```
 
-   Sesuai ke database PostgreSQL yang kamu miliki. Contoh untuk server sama dengan host:
+   Isi blok database (server **luar** Docker):
 
+   ```dotenv
+   DB_CONNECTION=mysql
+   DB_HOST=153.92.15.19
+   DB_PORT=3306
+   DB_DATABASE=u887691424_nusamedka
+   DB_USERNAME=...
+   DB_PASSWORD=...
    ```
-   DB_CONNECTION=pgsql
-   DB_HOST=127.0.0.1
-   DB_PORT=5432
-   DB_DATABASE=meditech
-   DB_USERNAME=postgres
-   DB_PASSWORD=********
+
+   Pilih mode cache/session/queue (lihat §9):
+
+   ```dotenv
+   # tanpa redis (default)
+   CACHE_STORE=file
+   SESSION_DRIVER=file
+   QUEUE_CONNECTION=sync
+
+   # dengan redis
+   CACHE_STORE=redis
+   SESSION_DRIVER=redis
+   QUEUE_CONNECTION=redis
+   REDIS_HOST=redis
    ```
 
    Juga pastikan konstanta SIMRS (bagian `JENIS_RAWAT_*`, `FORM_ID_*`, `OBJEK_ID_*`, `PROFESI_ID_DOKTER`, `REF_BAGIAN_RAJAL`) terisi. **`.env` berisi password database dan tidak boleh di-commit ke git.**
@@ -389,14 +418,16 @@ Command ini (`App\Console\Commands\SyncMasterMenuSeeder`) membaca record **aktif
 3. **Build & jalankan container**
 
    ```bash
-   docker compose up -d --build
+   docker compose up -d --build            # tanpa Redis
+   docker compose --profile redis up -d --build   # dengan Redis
    ```
 
    Yang terjadi saat pertama kali:
-   - Image `app` dibangun dari `Dockerfile` (PHP 8.3 CLI + ekstensi Postgres + Composer).
-   - Container `app` menjalankan `composer install` lalu `php artisan serve --host=0.0.0.0 --port=8000`.
+   - Image dibangun dari `Dockerfile` multi-target: `fpm` (PHP 8.3 FPM + ekstensi + Composer) dan `apache` (Apache + `mod_proxy_fcgi`).
+   - Container `app` menjalankan `composer install` lalu `php-fpm` (menjadi backend `.php`).
+   - Container `web` menjalankan Apache (DocumentRoot `public/`) dan meneruskan request `.php` ke `app:9000`.
    - Container `vite` (Node 22) menjalankan `npm install` lalu `npm run dev -- --host 0.0.0.0` (dev server di port 5173).
-   - Nilai `.env` diinjeksi otomatis (`env_file`).
+   - Nilai `.env` diinjeksi otomatis (`env_file`) dan juga dibaca Laravel langsung dari file `.env` di volume.
 
 4. **Siapkan schema (hanya untuk database baru)**
 
@@ -406,11 +437,11 @@ Command ini (`App\Console\Commands\SyncMasterMenuSeeder`) membaca record **aktif
    docker compose exec app php artisan migrate --seed
    ```
 
-   Jika kamu memakai database legacy yang sudah berisi data, **LEWATI langkah migrasi** — jangan jalankan `migrate:fresh`.
+   Jika kamu memakai database yang sudah berisi data, **LEWATI langkah migrasi** — jangan jalankan `migrate:fresh`.
 
 5. **Akses aplikasi**
 
-   Buka `http://localhost:8000`. Kedua container memakai `network_mode: host`, sehingga port 8000 langsung terpublish ke localhost.
+   Buka `http://localhost:8081` (port 80/8080 di host sudah dipakai aplikasi lain).
 
    Login default dari seeder:
 
@@ -425,66 +456,89 @@ Command ini (`App\Console\Commands\SyncMasterMenuSeeder`) membaca record **aktif
    Nilai `.env` terbaca saat container start. Setelah mengeditnya, wajib recreate:
 
    ```bash
-   docker compose up -d --force-recreate app vite
+   docker compose up -d --force-recreate app web
    ```
+
+   Lalu bersihkan cache Laravel:
+
+   ```bash
+   docker compose exec app php artisan config:clear
+   docker compose exec app php artisan cache:clear
+   ```
+
+   > **Jangan** `php artisan config:cache` — aplikasi membaca `env('FORM_ID_*')` / `env('OBJEK_ID_*')` saat runtime.
 
 ### Struktur Docker (komposisi aktual)
 
-`docker-compose.yml` hanya berisi **dua service**:
+`docker-compose.yml` berisi **lima service**:
 
-- `app` — image khusus dari `Dockerfile` (PHP 8.3 CLI + ekstensi + composer), menjalankan `artisan serve` di port 8000. Volume `./:/var/www/html` dipasang langsung (hot reload untuk file PHP). Berjalan sebagai **user host (uid 1000)** via `user: "1000:1000"` — sehingga file yang dibuat dari dalam container (scaffold `make:submenu`, cache, dsb.) dimiliki uid 1000: bisa diedit/dihapus dari host tanpa `sudo`. Bila uid host teammate berbeda, sesuaikan nilai `user:` dengan `id -u`/`id -g` (jangan dihapus barisnya).
-- `vite` — image `node:22-alpine`, menjalankan Vite dev server di port 5173 untuk aset frontend.
+| Service | Image | Peran | Port |
+| :--- | :--- | :--- | :--- |
+| `web` | target `apache` | Apache 2.4 (`rewrite` + `proxy_fcgi`), DocumentRoot `public/` | host **8081** → container 80 |
+| `app` | target `fpm` | PHP 8.3 FPM + `artisan`, `composer install` saat start | internal `app:9000` |
+| `redis` | `redis:7-alpine` | cache/session/queue — **opsional** (profile `redis`) | internal `redis:6379` |
+| `queue` | target `fpm` | `artisan queue:work redis` — ikut profile `redis` | — |
+| `vite` | `node:22-alpine` | Vite dev server | host network, 5173 |
 
-Tidak ada service `db`, `redis`, maupun `queue` di dalam compose — database PostgreSQL bersifat eksternal, dan pada development `CACHE_STORE=file`, `QUEUE_CONNECTION=sync`, `SESSION_DRIVER=file`.
+- **Tidak ada service `db`** — database bersifat eksternal dan dikonfigurasi hanya lewat `.env`.
+- Container `app` (dan `queue`) berjalan sebagai **user host (uid 1000)** via `user: "1000:1000"`, sehingga file yang dibuat dari dalam container (cache, log, scaffold `make:submenu`) dimiliki uid 1000: bisa diedit/dihapus dari host tanpa `sudo`. Bila uid host teammate berbeda, sesuaikan nilai `user:` dengan `id -u`/`id -g` (jangan dihapus barisnya).
+- Container `web` berjalan sebagai root di dalam container (agar bisa bind port 80); penulisan file aplikasi tetap terjadi di container `app` (uid 1000).
+- **Redis opsional**: tanpa profile `redis`, aplikasi berjalan dengan `CACHE_STORE=file`, `SESSION_DRIVER=file`, `QUEUE_CONNECTION=sync` (tidak butuh Redis sama sekali). Driver `database` tidak tersedia untuk cache/session/queue karena tabel `cache`/`sessions`/`jobs` tidak ada di migrasi project.
 
-> Catatan: README versi lama menggambarkan stack 4 service (db/redis/queue) dengan multi-stage build `Dockerfile`; itu sudah usang. `docker-compose.yml` dan `Dockerfile` saat ini adalah sumber kebenaran.
+> Panduan lengkap ada di `deploy/README.md`.
 
 ---
 
-## 8. Instalasi Manual
+## 8. Instalasi Manual (tanpa Docker)
 
-### Prasyarat
+> Cara **alternatif** untuk environment yang tidak boleh memakai Docker. Stack yang sama:
+> **Apache 2.4 + PHP-FPM (+ Redis opsional)**, database tetap **eksternal**.
+>
+> **Panduan lengkap ada di [`deploy/README-MANUAL.md`](deploy/README-MANUAL.md)** —
+> berisi install paket, vhost Apache, pool PHP-FPM, permission `www-data`, `.env`,
+> systemd queue/scheduler, aktivasi Redis, verifikasi, dan troubleshooting.
 
-- **PHP 8.3** dengan ekstensi: `pdo_pgsql`, `pgsql`, `mbstring`, `exif`, `pcntl`, `bcmath`, `gd`, `zip`, `intl`, `opcache`, `curl`.
-- **Composer 2.x**.
-- **Node.js 22+** dan **npm**.
-- **PostgreSQL** yang bisa diakses (server eksternal atau lokal).
-
-### Langkah-langkah
+### Ringkas
 
 ```bash
-# 1. Clone & masuk direktori
-git clone <url-repo> NusaMedika
-cd NusaMedika
+# 1. Paket sistem
+sudo apt-get update
+sudo apt-get install -y apache2 redis-server \
+  php8.5-fpm php8.5-cli php8.5-mysql php8.5-pgsql php8.5-mbstring php8.5-xml \
+  php8.5-curl php8.5-zip php8.5-bcmath php8.5-intl php8.5-gd php8.5-redis
 
-# 2. Install dependensi PHP
+# 2. Apache + PHP-FPM
+sudo a2enmod rewrite proxy proxy_fcgi headers
+echo "Listen 8081" | sudo tee -a /etc/apache2/ports.conf
+sudo cp deploy/apache/nusamedika-manual.conf /etc/apache2/sites-available/nusamedika.conf
+sudo sed -i "s#__APP_DIR__#$PWD#g; s#__PHP_VER__#8.5#g; s#__PORT__#8081#g" \
+  /etc/apache2/sites-available/nusamedika.conf
+sudo cp deploy/php/php-fpm-pool-manual.conf /etc/php/8.5/fpm/pool.d/www.conf
+sudo cp deploy/php/php.ini /etc/php/8.5/{fpm,cli}/conf.d/99-nusamedika.ini
+sudo a2ensite nusamedika && sudo apache2ctl configtest
+
+# 3. Dependency + aset (sebagai user biasa)
 composer install
+sudo chown -R $USER:$USER node_modules public/build vendor   # bila root-owned
+npm install && npm run build
+php artisan storage:link
 
-# 3. Siapkan .env
-cp .env.example .env
-# edit nilai DB_* sesuai dengan PostgreSQL kamu
-# lalu generate APP_KEY (tidak wajib jika memakai APP_KEY dari contoh)
-php artisan key:generate
-
-# 4. Install dependensi frontend
-npm install
-
-# 5. Migrasi + seeder (HANYA untuk database baru)
-php artisan migrate --seed
-# Jika memakai database legacy yang sudah terisi, lewati langkah ini.
-
-# 6. Jalankan backend & frontend
-php artisan serve --port=8000          # terminal 1
-npm run dev -- --host 0.0.0.0          # terminal 2
+# 4. Service
+sudo systemctl enable --now apache2 php8.5-fpm redis-server
 ```
 
-Atau jalankan semuanya sekaligus (server, queue worker, pail log, dan vite):
+Buka `http://localhost:8081` dan login (tabel kredensial di §7).
+
+> **Catatan:** port 8081 sama dengan stack Docker — jalankan **salah satu** saja
+> (`docker compose stop web` bila memilih instalasi manual).
+> Di mode manual, `REDIS_HOST` memakai `127.0.0.1` (bukan `redis` seperti di Docker).
+
+### Development ringan di host (tanpa Apache)
 
 ```bash
-composer run dev
+php artisan serve --port=8000     # terminal 1
+npm run dev -- --host 0.0.0.0     # terminal 2
 ```
-
-Buka `http://localhost:8000` dan login (lihat tabel kredensial di bagian Instalasi Docker).
 
 ### Instalasi manual plus production build
 
@@ -495,7 +549,6 @@ npm install
 npm run build
 php artisan migrate --force
 php artisan db:seed --force
-php artisan serve --port=8000
 ```
 
 ---
@@ -506,9 +559,14 @@ Variabel penting selain standar Laravel (`.env.example` sudah berisi semua):
 
 | Variabel | Contoh | Keterangan |
 | :--- | :--- | :--- |
-| `DB_CONNECTION` | `pgsql` | Driver database (hanya `pgsql` yang digunakan). |
-| `DB_HOST` / `DB_PORT` | `192.168.149.168` / `5432` | Host PostgreSQL eksternal. |
-| `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` | `meditech` | Kredensial database. |
+| `DB_CONNECTION` | `mysql` / `pgsql` | Driver database (server **eksternal**, di luar Docker). |
+| `DB_HOST` / `DB_PORT` | `153.92.15.19` / `3306` | Host database eksternal. |
+| `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` | `u887691424_nusamedka` | Kredensial database. |
+| `APP_URL` | `http://localhost:8081` | URL aplikasi (sesuai port publish Apache). |
+| `CACHE_STORE` | `file` / `redis` | Cache store. `redis` butuh container `redis` (profile `redis`). |
+| `SESSION_DRIVER` | `file` / `redis` | Driver session. |
+| `QUEUE_CONNECTION` | `sync` / `redis` | Antrean. `redis` butuh worker `queue` (profile `redis`). |
+| `REDIS_HOST` | `redis` | Host Redis **di dalam jaringan compose** (bukan `127.0.0.1`). |
 | `JENIS_RAWAT_IGD` / `JENIS_RAWAT_RI` / `JENIS_RAWAT_RJ` | `IGD` / `RI` / `RJ` | Kode jenis rawat untuk filter pendaftaran / EMR. |
 | `FORM_ID_SOAP` | `2` | ID form SOAP/CPPT di tabel `form`. |
 | `FORM_ID_PENGKAJIAN_AWAL_KEPERAWATAN` | `3` | ID form pengkajian awal keperawatan. |
@@ -518,7 +576,7 @@ Variabel penting selain standar Laravel (`.env.example` sudah berisi semua):
 | `PROFESI_ID_DOKTER` | `1` | ID profesi dokter di tabel `profesi`. |
 | `REF_BAGIAN_RAJAL` | `1` | ID referensi bagian rawat jalan. |
 
-> **Penting:** konstanta SIMRS dibaca langsung via `env()` saat runtime (bukan `config()`). Jangan menjalankan `config:cache` ketika nilai di atas belum di-set di `.env`, karena aplikasi akan kehilangan konstanta tersebut. Setelah mengubah `.env` pada mode Docker, selalu `docker compose up -d --force-recreate app vite`.
+> **Penting:** konstanta SIMRS dibaca langsung via `env()` saat runtime (bukan `config()`). Jangan menjalankan `config:cache` ketika nilai di atas belum di-set di `.env`, karena aplikasi akan kehilangan konstanta tersebut. Setelah mengubah `.env` pada mode Docker, selalu `docker compose up -d --force-recreate app web`.
 
 ---
 
@@ -526,13 +584,18 @@ Variabel penting selain standar Laravel (`.env.example` sudah berisi semua):
 
 | Masalah | Solusi |
 | :--- | :--- |
-| Koneksi database ditolak (misal `Connection refused`) | Pastikan server PostgreSQL dapat dijangkau dari host, nilai `DB_*` di `.env` benar, dan ekstensi `pdo_pgsql` terpasang (`php -m`). Karena mode `network_mode: host`, gunakan alamat host seperti `127.0.0.1` jika Postgres berada di mesin yang sama. |
-| Perubahan `.env` tidak berpengaruh | Nilai `.env` dibaca saat container start. Jalankan `docker compose up -d --force-recreate app vite`. |
-| Aset frontend tidak termuat / tampilan polos | Pastikan container `vite` berjalan (`docker compose ps`, log `docker compose logs -f vite`). Untuk mode statis: `npm run build`. |
+| `Connection refused` ke database | Server DB eksternal harus bisa dijangkau dari container: `docker compose exec app php -r 'echo gethostbyname("153.92.15.19");'`. Cek juga `DB_*` di `.env` dan firewall server DB. |
+| Perubahan `.env` tidak berpengaruh | Nilai `.env` dibaca saat container start. Jalankan `docker compose up -d --force-recreate app web`, lalu `docker compose exec app php artisan config:clear && docker compose exec app php artisan cache:clear`. |
+| Halaman menampilkan source PHP (tidak dieksekusi) | Modul `proxy_fcgi` belum aktif. Rebuild image: `docker compose up -d --build web`, lalu cek `docker compose logs web`. |
+| Apache 502 / "Service Unavailable" | Container `app` (PHP-FPM) mati atau belum siap. Cek `docker compose logs app` dan `docker compose ps`. |
+| Error `Class "Redis" not found` / koneksi Redis refused | Ekstensi `php8.5-redis`/phpredis belum ada atau container `redis` belum jalan. Jalankan `docker compose --profile redis up -d` dan pastikan `.env` memakai `REDIS_HOST=redis` (bukan `127.0.0.1`). |
+| Ingin mengaktifkan Redis | `docker compose --profile redis up -d`, lalu di `.env`: `CACHE_STORE=redis`, `SESSION_DRIVER=redis`, `QUEUE_CONNECTION=redis`. |
+| Cache/session lama masih ada setelah pindah ke Redis | `docker compose exec redis redis-cli -n 0 FLUSHDB` (session+queue) dan `-n 1 FLUSHDB` (cache). |
+| Aset frontend tidak termuat / tampilan polos | Pastikan container `vite` berjalan (`docker compose ps`, log `docker compose logs -f vite`). Untuk mode statis: `docker compose exec vite npm run build`. |
 | Halaman 404 / route tidak ada untuk sub-menu baru | Setelah membuat/merubah `sub_menu`, provider auto-route aktif di request berikutnya; pastikan `file_sub_menu` terisi benar dan basename unik. Bila memakai `route:cache`, lakukan `route:clear` lalu `route:cache` lagi. |
 | Sidebar tidak menampilkan sub-menu baru | Clear cache sidebar: logout lalu login ulang (logout melakukan `Cache::forget`), atau hapus key `sidebar_moduls_user_{id}` di level aplikasi / setelah ubah `user_akses`. |
 | `migrate:fresh` menjatuhkan semua data | `migrate:fresh` akan **DROP SEMUA tabel** termasuk tabel legacy yang tidak punya migrasi. Pastikan kamu menyadarinya; untuk database berisi data gunakan `migrate` biasa. |
-| Test gagal karena database | `phpunit.xml` memakai `sqlite :memory:`. Gunakan `php artisan test` sesuai konfigurasi; kode yang bergantung PostgreSQL tidak akan berjalan apa adanya di bawah test. |
+| Test gagal karena database | `phpunit.xml` memakai `sqlite :memory:`. Gunakan `php artisan test` sesuai konfigurasi; kode yang bergantung database nyata tidak akan berjalan apa adanya di bawah test. |
 | `config:cache` membuat konstanta SIMRS hilang | Jangan cache config tanpa konstanta `.env` (lihat bagian Konfigurasi Environment). |
 
 ---

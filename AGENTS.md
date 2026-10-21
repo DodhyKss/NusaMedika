@@ -4,20 +4,32 @@ Laravel 13 (PHP 8.3) SIMRS app ("MediTechV2") — an Indonesian hospital EMR. Al
 
 ## Running everything through Docker
 
-- No PHP is installed on the host. All PHP/artisan commands must run in the app container:
+Stack: **Apache 2.4 + PHP 8.3 FPM (+ Redis opsional)**, database **eksternal** (bukan service Docker).
+
+- No PHP is installed on the host **pada alur Docker** (semua PHP/artisan lewat container). All PHP/artisan commands must run in the app container:
   `docker compose exec app php artisan <cmd>`
-- The compose file has three services: `app` (php-cli + `artisan serve` on port 8000), `db` (mysql:8.0), and `vite`. `app` and `vite` use `network_mode: host`; `db` uses `ports: 3306:3306` + named volume `mysql_data` + healthcheck (`mysqladmin ping`).
-- **Database = MySQL 8.0 lokal** via service `db` (`.env`: `DB_CONNECTION=mysql`, `DB_HOST=127.0.0.1`, `DB_PORT=3306`, `DB_DATABASE=meditech`, `DB_USERNAME=meditech`, `DB_PASSWORD=meditech`). MySQL berdiri sendiri: `docker compose up -d db`, tunggu `healthy`, lalu `docker compose exec app php artisan migrate:fresh --seed`. PostgreSQL eksternal (192.168.149.168) **tidak lagi dipakai** — namun driver `pdo_pgsql` masih terpasang di image, jadi kedua driver didukung oleh kode (lihat section *Dual-driver MySQL/PostgreSQL*).
-- The `Dockerfile` installs both DB drivers: `pdo_mysql mysqlnd` (ditambah lebih dulu) dan `pgsql pdo_pgsql`.
+  (Bila environment memakai **instalasi manual** — lihat `deploy/README-MANUAL.md` — PHP 8.5 terpasang di host dan `php artisan` bisa langsung dijalankan dari direktori project.)
+- The compose file has **five services**:
+  - `web` — Apache 2.4 (`mod_rewrite` + `mod_proxy_fcgi`), DocumentRoot `/var/www/html/public`, published **host 8081 → container 80** (`http://localhost:8081`). Request `.php` diteruskan ke `app:9000`.
+  - `app` — PHP 8.3 FPM (image target `fpm`), menjalankan `composer install` lalu `php-fpm`; inilah container tempat `php artisan` dijalankan.
+  - `redis` — **opsional** (compose **profile `redis`**), untuk cache/session/queue.
+  - `queue` — `artisan queue:work redis`, juga ikut profile `redis`.
+  - `vite` — Node 22 dev server, `network_mode: host` (port 5173).
+- **Tidak ada service `db`.** Database adalah **server luar** dan seluruh konfigurasi hanya di `.env` (`DB_CONNECTION`/`DB_HOST`/`DB_PORT`/`DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD`). Ganti server DB ⇒ ubah `.env` saja, lalu `docker compose up -d --force-recreate app web` + `config:clear`/`cache:clear`. Jangan pernah membuat service database di compose.
+- **Redis opsional**: default `.env` memakai `CACHE_STORE=file`, `SESSION_DRIVER=file`, `QUEUE_CONNECTION=sync` (aplikasi jalan tanpa Redis). Untuk memakai Redis: `docker compose --profile redis up -d` + ubah `.env` ke `redis`/`redis`/`redis` dengan `REDIS_HOST=redis` (nama service, **bukan** `127.0.0.1`). Driver `database` untuk cache/session/queue **tidak boleh** dipakai — tabel `cache`/`sessions`/`jobs` tidak ada di migrasi project.
+- The `Dockerfile` is multi-target: `base` (php:8.3-fpm + apache2 + composer), `fpm` (PHP-FPM + tuning), `apache` (vhost + `proxy_fcgi`). Ekstensi DB: `pdo_mysql mysqlnd` **dan** `pgsql pdo_pgsql` (lihat section *Dual-driver MySQL/PostgreSQL*). Ekstensi `redis` ikut terpasang (phpredis) walau Redis opsional.
 - `.env` is gitignored but required. `.env.example` has placeholder DB values. Never commit `.env` (it contains the DB password).
-- The `.env` file is injected at container start (`env_file`), so after editing it you must recreate the containers: `docker compose up -d --force-recreate app vite` — otherwise the running app keeps the old values (e.g. a changed `OBJEK_*`/`JENIS_RAWAT_*` constant or DB setting is not picked up).
-- Vite runs in its own container; frontend assets load via `@vite` dev server.
-- **Container `app` runs as the host user (`user: "1000:1000"`)** in `docker-compose.yml`, so any file written from inside the container (e.g. via `make:submenu`, `artisan`, caches) is owned by the host user (uid 1000) — editable/deletable from the host without `sudo`. Do **not** remove this `user:` line: without it the container runs as root and every created file becomes root-owned (hard to delete from the host). Note: if a teammate's host uid differs, they must adjust the value to their `id -u`/`id -g`.
+- The `.env` file is injected at container start (`env_file`) **dan** dibaca Laravel langsung dari file di volume, jadi setelah mengeditnya recreate container: `docker compose up -d --force-recreate app web` — otherwise the running app keeps the old values (e.g. a changed `OBJEK_*`/`JENIS_RAWAT_*` constant or DB setting is not picked up).
+- **Jangan `php artisan config:cache`** — konstanta SIMRS dibaca via `env()` saat runtime.
+- Vite runs in its own container; frontend assets load via `@vite` dev server (`public/hot`). Untuk production: `docker compose exec vite npm run build`.
+- **Container `app` (dan `queue`) runs as the host user (`user: "1000:1000"`)** in `docker-compose.yml`, so any file written from inside the container (e.g. via `make:submenu`, `artisan`, caches) is owned by the host user (uid 1000) — editable/deletable from the host without `sudo`. Do **not** remove this `user:` line: without it the container runs as root and every created file becomes root-owned (hard to delete from the host). Note: if a teammate's host uid differs, they must adjust the value to their `id -u`/`id -g`. Container `web` (Apache) tetap root di dalam container agar bisa bind port 80 — file aplikasi tetap ditulis oleh container `app` (uid 1000).
 - Gotcha: after adding `user: 1000:1000`, ensure `vendor/` and writable dirs (`storage/`, `bootstrap/cache/`) are owned by uid 1000 too — otherwise `composer install` at container start fails with "Permission denied" (fix with a one-off `docker run --rm -v "$PWD":/var/www/html -w /var/www/html --user root <image> chown -R 1000:1000 vendor storage bootstrap`).
+- File konfigurasi container ada di `deploy/`: `deploy/apache/nusamedika-docker.conf` (vhost), `deploy/php/php.ini` (tuning PHP), `deploy/redis/redis.conf` (Redis), `deploy/README.md` (panduan cepat).
+- **Alternatif tanpa Docker** (host): `deploy/README-MANUAL.md` + `deploy/apache/nusamedika-manual.conf`, `deploy/php/php-fpm-pool-manual.conf`, `deploy/redis/redis-manual.conf`, `deploy/systemd/*` (queue worker & scheduler). Stack sama (Apache + PHP-FPM + Redis opsional), DB tetap eksternal. Perbedaan penting: di host **`REDIS_HOST=127.0.0.1`** (bukan `redis`), dan `php artisan` bisa dijalankan langsung tanpa container.
 
 ## Dual-driver MySQL/PostgreSQL
 
-Kode mendukung dua driver (image punya `pdo_mysql` & `pdo_pgsql`), default **MySQL 8.0**. Saat memindahkan/membuat kode, jaga tetap kompatibel dua arah:
+Kode mendukung dua driver (image punya `pdo_mysql` & `pdo_pgsql`), default **MySQL** (server eksternal). Saat memindahkan/membuat kode, jaga tetap kompatibel dua arah:
 
 - **`increments()`** → MySQL `AUTO_INCREMENT` / Postgres `serial` (sama-sama OK).
 - **JSON**: pakai `$table->json(...)`, **jangan** `jsonb` (tidak ada di MySQL).
@@ -45,7 +57,7 @@ The original 295 migrations (generated via `kitloong/laravel-migrations-generato
 
 - Semua migration bersih, pakai `Schema::create` + `$table->increments(...)`; yang sidah ada `with `header_ehr` dibuat via `DB::statement("CREATE OR REPLACE VIEW ...")`.
 - `migrate` wraps each migration in a transaction (rolls back on failure), so a failed run leaves the DB clean.
-- The database at the configured host already holds the **real legacy data**. `migrate:fresh` akan **DROP semua tabel** (termasuk ~227 tabel legacy + semua view yang tidak punya migration) lalu recreate hanya 39 objek di atas — destruktif & irreversibel, pastikan dulu sebelum dijalankan.
+- The database at the configured host (server **eksternal**) already holds the **real legacy data**. `migrate:fresh` akan **DROP semua tabel** (termasuk ~227 tabel legacy + semua view yang tidak punya migration) lalu recreate hanya 39 objek di atas — destruktif & irreversibel, pastikan dulu sebelum dijalankan. Selalu cek `docker compose exec app php artisan migrate:status` dulu.
 
 ## Seeders
 
@@ -133,7 +145,7 @@ Semua route non-EMR (Registrasi, Rawat Jalan/Inap/GD, seluruh Administrator) **t
 
 **Sidebar:** link sub-menu tidak lagi `url(file_sub_menu)` (itu akan menunjuk ke `/Registrasi/Pasien/DaftarPasien` yang tidak ada), melainkan `\App\Providers\SubMenuRouteServiceProvider::url($file_sub_menu)` (`resources/views/layouts/sidebar.blade.php` ~line 63).
 
-**Cache:** route dibangun per-request (tak perlu `route:cache` untuk dev; `artisan serve` fresh per request). `SubMenuController` memanggil `SubMenuRouteServiceProvider::flushPathCache()` (bersamaan dengan clear sidebar cache) saat sub_menu berubah. `php artisan route:cache` didukung (route memakai controller), setelah snapshot path baru perlu `route:cache` ulang; `route:clear` saat kembali ke dev.
+**Cache:** route dibangun per-request (tak perlu `route:cache` untuk dev; tiap request ke Apache → PHP-FPM membangun route anew). `SubMenuController` memanggil `SubMenuRouteServiceProvider::flushPathCache()` (bersamaan dengan clear sidebar cache) saat sub_menu berubah. `php artisan route:cache` didukung (route memakai controller), setelah snapshot path baru perlu `route:cache` ulang; `route:clear` saat kembali ke dev.
 
 ## Sidebar / menu behavior
 
@@ -281,9 +293,9 @@ Blok profile di `resources/views/layouts/navbar.blade.php` (nama + avatar) adala
 - Route aksi lonceng (non-CRUD, manual di `routes/web.php`): `POST /notifikasi/{notifikasi}/tutup` (`notifikasi.tutup`) & `POST /notifikasi/tutup-semua` (`notifikasi.tutup_semua`) → `App\Http\Controllers\Notifikasi\NotifikasiPenerimaController`. `tutup()` mengembalikan `false` bila notifikasi itu bukan milik user tersebut (flash error) — **jangan** pakai `Notifikasi::find()` lalu update, itu bisa menutup milik orang lain.
 - Label target di daftar riwayat: `Notifikasi::targetLabel()` (`Semua User` / `Bagian: …` / `User: …`).
 
-## Zona waktu: app vs MySQL container (PENTING)
+## Zona waktu: app vs server database (PENTING)
 
-- `config/app.php` → `timezone = Asia/Makassar` (UTC+8), tetapi **service `db` berjalan di UTC**. Selisihnya **8 jam**.
+- `config/app.php` → `timezone = Asia/Makassar` (UTC+8), tetapi **server database eksternal bisa berjalan di UTC**. Selisihnya **8 jam**.
 - Semua timestamp harus ditulis dari PHP (`now()`, `Carbon::now()`), **jangan** pakai `NOW()`/`NOW(6)` MySQL di seed/insert manual — hasilnya 8 jam di masa lalu dan langsung dianggap kedaluwarsa oleh perbandingan `where('tanggal_kadaraluarsa','>', now())` (scope `StatusSosial::belumKedaluwarsa()`).
 - Gejala yang khas: status langsung hilang begitu dibuat — periksa dulu apakah kolomnya diisi lewat MySQL `NOW()` atau ditulis dari PHP.
 
@@ -432,7 +444,7 @@ Menu 8 "Manajemen EMR" (modul 5 Administrator) berisi dua master CRUD; keduanya 
 
 - Tests are phpunit: 4 file — `tests/Unit/SelectOptionTest.php`, `tests/Feature/SelectOptionRenderTest.php`, + 2 stub `ExampleTest`. `phpunit.xml` forces `sqlite :memory:`, so DB-bound code won't run under tests as-is; use `php artisan test` inside the container (`docker compose exec app php artisan test`).
 - Formatting: `vendor/bin/pint` dengan `pint.json` (preset `laravel`). No PHPStan/Psalm, no CI. `composer lint` / `composer format`.
-- `composer dev` runs `artisan serve` + queue + pail + vite via concurrently — only useful inside the app container.
+- `composer dev` runs `artisan serve` + queue + pail + vite via concurrently — hanya berguna di dalam container `app` (mode normal: web server = Apache + PHP-FPM di container `web`/`app`).
 
 ## Form Assesmen Awal Medis Rawat Jalan (EMR, form 11)
 
