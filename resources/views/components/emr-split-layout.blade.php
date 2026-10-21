@@ -30,11 +30,11 @@
     };
 @endphp
 
-<div class="h-screen flex flex-col md:flex-row w-full overflow-hidden">
+<div class="flex flex-col md:flex-row w-full h-auto md:h-screen md:overflow-hidden">
     
     <!-- Panel Kiri: List Riwayat -->
-    <div id="panel-kiri" class="relative z-30 w-full md:w-1/3 border-r border-slate-200 bg-white flex flex-col h-full transition-all duration-300">
-        <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center relative z-20">
+    <div id="panel-kiri" class="relative z-30 w-full md:w-1/3 border-r border-slate-200 bg-white flex flex-col h-[45vh] md:h-full transition-all duration-300">
+        <div class="p-3 sm:p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center gap-2 flex-wrap relative z-20">
             <h2 class="font-bold text-slate-700">{{ $titleRiwayat }}</h2>
             <div class="flex items-center gap-2">
                 <!-- Tombol Refresh -->
@@ -105,7 +105,7 @@
                 </span>
                 @endif
                 
-                <button type="button" onclick="togglePanel('kiri')" title="Maximize/Minimize" class="inline-flex items-center justify-center p-1.5 text-slate-500 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-700 rounded-lg transition-colors shadow-sm ml-1">
+                <button type="button" onclick="togglePanel('kiri')" title="Maximize/Minimize" class="hidden md:inline-flex items-center justify-center p-1.5 text-slate-500 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-700 rounded-lg transition-colors shadow-sm ml-1">
                     <svg id="icon-maximize-kiri" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
                 </button>
             </div>
@@ -117,21 +117,21 @@
     </div>
     
     <!-- Panel Kanan: Form -->
-    <div id="panel-kanan" class="w-full md:w-2/3 bg-slate-50 flex flex-col h-full overflow-y-auto transition-all duration-300">
-        <form id="form-kanan" action="{{ $formAction }}" method="POST" class="p-6 max-w-4xl w-full mx-auto transition-all duration-300" onsubmit="document.getElementById('save_loader').classList.remove('hidden');">
+    <div id="panel-kanan" class="w-full md:w-2/3 bg-slate-50 flex flex-col min-h-[60vh] md:h-full overflow-y-auto transition-all duration-300">
+        <form id="form-kanan" action="{{ $formAction }}" method="POST" class="p-3 sm:p-6 max-w-4xl w-full mx-auto transition-all duration-300" onsubmit="document.getElementById('save_loader').classList.remove('hidden');">
             @csrf
             @if($isEdit)
                 @method('PUT')
             @endif
 
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-800">{{ $titleForm }}</h2>
+            <div class="flex justify-between items-center gap-3 flex-wrap mb-6">
+                <div class="min-w-0">
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800">{{ $titleForm }}</h2>
                     <p class="text-sm text-slate-500 mt-1">{{ $subtitleForm }}</p>
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="togglePanel('kanan')" title="Maximize/Minimize" class="inline-flex items-center justify-center p-2 text-slate-500 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-700 rounded-lg transition-colors shadow-sm">
+                    <button type="button" onclick="togglePanel('kanan')" title="Maximize/Minimize" class="hidden md:inline-flex items-center justify-center p-2 text-slate-500 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-700 rounded-lg transition-colors shadow-sm">
                         <svg id="icon-maximize-kanan" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
                     </button>
                     
@@ -155,7 +155,7 @@
                 {{ $slot }}
             @endif
 
-            <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end gap-3">
+            <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end gap-3 flex-wrap">
                 @if($isView || (!$isEdit && !$canCreate))
                     @if($isView && $canRead && $printUrl)
                         <button type="button" onclick="window.open('{{ $printUrl }}', '_blank')" class="inline-flex items-center px-6 py-2.5 bg-white border border-slate-300 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
@@ -236,8 +236,8 @@
         if (panelState === 'split') {
             panelKiri.style.display = 'flex';
             panelKanan.style.display = 'flex';
-            panelKiri.className = 'relative z-30 w-full md:w-1/3 border-r border-slate-200 bg-white flex flex-col h-full transition-all duration-300';
-            panelKanan.className = 'w-full md:w-2/3 bg-slate-50 flex flex-col h-full overflow-y-auto transition-all duration-300';
+            panelKiri.className = 'relative z-30 w-full md:w-1/3 border-r border-slate-200 bg-white flex flex-col h-[45vh] md:h-full transition-all duration-300';
+            panelKanan.className = 'w-full md:w-2/3 bg-slate-50 flex flex-col min-h-[60vh] md:h-full overflow-y-auto transition-all duration-300';
             if (formKanan) {
                 formKanan.classList.remove('max-w-full');
                 formKanan.classList.add('max-w-4xl');
@@ -247,12 +247,12 @@
         } else if (panelState === 'kiri-full') {
             panelKanan.style.display = 'none';
             panelKiri.style.display = 'flex';
-            panelKiri.className = 'relative z-30 w-full bg-white flex flex-col h-full transition-all duration-300';
+            panelKiri.className = 'relative z-30 w-full bg-white flex flex-col h-[45vh] md:h-full transition-all duration-300';
             if(iconKiri) iconKiri.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v4m0 0H5m4 0L3 3m6 18v-4m0 0H5m4 0l-2 2m6-16V3m0 4h4m-4 0l2-2m-6 16v-4m0 0h4m-4 0l2 2"></path>';
         } else if (panelState === 'kanan-full') {
             panelKiri.style.display = 'none';
             panelKanan.style.display = 'flex';
-            panelKanan.className = 'w-full bg-slate-50 flex flex-col h-full overflow-y-auto transition-all duration-300';
+            panelKanan.className = 'w-full bg-slate-50 flex flex-col min-h-[60vh] md:h-full overflow-y-auto transition-all duration-300';
             if (formKanan) {
                 formKanan.classList.remove('max-w-4xl');
                 formKanan.classList.add('max-w-full');

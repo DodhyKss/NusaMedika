@@ -1,4 +1,4 @@
-<nav class="sticky top-0 z-30 flex items-center justify-between w-full h-16 min-h-16 px-6 bg-white border-b border-slate-200 flex-shrink-0">
+<nav class="sticky top-0 z-30 flex items-center justify-between w-full h-16 min-h-16 px-3 sm:px-6 bg-white border-b border-slate-200 flex-shrink-0 gap-2">
     @php
         // Calculate patient counts for navbar display
         $occupiedBeds = \App\Models\Bed::terisi()->count();
@@ -17,17 +17,17 @@
         </button>
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1 sm:gap-2 min-w-0">
         <!-- Patient Counts -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1 sm:gap-2">
             <!-- Rawat Inap Count -->
-            <div class="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium">Rawat Inap
+            <div class="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium" title="Pasien Rawat Inap aktif"><span class="hidden sm:inline">Rawat Inap</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                 <span>{{ $occupiedBeds }}</span>
             </div>
             
             <!-- Rawat Jalan Count -->
-            <div class="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium">Rawat Jalan
+            <div class="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium" title="Kunjungan Rawat Jalan hari ini"><span class="hidden sm:inline">Rawat Jalan</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 <span>{{ $rjToday }}</span>
             </div>
@@ -51,7 +51,7 @@
                 @endif
             </button>
 
-            <div id="notifikasi-popover" class="hidden absolute right-0 top-full mt-2 w-96 bg-white rounded-xl border border-slate-200 shadow-lg z-50 overflow-hidden">
+            <div id="notifikasi-popover" class="hidden absolute right-0 top-full mt-2 w-[calc(100vw-1.5rem)] max-w-96 bg-white rounded-xl border border-slate-200 shadow-lg z-50 overflow-hidden">
                 <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between gap-2">
                     <p class="text-xs font-bold text-slate-700 uppercase tracking-wider">Notifikasi</p>
                     @if ($jumlahNotifikasi)
@@ -108,7 +108,7 @@
                 <svg id="speedtest-icon" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
             </button>
 
-            <div id="speedtest-popover" class="hidden absolute right-0 top-full mt-2 w-64 bg-white rounded-xl border border-slate-200 shadow-lg p-4 z-50">
+            <div id="speedtest-popover" class="hidden absolute right-0 top-full mt-2 w-[calc(100vw-1.5rem)] max-w-64 bg-white rounded-xl border border-slate-200 shadow-lg p-4 z-50">
                 <p class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Kecepatan Internet</p>
                 <div id="speedtest-status" class="hidden text-sm text-slate-500 flex items-center gap-2">
                     <span class="inline-block w-3 h-3 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin"></span>

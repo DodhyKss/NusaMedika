@@ -16,15 +16,18 @@
     @include('components.loading')
 
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <div id="sidebar-wrapper" class="transition-all duration-300 ease-in-out w-70 overflow-hidden bg-slate-900 border-r border-slate-800 flex-shrink-0">
+        <!-- Backdrop gelap (hanya mobile) untuk menu drawer -->
+        <div id="sidebar-backdrop" class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-[2px] hidden lg:hidden"></div>
+
+        <!-- Sidebar: di mobile jadi drawer (off-canvas), di desktop kolom tetap -->
+        <div id="sidebar-wrapper" class="fixed lg:static inset-y-0 left-0 z-50 w-[280px] max-w-[85vw] overflow-hidden bg-slate-900 border-r border-slate-800 flex-shrink-0">
             @include('layouts.sidebar')
         </div>
         
         <!-- Main Content -->
-        <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden min-w-0 bg-slate-50">
+        <div class="relative flex flex-col flex-1 w-full lg:w-auto overflow-y-auto overflow-x-hidden min-w-0 bg-slate-50">
             @include('layouts.navbar')
-            <main class="w-full grow p-6">
+            <main class="w-full grow p-3 sm:p-4 lg:p-6">
                 {{-- Notification --}}
                 @if(session('success'))
                     <div class="flex items-start gap-3 bg-emerald-50 border border-emerald-200 p-3.5 mb-6 rounded-lg">
@@ -47,25 +50,108 @@
     <!-- Scripts (jQuery & Select2 dibundle via Vite di resources/js/app.js) -->
     <!-- Custom Matcher Select2 Removed -->
     
+    <style>
+        /* ---- Sidebar responsif --------------------------------------------
+           Mobile  (< 1024px): sidebar menjadi drawer off-canvas (translateX).
+           Desktop (>= 1024px): sidebar kolom tetap, bisa di-collapse jadi ikon.
+           Transisi hanya diaktifkan saat user membuka/menutup drawer
+           (class `sidebar-animate`), supaya tidak ada animasi "geser keluar"
+           ketika halaman baru dibuka. */
+        #sidebar-wrapper {
+            transition: width 300ms ease-in-out;
+        }
+
+        @media (max-width: 1023px) {
+            #sidebar-wrapper { transform: translateX(-100%); }
+            #sidebar-wrapper.is-open { transform: translateX(0); }
+            #sidebar-wrapper.sidebar-animate { transition: transform 300ms ease-in-out; }
+        }
+
+        @media (min-width: 1024px) {
+            #sidebar-wrapper.sidebar-collapsed { width: 68px; }
+        }
+    </style>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleBtn = document.getElementById('sidebar-toggle');
             const sidebar = document.getElementById('sidebar-wrapper');
-            
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const mqMobile = window.matchMedia('(max-width: 1023px)');
+
+            const isMobile = () => mqMobile.matches;
+
+            function openDrawer() {
+                if (!sidebar) return;
+                sidebar.classList.add('sidebar-animate');
+                // Paksa reflow supaya transisi benar-benar berjalan
+                void sidebar.offsetWidth;
+                sidebar.classList.add('is-open');
+                backdrop?.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }
+
+            function closeDrawer() {
+                if (!sidebar) return;
+                sidebar.classList.add('sidebar-animate');
+                void sidebar.offsetWidth;
+                sidebar.classList.remove('is-open');
+                backdrop?.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+
+                // Hapus penanda transisi setelah animasi selesai
+                setTimeout(function () {
+                    sidebar?.classList.remove('sidebar-animate');
+                }, 350);
+            }
+
             if (toggleBtn && sidebar) {
                 toggleBtn.addEventListener('click', function() {
                     closeFlyout();
+
+                    if (isMobile()) {
+                        // Mobile: buka/tutup drawer
+                        if (sidebar.classList.contains('is-open')) {
+                            closeDrawer();
+                        } else {
+                            openDrawer();
+                        }
+                        return;
+                    }
+
+                    // Desktop: collapse jadi ikon
                     const collapsed = sidebar.classList.toggle('sidebar-collapsed');
 
                     if (collapsed) {
-                        sidebar.classList.remove('w-70');
-                        sidebar.classList.add('w-[68px]');
                         sidebar.querySelectorAll('details[open]').forEach(d => d.removeAttribute('open'));
-                    } else {
-                        sidebar.classList.remove('w-[68px]');
-                        sidebar.classList.add('w-70');
                     }
                 });
+
+                // Tutup drawer saat backdrop diklik / tekan Escape / pilih menu
+                backdrop?.addEventListener('click', closeDrawer);
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && isMobile()) {
+                        closeDrawer();
+                    }
+                });
+
+                sidebar.addEventListener('click', function(e) {
+                    if (isMobile() && e.target.closest('a[href]')) {
+                        closeDrawer();
+                    }
+                });
+
+                // Changing the desktop/mobile state resets the appropriate mode
+                mqMobile.addEventListener('change', function(e) {
+                    if (e.matches) {
+                        closeDrawer();
+                        sidebar.classList.remove('sidebar-collapsed');
+                    } else {
+                        closeDrawer();
+                    }
+                });
+            }
 
                 // Floating Flyout untuk Sidebar Collapsed
                 function openFlyout(summary) {

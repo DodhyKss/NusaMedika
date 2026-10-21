@@ -387,6 +387,27 @@ Yang membuatnya otomatis:
 Kalau `public/hot` kosong (dev server mati), asset dilayani dari build statis:
 `docker compose exec vite npm run build`.
 
+### 6.6 Tampilan responsif (HP / tablet)
+
+Seluruh aplikasi sudah menyesuaikan tampilan untuk layar kecil — tidak perlu
+konfigurasi tambahan:
+
+| Bagian | Perilaku |
+| :--- | :--- |
+| `resources/views/layouts/app.blade.php` | Sidebar jadi **drawer off-canvas** di bawah 1024px (tombol hamburger di navbar, backdrop gelap, tutup otomatis saat menu dipilih / tekan Escape). Di desktop tetap kolom tetap + bisa di-collapse jadi ikon. Konten dipadding `p-3 sm:p-4 lg:p-6`. |
+| `resources/views/layouts/navbar.blade.php` | Counter "Rawat Inap/Rawat Jalan" disembunyikan teksnya di layar kecil (hanya ikon + angka), popover notifikasi & speedtest memakai lebar `w-[calc(100vw-1.5rem)]` supaya tidak keluar layar. |
+| `resources/css/app.css` | Blok `RESPONSIF MOBILE (global)`: grid yang berisi form jadi **satu kolom** di bawah 640px (`:has(input, select, textarea)`), baris tombol/filter boleh membungkus, kontrol form dibatasi lebar layar, font input minimal 16px (anti auto-zoom iOS), `touch-action: manipulation` (hilangkan jeda tap). |
+| `resources/js/app.js` | `bungkusTabel()` membungkus setiap tabel dengan container scroll horizontal (`.nusa-table-scroll`) sehingga tabel lebar bisa digeser di HP, bukan terpotong. |
+| `resources/views/components/emr-split-layout.blade.php` | Di bawah 768px panel riwayat (45vh) berada di atas panel form, tombol maximize disembunyikan. |
+| `resources/views/components/page-header.blade.php` | Judul + tombol aksi membungkus (`flex-wrap`) di layar kecil. |
+
+Verifikasi cepat (butuh Google Chrome di host):
+
+```bash
+# cek tidak ada elemen yang melebar melebihi layar
+google-chrome --headless=new --window-size=390,844 --screenshot=/tmp/m.png "http://localhost:8081/dashboard"
+```
+
 ---
 
 ## 7. Instalasi dengan Docker
@@ -628,6 +649,7 @@ Variabel penting selain standar Laravel (`.env.example` sudah berisi semua):
 | Cache/session lama masih ada setelah pindah ke Redis | `docker compose exec redis redis-cli -n 0 FLUSHDB` (session+queue) dan `-n 1 FLUSHDB` (cache). |
 | Aset frontend tidak termuat / tampilan polos | Pastikan container `vite` berjalan (`docker compose ps`, log `docker compose logs -f vite`). Untuk mode statis: `docker compose exec vite npm run build`. |
 | Aset frontend tidak termuat **saat dibuka dari device lain via IP** | Dev server Vite (`port 5173`) harus jalan & tidak diblokir firewall. IP LAN ditulis otomatis ke `public/hot`; host request tetap dipakai sebagai host asset (lihat §6.5). Cek: `cat public/hot` lalu `curl -I http://<IP>:5173/@vite/client`. |
+| Tampilan di HP terpotong / melebar | Sidebar di bawah 1024px menjadi drawer (butuh tombol hamburger). Tabel lebar digeser horizontal. Kalau tabel masih terpotong, pastikan `resources/js/app.js` termuat (build ulang: `docker compose exec vite npm run build`). Lihat §6.6. |
 | **Ikon sidebar (Font Awesome) tidak muncul** di device lain | Webfont di-load dari `url()` pada CSS. Pastikan `vite.config.js` punya `server.origin: ''` (URL relatif) — kalau origin terisi, Vite menulis `url(http://0.0.0.0:5173/.../fa-solid-900.woff2)` yang hanya jalan di komputer server. Cek: `curl -s http://<IP>:5173/resources/css/app.css \| grep webfonts` → harus relatif (`/node_modules/...`). |
 | Halaman 404 / route tidak ada untuk sub-menu baru | Setelah membuat/merubah `sub_menu`, provider auto-route aktif di request berikutnya; pastikan `file_sub_menu` terisi benar dan basename unik. Bila memakai `route:cache`, lakukan `route:clear` lalu `route:cache` lagi. |
 | Sidebar tidak menampilkan sub-menu baru | Clear cache sidebar: logout lalu login ulang (logout melakukan `Cache::forget`), atau hapus key `sidebar_moduls_user_{id}` di level aplikasi / setelah ubah `user_akses`. |
