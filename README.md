@@ -360,6 +360,33 @@ Command ini (`App\Console\Commands\SyncMasterMenuSeeder`) membaca record **aktif
 
 > Note: `phpunit.xml` memaksa driver `sqlite :memory:`, sehingga kode yang bergantung pada PostgreSQL (Eloquent/DB nyata) tidak akan berjalan apa adanya di bawah test.
 
+### 6.5 Akses dari device lain (HP / laptop lain) via IP
+
+Aplikasi + dev server Vite bisa dibuka dari device lain di jaringan yang sama, **tanpa
+perlu mengubah konfigurasi setiap kali IP komputer berubah**:
+
+```bash
+# di komputer server
+docker compose up -d vite            # dev server Vite (port 5173)
+ip -4 addr show | grep inet          # lihat IP LAN, mis. 10.100.1.80
+```
+
+Lalu di HP/laptop lain (device harus di Wi-Fi yang sama):
+
+- Aplikasi: `http://10.100.1.80:8081`
+- Dev server Vite: `http://10.100.1.80:5173` (port 5173 harus terbuka di firewall)
+
+Yang membuatnya otomatis:
+
+| Bagian | Perilaku |
+| :--- | :--- |
+| `vite.config.js` | Mendeteksi IP LAN komputer otomatis (route default, fallback `os.networkInterfaces()`) lalu menulis IP tersebut ke `public/hot`. Override manual: env `DEV_HOST`. |
+| `vite.config.js` | `server.host = '0.0.0.0'`, `server.origin = ''` (URL aset **relatif** — kalau origin diisi, webfont Font Awesome ditulis absolut `http://0.0.0.0:5173/...` sehingga ikon sidebar hilang di device lain), `server.hmr.host` **tidak** di-set (client HMR memakai host dari URL `@vite/client`), `server.cors.origin = true` (agar module script tidak diblokir CORS), `server.allowedHosts = true` (boleh diakses lewat hostname). |
+| `app/Support/Vite.php` | Override `hotAsset()`: host pada `public/hot` diganti dengan host request, jadi asset selalu diambil dari IP/host yang sedang dipakai user (localhost, IP LAN, atau hostname) — termasuk HMR websocket-nya. |
+
+Kalau `public/hot` kosong (dev server mati), asset dilayani dari build statis:
+`docker compose exec vite npm run build`.
+
 ---
 
 ## 7. Instalasi dengan Docker
@@ -600,6 +627,8 @@ Variabel penting selain standar Laravel (`.env.example` sudah berisi semua):
 | Ingin mengaktifkan Redis | `docker compose --profile redis up -d`, lalu di `.env`: `CACHE_STORE=redis`, `SESSION_DRIVER=redis`, `QUEUE_CONNECTION=redis`. |
 | Cache/session lama masih ada setelah pindah ke Redis | `docker compose exec redis redis-cli -n 0 FLUSHDB` (session+queue) dan `-n 1 FLUSHDB` (cache). |
 | Aset frontend tidak termuat / tampilan polos | Pastikan container `vite` berjalan (`docker compose ps`, log `docker compose logs -f vite`). Untuk mode statis: `docker compose exec vite npm run build`. |
+| Aset frontend tidak termuat **saat dibuka dari device lain via IP** | Dev server Vite (`port 5173`) harus jalan & tidak diblokir firewall. IP LAN ditulis otomatis ke `public/hot`; host request tetap dipakai sebagai host asset (lihat §6.5). Cek: `cat public/hot` lalu `curl -I http://<IP>:5173/@vite/client`. |
+| **Ikon sidebar (Font Awesome) tidak muncul** di device lain | Webfont di-load dari `url()` pada CSS. Pastikan `vite.config.js` punya `server.origin: ''` (URL relatif) — kalau origin terisi, Vite menulis `url(http://0.0.0.0:5173/.../fa-solid-900.woff2)` yang hanya jalan di komputer server. Cek: `curl -s http://<IP>:5173/resources/css/app.css \| grep webfonts` → harus relatif (`/node_modules/...`). |
 | Halaman 404 / route tidak ada untuk sub-menu baru | Setelah membuat/merubah `sub_menu`, provider auto-route aktif di request berikutnya; pastikan `file_sub_menu` terisi benar dan basename unik. Bila memakai `route:cache`, lakukan `route:clear` lalu `route:cache` lagi. |
 | Sidebar tidak menampilkan sub-menu baru | Clear cache sidebar: logout lalu login ulang (logout melakukan `Cache::forget`), atau hapus key `sidebar_moduls_user_{id}` di level aplikasi / setelah ubah `user_akses`. |
 | `migrate:fresh` menjatuhkan semua data | `migrate:fresh` akan **DROP SEMUA tabel** termasuk tabel legacy yang tidak punya migrasi. Pastikan kamu menyadarinya; untuk database berisi data gunakan `migrate` biasa. |

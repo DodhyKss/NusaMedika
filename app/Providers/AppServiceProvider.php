@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Console\Commands\Make\ModelMakeCommand;
 use App\Http\View\Composers\InformasiPasienComposer;
 use App\Http\View\Composers\SidebarComposer;
+use App\Support\Vite;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\View;
@@ -24,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
                 ModelMakeCommand::class,
             ]);
         });
+
+        // Vite kustom: host dev-server (public/hot) otomatis mengikuti host
+        // request, sehingga halaman yang dibuka dari device lain via IP tetap
+        // memuat CSS/JS + HMR tanpa perlu mengganti konfigurasi manual.
+        $this->app->singleton(\Illuminate\Foundation\Vite::class, Vite::class);
     }
 
     /**
