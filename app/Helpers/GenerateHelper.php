@@ -12,6 +12,8 @@ class GenerateHelper
      * Dipakai setelah seeder mengisi data dengan ID eksplisit agar insert baru
      * (yang memakai auto-increment) tidak bentrok dengan ID yang sudah dipakai.
      *
+     * PostgreSQL: setval(pg_get_serial_sequence(...), max+1)
+     *
      * @param  string  $tableName  Nama tabel
      * @param  string|null  $primaryKey  Kolom primary key (opsional)
      */
@@ -20,15 +22,10 @@ class GenerateHelper
         $primaryKey = $primaryKey ?: $tableName.'_id';
 
         try {
-            if (in_array(config('database.default'), ['mysql', 'mariadb'], true)) {
-                $max = (int) DB::table($tableName)->max($primaryKey);
-                DB::statement("ALTER TABLE {$tableName} AUTO_INCREMENT = ".($max + 1));
-            } else {
-                DB::statement(
-                    'SELECT setval(pg_get_serial_sequence(?, ?), COALESCE((SELECT MAX('.$primaryKey.') FROM '.$tableName.') + 1, 1), false)',
-                    [$tableName, $primaryKey]
-                );
-            }
+            DB::statement(
+                'SELECT setval(pg_get_serial_sequence(?, ?), COALESCE((SELECT MAX('.$primaryKey.') FROM '.$tableName.') + 1, 1), false)',
+                [$tableName, $primaryKey]
+            );
         } catch (\Exception $e) {
             // Abaikan jika sequence tidak ditemukan.
         }
@@ -41,10 +38,8 @@ class GenerateHelper
      */
     public static function generateNoMr(): string
     {
-        $regexOperator = in_array(config('database.default'), ['mysql', 'mariadb'], true) ? 'regexp' : '~';
-
         $max = (int) DB::table('pasien')
-            ->where('no_mr', $regexOperator, '^[0-9]+$')
+            ->where('no_mr', '~', '^[0-9]+$')
             ->max('no_mr');
 
         return str_pad((string) ($max + 1), 7, '0', STR_PAD_LEFT);
@@ -101,7 +96,7 @@ class GenerateHelper
         $prefix = strtoupper($prefix).'-'.now()->format('Ymd');
 
         $suffixes = DB::table($table)
-            ->where($column, 'like', $prefix.'-%')
+            ->where($column, 'ilike', $prefix.'-%')
             ->where(function ($q) {
                 $q->whereNull('status_batal')->orWhere('status_batal', 0);
             })

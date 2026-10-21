@@ -220,7 +220,7 @@ class OrderResepController extends Controller
     {
         $prefix = 'RES-'.now()->format('Ymd');
         $suffixes = DB::table('peresepan_obat')
-            ->where('no_resep', 'like', $prefix.'-%')
+            ->where('no_resep', 'ilike', $prefix.'-%')
             ->pluck('no_resep')
             ->map(fn ($no) => (int) last(explode('-', $no)))
             ->toArray();

@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\RegistrasiDetail;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Pusat agregasi Medical Check Up (dipakai form 70 "Kesimpulan MCU").
@@ -80,13 +81,22 @@ class McuHelper
         $registrasiId = (int) $registrasiDetail->registrasi_id;
         $baris = [];
 
+        // Semua registrasi_detail milik kunjungan ini — form organ bisa diisi
+        // pada detail mana saja dalam satu kunjungan MCU.
+        $detailIds = DB::table('registrasi_detail')
+            ->where('registrasi_id', $registrasiId)
+            ->pluck('registrasi_detail_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+        $detailIds[] = (int) $registrasiDetail->registrasi_detail_id;
+
         foreach (self::FORMS_MCU as $slug => $meta) {
             $formId = EmrHelper::formIdBySlug($slug);
             if (! $formId) {
                 continue;
             }
 
-            $nilai = EmrHelper::latestValuesByVariabel((int) $formId, $registrasiId, $meta['ringkas']);
+            $nilai = self::nilaiTerbaru((int) $formId, $detailIds, $meta['ringkas']);
             $terisi = false;
             $potongan = [];
 
@@ -109,6 +119,45 @@ class McuHelper
         }
 
         return $baris;
+    }
+
+    /**
+     * Nilai terbaru beberapa variabel dari EMR terakhir sebuah form pada
+     * sekumpulan registrasi_detail (bukan satu id saja — dipakai ringkasan
+     * MCU yang form organnya bisa diisi pada detail mana pun dalam kunjungan).
+     *
+     * @param  array<int, int>  $detailIds
+     * @param  array<int, string>  $variabels
+     * @return array<string, string>
+     */
+    private static function nilaiTerbaru(int $formId, array $detailIds, array $variabels): array
+    {
+        if ($detailIds === []) {
+            return [];
+        }
+
+        $emr = DB::table('emr')
+            ->where('form_id', $formId)
+            ->whereIn('registrasi_detail_id', array_values(array_unique($detailIds)))
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->orderByDesc('tgl_jam')
+            ->orderByDesc('emr_id')
+            ->first();
+
+        if (! $emr) {
+            return [];
+        }
+
+        return DB::table('emr_detail')
+            ->where('emr_id', $emr->emr_id)
+            ->whereIn('variabel', $variabels)
+            ->where(function ($q) {
+                $q->whereNull('status_batal')->orWhere('status_batal', 0);
+            })
+            ->pluck('value', 'variabel')
+            ->all();
     }
 
     /**

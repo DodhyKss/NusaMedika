@@ -19,8 +19,8 @@ class MasterImplementasiController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('kode_implementasi', 'like', "%{$search}%")
-                    ->orWhere('nama_implementasi', 'like', "%{$search}%");
+                $q->where('kode_implementasi', 'ilike', "%{$search}%")
+                    ->orWhere('nama_implementasi', 'ilike', "%{$search}%");
             });
         }
 

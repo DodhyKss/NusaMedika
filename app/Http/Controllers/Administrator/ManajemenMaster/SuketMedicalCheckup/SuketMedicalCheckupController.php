@@ -19,7 +19,7 @@ class SuketMedicalCheckupController extends Controller
         $query = SuketMcu::aktif();
 
         if ($search !== '') {
-            $query->where('nama_suket', 'like', "%{$search}%");
+            $query->where('nama_suket', 'ilike', "%{$search}%");
         }
 
         $suketList = $query->orderBy('nama_suket')->paginate(10)->withQueryString();

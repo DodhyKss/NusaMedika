@@ -28,12 +28,11 @@ class ApiBarangController extends Controller
         }
 
         if ($term) {
-            // Pakai `like`, bukan `ilike`: `ilike` hanya ada di PostgreSQL,
-            // sedangkan app ini berjalan di MySQL (collation utf8mb4 sudah
-            // case-insensitive).
+            // PostgreSQL: pakai `ilike` supaya pencarian tetap case-insensitive
+            // (di MySQL ini otomatis dari collation utf8mb4_unicode_ci).
             $query->where(function ($q) use ($term) {
-                $q->where('nama_barang', 'like', "%{$term}%")
-                    ->orWhere('kode_barang', 'like', "%{$term}%");
+                $q->where('nama_barang', 'ilike', "%{$term}%")
+                    ->orWhere('kode_barang', 'ilike', "%{$term}%");
             });
         }
 

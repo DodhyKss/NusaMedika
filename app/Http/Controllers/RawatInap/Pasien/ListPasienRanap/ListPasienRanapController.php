@@ -9,6 +9,39 @@ use Illuminate\Support\Facades\DB;
 
 class ListPasienRanapController extends Controller
 {
+    /**
+     * Ekspresi SQL PostgreSQL untuk lama(rawat) & kategori LOS.
+     *
+     * Postgres tidak punya TIMESTAMPDIFF, jadi selisih waktu dihitung dengan
+     * EXTRACT(EPOCH FROM ...) (detik) dan CURRENT_DATE (jumlah hari yang
+     * terlewati, setara TIMESTAMPDIFF(DAY) di MySQL).
+     *
+     * Catatan: PG hanya punya lpad(text, ...) & to_char, jadi angka hasil
+     * MOD()/FLOOR() (bertipe numeric) wajib dikonversi ke integer dulu.
+     */
+    private function ekspresiLos(): array
+    {
+        $detik = 'FLOOR(EXTRACT(EPOCH FROM (NOW() - r.tgl_masuk)))';
+        $hari = '(CURRENT_DATE - DATE(r.tgl_masuk))';
+
+        $jam = "TO_CHAR(CAST(FLOOR(MOD({$detik}, 86400) / 3600) AS integer), 'FM00')";
+        $menit = "TO_CHAR(CAST(FLOOR(MOD(MOD({$detik}, 86400), 3600) / 60) AS integer), 'FM00')";
+        $detikRemain = "TO_CHAR(CAST(MOD(MOD(MOD({$detik}, 86400), 3600), 60) AS integer), 'FM00')";
+
+        return [
+            'los' => DB::raw(
+                "CONCAT(FLOOR({$detik} / 86400), ' days ', {$jam}, ':', {$menit}, ':', {$detikRemain}) as los"
+            ),
+            'kapasitas' => DB::raw(
+                "case when {$hari} <= 3 then 'LOS <=3' "
+                ."when {$hari} <= 5 then 'LOS >3 & <=5' "
+                ."when {$hari} <= 7 then 'LOS >5 & <=7' "
+                ."when {$hari} <= 10 then 'LOS >7 & <=10' "
+                ."else 'LOS >10' end as kapasitas"
+            ),
+        ];
+    }
+
     public function index(Request $request)
     {
         $ruanganId = $request->input('ruangan', '');
@@ -19,6 +52,9 @@ class ListPasienRanapController extends Controller
         if ($filter) {
             // Dokter hanya melihat pasiennya sendiri (DPJP + konsul), profesi lain melihat semua pasien ranap
             $hanyaPasienSaya = AksesEhr::profesiId() === (int) env('PROFESI_ID_DOKTER', 1);
+
+            // Ekspresi lama(rawat) & kategori LOS (PostgreSQL)
+            $los = $this->ekspresiLos();
 
             $subQueryDpjp = DB::table('penanggung_rawat as pr')
                 ->select(
@@ -36,8 +72,8 @@ class ListPasienRanapController extends Controller
                     'p.jenis_kelamin',
                     'p.tgl_lahir',
                     'n.nama_nasabah',
-                    DB::raw("CONCAT(FLOOR(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()) / 86400), ' days ', LPAD(FLOOR(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400) / 3600), 2, '0'), ':', LPAD(FLOOR(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600) / 60), 2, '0'), ':', LPAD(MOD(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600), 60), 2, '0')) as los"),
-                    DB::raw("case when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 3 then 'LOS <=3' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 5 then 'LOS >3 & <=5' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 7 then 'LOS >5 & <=7' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 10 then 'LOS >7 & <=10' else 'LOS >10' end as kapasitas"),
+                    $los['los'],
+                    $los['kapasitas'],
                     DB::raw("'DPJP' as status_perawatan")
                 )
                 ->join('registrasi as r', 'pr.registrasi_id', '=', 'r.registrasi_id')
@@ -106,10 +142,11 @@ class ListPasienRanapController extends Controller
                     'p.jenis_kelamin',
                     'p.tgl_lahir',
                     'n.nama_nasabah',
-                    DB::raw("CONCAT(FLOOR(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()) / 86400), ' days ', LPAD(FLOOR(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400) / 3600), 2, '0'), ':', LPAD(FLOOR(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600) / 60), 2, '0'), ':', LPAD(MOD(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600), 60), 2, '0')) as los"),
-                    DB::raw("case when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 3 then 'LOS <=3' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 5 then 'LOS >3 & <=5' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 7 then 'LOS >5 & <=7' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 10 then 'LOS >7 & <=10' else 'LOS >10' end as kapasitas"),
+                    $los['los'],
+                    $los['kapasitas'],
                     DB::raw("COALESCE(ed_jk.value, 'Konsul') as status_perawatan")
                 )
+
                 ->join('registrasi as r', 'e.registrasi_id', '=', 'r.registrasi_id')
                 ->join('bed as bd', 'r.pasien_id', '=', 'bd.pasien_id_1')
                 ->join('bagian as b', 'bd.bagian_id', '=', 'b.bagian_id')
@@ -212,6 +249,9 @@ class ListPasienRanapController extends Controller
      */
     private function subQuerySemuaRanap($ruanganId = null)
     {
+        // Ekspresi lama(rawat) & kategori LOS (PostgreSQL)
+        $los = $this->ekspresiLos();
+
         $statusPerawatan = 'case'
             ." when exists (select 1 from penanggung_rawat pr where pr.registrasi_id = r.registrasi_id and (pr.status_batal is null or pr.status_batal = 0)) then 'DPJP'"
             .' when exists (select 1 from emr e where e.registrasi_id = r.registrasi_id and e.form_id = '.env('FORM_ID_KONSULTASI', 26).' and (e.status_batal is null or e.status_batal = 0)) then \'Konsul\''
@@ -262,8 +302,8 @@ class ListPasienRanapController extends Controller
                 'p.jenis_kelamin',
                 'p.tgl_lahir',
                 'n.nama_nasabah',
-                DB::raw("CONCAT(FLOOR(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()) / 86400), ' days ', LPAD(FLOOR(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400) / 3600), 2, '0'), ':', LPAD(FLOOR(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600) / 60), 2, '0'), ':', LPAD(MOD(MOD(MOD(TIMESTAMPDIFF(SECOND, r.tgl_masuk, NOW()), 86400), 3600), 60), 2, '0')) as los"),
-                DB::raw("case when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 3 then 'LOS <=3' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 5 then 'LOS >3 & <=5' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 7 then 'LOS >5 & <=7' when TIMESTAMPDIFF(DAY, r.tgl_masuk, NOW()) <= 10 then 'LOS >7 & <=10' else 'LOS >10' end as kapasitas"),
+                $los['los'],
+                $los['kapasitas'],
                 DB::raw($statusPerawatan.' as status_perawatan')
             )
             ->groupBy(

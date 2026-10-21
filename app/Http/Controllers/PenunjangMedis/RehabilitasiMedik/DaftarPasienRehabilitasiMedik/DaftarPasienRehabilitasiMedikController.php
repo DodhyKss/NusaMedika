@@ -78,8 +78,8 @@ class DaftarPasienRehabilitasiMedikController extends Controller
 
             if ($keyword !== null && $keyword !== '') {
                 $query->where(function ($q) use ($keyword) {
-                    $q->where('p.no_mr', 'like', '%'.$keyword.'%')
-                        ->orWhere('p.nama_pasien', 'like', '%'.$keyword.'%');
+                    $q->where('p.no_mr', 'ilike', '%'.$keyword.'%')
+                        ->orWhere('p.nama_pasien', 'ilike', '%'.$keyword.'%');
                 });
             }
 

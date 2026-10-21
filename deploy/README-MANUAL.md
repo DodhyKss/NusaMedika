@@ -1,7 +1,7 @@
 # Instalasi Manual (tanpa Docker) — SIMRS NusaMedika
 
 Stack yang dipasang manual di host: **Apache 2.4 + PHP 8.5 FPM (+ Redis opsional)**,
-dengan **database eksternal** (MySQL/PostgreSQL di luar mesin ini, atau server lain).
+dengan **PostgreSQL** (server database berjalan di luar Docker — di host ini atau server lain).
 
 > Cara ini dipakai kalau environment **tidak boleh memakai Docker** (mis. server rumah sakit
 > dengan kebijakan tertentu, atau development di laptop tanpa Docker Desktop).
@@ -21,7 +21,7 @@ dengan **database eksternal** (MySQL/PostgreSQL di luar mesin ini, atau server l
 | Redis | 8.0 | repo Ubuntu (**opsional**) |
 | Composer | 2.x | getcomposer.org |
 | Node.js | 22+ | sudah ada di host / `apt install nodejs npm` |
-| Database | MySQL 8 / PostgreSQL | **server eksternal** (bukan di host ini) |
+| Database | PostgreSQL 18 | **server eksternal** (di luar Docker) — setup: `sudo bash deploy/setup-postgres.sh` |
 
 Variabel yang dipakai di seluruh panduan ini (sesuaikan bila berbeda):
 
@@ -42,7 +42,7 @@ sudo apt-get install -y --no-install-recommends \
   apache2 curl ca-certificates unzip git \
   redis-server redis-tools \
   php${PHP_VER}-fpm php${PHP_VER}-cli php${PHP_VER}-common \
-  php${PHP_VER}-mysql php${PHP_VER}-pgsql php${PHP_VER}-mbstring \
+  php${PHP_VER}-pgsql php${PHP_VER}-mbstring \
   php${PHP_VER}-xml php${PHP_VER}-curl php${PHP_VER}-zip \
   php${PHP_VER}-bcmath php${PHP_VER}-intl php${PHP_VER}-gd php${PHP_VER}-redis
 ```
@@ -51,7 +51,7 @@ Cek hasilnya:
 
 ```bash
 php -v
-php -m | grep -E "pdo_mysql|pdo_pgsql|mbstring|redis|opcache|gd|intl"
+php -m | grep -E "pdo_pgsql|mbstring|redis|opcache|gd|intl"
 ```
 
 ### Composer
@@ -154,13 +154,18 @@ cp .env.example .env     # lewati bila .env sudah ada
 Isi blok **database eksternal** (tidak ada database di host ini):
 
 ```dotenv
-DB_CONNECTION=mysql
-DB_HOST=153.92.15.19
-DB_PORT=3306
-DB_DATABASE=u887691424_nusamedka
-DB_USERNAME=...
-DB_PASSWORD=...
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1        # dari host (dari container: host.docker.internal)
+DB_PORT=5432
+DB_DATABASE=meditech
+DB_USERNAME=meditech
+DB_PASSWORD=meditech
+DB_SSLMODE=prefer
 ```
+
+> Database disiapkan sekali dengan: `sudo bash deploy/setup-postgres.sh`
+> (membuat role + database `meditech`, menambahkan aturan pg_hba untuk jaringan Docker,
+> dan melakukan backup otomatis bila database sudah berisi data).
 
 Pilih mode cache/session/queue:
 

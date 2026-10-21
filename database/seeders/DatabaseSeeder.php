@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             SatuanSeeder::class,
             JenisBarangSeeder::class,
             BarangSeeder::class,
+            StokAwalSeeder::class,
             ModulMenuSubMenuSeeder::class,
             MasterPegawaiSeeder::class,
             UserSeeder::class,

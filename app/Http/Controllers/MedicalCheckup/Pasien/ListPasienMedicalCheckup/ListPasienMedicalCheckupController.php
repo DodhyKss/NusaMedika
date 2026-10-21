@@ -118,7 +118,7 @@ class ListPasienMedicalCheckupController extends Controller
         }
 
         $polikliniks = Bagian::where('referensi_bagian_id', env('REF_BAGIAN_RAJAL'))
-            ->where('nama_bagian', 'like', '%MEDICAL CHECKUP%')
+            ->where('nama_bagian', 'ilike', '%MEDICAL CHECKUP%')
             ->where(function ($q) {
                 $q->whereNull('status_batal')->orWhere('status_batal', 0);
             })

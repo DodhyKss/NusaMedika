@@ -1408,3 +1408,18 @@ function helperOptionFor(string $var): ?string
 
     return null;
 }
+
+/**
+ * Id registrasi_detail untuk harness E2E.
+ * Diambil dari data terbaru yang tersedia (dibuat PasienDummySeeder) supaya
+ * tidak bergantung pada id tetap dari database lama. Fallback ke 12.
+ */
+function rdId(): int
+{
+    static $id = null;
+    if ($id === null) {
+        $id = (int) (DB::table('registrasi_detail')->max('registrasi_detail_id') ?: 12);
+    }
+
+    return $id;
+}

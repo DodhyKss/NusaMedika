@@ -4,7 +4,7 @@ Laravel 13 (PHP 8.3) SIMRS app ("MediTechV2") — an Indonesian hospital EMR. Al
 
 ## Running everything through Docker
 
-Stack: **Apache 2.4 + PHP 8.3 FPM (+ Redis opsional)**, database **eksternal** (bukan service Docker).
+Stack: **Apache 2.4 + PHP 8.3 FPM (+ Redis opsional)**, database **PostgreSQL** (di luar Docker).
 
 - No PHP is installed on the host **pada alur Docker** (semua PHP/artisan lewat container). All PHP/artisan commands must run in the app container:
   `docker compose exec app php artisan <cmd>`
@@ -15,30 +15,46 @@ Stack: **Apache 2.4 + PHP 8.3 FPM (+ Redis opsional)**, database **eksternal** (
   - `redis` — **opsional** (compose **profile `redis`**), untuk cache/session/queue.
   - `queue` — `artisan queue:work redis`, juga ikut profile `redis`.
   - `vite` — Node 22 dev server, `network_mode: host` (port 5173).
-- **Tidak ada service `db`.** Database adalah **server luar** dan seluruh konfigurasi hanya di `.env` (`DB_CONNECTION`/`DB_HOST`/`DB_PORT`/`DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD`). Ganti server DB ⇒ ubah `.env` saja, lalu `docker compose up -d --force-recreate app web` + `config:clear`/`cache:clear`. Jangan pernah membuat service database di compose.
+- **Tidak ada service `db`.** Database = **PostgreSQL** yang jalan di host (di luar Docker); seluruh konfigurasi hanya di `.env`:
+  `DB_CONNECTION=pgsql`, `DB_HOST=host.docker.internal` (dari container — compose memakai `extra_hosts: host.docker.internal:host-gateway`), `DB_PORT=5432`, `DB_DATABASE/DB_USERNAME/DB_PASSWORD`, `DB_SSLMODE=prefer`.
+  Di host (instalasi manual) `DB_HOST=127.0.0.1`. Ganti server DB ⇒ ubah `.env` saja, lalu `docker compose up -d --force-recreate app web` + `config:clear`/`cache:clear`.
+- Setup PostgreSQL (role `meditech`, db `meditech`, aturan pg_hba untuk jaringan Docker) dilakukan sekali lewat:
+  `sudo bash deploy/setup-postgres.sh` (idempotent, aman diulang).
 - **Redis opsional**: default `.env` memakai `CACHE_STORE=file`, `SESSION_DRIVER=file`, `QUEUE_CONNECTION=sync` (aplikasi jalan tanpa Redis). Untuk memakai Redis: `docker compose --profile redis up -d` + ubah `.env` ke `redis`/`redis`/`redis` dengan `REDIS_HOST=redis` (nama service, **bukan** `127.0.0.1`). Driver `database` untuk cache/session/queue **tidak boleh** dipakai — tabel `cache`/`sessions`/`jobs` tidak ada di migrasi project.
-- The `Dockerfile` is multi-target: `base` (php:8.3-fpm + apache2 + composer), `fpm` (PHP-FPM + tuning), `apache` (vhost + `proxy_fcgi`). Ekstensi DB: `pdo_mysql mysqlnd` **dan** `pgsql pdo_pgsql` (lihat section *Dual-driver MySQL/PostgreSQL*). Ekstensi `redis` ikut terpasang (phpredis) walau Redis opsional.
-- `.env` is gitignored but required. `.env.example` has placeholder DB values. Never commit `.env` (it contains the DB password).
+- The `Dockerfile` is multi-target: `base` (php:8.3-fpm + apache2 + composer), `fpm` (PHP-FPM + tuning), `apache` (vhost + `proxy_fcgi`). Ekstensi DB: `pgsql pdo_pgsql` (lihat section *PostgreSQL*). Ekstensi `redis` ikut terpasang (phpredis) walau Redis opsional.
+- `.env` is gitignored but required. `.env.example` has placeholder DB values. Never commit `.env` (it contains the DB password). Backup konfigurasi lama disimpan di `.env.mysql-backup` (juga gitignored).
 - The `.env` file is injected at container start (`env_file`) **dan** dibaca Laravel langsung dari file di volume, jadi setelah mengeditnya recreate container: `docker compose up -d --force-recreate app web` — otherwise the running app keeps the old values (e.g. a changed `OBJEK_*`/`JENIS_RAWAT_*` constant or DB setting is not picked up).
 - **Jangan `php artisan config:cache`** — konstanta SIMRS dibaca via `env()` saat runtime.
 - Vite runs in its own container; frontend assets load via `@vite` dev server (`public/hot`). Untuk production: `docker compose exec vite npm run build`.
 - **Container `app` (dan `queue`) runs as the host user (`user: "1000:1000"`)** in `docker-compose.yml`, so any file written from inside the container (e.g. via `make:submenu`, `artisan`, caches) is owned by the host user (uid 1000) — editable/deletable from the host without `sudo`. Do **not** remove this `user:` line: without it the container runs as root and every created file becomes root-owned (hard to delete from the host). Note: if a teammate's host uid differs, they must adjust the value to their `id -u`/`id -g`. Container `web` (Apache) tetap root di dalam container agar bisa bind port 80 — file aplikasi tetap ditulis oleh container `app` (uid 1000).
 - Gotcha: after adding `user: 1000:1000`, ensure `vendor/` and writable dirs (`storage/`, `bootstrap/cache/`) are owned by uid 1000 too — otherwise `composer install` at container start fails with "Permission denied" (fix with a one-off `docker run --rm -v "$PWD":/var/www/html -w /var/www/html --user root <image> chown -R 1000:1000 vendor storage bootstrap`).
-- File konfigurasi container ada di `deploy/`: `deploy/apache/nusamedika-docker.conf` (vhost), `deploy/php/php.ini` (tuning PHP), `deploy/redis/redis.conf` (Redis), `deploy/README.md` (panduan cepat).
-- **Alternatif tanpa Docker** (host): `deploy/README-MANUAL.md` + `deploy/apache/nusamedika-manual.conf`, `deploy/php/php-fpm-pool-manual.conf`, `deploy/redis/redis-manual.conf`, `deploy/systemd/*` (queue worker & scheduler). Stack sama (Apache + PHP-FPM + Redis opsional), DB tetap eksternal. Perbedaan penting: di host **`REDIS_HOST=127.0.0.1`** (bukan `redis`), dan `php artisan` bisa dijalankan langsung tanpa container.
+- File konfigurasi container ada di `deploy/`: `deploy/apache/nusamedika-docker.conf` (vhost), `deploy/php/php.ini` (tuning PHP), `deploy/redis/redis.conf` (Redis), `deploy/setup-postgres.sh` (setup DB), `deploy/README.md` (panduan cepat).
+- **Alternatif tanpa Docker** (host): `deploy/README-MANUAL.md` + `deploy/apache/nusamedika-manual.conf`, `deploy/php/php-fpm-pool-manual.conf`, `deploy/redis/redis-manual.conf`, `deploy/systemd/*` (queue worker & scheduler). Stack sama (Apache + PHP-FPM + Redis opsional), DB tetap PostgreSQL di luar Docker. Perbedaan penting: di host **`DB_HOST=127.0.0.1`** dan **`REDIS_HOST=127.0.0.1`** (bukan `redis`), dan `php artisan` bisa dijalankan langsung tanpa container.
 
-## Dual-driver MySQL/PostgreSQL
+## PostgreSQL (satu-satunya driver DB)
 
-Kode mendukung dua driver (image punya `pdo_mysql` & `pdo_pgsql`), default **MySQL** (server eksternal). Saat memindahkan/membuat kode, jaga tetap kompatibel dua arah:
+Aplikasi memakai **PostgreSQL**. Blok `mysql`/`mariadb` sudah dihapus dari `config/database.php` — jangan menambahkannya kembali. Aturan saat menulis query/migrasi:
 
-- **`increments()`** → MySQL `AUTO_INCREMENT` / Postgres `serial` (sama-sama OK).
-- **JSON**: pakai `$table->json(...)`, **jangan** `jsonb` (tidak ada di MySQL).
-- **Case-insensitive**: pakai operator `'like'` (bukan `ilike` PG); kebenaran CI search di MySQL ditangani collation `utf8mb4_unicode_ci`.
-- **Regex**: `GenerateHelper::generateNoMr()` memilih operator `regexp` (mysql) vs `~` (pg) dari `config('database.default')`.
-- **`GenerateHelper::resetSequence()`**: cabang MySQL `ALTER TABLE ... AUTO_INCREMENT = max+1` vs PG `setval(pg_get_serial_sequence(...))`, dipilih per driver.
-- **View `header_ehr`** (`2026_08_28_000038`) memakai `CONCAT_WS('.', ...)` tanpa `::text`/kutip ganda — kompatibel kedua driver.
-- **Agregat durasi** (`ListPasienRanapController`): `date_trunc('second', age(...))`/`interval` (PG) diganti `TIMESTAMPDIFF(SECOND/*DAY*/, ...)` + `CONCAT`/`LPAD` bentuk `"N days HH:MM:SS"`; view `list_pasien_ranap.blade.php` memetakan `days/mons/years` → Hari/Bulan/Tahun.
-- Pindah dari PG ke MySQL: `migrate:fresh --seed` akan **drop semua tabel** — pastikan data lama sudah dibackup.
+- **`increments()`** → serial ✔ (satu-satunya bentuk yang dipakai).
+- **JSON**: `$table->json(...)` ✔ (PG `json`, bukan `jsonb`).
+- **Case-insensitive**: PostgreSQL `LIKE` bersifat **case-sensitive** (MySQL lama FREE dari collation). Karena itu **seluruh pencarian wajib pakai operator `ilike`** — sudah dikonversi di 59 call site. Jangan menulis `'like'` lagi.
+- **Regex**: operator PG `~` (bukan `regexp`). Dipakai di `GenerateHelper::generateNoMr()`.
+- **`GenerateHelper::resetSequence()`**: PG `setval(pg_get_serial_sequence(...), max+1)` — dipanggil di akhir `DatabaseSeeder` untuk 38 tabel.
+- **Tidak ada `TIMESTAMPDIFF`**: selisih waktu dihitung `FLOOR(EXTRACT(EPOCH FROM (NOW() - r.tgl_masuk)))`; jumlah hari `CURRENT_DATE - DATE(r.tgl_masuk)`. Contoh lengkap ada di `ListPasienRanapController::ekspresiLos()`. Fungsi yang **ada** di PG: `NOW()`, `CONCAT()`, `LPAD()`, `MOD()`, `FLOOR()`, `COALESCE()`, `DATE()`.
+- **View `header_ehr`** (`2026_08_28_000038`) memakai `CONCAT_WS('.', ...)` ✔ kompatibel PG.
+- **Case-sensitive unique constraint**: berbeda dari MySQL lama (`utf8mb4_unicode_ci` yang mengabaikan besar-kecil). Dua nilai yang berbeda huruf besar/kecil kini dianggap berbeda → perhatikan saat input kode/kode_barang.
+- **`migrate:fresh`** = drop semua tabel (data lama hilang) — untuk DB yang sudah berisi data pakai `migrate` biasa.
+
+### Jebakan PG yang sudah pernah menimpa (penting!)
+
+1. **`insertGetId()` WAJIB menyebut nama PK.** MySQL memakai `LAST_INSERT_ID()` (nama kolom tak masalah), sedangkan PG memakai `RETURNING "id"` → error `column "id" does not exist` kalau tabel punya PK custom. Selalu tulis `insertGetId([...], 'pasien_id')`.
+2. **`lpad()` hanya menerima `text`.** `MOD()`/`FLOOR()` di PG menghasilkan `numeric` → `lpad(numeric, ...)` error `function lpad(numeric, integer, unknown) does not exist`. Pakai `TO_CHAR(CAST(... AS integer), 'FM00')`.
+3. **Alias wajib pada ekspresi SELECT.** Tanpa `as los`, PG memberi nama kolom `?column?` sehingga `$row->los` undefined di view (tampilkan "-" tanpa error). MySQL lebih_longgar di sini.
+4. **`where('x', 'like', …)` tidak ada padanan CI di PG** → selalu `ilike`.
+5. **Fungsi yang TIDAK ada di PG**: `TIMESTAMPDIFF`, `DATE_SUB`, `DATE_ADD`, `IFNULL`, `GROUP_CONCAT`, `DATE_FORMAT`, `UNIX_TIMESTAMP`, `LAST_INSERT_ID`, `FIELD()`. Yang ada: `NOW()`, `CURRENT_DATE`, `CONCAT()`, `CONCAT_WS()`, `MOD()`, `FLOOR()`, `COALESCE()`, `DATE()`, `TO_CHAR()`, `EXTRACT(EPOCH FROM …)`, `~` (regex).
+6. **`GROUP BY` + kolom tak聚集**: PG mengizinkan kolom yang *functionally dependent* pada PK yang di-group (MySQL lenient, PG juga) — tapi ekspresi volatil (`NOW()`) tetap harus masuk select.
+7. **Kolom boolean**: default harus `'0'`/`'1'` (string) — `DEFAULT 0` untuk `boolean` ditolak PG.
+8. **Harness E2E tidak boleh hardcode `registrasi_detail_id`.** Pakai `rdId()` dari `tools/lib_pay.php` (mengambil id terbaru) — id 12 hanya berlaku pada database lama.
 
 ## Schema conventions (59 model + 9 EMR tables + 1 view + 7 tabel sosial/notifikasi)
 
@@ -61,7 +77,7 @@ The original 295 migrations (generated via `kitloong/laravel-migrations-generato
 
 ## Seeders
 
-`php artisan db:seed` runs (in order, 20 seeder): `ReferensiBagianSeeder`, `BagianSeeder` (39 baris dalam 6 kategori `referensi_bagian_id`: 1 Poli RJ 16, 2 Ruang Perawatan 13, 3 IGD 2, 4 Gudang 1, 5 Depo 4, 6 Penunjang Medis 3; menghapus permanen record lama lalu seed ulang ber-id berurutan dari 1), `SatuanSeeder`, `ModulMenuSubMenuSeeder` (10 modul → 19 menu → 51 sub_menu; **`file_sub_menu` kini menyimpan path view lengkap BESERTA nama file blade**, misal 24 "Wilayah" `Administrator/ManajemenMaster/Wilayah/wilayah`, 25 "Master Nasabah" `'...Nasabah/nasabah'`, 26 "Master Kelas" `'...Kelas/kelas'`, 27 "Jadwal Dokter" `'...JadwalDokter/jadwal_dokter'`, 28 "ICD" `'...Icd/icd'` — basename = snake_case folder leaf = URI, lihat section *Auto-route sub_menu*), `MasterPegawaiSeeder` (jabatan 1–8 + `status_kepegawaian` 1–4 + `pegawai` 1–3: Administrator Sistem/Perawat Jaga/Dokter Jaga), `UserSeeder` (admin/perawat/dokter + `user_akses`; admin diberi akses **semua sub_menu aktif** — dihitung dinamis di `UserSeeder` supaya sub_menu baru otomatis terakses), `WilayahSeeder` (data contoh master wilayah: 3 provinsi → 12 kabupaten → 10 kecamatan → 20 kelurahan), `KelasRuangSeeder`, `BedSeeder`, `SuketMcuSeeder`, `NasabahSeeder`, `IcdSeeder`, `JadwalDokterSeeder`, `ImplementasiSeeder`, `KategoriTindakanSeeder`, `TindakanSeeder`, `GroupTindakanSeeder`, `MasterTarifSeeder`, `PasienDummySeeder` (lihat section *Pasien Dummy*), `EmrMasterSeeder` (terakhir: baseline `dashboard_menu`/`dashboard_menu_sub`/`dashboard_menu_sub_extra` + `form` 1–4 + `akses_ehr` — lihat section *Manajemen EMR*). All are idempotent and safe to re-run (modul/menu/sub_menu/users use `updateOrInsert` keyed on the PK; `user_akses` uses plain auto-increment now — `getNextId` is gone). `DatabaseSeeder` calls `GenerateHelper::resetSequence()` (38 tabel) di akhir untuk menyetel ulang sequence setelah seeder mengisi ID eksplisit, agar insert auto-increment berikutnya dari aplikasi tidak bentrok. Users are linked to a `pegawai` via `users.pegawai_id` and `users.nama_pegawai` is copied from the pegawai record (admin→1, perawat→2, dokter→3).
+`php artisan db:seed` runs (in order, 21 seeder): `ReferensiBagianSeeder`, `BagianSeeder` (39 baris dalam 6 kategori `referensi_bagian_id`: 1 Poli RJ 16, 2 Ruang Perawatan 13, 3 IGD 2, 4 Gudang 1, 5 Depo 4, 6 Penunjang Medis 3; menghapus permanen record lama lalu seed ulang ber-id berurutan dari 1), `SatuanSeeder`, `JenisBarangSeeder` + `BarangSeeder` + **`StokAwalSeeder`** (stok awal batch), `ModulMenuSubMenuSeeder` (10 modul → 19 menu → 51 sub_menu; **`file_sub_menu` kini menyimpan path view lengkap BESERTA nama file blade**, misal 24 "Wilayah" `Administrator/ManajemenMaster/Wilayah/wilayah`, 25 "Master Nasabah" `'...Nasabah/nasabah'`, 26 "Master Kelas" `'...Kelas/kelas'`, 27 "Jadwal Dokter" `'...JadwalDokter/jadwal_dokter'`, 28 "ICD" `'...Icd/icd'` — basename = snake_case folder leaf = URI, lihat section *Auto-route sub_menu*), `MasterPegawaiSeeder` (jabatan 1–8 + `status_kepegawaian` 1–4 + `pegawai` 1–3: Administrator Sistem/Perawat Jaga/Dokter Jaga), `UserSeeder` (admin/perawat/dokter + `user_akses`; admin diberi akses **semua sub_menu aktif** — dihitung dinamis di `UserSeeder` supaya sub_menu baru otomatis terakses), `WilayahSeeder` (data contoh master wilayah: 3 provinsi → 12 kabupaten → 10 kecamatan → 20 kelurahan), `KelasRuangSeeder`, `BedSeeder`, `SuketMcuSeeder`, `NasabahSeeder`, `IcdSeeder`, `JadwalDokterSeeder`, `ImplementasiSeeder`, `KategoriTindakanSeeder`, `TindakanSeeder`, `GroupTindakanSeeder`, `MasterTarifSeeder`, `PasienDummySeeder` (lihat section *Pasien Dummy*), `EmrMasterSeeder` (terakhir: baseline `dashboard_menu`/`dashboard_menu_sub`/`dashboard_menu_sub_extra` + `form` 1–4 + `akses_ehr` — lihat section *Manajemen EMR*). All are idempotent and safe to re-run (modul/menu/sub_menu/users use `updateOrInsert` keyed on the PK; `user_akses` uses plain auto-increment now — `getNextId` is gone). `DatabaseSeeder` calls `GenerateHelper::resetSequence()` (38 tabel) di akhir untuk menyetel ulang sequence setelah seeder mengisi ID eksplisit, agar insert auto-increment berikutnya dari aplikasi tidak bentrok. Users are linked to a `pegawai` via `users.pegawai_id` and `users.nama_pegawai` is copied from the pegawai record (admin→1, perawat→2, dokter→3).
 
 **`ModulMenuSubMenuSeeder.php` kini dihasilkan otomatis** oleh command `php artisan seeder:sync-master-menu` (`App\Console\Commands\SyncMasterMenuSeeder`) — membaca record **aktif** (`status_batal != 1 OR NULL`) dari tabel `modul`/`menu`/`sub_menu`, lalu menulis ulang file seeder dengan `updateOrInsert` + komentar pengelompokan per modul/menu. Jadi setelah membuat modul/menu/sub_menu baru lewat aplikasi (atau langsung di DB), jalankan command itu — jangan edit seeder manual. Jalankan ulang `db:seed` bila perlu; seeder idempotent, record yang di-mark `status_batal=1` otomatis tidak ikut di-seed.
 
@@ -107,6 +123,12 @@ Form Modul (tambah/ubah) memakai **icon picker grid**, bukan text input: 2587 ik
 ## Auth is plain-text
 
 `AuthController::login` compares `user_password` directly (no bcrypt), and `users.user_password` is `varchar(30)`. Do **not** use the default `UserFactory` (it targets `name`/`email`/`password` columns that don't exist). Seed passwords as plain strings.
+
+## MCU: ringkasan & soft-gate Kesimpulan MCU (perbaikan 2026-10-21)
+
+- `McuHelper::ringkasan()` mencari nilai form organ via **daftar `registrasi_detail_id`** milik satu kunjungan (`McuHelper::nilaiTerbaru()`), BUKAN `EmrHelper::latestValuesByVariabel()` yang hanya menerima satu `registrasi_detail_id`.
+  **Jebakan lama:** helper itu pernah menerima `registrasi_id` → ringkasan selalu kosong → badge "Belum diperiksa" salah dan soft-gate "Isi minimal satu pemeriksaan spesialis" **selalu menolak** simpan Kesimpulan MCU. Jangan kembalikan ke `latestValuesByVariabel($formId, $registrasiId, ...)`.
+- Organ yang planted saat harness: **`gizi_mcu`** (variabel ringkasan `status_gizi` & `risiko_gizi` benar-benar bisa terisi). Organ `bedah_mcu`/`neurologi_mcu`/etc. punya `ringkas => ['diagnosa']` sementara form native-nya tidak punya field `diagnosa` → tidak pernah terisi.
 
 ## Select options tanpa tabel database
 
@@ -255,7 +277,7 @@ Rancangan lengkap: `docs/KONSEP_TINDAKAN_MEDIS.md`. Ringkas:
 - **`pemakaian_obat_bmhp = Ya` → minimal satu baris dengan `jumlah > 0`**; `Tidak` → semua baris dibuang dari payload di `filteredData()` (bukan hanya tidak terkirim), supaya tidak ada baris yatim di `emr_detail`. Error_item yang tidak ada mapping-nya tidak disimpan (dibuang di `filteredData()`).
 - **Master Barang** (sumber pilihan obat/BMHP): `JenisBarangSeeder` (`barang_jenis`: `Obat`, `BMHP`) + `BarangSeeder` (18 item: 8 Obat `OBT-001..008` + 10 BMHP `BMH-001..010`, lookup satuan per nama). Keduanya didaftarkan di `DatabaseSeeder` setelah `SatuanSeeder`, dan `'barang_jenis'`/`'barang'` masuk `resetSequences()`.
 - **Dropdown dokter** memakai `x-select_dokter` yang membaca `pegawai` (`profesi_id = 1`), **bukan** `users`. `MasterPegawaiSeeder` menyediakan 5 dokter aktif (`pegawai_id` 3, 14, 15, 16, 17).
-- **Seeder stok awal** `database/seeders/StokAwalSeeder.php` ( idempotent, dipanggil setelah `BarangSeeder`): mengisi `stock` + `kartu_stock` (`jenis_mutasi = 0`) untuk 18 barang × 2 batch × bagian-bagian yang dipakai `registrasi_detail` = 108 baris. **Tanpa ini tidak ada batch yang bisa dipilih** dan baris obat/BMHP selalu ditolak. `harga_jual` di-seed `NULL` supaya pengurangan stok menyasar baris `stock` yang sama.
+- **Seeder stok awal** `database/seeders/StokAwalSeeder.php` (idempotent, **sudah terdaftar di `DatabaseSeeder`** setelah `BarangSeeder` — jalankan manual bila DB sudah ada): mengisi `stock` + `kartu_stock` (`jenis_mutasi = 0`) untuk 18 barang × 2 batch × bagian-bagian yang dipakai `registrasi_detail` = 108 baris. **Tanpa ini tidak ada batch yang bisa dipilih** dan baris obat/BMHP selalu ditolak. `harga_jual` di-seed `NULL` supaya pengurangan stok menyasar baris `stock` yang sama.
 - **Akses EHR**: `akses_ehr` form 10 di-seed full CRUD untuk Dokter (1) & Perawat (2); `AksesEhr::can()` dipakai di `index`/`store`/`update`/`destroy`. Akses `Barang::aktif()` juga berlaku pada item obat/BMHP.
 - **Gotcha Blade `@json()`**: opsi `<option>` untuk baris obat/BMHP yang ditambahkan lewat JS **wajib** dihitung di blok `@php` lalu dipakai sebagai variabel tunggal (`@json($barisObatOptions)`). Ekspresi kompleks di argumen `@json()` dipecah `explode(',')` dan menghasilkan error runtime.
 

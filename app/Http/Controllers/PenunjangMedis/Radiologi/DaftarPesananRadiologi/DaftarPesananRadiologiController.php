@@ -53,7 +53,7 @@ class DaftarPesananRadiologiController extends Controller
             }
 
             if ($noOrder !== null && $noOrder !== '') {
-                $query->where('order_radiologi.no_order', 'like', '%'.$noOrder.'%');
+                $query->where('order_radiologi.no_order', 'ilike', '%'.$noOrder.'%');
             }
 
             if ($pasienId !== null && $pasienId !== '') {

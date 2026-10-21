@@ -22,8 +22,8 @@ class MasterTindakanController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('kode_tindakan', 'like', "%{$search}%")
-                    ->orWhere('nama_tindakan', 'like', "%{$search}%");
+                $q->where('kode_tindakan', 'ilike', "%{$search}%")
+                    ->orWhere('nama_tindakan', 'ilike', "%{$search}%");
             });
         }
 

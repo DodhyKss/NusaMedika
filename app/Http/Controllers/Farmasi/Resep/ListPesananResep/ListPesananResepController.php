@@ -55,7 +55,7 @@ class ListPesananResepController extends Controller
             }
 
             if ($noResep !== null && $noResep !== '') {
-                $query->where('no_resep', 'like', '%'.$noResep.'%');
+                $query->where('no_resep', 'ilike', '%'.$noResep.'%');
             }
 
             if ($pasienId !== null && $pasienId !== '') {

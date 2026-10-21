@@ -628,7 +628,8 @@ class BedManagementController extends Controller
                     'status_selesai' => 0,
                     'input_time' => $tglPindah,
                     'input_user_id' => Auth::id(),
-                ]);
+                ], 'registrasi_detail_id');
+
             }
 
             // Catat pergerakan pasien di bed_log

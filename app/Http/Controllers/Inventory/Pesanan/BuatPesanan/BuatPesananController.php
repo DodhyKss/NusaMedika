@@ -27,8 +27,8 @@ class BuatPesananController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('no_pemesanan', 'like', "%{$search}%")
-                    ->orWhereHas('details.supplier', fn ($s) => $s->where('nama_supplier', 'like', "%{$search}%"));
+                $q->where('no_pemesanan', 'ilike', "%{$search}%")
+                    ->orWhereHas('details.supplier', fn ($s) => $s->where('nama_supplier', 'ilike', "%{$search}%"));
             });
         }
 

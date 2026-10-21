@@ -19,7 +19,7 @@ class MasterKategoriTindakanController extends Controller
         $query = KategoriTindakan::aktif()->withCount('tindakan');
 
         if ($search !== '') {
-            $query->where('nama_kategori_tindakan', 'like', "%{$search}%");
+            $query->where('nama_kategori_tindakan', 'ilike', "%{$search}%");
         }
 
         $kategoriList = $query->orderBy('nama_kategori_tindakan')->paginate(10)->withQueryString();

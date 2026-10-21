@@ -62,7 +62,7 @@ class DaftarGawatDaruratObstetriGinekologiController extends Controller
                 $q->whereNull('status_batal')->orWhere('status_batal', 0);
             })
             ->where(function ($q) {
-                $q->where('nama_bagian', 'like', '%OBGYN%')->orWhere('nama_bagian', 'like', '%OBGIN%');
+                $q->where('nama_bagian', 'ilike', '%OBGYN%')->orWhere('nama_bagian', 'ilike', '%OBGIN%');
             })
             ->orderBy('bagian_id')
             ->first();

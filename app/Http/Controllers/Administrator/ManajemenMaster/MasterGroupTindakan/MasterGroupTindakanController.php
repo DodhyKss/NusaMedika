@@ -20,7 +20,7 @@ class MasterGroupTindakanController extends Controller
         $query = GroupTindakan::aktif()->with('bagian')->withCount('tindakan');
 
         if ($search !== '') {
-            $query->where('nama_group_tindakan', 'like', "%{$search}%");
+            $query->where('nama_group_tindakan', 'ilike', "%{$search}%");
         }
 
         if ($bagianId) {

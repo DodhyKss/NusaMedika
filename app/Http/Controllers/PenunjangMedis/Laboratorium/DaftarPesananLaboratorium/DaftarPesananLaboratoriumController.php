@@ -53,7 +53,7 @@ class DaftarPesananLaboratoriumController extends Controller
             }
 
             if ($noOrder !== null && $noOrder !== '') {
-                $query->where('order_laboratorium.no_order', 'like', '%'.$noOrder.'%');
+                $query->where('order_laboratorium.no_order', 'ilike', '%'.$noOrder.'%');
             }
 
             if ($pasienId !== null && $pasienId !== '') {

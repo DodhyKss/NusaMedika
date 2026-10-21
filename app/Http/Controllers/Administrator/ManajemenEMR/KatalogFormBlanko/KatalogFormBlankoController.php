@@ -72,10 +72,10 @@ class KatalogFormBlankoController extends Controller
             ->orderBy('nama_blanko');
 
         if ($request->filled('kategori')) {
-            $q->where('kategori', 'like', '%'.$request->string('kategori').'%');
+            $q->where('kategori', 'ilike', '%'.$request->string('kategori').'%');
         }
         if ($request->filled('departemen')) {
-            $q->where('departemen', 'like', '%'.$request->string('departemen').'%');
+            $q->where('departemen', 'ilike', '%'.$request->string('departemen').'%');
         }
         if ($request->filled('status')) {
             $q->where('is_aktif', $request->integer('status'));

@@ -11,9 +11,10 @@
 | `queue` | `artisan queue:work` — ikut profile `redis` | — |
 | `vite` | dev server Vite (node) | host network, 5173 |
 
-> **Database tidak ada di Docker.** Koneksi MySQL/PostgreSQL **eksternal** dibaca
-> sepenuhnya dari `.env` (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`,
+> **Database tidak ada di Docker.** Koneksi **PostgreSQL** yang jalan di luar container
+> dibaca sepenuhnya dari `.env` (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`,
 > `DB_PASSWORD`). Tidak ada service `db` di `docker-compose.yml`.
+> Setup sekali jalan: `sudo bash deploy/setup-postgres.sh`.
 
 ---
 
@@ -76,12 +77,13 @@ Driver `database` **tidak** bisa dipakai untuk cache/session/queue: tabel
 Semua di `.env`:
 
 ```dotenv
-DB_CONNECTION=mysql
-DB_HOST=153.92.15.19
-DB_PORT=3306
-DB_DATABASE=u887691424_nusamedka
-DB_USERNAME=...
-DB_PASSWORD=...
+DB_CONNECTION=pgsql
+DB_HOST=host.docker.internal   # dari container (host-gateway); dari host: 127.0.0.1
+DB_PORT=5432
+DB_DATABASE=meditech
+DB_USERNAME=meditech
+DB_PASSWORD=meditech
+DB_SSLMODE=prefer
 ```
 
 Ganti server DB? cukup ubah `.env`, lalu:
@@ -92,15 +94,20 @@ docker compose exec app php artisan config:clear
 docker compose exec app php artisan cache:clear
 ```
 
+> Database lokal di host ini disiapkan dengan `sudo bash deploy/setup-postgres.sh`
+> (role + database `meditech` + aturan `pg_hba` untuk jaringan Docker).
+
 > **Jangan** `php artisan config:cache` — aplikasi membaca `env('FORM_ID_*')` /
 > `env('OBJEK_ID_*')` saat runtime (lihat `AGENTS.md` § EMR dynamic forms).
 
 Perintah database yang pernah dipakai (service `db` sudah dihapus):
 
 ```bash
-# mysql client dari container app (tidak ada lagi service db)
+# PostgreSQL: tidak ada lagi service db, perintah lewat artisan
 docker compose exec app php artisan migrate:status
 docker compose exec app php artisan migrate --force
+# (opsional) psql dari container app
+docker compose exec app psql "host=host.docker.internal dbname=meditech user=meditech password=meditech" -c '\dt'
 ```
 
 ---

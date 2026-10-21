@@ -77,7 +77,7 @@ class KonsultasiController extends Controller
         // Bagian penunjang Rehabilitasi Medik (referensi 6 + LIKE '%REHABILITASI%')
         $bagianRehabList = Bagian::aktif()
             ->where('referensi_bagian_id', 6)
-            ->where('nama_bagian', 'like', '%REHABILITASI%')
+            ->where('nama_bagian', 'ilike', '%REHABILITASI%')
             ->orderBy('nama_bagian')
             ->get();
 

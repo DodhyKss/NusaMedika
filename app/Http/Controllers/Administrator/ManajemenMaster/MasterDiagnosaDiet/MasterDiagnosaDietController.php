@@ -33,8 +33,8 @@ class MasterDiagnosaDietController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('kode_diagnosa_diet', 'like', "%{$search}%")
-                    ->orWhere('nama_diagnosa_diet', 'like', "%{$search}%");
+                $q->where('kode_diagnosa_diet', 'ilike', "%{$search}%")
+                    ->orWhere('nama_diagnosa_diet', 'ilike', "%{$search}%");
             });
         }
 

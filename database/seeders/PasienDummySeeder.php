@@ -114,7 +114,7 @@ class PasienDummySeeder extends Seeder
                 'no_mr' => GenerateHelper::generateNoMr(),
                 'input_time' => $now,
                 'input_user_id' => $userId,
-            ]));
+            ]), 'pasien_id');
         }
 
         // ===== 2. Nasabah pasien (BPJS + Umum/Mandiri) =====
@@ -144,7 +144,7 @@ class PasienDummySeeder extends Seeder
             $pasienNasabahId = (int) DB::table('pasien_nasabah')->insertGetId(array_merge($pnData, [
                 'input_time' => $now,
                 'input_user_id' => $userId,
-            ]));
+            ]), 'pasien_nasabah_id');
         }
 
         // Simpan juga penjamin alternatif Umum/Mandiri (secondary).
@@ -476,7 +476,7 @@ class PasienDummySeeder extends Seeder
             'status_batal' => 0,
             'input_time' => $d['now'],
             'input_user_id' => $d['user_id'],
-        ]);
+        ], 'registrasi_id');
     }
 
     private function insertRegistrasiDetail(array $d): int
@@ -495,7 +495,7 @@ class PasienDummySeeder extends Seeder
             'status_batal' => 0,
             'input_time' => $d['now'],
             'input_user_id' => $d['user_id'],
-        ]);
+        ], 'registrasi_detail_id');
     }
 
     private function insertBillTemp(int $registrasiDetailId, array $d): void

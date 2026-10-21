@@ -28,7 +28,7 @@ class DaftarMedicalCheckupController extends Controller
             ->whereHas('bagian', function ($q) {
                 $q->aktif()
                     ->where('referensi_bagian_id', env('REF_BAGIAN_RAJAL'))
-                    ->where('nama_bagian', 'like', '%MEDICAL CHECKUP%');
+                    ->where('nama_bagian', 'ilike', '%MEDICAL CHECKUP%');
             })
             ->with([
                 'pegawai' => fn ($q) => $q->where(function ($sq) {

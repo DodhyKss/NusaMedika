@@ -60,9 +60,9 @@ Dokumen ini adalah panduan lengkap: arsitektur, struktur proyek, cara kerja, lib
 ### Infrastruktur
 
 - **Apache 2.4** sebagai web server (container `web`) — `mod_rewrite` + `mod_proxy_fcgi`, DocumentRoot `public/`, akses <http://localhost:8081>.
-- **PHP 8.3 FPM** (container `app`) dengan ekstensi: `pdo_mysql mysqlnd`, `pdo_pgsql`, `pgsql`, `mbstring`, `exif`, `pcntl`, `bcmath`, `gd`, `zip`, `intl`, `opcache`, `redis`, `curl`, `git`, `unzip`, `postgresql-client`, `tzdata`.
+- **PHP 8.3 FPM** (container `app`) dengan ekstensi: `pdo_pgsql`, `pgsql`, `mbstring`, `exif`, `pcntl`, `bcmath`, `gd`, `zip`, `intl`, `opcache`, `redis`, `curl`, `git`, `unzip`, `postgresql-client`, `tzdata`.
 - **Redis** (container `redis`) — **opsional** untuk cache / session / queue (profile `redis`). Tanpanya aplikasi tetap jalan dengan driver `file`/`sync`.
-- **MySQL / PostgreSQL eksternal** sebagai database — **tidak ada service database di dalam Docker**; seluruh konfigurasi DB hanya di `.env` (`DB_*`).
+- **PostgreSQL** sebagai database — server PostgreSQL berjalan **di luar Docker** (di host ini); konfigurasi hanya di `.env` (`DB_*`). Setup sekali jalan: `sudo bash deploy/setup-postgres.sh`.
 - **Docker + Docker Compose** untuk seluruh lingkungan (service: `web`, `app`, `redis`, `queue`, `vite` — lihat bagian Instalasi Docker).
 
 ---
@@ -370,7 +370,7 @@ Stack: **Apache 2.4 + PHP 8.3 FPM (+ Redis opsional)**, database **eksternal**.
 
 - Docker Engine (Docker Desktop di Windows/macOS, atau daemon Docker di Linux).
 - Plugin **Docker Compose v2** (sudah termasuk di Docker Desktop / diinstal terpisah di Linux).
-- Server **MySQL** (atau PostgreSQL) yang bisa diakses — **di luar Docker**; koneksi ditentukan oleh `.env`.
+- Server **PostgreSQL** yang bisa diakses — **di luar Docker**; koneksi ditentukan oleh `.env`. Di host ini: `sudo bash deploy/setup-postgres.sh` (buat role + database `meditech` + aturan pg_hba untuk jaringan Docker).
 
 ### Langkah-langkah
 
@@ -390,13 +390,18 @@ Stack: **Apache 2.4 + PHP 8.3 FPM (+ Redis opsional)**, database **eksternal**.
    Isi blok database (server **luar** Docker):
 
    ```dotenv
-   DB_CONNECTION=mysql
-   DB_HOST=153.92.15.19
-   DB_PORT=3306
-   DB_DATABASE=u887691424_nusamedka
-   DB_USERNAME=...
-   DB_PASSWORD=...
+   DB_CONNECTION=pgsql
+   DB_HOST=host.docker.internal
+   DB_PORT=5432
+   DB_DATABASE=meditech
+   DB_USERNAME=meditech
+   DB_PASSWORD=meditech
+   DB_SSLMODE=prefer
    ```
+
+   > `host.docker.internal` hanya berlaku dari dalam container (compose memakai
+   > `extra_hosts: host.docker.internal:host-gateway`). Untuk instalasi manual di host,
+   > ganti dengan `127.0.0.1`.
 
    Pilih mode cache/session/queue (lihat §9):
 
@@ -559,9 +564,10 @@ Variabel penting selain standar Laravel (`.env.example` sudah berisi semua):
 
 | Variabel | Contoh | Keterangan |
 | :--- | :--- | :--- |
-| `DB_CONNECTION` | `mysql` / `pgsql` | Driver database (server **eksternal**, di luar Docker). |
-| `DB_HOST` / `DB_PORT` | `153.92.15.19` / `3306` | Host database eksternal. |
-| `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` | `u887691424_nusamedka` | Kredensial database. |
+| `DB_CONNECTION` | `pgsql` | Driver database (PostgreSQL, server **di luar Docker**). |
+| `DB_HOST` / `DB_PORT` | `host.docker.internal` / `5432` | Host PostgreSQL. Dari container = `host.docker.internal`; dari host = `127.0.0.1`. |
+| `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` | `meditech` | Kredensial database (dibuat oleh `deploy/setup-postgres.sh`). |
+| `DB_SSLMODE` | `prefer` | Mode SSL PostgreSQL (`require` untuk server cloud). |
 | `APP_URL` | `http://localhost:8081` | URL aplikasi (sesuai port publish Apache). |
 | `CACHE_STORE` | `file` / `redis` | Cache store. `redis` butuh container `redis` (profile `redis`). |
 | `SESSION_DRIVER` | `file` / `redis` | Driver session. |
@@ -584,7 +590,9 @@ Variabel penting selain standar Laravel (`.env.example` sudah berisi semua):
 
 | Masalah | Solusi |
 | :--- | :--- |
-| `Connection refused` ke database | Server DB eksternal harus bisa dijangkau dari container: `docker compose exec app php -r 'echo gethostbyname("153.92.15.19");'`. Cek juga `DB_*` di `.env` dan firewall server DB. |
+| `Connection refused` ke database | PostgreSQL harus bisa dijangkau dari container. Uji: `docker compose exec app php -r 'echo gethostbyname("host.docker.internal");'`. Pastikan `sudo bash deploy/setup-postgres.sh` sudah dijalankan (aturan pg_hba untuk subnet Docker) dan `DB_*` di `.env` benar. |
+| `password authentication failed` untuk user `meditech` | Password di `.env` tidak sama dengan yang dibuat skrip. Jalankan ulang `sudo bash deploy/setup-postgres.sh` (skrip menyinkronkan password) atau ubah password di `.env`. |
+| `could not translate host name "host.docker.internal"` | `extra_hosts` belum ada di service `app`/`queue`. Pastikan `docker-compose.yml` memuat `extra_hosts: ["host.docker.internal:host-gateway"]`, lalu recreate container. |
 | Perubahan `.env` tidak berpengaruh | Nilai `.env` dibaca saat container start. Jalankan `docker compose up -d --force-recreate app web`, lalu `docker compose exec app php artisan config:clear && docker compose exec app php artisan cache:clear`. |
 | Halaman menampilkan source PHP (tidak dieksekusi) | Modul `proxy_fcgi` belum aktif. Rebuild image: `docker compose up -d --build web`, lalu cek `docker compose logs web`. |
 | Apache 502 / "Service Unavailable" | Container `app` (PHP-FPM) mati atau belum siap. Cek `docker compose logs app` dan `docker compose ps`. |

@@ -36,6 +36,9 @@ services:
       - .env
     environment:
       COMPOSER_HOME: /tmp/composer
+    extra_hosts:
+      # Agar container bisa menjangkau PostgreSQL yang jalan di host
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./:/var/www/html
     command: sh -c "composer install --no-interaction --prefer-dist --optimize-autoloader && exec php-fpm --nodaemonize"
@@ -78,6 +81,8 @@ services:
       - .env
     environment:
       COMPOSER_HOME: /tmp/composer
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./:/var/www/html
     command: sh -c "until [ -f vendor/autoload.php ]; do sleep 2; done; exec php artisan queue:work redis --sleep=3 --tries=3 --timeout=1800"

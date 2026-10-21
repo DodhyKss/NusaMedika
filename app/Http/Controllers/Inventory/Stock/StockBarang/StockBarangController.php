@@ -22,8 +22,8 @@ class StockBarangController extends Controller
 
         if ($search !== '') {
             $query->whereHas('barang', function ($q) use ($search) {
-                $q->where('nama_barang', 'like', "%{$search}%")
-                    ->orWhere('kode_barang', 'like', "%{$search}%");
+                $q->where('nama_barang', 'ilike', "%{$search}%")
+                    ->orWhere('kode_barang', 'ilike', "%{$search}%");
             });
         }
 

@@ -27,8 +27,8 @@ class BedController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('no_kamar', 'like', "%{$search}%")
-                    ->orWhere('nama_bed', 'like', "%{$search}%");
+                $q->where('no_kamar', 'ilike', "%{$search}%")
+                    ->orWhere('nama_bed', 'ilike', "%{$search}%");
             });
         }
 

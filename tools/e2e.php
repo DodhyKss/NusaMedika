@@ -107,11 +107,13 @@ foreach ($ids as $fid) {
     // store, tanam satu EMR organ minimal (bedah_mcu, 5 variabel) lalu
     // biarkan pembersihan akhir run menghapusnya bersama data uji lain.
     if ($slug === 'kesimpulan_mcu') {
-        $organId = DB::table('form')->where('slug', 'bedah_mcu')->value('form_id');
+        // Tanam satu form organ yang variabel ringkasnya benar-benar bisa terisi
+        // (McuHelper::ringkasan memakai status_gizi & risiko_gizi untuk gizi_mcu).
+        $organId = DB::table('form')->where('slug', 'gizi_mcu')->value('form_id');
         if ($organId) {
             $organVars = EmrHelper::objekVariabels((int) $organId);
-            $organPayload = buildPayload("App\\Http\\Controllers\\EMR\\BedahMcu\\BedahMcuController", (int) $organId);
-            EmrHelper::insert((int) $organId, array_intersect_key($organPayload, array_flip($organVars)), 12);
+            $organPayload = buildPayload("App\\Http\\Controllers\\EMR\\GiziMcu\\GiziMcuController", (int) $organId);
+            EmrHelper::insert((int) $organId, array_intersect_key($organPayload, array_flip($organVars)), rdId());
         }
     }
     auth()->loginUsingId($cu);
@@ -123,7 +125,7 @@ foreach ($ids as $fid) {
     $ok = false;
     $pend = [];
     try {
-        (new $cls)->store($rq, 12);
+        (new $cls)->store($rq, rdId());
         $ok = true;
     } catch (ValidationException $e) {
         $pend = $e->errors();
@@ -143,9 +145,9 @@ foreach ($ids as $fid) {
         $q->whereNull('status_batal')->orWhere('status_batal', 0);
     })->pluck('value', 'variabel');
     $miss = array_values(array_filter($vars, fn ($v) => ! $saved->has($v)));
-    $g = $K->handle(mk('GET', "/emr/form/$slug/12/$id?action=view", [], $cu))->getStatusCode();
-    $uR = $uu ? $K->handle(mk('PUT', "/emr/form-update/$slug/12/$id", $p, $uu))->getStatusCode() : 'append-only';
-    $dR = $du ? $K->handle(mk('DELETE', "/emr/form-delete/$slug/12/$id", [], $du))->getStatusCode() : 'append-only';
+    $g = $K->handle(mk('GET', "/emr/form/$slug/".rdId()."/$id?action=view", [], $cu))->getStatusCode();
+    $uR = $uu ? $K->handle(mk('PUT', "/emr/form-update/$slug/".rdId()."/$id", $p, $uu))->getStatusCode() : 'append-only';
+    $dR = $du ? $K->handle(mk('DELETE', "/emr/form-delete/$slug/".rdId()."/$id", [], $du))->getStatusCode() : 'append-only';
     $good = ($saved->count() === count($vars)) && $g === 200 && ($uR === 'append-only' || $uR === 302) && ($dR === 'append-only' || $dR === 302);
     printf("  %-30s simpan=%d/%d index=%d upd=%s del=%s %s\n", $slug, $saved->count(), count($vars), $g, $uR, $dR, $good ? 'OK' : '<<< PERIKSA');
     if (! $good) {

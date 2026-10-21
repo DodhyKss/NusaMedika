@@ -182,7 +182,7 @@ class SuratKeteranganSehatController extends Controller
      * Nomor surat server-side: `{urut:02d} / KDPM / SKS / {bulan romawi} / {tahun}`.
      * Bulan ROMAWI (I..XII) mengikuti legacy `_romawiBulan(date('m'))` —
      * locale app `en` membuat `translatedFormat('M')` menghasilkan "Oct".
-     * `now()` PHP dipakai, bukan `NOW()` MySQL (container db = UTC).
+     * `now()` PHP dipakai, bukan `NOW()` SQL (server database bisa berjalan UTC).
      */
     private function nomorSurat(): string
     {
