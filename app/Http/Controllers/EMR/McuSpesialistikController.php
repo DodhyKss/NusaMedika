@@ -10,6 +10,8 @@ use App\Http\Controllers\Controller;
 use App\Models\RegistrasiDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Base controller untuk form Medical Check Up spesialis yang berpola
@@ -109,7 +111,7 @@ abstract class McuSpesialistikController extends Controller
             EmrHelper::insert((int) $form_id, $this->filteredData($data, (int) $form_id, $organ), (int) $registrasi_detail_id);
 
             return redirect()->back()->with('success', $this->labelForm().' berhasil disimpan.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal menyimpan '.$this->labelForm().': '.$e->getMessage())->withInput();
@@ -129,7 +131,7 @@ abstract class McuSpesialistikController extends Controller
             EmrHelper::update((int) $emr_id, (int) $form_id, $this->filteredData($data, (int) $form_id, $organ));
 
             return redirect()->back()->with('success', $this->labelForm().' berhasil diperbarui.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal memperbarui '.$this->labelForm().': '.$e->getMessage())->withInput();
@@ -227,7 +229,7 @@ abstract class McuSpesialistikController extends Controller
      */
     protected function viewName(): string
     {
-        return 'moduls.EMR.'.\Illuminate\Support\Str::studly($this->slug).'.index';
+        return 'moduls.EMR.'.Str::studly($this->slug).'.index';
     }
 
     /**

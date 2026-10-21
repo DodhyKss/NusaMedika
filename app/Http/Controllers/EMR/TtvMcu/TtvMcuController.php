@@ -5,6 +5,7 @@ namespace App\Http\Controllers\EMR\TtvMcu;
 use App\Helpers\AksesEhr;
 use App\Helpers\EmrHelper;
 use App\Helpers\GiziHelper;
+use App\Helpers\SelectOption;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrasiDetail;
 use Illuminate\Http\Request;
@@ -37,7 +38,7 @@ class TtvMcuController extends Controller
         $riwayat = EmrHelper::emrList((int) $form_id, (int) $registrasi_detail->registrasi_id);
         $historyGrouped = EmrHelper::historyKunjunganGrouped($registrasi_detail);
 
-        $pekerjaan = \App\Helpers\SelectOption::get('pekerjaan') ?? [];
+        $pekerjaan = SelectOption::get('pekerjaan') ?? [];
 
         if (empty($emr_id) && ! ($aksesCrud['create'] ?? false) && $riwayat->isNotEmpty()) {
             return redirect()->route('emr.dynamic.index', [
