@@ -6,6 +6,15 @@
             <img src="{{ asset('logo_white.png') }}" alt="{{ config('app.name', 'SIMRS') }}" class="h-9 w-auto object-contain flex-shrink-0">
             <span class="app-name text-white font-bold text-[15px] leading-tight truncate">{{ config('app.name', 'SIMRS') }}</span>
         </a>
+
+        {{-- Tombol tutup drawer (khusus mobile). Di desktop sidebar kolom tetap,
+             jadi tombol ini disembunyikan. --}}
+        <button type="button" id="sidebar-close" title="Tutup menu"
+                class="lg:hidden ml-auto p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-white/10 focus:outline-none transition-colors flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
     </div>
 
     <!-- Sidebar Search -->

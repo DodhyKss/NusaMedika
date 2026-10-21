@@ -25,7 +25,7 @@
         </div>
         
         <!-- Main Content -->
-        <div class="relative flex flex-col flex-1 w-full lg:w-auto overflow-y-auto overflow-x-hidden min-w-0 bg-slate-50">
+        <div id="main-content" class="relative flex flex-col flex-1 w-full lg:w-auto overflow-y-auto overflow-x-hidden min-w-0 bg-slate-50">
             @include('layouts.navbar')
             <main class="w-full grow p-3 sm:p-4 lg:p-6">
                 {{-- Notification --}}
@@ -70,17 +70,35 @@
         @media (min-width: 1024px) {
             #sidebar-wrapper.sidebar-collapsed { width: 68px; }
         }
+
+        /* Drawer mobile terbuka: scroll halaman di belakang dikunci */
+        body.drawer-open { overflow: hidden; }
     </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleBtn = document.getElementById('sidebar-toggle');
+            const closeBtn = document.getElementById('sidebar-close');
             const sidebar = document.getElementById('sidebar-wrapper');
             const backdrop = document.getElementById('sidebar-backdrop');
+            const mainContent = document.getElementById('main-content');
             const mqMobile = window.matchMedia('(max-width: 1023px)');
+            const STORAGE_KEY = 'nusamedika.sidebar.collapsed';
 
             const isMobile = () => mqMobile.matches;
 
+            // ---------- Ikon tombol toggle (menu <-> tutup) ----------
+            function syncIcon() {
+                const menuIcon = document.getElementById('sidebar-icon-menu');
+                const closeIcon = document.getElementById('sidebar-icon-close');
+                const drawerOpen = !!sidebar && sidebar.classList.contains('is-open');
+                // Pakai style.display (bukan class `hidden`) supaya tidak
+                // bentrok dengan utility display lain di Tailwind v4.
+                if (menuIcon) menuIcon.style.display = (isMobile() && drawerOpen) ? 'none' : '';
+                if (closeIcon) closeIcon.style.display = (isMobile() && drawerOpen) ? '' : 'none';
+            }
+
+            // ---------- Mobile: drawer off-canvas ----------
             function openDrawer() {
                 if (!sidebar) return;
                 sidebar.classList.add('sidebar-animate');
@@ -88,7 +106,10 @@
                 void sidebar.offsetWidth;
                 sidebar.classList.add('is-open');
                 backdrop?.classList.remove('hidden');
-                document.body.classList.add('overflow-hidden');
+                document.body.classList.add('drawer-open', 'overflow-hidden');
+                // Konten utama adalah elemen yang benar-benar di-scroll
+                if (mainContent) mainContent.style.overflowY = 'hidden';
+                syncIcon();
             }
 
             function closeDrawer() {
@@ -97,7 +118,9 @@
                 void sidebar.offsetWidth;
                 sidebar.classList.remove('is-open');
                 backdrop?.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden');
+                document.body.classList.remove('drawer-open', 'overflow-hidden');
+                if (mainContent) mainContent.style.overflowY = '';
+                syncIcon();
 
                 // Hapus penanda transisi setelah animasi selesai
                 setTimeout(function () {
@@ -105,28 +128,59 @@
                 }, 350);
             }
 
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function() {
-                    closeFlyout();
+            // ---------- Desktop: collapse ke mode ikon ----------
+            // Status <details> yang terbuka disimpan lalu dipulihkan saat
+            // sidebar dibuka kembali, supaya menu tidak ikut tertutup semua.
+            let detailTerbuka = [];
 
-                    if (isMobile()) {
-                        // Mobile: buka/tutup drawer
-                        if (sidebar.classList.contains('is-open')) {
-                            closeDrawer();
-                        } else {
-                            openDrawer();
-                        }
-                        return;
+            function setCollapsed(collapsed) {
+                if (!sidebar) return;
+
+                if (collapsed) {
+                    detailTerbuka = Array.from(sidebar.querySelectorAll('details[open]'));
+                    sidebar.classList.add('sidebar-collapsed');
+                    detailTerbuka.forEach(function (d) { d.removeAttribute('open'); });
+                } else {
+                    sidebar.classList.remove('sidebar-collapsed');
+                    detailTerbuka.forEach(function (d) { d.setAttribute('open', ''); });
+                    detailTerbuka = [];
+                }
+
+                try {
+                    localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0');
+                } catch (e) {
+                    // localStorage mungkin tidak tersedia (mode privat)
+                }
+            }
+
+            // ---------- Tombol toggle utama ----------
+            function toggleSidebar() {
+                closeFlyout();
+
+                if (isMobile()) {
+                    if (sidebar && sidebar.classList.contains('is-open')) {
+                        closeDrawer();
+                    } else {
+                        openDrawer();
                     }
+                    return;
+                }
 
-                    // Desktop: collapse jadi ikon
-                    const collapsed = sidebar.classList.toggle('sidebar-collapsed');
+                // Desktop: collapse jadi ikon
+                setCollapsed(!sidebar.classList.contains('sidebar-collapsed'));
+                syncIcon();
+            }
 
-                    if (collapsed) {
-                        sidebar.querySelectorAll('details[open]').forEach(d => d.removeAttribute('open'));
-                    }
-                });
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', toggleSidebar);
+            }
 
+            // Tombol tutup di dalam header drawer (mobile)
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeDrawer);
+            }
+
+            if (sidebar) {
                 // Tutup drawer saat backdrop diklik / tekan Escape / pilih menu
                 backdrop?.addEventListener('click', closeDrawer);
 
@@ -144,14 +198,31 @@
 
                 // Changing the desktop/mobile state resets the appropriate mode
                 mqMobile.addEventListener('change', function(e) {
+                    closeDrawer();
                     if (e.matches) {
-                        closeDrawer();
+                        // ke mode mobile: buang status collapse desktop
                         sidebar.classList.remove('sidebar-collapsed');
+                        try { localStorage.setItem(STORAGE_KEY, '0'); } catch (err) {}
                     } else {
-                        closeDrawer();
+                        // kembali ke desktop: pulihkan status collapse tersimpan
+                        let collapsed = false;
+                        try { collapsed = localStorage.getItem(STORAGE_KEY) === '1'; } catch (err) {}
+                        sidebar.classList.toggle('sidebar-collapsed', collapsed);
                     }
+                    syncIcon();
                 });
+
+                // Pulihkan status collapse desktop dari penyimpanan lokal
+                if (!isMobile()) {
+                    let collapsed = false;
+                    try { collapsed = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
+                    if (collapsed) {
+                        sidebar.classList.add('sidebar-collapsed');
+                    }
+                }
             }
+
+            syncIcon();
 
                 // Floating Flyout untuk Sidebar Collapsed
                 function openFlyout(summary) {
@@ -212,9 +283,9 @@
                     popover.style.top = top + 'px';
                     popover.dataset.activeSummary = modulName;
 
-                    const closeBtn = popover.querySelector('#close-floating-popover');
-                    if (closeBtn) {
-                        closeBtn.addEventListener('click', closeFlyout);
+                    const tombolTutup = popover.querySelector('#close-floating-popover');
+                    if (tombolTutup) {
+                        tombolTutup.addEventListener('click', closeFlyout);
                     }
                 }
 
@@ -265,10 +336,9 @@
                 document.addEventListener('keydown', function(e) {
                     if (e.ctrlKey && e.key.toLowerCase() === 'b') {
                         e.preventDefault();
-                        toggleBtn.click();
+                        if (toggleBtn) toggleBtn.click();
                     }
                 });
-            }
 
             // Sidebar Search
             const searchInput = document.getElementById('sidebar-search');
