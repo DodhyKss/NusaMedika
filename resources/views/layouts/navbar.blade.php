@@ -54,20 +54,25 @@
                 @endif
             </button>
 
-            <div id="notifikasi-popover" class="hidden absolute right-0 top-full mt-2 w-[calc(100vw-1.5rem)] max-w-96 bg-white rounded-xl border border-slate-200 shadow-lg z-50 overflow-hidden">
-                <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between gap-2">
+            {{-- Popover memakai `fixed` terhadap viewport (bukan anchor ke tombol),
+                 karena posisi tombol lonceng di navbar berubah-ubah mengikuti isi
+                 navbar → di HP/tablet popover anchor absolute meluber keluar layar.
+                 `right-3` + `top-16` (= tinggi navbar) menjaga popover selalu
+                 terlihat & menempel di kanan. --}}
+            <div id="notifikasi-popover" class="hidden fixed right-3 top-16 w-[calc(100vw-1.5rem)] max-w-96 bg-white rounded-xl border border-slate-200 shadow-lg z-50 overflow-hidden">
+                <div class="px-4 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
                     <p class="text-xs font-bold text-slate-700 uppercase tracking-wider">Notifikasi</p>
                     @if ($jumlahNotifikasi)
-                        <form method="POST" action="{{ route('notifikasi.tutup_semua') }}" id="formTutupSemua">
+                        <form method="POST" action="{{ route('notifikasi.tutup_semua') }}" id="formTutupSemua" class="ml-auto">
                             @csrf
-                            <button type="submit" class="text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                            <button type="submit" class="text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap">
                                 Tandai semua dibaca
                             </button>
                         </form>
                     @endif
                 </div>
 
-                <div id="notifikasi-list" class="max-h-96 overflow-y-auto divide-y divide-slate-100">
+                <div id="notifikasi-list" class="max-h-80 sm:max-h-96 overflow-y-auto divide-y divide-slate-100">
                     @forelse ($notifikasiBelum as $penerima)
                         <div class="px-4 py-3 flex items-start gap-3 hover:bg-slate-50 transition-colors" data-notifikasi-item="{{ $penerima->notifikasi_id }}">
                             <span class="mt-1 w-2 h-2 rounded-full flex-shrink-0
@@ -80,8 +85,8 @@
                                 @endphp
                                 {{ $dotClass }}"></span>
                             <div class="flex-1 min-w-0">
-                                <p class="text-[13px] font-semibold text-slate-800 leading-snug">{{ $penerima->notifikasi->judul }}</p>
-                                <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">{{ $penerima->notifikasi->pesan }}</p>
+                                <p class="text-[13px] font-semibold text-slate-800 leading-snug break-words">{{ $penerima->notifikasi->judul }}</p>
+                                <p class="text-xs text-slate-500 mt-0.5 leading-relaxed break-words">{{ $penerima->notifikasi->pesan }}</p>
                                 <p class="text-[11px] text-slate-400 mt-1">
                                     {{ $penerima->notifikasi->input_time ? \Illuminate\Support\Carbon::parse($penerima->notifikasi->input_time)->diffForHumans() : '' }}
                                 </p>
@@ -111,7 +116,7 @@
                 <svg id="speedtest-icon" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
             </button>
 
-            <div id="speedtest-popover" class="hidden absolute right-0 top-full mt-2 w-[calc(100vw-1.5rem)] max-w-64 bg-white rounded-xl border border-slate-200 shadow-lg p-4 z-50">
+            <div id="speedtest-popover" class="hidden fixed right-3 top-16 w-[calc(100vw-1.5rem)] max-w-64 bg-white rounded-xl border border-slate-200 shadow-lg p-4 z-50">
                 <p class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Kecepatan Internet</p>
                 <div id="speedtest-status" class="hidden text-sm text-slate-500 flex items-center gap-2">
                     <span class="inline-block w-3 h-3 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin"></span>

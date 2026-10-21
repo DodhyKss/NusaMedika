@@ -126,6 +126,28 @@ docker compose restart app web                      # restart setelah ubah .env
 
 Semua command artisan tetap lewat container `app` (tidak ada PHP di host).
 
+### `docker compose down` tidak ALWAYS menghapus network
+
+Service `redis` & `queue` berada di **profile `redis`**. Tanpa profile, `docker compose down`
+hanya shut down `app`/`web`/`vite` — container `nusamedika_redis` & `nusamedika_queue`
+tetap hidup, memegang endpoint di network `nusamedika_default`, sehingga network
+**tidak bisa dihapus**:
+
+```
+Network nusamedika_default  Resource is still in use
+```
+
+Solusinya — pakai profile yang sama saat start:
+
+```bash
+docker compose --profile redis down          # hentikan SEMUA (termasuk redis & queue)
+docker compose --profile redis up -d --build # nyalakan lagi
+```
+
+Alternatif: set `COMPOSE_PROFILES=redis` di `.env` supaya profile aktif otomatis
+(cukup `docker compose up -d` / `down` tanpa flag) — tapi hati-hati, `up` juga akan
+menyalakan redis + queue walaupun `.env` masih memakai driver file/sync.
+
 ---
 
 ## 5. Catatan penting
